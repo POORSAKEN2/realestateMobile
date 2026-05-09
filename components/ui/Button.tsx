@@ -1,5 +1,7 @@
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 
+import { colors } from '../../constants/colors';
+
 type ButtonProps = {
   title: string;
   onPress: () => void;
@@ -15,10 +17,10 @@ export function Button({
 }: ButtonProps) {
   const buttonClassName =
     variant === 'primary'
-      ? 'bg-teal-500 active:bg-teal-600'
-      : 'border border-slate-600 bg-transparent active:bg-slate-800';
+      ? 'bg-primary active:opacity-90'
+      : 'border border-description bg-transparent active:bg-whitePrimary/10';
 
-  const textClassName = variant === 'primary' ? 'text-slate-950' : 'text-white';
+  const textClassName = variant === 'primary' ? 'text-whitePrimary' : 'text-whitePrimary';
 
   return (
     <Pressable
@@ -28,7 +30,9 @@ export function Button({
       onPress={onPress}
     >
       {isLoading ? (
-        <ActivityIndicator color={variant === 'primary' ? '#0f172a' : '#ffffff'} />
+        <ActivityIndicator
+          color={variant === 'primary' ? colors.whitePrimary : colors.whitePrimary}
+        />
       ) : (
         <Text className={`text-base font-semibold ${textClassName}`}>{title}</Text>
       )}

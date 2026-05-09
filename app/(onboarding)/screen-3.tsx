@@ -1,5 +1,5 @@
-import { OnboardingScreen } from '../../components/OnboardingScreen';
+import { OnboardingThree } from '../../components/onboarding/OnboardingThree';
 
 export default function OnboardingStepThree() {
-  return <OnboardingScreen index={2} nextHref="/(onboarding)/screen-4" />;
+  return <OnboardingThree />;
 }
