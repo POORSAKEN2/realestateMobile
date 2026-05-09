@@ -8,51 +8,51 @@ export type OnboardingContent = {
 export const onboardingScreens: OnboardingContent[] = [
   {
     eyebrow: 'Step 1 of 7',
-    title: 'Find properties faster',
+    title: 'RE.M. is Your Mobile Real Estate Manager',
     description:
       'Browse homes, units, and lots from a mobile workspace built for real estate searches.',
     accent: 'bg-teal-400',
   },
   {
     eyebrow: 'Step 2 of 7',
-    title: 'Compare listings clearly',
+    title: 'Keep Your Properties Organized',
     description:
-      'Keep price, location, size, and status easy to scan while you narrow down options.',
+      'Add your properties, update their details, and keep important information in one easy-to-access place.',
     accent: 'bg-sky-400',
   },
   {
     eyebrow: 'Step 3 of 7',
-    title: 'Track buyer interest',
+    title: 'Manage Tenants and Leases Easily',
     description:
-      'Stay close to inquiries and follow-ups so promising leads do not slip out of view.',
+      'You can track who’s renting, when leases start or end, and what needs your attention next.',
     accent: 'bg-amber-300',
   },
   {
     eyebrow: 'Step 4 of 7',
-    title: 'Save the right details',
+    title: 'Stay on Top of Expenses',
     description:
-      'Organize listing notes, contact context, and property highlights in one place.',
+      'R.E.M. helps you understand your expenses, check returns, and make better decisions for your properties.',
     accent: 'bg-rose-300',
   },
   {
     eyebrow: 'Step 5 of 7',
-    title: 'Plan showings with less friction',
+    title: 'Keep Everything in One Place',
     description:
-      'Prepare for visits with a cleaner view of property context before each appointment.',
+      'No more jumping between folders, notes, and spreadsheets. with R.E.M., you can manage documents, bookings, support requests, and updates in one clean workspace.',
     accent: 'bg-violet-300',
   },
   {
     eyebrow: 'Step 6 of 7',
-    title: 'Work from anywhere',
+    title: 'Set Your Dashboard Location',
     description:
-      'Use a focused mobile flow for field work, client conversations, and quick checks.',
+      'This helps R.E.M. show the right area, property activity, and location-based details when you open your dashboard.',
     accent: 'bg-lime-300',
   },
   {
     eyebrow: 'Step 7 of 7',
-    title: 'Start your real estate workspace',
+    title: 'You’re All Set',
     description:
-      'Your app foundation is ready. Continue to sign in and connect the next product pieces.',
+      'Start managing your properties, tenants, leases, expenses, and documents from one simple dashboard.',
     accent: 'bg-cyan-300',
   },
 ];

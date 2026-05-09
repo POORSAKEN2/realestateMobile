@@ -1,5 +1,5 @@
-import { OnboardingScreen } from '../../components/OnboardingScreen';
+import { OnboardingSeven } from '../../components/onboarding/OnboardingSeven';
 
 export default function OnboardingStepSeven() {
-  return <OnboardingScreen index={6} />;
+  return <OnboardingSeven />;
 }
