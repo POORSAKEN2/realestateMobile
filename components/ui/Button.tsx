@@ -18,9 +18,10 @@ export function Button({
   const buttonClassName =
     variant === 'primary'
       ? 'bg-primary active:opacity-90'
-      : 'border border-description bg-transparent active:bg-whitePrimary/10';
+      : 'border border-description bg-whitePrimary active:bg-slate-100';
 
-  const textClassName = variant === 'primary' ? 'text-whitePrimary' : 'text-whitePrimary';
+  const textClassName =
+    variant === 'primary' ? 'text-whitePrimary' : 'text-primary';
 
   return (
     <Pressable
@@ -31,7 +32,7 @@ export function Button({
     >
       {isLoading ? (
         <ActivityIndicator
-          color={variant === 'primary' ? colors.whitePrimary : colors.whitePrimary}
+          color={variant === 'primary' ? colors.whitePrimary : colors.primary}
         />
       ) : (
         <Text className={`text-base font-semibold ${textClassName}`}>{title}</Text>
