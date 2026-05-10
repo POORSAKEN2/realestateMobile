@@ -7,7 +7,10 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
 const extra = Constants.expoConfig?.extra as { apiBaseUrl?: string } | undefined;
 
 export const API_BASE_URL =
-  extra?.apiBaseUrl ?? process.env.EXPO_PUBLIC_API_BASE_URL ?? '';
+  extra?.apiBaseUrl ??
+  process.env.EXPO_PUBLIC_API_BASE_URL ??
+  process.env.VITE_API_BASE_URL ??
+  '';
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const url = path.startsWith('http') ? path : `${API_BASE_URL}${path}`;
