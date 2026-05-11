@@ -48,6 +48,12 @@ export type CreatePropertyPayload = {
   is_transient_bookable?: boolean;
   description?: string;
   area?: string;
+  image?: {
+    uri: string;
+    name: string;
+    type: string;
+    file?: Blob;
+  };
 };
 
 const DEFAULT_PROPERTY_IMAGE =
@@ -196,11 +202,32 @@ export async function createProperty(
   payload: CreatePropertyPayload,
   accessToken?: string,
 ) {
+  const { image, ...propertyFields } = payload;
+  const body = image ? toPropertyFormData(propertyFields, image) : payload;
   const response = await apiClient.post<ApiEnvelope<Property> | Property>(
     "/properties",
-    payload,
+    body,
     { headers: authHeaders(accessToken) },
   );
 
   return normalizeProperty(unwrapData<Property>(response));
+}
+
+function toPropertyFormData(
+  payload: Omit<CreatePropertyPayload, "image">,
+  image: NonNullable<CreatePropertyPayload["image"]>,
+) {
+  const formData = new FormData();
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    formData.append(
+      key,
+      typeof value === "boolean" ? (value ? "1" : "0") : String(value),
+    );
+  });
+
+  formData.append("images[]", (image.file ?? image) as unknown as Blob);
+
+  return formData;
 }

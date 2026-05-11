@@ -1,12 +1,23 @@
-import { Image, ImageBackground, Text, TextInput, View, TouchableOpacity, Dimensions, Platform, Modal, Pressable, ScrollView } from 'react-native';
+import {
+  Image,
+  ImageBackground,
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+  Dimensions,
+  Platform,
+  Modal,
+  Pressable,
+  ScrollView,
+} from "react-native";
 import { BlurView } from "expo-blur";
 import { GlassView } from "expo-glass-effect";
-import { Stack } from "expo-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Screen } from '../../components/ui/Screen';
-import Ionicons from '@expo/vector-icons/build/Ionicons';
-import Feather from '@expo/vector-icons/Feather';
+import { Screen } from "../../components/ui/Screen";
+import Ionicons from "@expo/vector-icons/build/Ionicons";
+import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   fetchPortfolioHistory,
@@ -130,7 +141,9 @@ export default function DashboardScreen() {
   const [assetSortOrder, setAssetSortOrder] = useState<AssetSortOrder>("desc");
   const [assetStatusFilter, setAssetStatusFilter] =
     useState<AssetStatusFilter>("ALL");
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
+    null,
+  );
   const { data: stats, isLoading: isLoadingStats } = useQuery({
     queryKey: ["analytics", "stats", accessToken],
     queryFn: () => fetchPortfolioStats(accessToken),
@@ -153,12 +166,13 @@ export default function DashboardScreen() {
     queryFn: () => fetchLessees(accessToken),
     enabled: !!selectedProperty,
   });
-  const { data: propertyDocuments = [], isLoading: isLoadingDocuments } = useQuery({
-    queryKey: ["documents", accessToken, selectedProperty?.id],
-    queryFn: () =>
-      fetchDocuments(accessToken, { propertyId: selectedProperty?.id }),
-    enabled: !!selectedProperty,
-  });
+  const { data: propertyDocuments = [], isLoading: isLoadingDocuments } =
+    useQuery({
+      queryKey: ["documents", accessToken, selectedProperty?.id],
+      queryFn: () =>
+        fetchDocuments(accessToken, { propertyId: selectedProperty?.id }),
+      enabled: !!selectedProperty,
+    });
 
   const { height } = Dimensions.get("window");
   const floatingCardHeight = Math.min(Math.max(height * 0.28, 230), 340);
@@ -220,7 +234,13 @@ export default function DashboardScreen() {
 
         return assetSortOrder === "asc" ? valueA - valueB : valueB - valueA;
       });
-  }, [assetSearchQuery, assetSortBy, assetSortOrder, assetStatusFilter, properties]);
+  }, [
+    assetSearchQuery,
+    assetSortBy,
+    assetSortOrder,
+    assetStatusFilter,
+    properties,
+  ]);
   const selectedPropertyLeases = useMemo(() => {
     if (!selectedProperty) return [];
 
@@ -230,7 +250,8 @@ export default function DashboardScreen() {
     if (!selectedProperty) return [];
 
     return propertyDocuments.filter(
-      (document) => !document.propertyId || document.propertyId === selectedProperty.id,
+      (document) =>
+        !document.propertyId || document.propertyId === selectedProperty.id,
     );
   }, [propertyDocuments, selectedProperty]);
   const selectedPropertyTenantCount = useMemo(
@@ -250,16 +271,26 @@ export default function DashboardScreen() {
     tone: "positive" | "negative" = "positive",
   ) => {
     if (isLoadingAnalytics) {
-      return <Text className="mt-1 text-[10px] font-medium text-zinc-400">Loading</Text>;
+      return (
+        <Text className="mt-1 text-[10px] font-medium text-zinc-400">
+          Loading
+        </Text>
+      );
     }
 
     if (!trend) {
-      return <Text className="mt-1 text-[10px] font-medium text-zinc-400">No prior data</Text>;
+      return (
+        <Text className="mt-1 text-[10px] font-medium text-zinc-400">
+          No prior data
+        </Text>
+      );
     }
 
     const isUp = trend.direction === "up";
     const isFavorable =
-      tone === "positive" ? trend.direction === "up" : trend.direction === "down";
+      tone === "positive"
+        ? trend.direction === "up"
+        : trend.direction === "down";
     const colorClass = isFavorable ? "text-emerald-600" : "text-rose-600";
 
     return (
@@ -269,7 +300,7 @@ export default function DashboardScreen() {
           size={12}
           color={isFavorable ? "#059669" : "#e11d48"}
         />
-        <Text className={`text-[10px] font-soraSemiBold ${colorClass}`}>
+        <Text className={`font-soraSemiBold text-[10px] ${colorClass}`}>
           {trend.value}
         </Text>
       </View>
@@ -325,17 +356,14 @@ export default function DashboardScreen() {
 
   return (
     <Screen className="flex-1 bg-white">
-      <Stack.Screen options={{ headerShown: false }} />
       <ImageBackground
         source={require("../../assets/images/dashboard.webp")}
         resizeMode="cover"
         className="-mx-6 -mt-6 overflow-hidden px-6 pt-6"
-         style={{
-            height: height * 0.3,
-            width: "auto",
-          }}
-      
-       
+        style={{
+          height: height * 0.3,
+          width: "auto",
+        }}
       >
         <View className="absolute inset-0 bg-black/25" />
 
@@ -357,7 +385,10 @@ export default function DashboardScreen() {
             </View>
 
             <View className="min-w-0 flex-1">
-              <Text className="text-base font-semibold text-white" numberOfLines={1}>
+              <Text
+                className="text-base font-semibold text-white"
+                numberOfLines={1}
+              >
                 {capitalizeWords(displayName)}
               </Text>
 
@@ -410,322 +441,372 @@ export default function DashboardScreen() {
             )}
           </TouchableOpacity>
         </View>
-      
       </ImageBackground>
       <View
         className="-mt-44 w-full rounded-[28px] border border-white/80 bg-[#fffafa]"
-          style={{
+        style={{
           height: floatingCardHeight,
-            padding: floatingCardPadding,
-            alignSelf: "stretch",
-            zIndex: 10,
-            shadowColor: "rgba(15,23,42,0.28)",
-            shadowOffset: { width: 0, height: 17 },
-            shadowOpacity: 0.22,
-            shadowRadius: 24,
-            elevation: 12,
-          }}
+          padding: floatingCardPadding,
+          alignSelf: "stretch",
+          zIndex: 10,
+          shadowColor: "rgba(15,23,42,0.28)",
+          shadowOffset: { width: 0, height: 17 },
+          shadowOpacity: 0.22,
+          shadowRadius: 24,
+          elevation: 12,
+        }}
+      >
+        <View
+          className="mb-2 flex-row items-center justify-between"
+          style={{ height: analyticsHeaderHeight }}
         >
+          <Text className="font-soraMedium">Analytics Overview</Text>
 
-          <View
-            className="mb-2 flex-row items-center justify-between"
-            style={{ height: analyticsHeaderHeight }}
+          <TouchableOpacity
+            activeOpacity={0.72}
+            accessibilityRole="button"
+            accessibilityLabel="Open analytics menu"
+            hitSlop={8}
+            className="h-9 w-9 items-center justify-center rounded-full bg-white/80"
           >
-            <Text className="font-soraMedium">Analytics Overview</Text>
-
-            <TouchableOpacity
-              activeOpacity={0.72}
-              accessibilityRole="button"
-              accessibilityLabel="Open analytics menu"
-              hitSlop={8}
-              className="h-9 w-9 items-center justify-center rounded-full bg-white/80"
-            >
-              <Feather name="more-horizontal" size={20} color="#52525b" />
-            </TouchableOpacity>
-          </View>
-          <View className="-m-1 flex-row flex-wrap">
-            <View className="w-1/2 p-1">
+            <Feather name="more-horizontal" size={20} color="#52525b" />
+          </TouchableOpacity>
+        </View>
+        <View className="-m-1 flex-row flex-wrap">
+          <View className="w-1/2 p-1">
             <View
               className="rounded-2xl border border-teal-100/70 bg-white/80 p-2.5"
               style={{ height: metricTileHeight }}
             >
-                <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
-              <Ionicons name="wallet-outline" size={20} color="#0f766e" />
-            </View>
-              <Text className="text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
-                {isLoadingAnalytics ? "..." : formatPesoValue(stats?.total_value)}
-              </Text>
-              <Text className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500" numberOfLines={2}>
-              Total Asset Value
-            </Text>
+              <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
+                <Ionicons name="wallet-outline" size={20} color="#0f766e" />
               </View>
+              <Text
+                className="text-lg font-bold text-zinc-950"
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {isLoadingAnalytics
+                  ? "..."
+                  : formatPesoValue(stats?.total_value)}
+              </Text>
+              <Text
+                className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500"
+                numberOfLines={2}
+              >
+                Total Asset Value
+              </Text>
             </View>
+          </View>
 
-            <View className="w-1/2 p-1">
+          <View className="w-1/2 p-1">
             <View
               className="rounded-2xl border border-sky-100/80 bg-white/80 p-2.5"
               style={{ height: metricTileHeight }}
             >
-                <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-sky-50">
-              <Feather name="percent" size={20} color="#0f766e" />
-            </View>
-              <Text className="text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
-                {isLoadingAnalytics ? "..." : `${stats?.avg_yield ?? 0}%`}
-              </Text>
-              <Text className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500" numberOfLines={2}>
-              Average Yield
-            </Text>
+              <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-sky-50">
+                <Feather name="percent" size={20} color="#0f766e" />
               </View>
+              <Text
+                className="text-lg font-bold text-zinc-950"
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                 {isLoadingAnalytics ? "..." : `${Number(stats?.avg_yield ?? 0).toFixed(1)}%`}
+              </Text>
+              <Text
+                className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500"
+                numberOfLines={2}
+              >
+                Average Yield
+              </Text>
             </View>
+          </View>
 
-            <View className="w-1/2 p-1">
+          <View className="w-1/2 p-1">
             <View
               className="rounded-2xl border border-emerald-100/80 bg-white/80 p-2.5"
               style={{ height: metricTileHeight }}
             >
-                <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-emerald-50">
-              <MaterialCommunityIcons name="cash-clock" size={20} color="#16A34A" />
-            </View>
-              <Text className="text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
-                {isLoadingAnalytics ? "..." : formatPesoValue(stats?.total_arrears)}
-              </Text>
-              <Text className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500" numberOfLines={2}>
-              Total Arrears
-            </Text>
+              <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-emerald-50">
+                <MaterialCommunityIcons
+                  name="cash-clock"
+                  size={20}
+                  color="#16A34A"
+                />
               </View>
+              <Text
+                className="text-lg font-bold text-zinc-950"
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {isLoadingAnalytics
+                  ? "..."
+                  : formatPesoValue(stats?.total_arrears)}
+              </Text>
+              <Text
+                className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500"
+                numberOfLines={2}
+              >
+                Total Arrears
+              </Text>
             </View>
+          </View>
 
-            <View className="w-1/2 p-1">
+          <View className="w-1/2 p-1">
             <View
               className="rounded-2xl border border-teal-100/70 bg-white/80 p-2.5"
               style={{ height: metricTileHeight }}
             >
-                <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
-                <MaterialCommunityIcons name="chart-line" size={20} color="#16A34A" />
-            </View>
-              <Text className="text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
+              <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
+                <MaterialCommunityIcons
+                  name="chart-line"
+                  size={20}
+                  color="#16A34A"
+                />
+              </View>
+              <Text
+                className="text-lg font-bold text-zinc-950"
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
                 {isLoadingAnalytics
                   ? "..."
                   : formatPesoValue(stats?.net_operating_income)}
               </Text>
-              <Text className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500" numberOfLines={2}>
-              Net Operating Income
-            </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-      <View className='my-5'>
-          <Text className='font-soraSemiBold'>Portfolio Assets</Text>
-          <Text className='font-regular text-description'>High-value holdings</Text>
-        </View>
-
-        <View className="rounded-[22px] border border-teal-100 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
-          <View className="flex-row items-center gap-3">
-            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-teal-50">
-              <Feather name="search" size={20} color="#0f766e" />
-            </View>
-
-            <View className="min-w-0 flex-1">
-              <Text className="mb-0.5 text-[11px] font-soraSemiBold uppercase text-teal-700">
-                Find property
+              <Text
+                className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500"
+                numberOfLines={2}
+              >
+                Net Operating Income
               </Text>
-              <TextInput
-                accessibilityLabel="Search portfolio assets"
-                className="h-7 p-0 font-soraMedium text-sm text-zinc-950"
-                placeholder="Location, unit, tenant, or asset"
-                placeholderTextColor="#94a3b8"
-                returnKeyType="search"
-                value={assetSearchQuery}
-                onChangeText={setAssetSearchQuery}
-              />
             </View>
-
-            <TouchableOpacity
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel={
-                showAssetFilters ? "Close search filters" : "Open search filters"
-              }
-              onPress={() =>
-                setShowAssetFilters((current) => {
-                  if (current) {
-                    setAssetStatusFilter("ALL");
-                  }
-
-                  return !current;
-                })
-              }
-              className={`h-11 w-11 items-center justify-center rounded-2xl ${
-                showAssetFilters ? "bg-teal-50" : "bg-[#0f766e]"
-              }`}
-            >
-              <Feather
-                name="sliders"
-                size={18}
-                color={showAssetFilters ? "#0f766e" : "#ffffff"}
-              />
-            </TouchableOpacity>
           </View>
-
-          {showAssetFilters && (
-            <View className="mt-4 gap-3 border-t border-teal-50 pt-3">
-              <View>
-                <Text className="mb-2 text-[10px] font-soraSemiBold uppercase text-zinc-400">
-                  Sort by
-                </Text>
-                <View className="flex-row gap-2">
-                  {(["value", "roi", "name"] as AssetSortBy[]).map((sortKey) => {
-                    const isActive = assetSortBy === sortKey;
-                    const label =
-                      sortKey === "value" ? "Value" : sortKey === "roi" ? "ROI" : "Name";
-
-                    return (
-                      <TouchableOpacity
-                        key={sortKey}
-                        activeOpacity={0.75}
-                        accessibilityRole="button"
-                        accessibilityLabel={`Sort assets by ${label}`}
-                        onPress={() => {
-                          if (assetSortBy === sortKey) {
-                            setAssetSortOrder((current) =>
-                              current === "desc" ? "asc" : "desc",
-                            );
-                          } else {
-                            setAssetSortBy(sortKey);
-                            setAssetSortOrder(sortKey === "name" ? "asc" : "desc");
-                          }
-                        }}
-                        className={`flex-row items-center gap-1 rounded-full px-3 py-1.5 ${
-                          isActive ? "bg-[#0f766e]" : "bg-zinc-50"
-                        }`}
-                      >
-                        <Text
-                          className={`text-[11px] font-soraSemiBold ${
-                            isActive ? "text-white" : "text-zinc-500"
-                          }`}
-                        >
-                          {label}
-                        </Text>
-                        {isActive && (
-                          <Feather
-                            name={assetSortOrder === "desc" ? "arrow-down" : "arrow-up"}
-                            size={11}
-                            color="#ffffff"
-                          />
-                        )}
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-
-              <View>
-                <Text className="mb-2 text-[10px] font-soraSemiBold uppercase text-zinc-400">
-                  Status
-                </Text>
-                <View className="flex-row flex-wrap gap-2">
-                  {assetStatusFilters.map((status) => {
-                    const isActive = assetStatusFilter === status;
-                    const label =
-                      status === "ALL" ? "All" : formatPropertyStatus(status);
-
-                    return (
-                      <TouchableOpacity
-                        key={status}
-                        activeOpacity={0.75}
-                        accessibilityRole="button"
-                        accessibilityLabel={`Show ${label} assets`}
-                        onPress={() => setAssetStatusFilter(status)}
-                        className={`rounded-full px-3 py-1.5 ${
-                          isActive ? "bg-teal-50" : "bg-zinc-50"
-                        }`}
-                      >
-                        <Text
-                          className={`text-[10px] font-soraSemiBold ${
-                            isActive ? "text-teal-700" : "text-zinc-500"
-                          }`}
-                        >
-                          {label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-            </View>
-          )}
         </View>
-          <View className="mt-4 gap-3">
-            {isLoadingProperties ? (
-              Array.from({ length: 2 }).map((_, index) => (
-                <View
-                  key={index}
-                  className="h-24 rounded-2xl border border-zinc-100 bg-zinc-50"
-                />
-              ))
-            ) : visibleAssets.length > 0 ? (
-              visibleAssets.map((property) => (
-                <TouchableOpacity
-                  key={property.id}
-                  activeOpacity={0.82}
-                  accessibilityRole="button"
-                  accessibilityLabel={`View ${property.title}`}
-                  onPress={() => setSelectedProperty(property)}
-                  className="flex-row gap-3 rounded-2xl border border-zinc-100 bg-white p-2.5"
-                >
-                  <Image
-                    source={{ uri: property.image }}
-                    className="h-20 w-20 rounded-xl bg-zinc-100"
-                    resizeMode="cover"
-                  />
+      </View>
 
-                  <View className="min-w-0 flex-1 justify-between py-0.5">
-                    <View>
-                      <View className="flex-row items-start justify-between gap-2">
-                        <Text
-                          className="min-w-0 flex-1 font-soraSemiBold text-sm text-zinc-950"
-                          numberOfLines={1}
-                        >
-                          {property.title}
-                        </Text>
-                        <Text className="rounded-full bg-teal-50 px-2 py-0.5 text-[9px] font-soraSemiBold uppercase text-teal-700">
-                          {property.roi}% ROI
-                        </Text>
-                      </View>
+      <View className="my-5">
+        <Text className="font-soraSemiBold">Portfolio Assets</Text>
+        <Text className="font-regular text-description">
+          High-value holdings
+        </Text>
+      </View>
 
-                      <View className="mt-1 flex-row items-center gap-1">
-                        <Feather name="map-pin" size={11} color="#71717a" />
-                        <Text
-                          className="min-w-0 flex-1 text-[11px] text-zinc-500"
-                          numberOfLines={1}
-                        >
-                          {property.location}
-                        </Text>
-                      </View>
-                    </View>
-
-                    <View className="flex-row items-center justify-between">
-                      <Text className="text-[11px] font-soraMedium text-zinc-500">
-                        {formatPropertyStatus(property.status)}
-                      </Text>
-                      <Text className="font-soraSemiBold text-xs text-zinc-950">
-                        {formatPesoValue(property.value)}
-                      </Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))
-            ) : (
-              <View className="items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-6">
-                <Feather name="search" size={22} color="#a1a1aa" />
-                <Text className="mt-2 text-xs font-soraMedium text-zinc-500">
-                  No assets found
-                </Text>
-              </View>
-            )}
+      <View className="rounded-[22px] border border-teal-100 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
+        <View className="flex-row items-center gap-3">
+          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-teal-50">
+            <Feather name="search" size={20} color="#0f766e" />
           </View>
+
+          <View className="min-w-0 flex-1">
+            <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-teal-700">
+              Find property
+            </Text>
+            <TextInput
+              accessibilityLabel="Search portfolio assets"
+              className="h-7 p-0 font-soraMedium text-sm text-zinc-950"
+              placeholder="Location, unit, tenant, or asset"
+              placeholderTextColor="#94a3b8"
+              returnKeyType="search"
+              value={assetSearchQuery}
+              onChangeText={setAssetSearchQuery}
+            />
+          </View>
+
+          <TouchableOpacity
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel={
+              showAssetFilters ? "Close search filters" : "Open search filters"
+            }
+            onPress={() =>
+              setShowAssetFilters((current) => {
+                if (current) {
+                  setAssetStatusFilter("ALL");
+                }
+
+                return !current;
+              })
+            }
+            className={`h-11 w-11 items-center justify-center rounded-2xl ${
+              showAssetFilters ? "bg-teal-50" : "bg-[#0f766e]"
+            }`}
+          >
+            <Feather
+              name="sliders"
+              size={18}
+              color={showAssetFilters ? "#0f766e" : "#ffffff"}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {showAssetFilters && (
+          <View className="mt-4 gap-3 border-t border-teal-50 pt-3">
+            <View>
+              <Text className="mb-2 font-soraSemiBold text-[10px] uppercase text-zinc-400">
+                Sort by
+              </Text>
+              <View className="flex-row gap-2">
+                {(["value", "roi", "name"] as AssetSortBy[]).map((sortKey) => {
+                  const isActive = assetSortBy === sortKey;
+                  const label =
+                    sortKey === "value"
+                      ? "Value"
+                      : sortKey === "roi"
+                        ? "ROI"
+                        : "Name";
+
+                  return (
+                    <TouchableOpacity
+                      key={sortKey}
+                      activeOpacity={0.75}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Sort assets by ${label}`}
+                      onPress={() => {
+                        if (assetSortBy === sortKey) {
+                          setAssetSortOrder((current) =>
+                            current === "desc" ? "asc" : "desc",
+                          );
+                        } else {
+                          setAssetSortBy(sortKey);
+                          setAssetSortOrder(
+                            sortKey === "name" ? "asc" : "desc",
+                          );
+                        }
+                      }}
+                      className={`flex-row items-center gap-1 rounded-full px-3 py-1.5 ${
+                        isActive ? "bg-[#0f766e]" : "bg-zinc-50"
+                      }`}
+                    >
+                      <Text
+                        className={`font-soraSemiBold text-[11px] ${
+                          isActive ? "text-white" : "text-zinc-500"
+                        }`}
+                      >
+                        {label}
+                      </Text>
+                      {isActive && (
+                        <Feather
+                          name={
+                            assetSortOrder === "desc"
+                              ? "arrow-down"
+                              : "arrow-up"
+                          }
+                          size={11}
+                          color="#ffffff"
+                        />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
+            <View>
+              <Text className="mb-2 font-soraSemiBold text-[10px] uppercase text-zinc-400">
+                Status
+              </Text>
+              <View className="flex-row flex-wrap gap-2">
+                {assetStatusFilters.map((status) => {
+                  const isActive = assetStatusFilter === status;
+                  const label =
+                    status === "ALL" ? "All" : formatPropertyStatus(status);
+
+                  return (
+                    <TouchableOpacity
+                      key={status}
+                      activeOpacity={0.75}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Show ${label} assets`}
+                      onPress={() => setAssetStatusFilter(status)}
+                      className={`rounded-full px-3 py-1.5 ${
+                        isActive ? "bg-teal-50" : "bg-zinc-50"
+                      }`}
+                    >
+                      <Text
+                        className={`font-soraSemiBold text-[10px] ${
+                          isActive ? "text-teal-700" : "text-zinc-500"
+                        }`}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          </View>
+        )}
+      </View>
+      <View className="mt-4 gap-3">
+        {isLoadingProperties ? (
+          Array.from({ length: 2 }).map((_, index) => (
+            <View
+              key={index}
+              className="h-24 rounded-2xl border border-zinc-100 bg-zinc-50"
+            />
+          ))
+        ) : visibleAssets.length > 0 ? (
+          visibleAssets.map((property) => (
+            <TouchableOpacity
+              key={property.id}
+              activeOpacity={0.82}
+              accessibilityRole="button"
+              accessibilityLabel={`View ${property.title}`}
+              onPress={() => setSelectedProperty(property)}
+              className="flex-row gap-3 rounded-2xl border border-zinc-100 bg-white p-2.5"
+            >
+              <Image
+                source={{ uri: property.image }}
+                className="h-20 w-20 rounded-xl bg-zinc-100"
+                resizeMode="cover"
+              />
+
+              <View className="min-w-0 flex-1 justify-between py-0.5">
+                <View>
+                  <View className="flex-row items-start justify-between gap-2">
+                    <Text
+                      className="min-w-0 flex-1 font-soraSemiBold text-sm text-zinc-950"
+                      numberOfLines={1}
+                    >
+                      {property.title}
+                    </Text>
+                    <Text className="rounded-full bg-teal-50 px-2 py-0.5 font-soraSemiBold text-[9px] uppercase text-teal-700">
+                      {property.roi}% ROI
+                    </Text>
+                  </View>
+
+                  <View className="mt-1 flex-row items-center gap-1">
+                    <Feather name="map-pin" size={11} color="#71717a" />
+                    <Text
+                      className="min-w-0 flex-1 text-[11px] text-zinc-500"
+                      numberOfLines={1}
+                    >
+                      {property.location}
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="flex-row items-center justify-between">
+                  <Text className="font-soraMedium text-[11px] text-zinc-500">
+                    {formatPropertyStatus(property.status)}
+                  </Text>
+                  <Text className="font-soraSemiBold text-xs text-zinc-950">
+                    {formatPesoValue(property.value)}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <View className="items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-6">
+            <Feather name="search" size={22} color="#a1a1aa" />
+            <Text className="mt-2 font-soraMedium text-xs text-zinc-500">
+              No assets found
+            </Text>
+          </View>
+        )}
+      </View>
       <Modal
         visible={!!selectedProperty}
         transparent
@@ -746,7 +827,7 @@ export default function DashboardScreen() {
               className="overflow-hidden rounded-t-[30px] bg-white"
               style={{ maxHeight: height * 0.86 }}
             >
-              <View className="h-1.5 w-12 self-center rounded-full bg-zinc-200 mt-3" />
+              <View className="mt-3 h-1.5 w-12 self-center rounded-full bg-zinc-200" />
 
               <ScrollView
                 bounces={false}
@@ -772,20 +853,25 @@ export default function DashboardScreen() {
                   </TouchableOpacity>
 
                   <View className="absolute bottom-5 left-5 right-5">
-                    <Text className="self-start rounded-md bg-teal-600 px-2 py-1 text-[10px] font-soraSemiBold uppercase text-white">
+                    <Text className="self-start rounded-md bg-teal-600 px-2 py-1 font-soraSemiBold text-[10px] uppercase text-white">
                       {formatPropertyStatus(selectedProperty.status)}
                     </Text>
                     <Text
-                      className="mt-2 text-2xl font-soraSemiBold text-white"
+                      className="mt-2 font-soraSemiBold text-2xl text-white"
                       numberOfLines={2}
                     >
                       {selectedProperty.title}
                     </Text>
                     <View className="mt-1 flex-row items-center gap-1">
                       <Feather name="map-pin" size={13} color="#ffffff" />
-                      <Text className="min-w-0 flex-1 text-xs text-white/80" numberOfLines={1}>
+                      <Text
+                        className="min-w-0 flex-1 text-xs text-white/80"
+                        numberOfLines={1}
+                      >
                         {selectedProperty.location}
-                        {selectedProperty.country ? `, ${selectedProperty.country}` : ""}
+                        {selectedProperty.country
+                          ? `, ${selectedProperty.country}`
+                          : ""}
                       </Text>
                     </View>
                   </View>
@@ -795,7 +881,7 @@ export default function DashboardScreen() {
                   <View className="flex-row flex-wrap">
                     <View className="w-1/2 p-1.5">
                       <View className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
-                        <Text className="text-[10px] font-soraSemiBold uppercase text-zinc-400">
+                        <Text className="font-soraSemiBold text-[10px] uppercase text-zinc-400">
                           Market Value
                         </Text>
                         <Text className="mt-1 text-xl font-bold text-zinc-950">
@@ -806,21 +892,25 @@ export default function DashboardScreen() {
 
                     <View className="w-1/2 p-1.5">
                       <View className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3">
-                        <Text className="text-[10px] font-soraSemiBold uppercase text-emerald-700/70">
+                        <Text className="font-soraSemiBold text-[10px] uppercase text-emerald-700/70">
                           Annual ROI
                         </Text>
                         <View className="mt-1 flex-row items-center gap-1">
                           <Text className="text-xl font-bold text-emerald-700">
                             {selectedProperty.roi}%
                           </Text>
-                          <Feather name="trending-up" size={16} color="#047857" />
+                          <Feather
+                            name="trending-up"
+                            size={16}
+                            color="#047857"
+                          />
                         </View>
                       </View>
                     </View>
 
                     <View className="w-1/2 p-1.5">
                       <View className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
-                        <Text className="text-[10px] font-soraSemiBold uppercase text-zinc-400">
+                        <Text className="font-soraSemiBold text-[10px] uppercase text-zinc-400">
                           {selectedProperty.occupancy !== undefined
                             ? "Occupancy"
                             : selectedProperty.bedrooms
@@ -832,17 +922,21 @@ export default function DashboardScreen() {
                             ? `${selectedProperty.occupancy}%`
                             : selectedProperty.bedrooms
                               ? `${selectedProperty.bedrooms} BR / ${selectedProperty.bathrooms ?? 0} BA`
-                              : selectedProperty.type ?? "N/A"}
+                              : (selectedProperty.type ?? "N/A")}
                         </Text>
                       </View>
                     </View>
 
                     <View className="w-1/2 p-1.5">
                       <View className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
-                        <Text className="text-[10px] font-soraSemiBold uppercase text-zinc-400">
+                        <Text className="font-soraSemiBold text-[10px] uppercase text-zinc-400">
                           Status
                         </Text>
-                        <Text className="mt-1 text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
+                        <Text
+                          className="mt-1 text-lg font-bold text-zinc-950"
+                          numberOfLines={1}
+                          adjustsFontSizeToFit
+                        >
                           {formatPropertyStatus(selectedProperty.status)}
                         </Text>
                       </View>
@@ -853,30 +947,34 @@ export default function DashboardScreen() {
                     <View className="flex-1 rounded-2xl border border-teal-100 bg-teal-50 p-4">
                       <View className="flex-row items-center gap-2">
                         <Feather name="users" size={16} color="#0f766e" />
-                        <Text className="text-[10px] font-soraSemiBold uppercase text-teal-700">
+                        <Text className="font-soraSemiBold text-[10px] uppercase text-teal-700">
                           Tenants
                         </Text>
                       </View>
                       <Text className="mt-2 text-2xl font-bold text-zinc-950">
-                        {isLoadingPropertyDetails ? "..." : selectedPropertyTenantCount}
+                        {isLoadingPropertyDetails
+                          ? "..."
+                          : selectedPropertyTenantCount}
                       </Text>
                     </View>
 
                     <View className="flex-1 rounded-2xl border border-sky-100 bg-sky-50 p-4">
                       <View className="flex-row items-center gap-2">
                         <Feather name="file-text" size={16} color="#0369a1" />
-                        <Text className="text-[10px] font-soraSemiBold uppercase text-sky-700">
+                        <Text className="font-soraSemiBold text-[10px] uppercase text-sky-700">
                           Documents
                         </Text>
                       </View>
                       <Text className="mt-2 text-2xl font-bold text-zinc-950">
-                        {isLoadingPropertyDetails ? "..." : selectedPropertyDocuments.length}
+                        {isLoadingPropertyDetails
+                          ? "..."
+                          : selectedPropertyDocuments.length}
                       </Text>
                     </View>
                   </View>
 
                   <View className="mt-6 border-t border-zinc-100 pt-5">
-                    <Text className="text-xs font-soraSemiBold uppercase text-zinc-400">
+                    <Text className="font-soraSemiBold text-xs uppercase text-zinc-400">
                       Current Tenants
                     </Text>
                     <View className="mt-3 gap-2">
@@ -895,14 +993,21 @@ export default function DashboardScreen() {
                             >
                               <View className="flex-row items-start justify-between gap-2">
                                 <View className="min-w-0 flex-1">
-                                  <Text className="font-soraSemiBold text-sm text-zinc-950" numberOfLines={1}>
+                                  <Text
+                                    className="font-soraSemiBold text-sm text-zinc-950"
+                                    numberOfLines={1}
+                                  >
                                     {lessee?.name ?? "Linked tenant"}
                                   </Text>
-                                  <Text className="mt-0.5 text-[11px] text-zinc-500" numberOfLines={1}>
-                                    {getLeaseRoomNumber(lease.roomNumber)} | {lease.startDate} to {lease.endDate}
+                                  <Text
+                                    className="mt-0.5 text-[11px] text-zinc-500"
+                                    numberOfLines={1}
+                                  >
+                                    {getLeaseRoomNumber(lease.roomNumber)} |{" "}
+                                    {lease.startDate} to {lease.endDate}
                                   </Text>
                                 </View>
-                                <Text className="rounded-full bg-white px-2 py-0.5 text-[9px] font-soraSemiBold uppercase text-zinc-500">
+                                <Text className="rounded-full bg-white px-2 py-0.5 font-soraSemiBold text-[9px] uppercase text-zinc-500">
                                   {lease.status}
                                 </Text>
                               </View>
@@ -911,7 +1016,7 @@ export default function DashboardScreen() {
                         })
                       ) : (
                         <View className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5">
-                          <Text className="text-xs font-soraMedium text-zinc-500">
+                          <Text className="font-soraMedium text-xs text-zinc-500">
                             No tenants linked to this property.
                           </Text>
                         </View>
@@ -920,7 +1025,7 @@ export default function DashboardScreen() {
                   </View>
 
                   <View className="mt-6 border-t border-zinc-100 pt-5">
-                    <Text className="text-xs font-soraSemiBold uppercase text-zinc-400">
+                    <Text className="font-soraSemiBold text-xs uppercase text-zinc-400">
                       Property Documents
                     </Text>
                     <View className="mt-3 gap-2">
@@ -933,13 +1038,23 @@ export default function DashboardScreen() {
                             className="flex-row items-center gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
                           >
                             <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
-                              <Feather name="file-text" size={17} color="#0f766e" />
+                              <Feather
+                                name="file-text"
+                                size={17}
+                                color="#0f766e"
+                              />
                             </View>
                             <View className="min-w-0 flex-1">
-                              <Text className="font-soraSemiBold text-sm text-zinc-950" numberOfLines={1}>
+                              <Text
+                                className="font-soraSemiBold text-sm text-zinc-950"
+                                numberOfLines={1}
+                              >
                                 {document.name}
                               </Text>
-                              <Text className="mt-0.5 text-[11px] text-zinc-500" numberOfLines={1}>
+                              <Text
+                                className="mt-0.5 text-[11px] text-zinc-500"
+                                numberOfLines={1}
+                              >
                                 {document.category} | {document.size}
                               </Text>
                             </View>
@@ -947,7 +1062,7 @@ export default function DashboardScreen() {
                         ))
                       ) : (
                         <View className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5">
-                          <Text className="text-xs font-soraMedium text-zinc-500">
+                          <Text className="font-soraMedium text-xs text-zinc-500">
                             No documents attached to this property.
                           </Text>
                         </View>
@@ -961,10 +1076,13 @@ export default function DashboardScreen() {
                         <Feather name="maximize-2" size={15} color="#52525b" />
                       </View>
                       <View className="min-w-0 flex-1">
-                        <Text className="text-[9px] font-soraSemiBold uppercase text-zinc-400">
+                        <Text className="font-soraSemiBold text-[9px] uppercase text-zinc-400">
                           Total Area
                         </Text>
-                        <Text className="text-xs font-soraSemiBold text-zinc-950" numberOfLines={1}>
+                        <Text
+                          className="font-soraSemiBold text-xs text-zinc-950"
+                          numberOfLines={1}
+                        >
                           {selectedProperty.area || "N/A"}
                         </Text>
                       </View>
@@ -975,10 +1093,10 @@ export default function DashboardScreen() {
                         <Feather name="zap" size={15} color="#52525b" />
                       </View>
                       <View className="min-w-0 flex-1">
-                        <Text className="text-[9px] font-soraSemiBold uppercase text-zinc-400">
+                        <Text className="font-soraSemiBold text-[9px] uppercase text-zinc-400">
                           Utility Score
                         </Text>
-                        <Text className="text-xs font-soraSemiBold text-zinc-950">
+                        <Text className="font-soraSemiBold text-xs text-zinc-950">
                           {selectedProperty.utilityScore || "A+"}
                         </Text>
                       </View>
