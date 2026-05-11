@@ -4,14 +4,14 @@ import {
   Sora_600SemiBold,
   Sora_700Bold,
   useFonts,
-} from '@expo-google-fonts/sora';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
-import { useState } from 'react';
-import { Text, TextInput } from 'react-native';
+} from "@expo-google-fonts/sora";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Stack } from "expo-router";
+import { useState } from "react";
+import { Text, TextInput } from "react-native";
 
-import '../global.css';
-import { AuthProvider } from '../context/AuthContext';
+import "../global.css";
+import { AuthProvider } from "../context/AuthContext";
 
 type TextWithDefaultProps = typeof Text & {
   defaultProps?: {
@@ -25,7 +25,7 @@ type TextInputWithDefaultProps = typeof TextInput & {
   };
 };
 
-const defaultFontStyle = { fontFamily: 'Sora_400Regular' };
+const defaultFontStyle = { fontFamily: "Sora_400Regular" };
 
 (Text as TextWithDefaultProps).defaultProps = {
   ...(Text as TextWithDefaultProps).defaultProps,
@@ -49,6 +49,7 @@ export default function RootLayout() {
         },
       }),
   );
+
   const [fontsLoaded] = useFonts({
     Sora_400Regular,
     Sora_500Medium,
@@ -63,7 +64,10 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
       </AuthProvider>
     </QueryClientProvider>
   );
