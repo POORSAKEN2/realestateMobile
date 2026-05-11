@@ -26,6 +26,10 @@ function readDotEnvValue(key) {
 
 module.exports = ({ config }) => ({
   ...config,
+  plugins: [
+    ...(config.plugins ?? []),
+    "@react-native-community/datetimepicker",
+  ],
   extra: {
     ...config.extra,
     apiBaseUrl:
