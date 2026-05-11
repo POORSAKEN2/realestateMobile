@@ -1,16 +1,995 @@
-import { Text, View } from 'react-native';
-
+import { Image, ImageBackground, Text, TextInput, View, TouchableOpacity, Dimensions, Platform, Modal, Pressable, ScrollView } from 'react-native';
+import { BlurView } from "expo-blur";
+import { GlassView } from "expo-glass-effect";
+import { Stack } from "expo-router";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Screen } from '../../components/ui/Screen';
+import Ionicons from '@expo/vector-icons/build/Ionicons';
+import Feather from '@expo/vector-icons/Feather';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  fetchPortfolioHistory,
+  fetchPortfolioStats,
+} from "../../api/analytics";
+import { fetchProperties, type Property } from "../../api/properties";
+import {
+  fetchDocuments,
+  fetchLeases,
+  fetchLessees,
+} from "../../api/propertyDetails";
+import { useAuth } from "../../hooks/useAuth";
+
+type AssetSortBy = "value" | "roi" | "name";
+type AssetSortOrder = "asc" | "desc";
+type AssetStatusFilter = "ALL" | Property["status"];
+type AuthUser = {
+  id?: string | number;
+  name?: string;
+  email?: string;
+  role?: string;
+  company?: string;
+  phone?: string;
+  profile_image?: string;
+  profile_image_url?: string;
+  profileImage?: string;
+  avatar?: string;
+};
+
+const assetStatusFilters: AssetStatusFilter[] = [
+  "ALL",
+  "REVENUE_GENERATING",
+  "PRE_LEASED",
+  "UNDER_CONSTRUCTION",
+  "PERSONAL_USE",
+  "IDLE",
+];
+
+const calculateTrend = (current: number, previous?: number) => {
+  if (previous === undefined || previous === 0) return null;
+
+  const diff = ((current - previous) / previous) * 100;
+
+  return {
+    direction: diff >= 0 ? ("up" as const) : ("down" as const),
+    value: `${Math.abs(diff).toFixed(1)}%`,
+  };
+};
+
+const formatPesoValue = (value: number = 0) => {
+  if (value >= 1_000_000_000) return `₱${(value / 1_000_000_000).toFixed(1)}B`;
+  if (value >= 1_000_000) return `₱${(value / 1_000_000).toFixed(1)}M`;
+  if (value === 0) return "₱0";
+
+  return `₱${value.toLocaleString()}`;
+};
+
+const formatPropertyStatus = (status: string) =>
+  status
+    .toLowerCase()
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+const isAuthUser = (value: unknown): value is AuthUser =>
+  typeof value === "object" && value !== null;
+
+const getInitials = (name?: string, email?: string) => {
+  const source = name?.trim() || email?.trim() || "User";
+  const initials = source
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+
+  return initials || "U";
+};
+
+const formatRole = (role?: string) => {
+  if (!role) return "Property Manager";
+
+  return role
+    .toLowerCase()
+    .split(/[_\s-]+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+};
+
+const capitalizeWords = (value: string) =>
+  value
+    .toLowerCase()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+const getLeaseRoomNumber = (roomNumber?: string | null) =>
+  roomNumber?.trim() || "No room assigned";
 
 export default function DashboardScreen() {
-  return (
-    <Screen>
-      <View className="gap-4">
-        <Text className="text-3xl font-bold text-white">Dashboard</Text>
-        <Text className="text-base leading-6 text-slate-300">
-          Dashboard template ready.
+  const { session } = useAuth();
+  const accessToken = session?.accessToken;
+  const loggedInUser = useMemo(
+    () => (isAuthUser(session?.user) ? session.user : null),
+    [session?.user],
+  );
+  const displayName = loggedInUser?.name?.trim() || "Signed in user";
+  const displayRole = formatRole(loggedInUser?.role);
+  const displayCompany = loggedInUser?.company?.trim();
+  const displayEmail = loggedInUser?.email?.trim();
+  const profileImageUri =
+    loggedInUser?.profile_image_url ||
+    loggedInUser?.profile_image ||
+    loggedInUser?.profileImage ||
+    loggedInUser?.avatar;
+  const userSubtitle = displayCompany
+    ? `${displayRole} at ${displayCompany}`
+    : displayRole;
+  const [assetSearchQuery, setAssetSearchQuery] = useState("");
+  const [showAssetFilters, setShowAssetFilters] = useState(false);
+  const [assetSortBy, setAssetSortBy] = useState<AssetSortBy>("value");
+  const [assetSortOrder, setAssetSortOrder] = useState<AssetSortOrder>("desc");
+  const [assetStatusFilter, setAssetStatusFilter] =
+    useState<AssetStatusFilter>("ALL");
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const { data: stats, isLoading: isLoadingStats } = useQuery({
+    queryKey: ["analytics", "stats", accessToken],
+    queryFn: () => fetchPortfolioStats(accessToken),
+  });
+  const { data: history = [], isLoading: isLoadingHistory } = useQuery({
+    queryKey: ["analytics", "history", accessToken],
+    queryFn: () => fetchPortfolioHistory(accessToken),
+  });
+  const { data: properties = [], isLoading: isLoadingProperties } = useQuery({
+    queryKey: ["properties", accessToken],
+    queryFn: () => fetchProperties(accessToken),
+  });
+  const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
+    queryKey: ["leases", accessToken],
+    queryFn: () => fetchLeases(accessToken),
+    enabled: !!selectedProperty,
+  });
+  const { data: lessees = [], isLoading: isLoadingLessees } = useQuery({
+    queryKey: ["lessees", accessToken],
+    queryFn: () => fetchLessees(accessToken),
+    enabled: !!selectedProperty,
+  });
+  const { data: propertyDocuments = [], isLoading: isLoadingDocuments } = useQuery({
+    queryKey: ["documents", accessToken, selectedProperty?.id],
+    queryFn: () =>
+      fetchDocuments(accessToken, { propertyId: selectedProperty?.id }),
+    enabled: !!selectedProperty,
+  });
+
+  const { height } = Dimensions.get("window");
+  const floatingCardHeight = Math.min(Math.max(height * 0.28, 230), 340);
+  const floatingCardPadding = 14;
+  const analyticsHeaderHeight = 44;
+  const metricGridGap = 8;
+  const metricTileHeight = Math.max(
+    (floatingCardHeight -
+      floatingCardPadding * 2 -
+      analyticsHeaderHeight -
+      metricGridGap) /
+      2,
+    72,
+  );
+  const isLoadingAnalytics = isLoadingStats || isLoadingHistory;
+  const previousSnapshot = history[1];
+
+  const trends = useMemo(
+    () => ({
+      totalValue: calculateTrend(
+        stats?.total_value ?? 0,
+        previousSnapshot?.total_value,
+      ),
+      yield: calculateTrend(stats?.avg_yield ?? 0, previousSnapshot?.avg_yield),
+      arrears: calculateTrend(
+        stats?.total_arrears ?? 0,
+        previousSnapshot?.total_arrears,
+      ),
+      noi: calculateTrend(
+        stats?.net_operating_income ?? 0,
+        previousSnapshot?.net_operating_income,
+      ),
+    }),
+    [previousSnapshot, stats],
+  );
+  const visibleAssets = useMemo(() => {
+    const query = assetSearchQuery.toLowerCase().trim();
+
+    return [...properties]
+      .filter((property) => {
+        const matchesStatus =
+          assetStatusFilter === "ALL" || property.status === assetStatusFilter;
+        const matchesSearch =
+          !query ||
+          property.title.toLowerCase().includes(query) ||
+          property.location.toLowerCase().includes(query);
+
+        return matchesStatus && matchesSearch;
+      })
+      .sort((a, b) => {
+        if (assetSortBy === "name") {
+          return assetSortOrder === "asc"
+            ? a.title.localeCompare(b.title)
+            : b.title.localeCompare(a.title);
+        }
+
+        const valueA = assetSortBy === "value" ? a.value : a.roi;
+        const valueB = assetSortBy === "value" ? b.value : b.roi;
+
+        return assetSortOrder === "asc" ? valueA - valueB : valueB - valueA;
+      });
+  }, [assetSearchQuery, assetSortBy, assetSortOrder, assetStatusFilter, properties]);
+  const selectedPropertyLeases = useMemo(() => {
+    if (!selectedProperty) return [];
+
+    return leases.filter((lease) => lease.propertyId === selectedProperty.id);
+  }, [leases, selectedProperty]);
+  const selectedPropertyDocuments = useMemo(() => {
+    if (!selectedProperty) return [];
+
+    return propertyDocuments.filter(
+      (document) => !document.propertyId || document.propertyId === selectedProperty.id,
+    );
+  }, [propertyDocuments, selectedProperty]);
+  const selectedPropertyTenantCount = useMemo(
+    () =>
+      new Set(
+        selectedPropertyLeases
+          .map((lease) => lease.lesseeId || lease.lessee?.id)
+          .filter(Boolean),
+      ).size,
+    [selectedPropertyLeases],
+  );
+  const isLoadingPropertyDetails =
+    isLoadingLeases || isLoadingLessees || isLoadingDocuments;
+
+  const renderTrend = (
+    trend: ReturnType<typeof calculateTrend>,
+    tone: "positive" | "negative" = "positive",
+  ) => {
+    if (isLoadingAnalytics) {
+      return <Text className="mt-1 text-[10px] font-medium text-zinc-400">Loading</Text>;
+    }
+
+    if (!trend) {
+      return <Text className="mt-1 text-[10px] font-medium text-zinc-400">No prior data</Text>;
+    }
+
+    const isUp = trend.direction === "up";
+    const isFavorable =
+      tone === "positive" ? trend.direction === "up" : trend.direction === "down";
+    const colorClass = isFavorable ? "text-emerald-600" : "text-rose-600";
+
+    return (
+      <View className="mt-1 flex-row items-center gap-1">
+        <Ionicons
+          name={isUp ? "trending-up" : "trending-down"}
+          size={12}
+          color={isFavorable ? "#059669" : "#e11d48"}
+        />
+        <Text className={`text-[10px] font-soraSemiBold ${colorClass}`}>
+          {trend.value}
         </Text>
       </View>
+    );
+  };
+
+  const notificationGlassStyle = {
+    width: "100%" as const,
+    height: "100%" as const,
+    alignItems: "center" as const,
+    justifyContent: "center" as const,
+    overflow: "hidden" as const,
+    borderRadius: 999,
+    backgroundColor:
+      Platform.OS === "android"
+        ? "rgba(255,255,255,0.26)"
+        : "rgba(255,255,255,0.08)",
+  };
+  const notificationIcon = (
+    <>
+      <Ionicons
+        name="notifications-outline"
+        size={23}
+        color="#ffffff"
+        style={{
+          textShadowColor: "rgba(15,23,42,0.35)",
+          textShadowOffset: { width: 0, height: 1 },
+          textShadowRadius: 4,
+        }}
+      />
+
+      <View className="absolute right-3.5 top-3.5 h-2.5 w-2.5 rounded-full border border-white/95 bg-red-500 shadow-sm shadow-red-900/40" />
+    </>
+  );
+  const iosNotificationGlassContent = (
+    <>
+      <View className="absolute inset-0 rounded-full bg-white/10" />
+      <View className="absolute inset-[1px] rounded-full border border-white/35" />
+      <View className="absolute inset-0 rounded-full border border-white/55" />
+      <View className="absolute -left-3 -top-3 h-10 w-14 rotate-[-25deg] rounded-full bg-white/70 opacity-75" />
+      <View className="absolute left-1 top-1 h-9 w-9 rounded-full bg-white/20" />
+      <View className="absolute -right-3 top-2 h-8 w-8 rounded-full bg-teal-100/25" />
+      <View className="absolute -bottom-4 right-0 h-11 w-11 rounded-full bg-black/15 opacity-45" />
+      {notificationIcon}
+    </>
+  );
+  const androidNotificationGlassContent = (
+    <>
+      <View className="absolute inset-0 rounded-full bg-white/5" />
+      {notificationIcon}
+    </>
+  );
+
+  return (
+    <Screen className="flex-1 bg-white">
+      <Stack.Screen options={{ headerShown: false }} />
+      <ImageBackground
+        source={require("../../assets/images/dashboard.webp")}
+        resizeMode="cover"
+        className="-mx-6 -mt-6 overflow-hidden px-6 pt-6"
+         style={{
+            height: height * 0.3,
+            width: "auto",
+          }}
+      
+       
+      >
+        <View className="absolute inset-0 bg-black/25" />
+
+        <View className="flex-row items-center justify-between pt-4">
+          {/* Profile */}
+          <View className="min-w-0 flex-1 flex-row items-center gap-3 pr-3">
+            <View className="h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/50 bg-white/30">
+              {profileImageUri ? (
+                <Image
+                  source={{ uri: profileImageUri }}
+                  className="h-full w-full"
+                  resizeMode="cover"
+                />
+              ) : (
+                <Text className="font-soraSemiBold text-base text-white">
+                  {getInitials(displayName, displayEmail)}
+                </Text>
+              )}
+            </View>
+
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold text-white" numberOfLines={1}>
+                {capitalizeWords(displayName)}
+              </Text>
+
+              <Text className="text-sm text-white/80" numberOfLines={1}>
+                {userSubtitle}
+              </Text>
+
+              {/* {displayEmail && (
+                <Text className="text-xs text-white/70" numberOfLines={1}>
+                  {displayEmail}
+                </Text>
+              )} */}
+            </View>
+          </View>
+
+          {/* Notification */}
+          <TouchableOpacity
+            activeOpacity={0.82}
+            accessibilityRole="button"
+            accessibilityLabel="Open notifications"
+            hitSlop={10}
+            className="relative overflow-hidden rounded-full border border-white/45 bg-white/10"
+            style={{
+              width: 45,
+              height: 45,
+              shadowColor: "rgba(15,23,42,0.45)",
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.24,
+              shadowRadius: 16,
+              elevation: 7,
+            }}
+          >
+            {Platform.OS === "ios" ? (
+              <GlassView
+                glassEffectStyle="regular"
+                tintColor="rgba(255,255,255,0.35)"
+                isInteractive
+                style={notificationGlassStyle}
+              >
+                {iosNotificationGlassContent}
+              </GlassView>
+            ) : (
+              <BlurView
+                intensity={410}
+                tint="light"
+                style={notificationGlassStyle}
+              >
+                {androidNotificationGlassContent}
+              </BlurView>
+            )}
+          </TouchableOpacity>
+        </View>
+      
+      </ImageBackground>
+      <View
+        className="-mt-44 w-full rounded-[28px] border border-white/80 bg-[#fffafa]"
+          style={{
+          height: floatingCardHeight,
+            padding: floatingCardPadding,
+            alignSelf: "stretch",
+            zIndex: 10,
+            shadowColor: "rgba(15,23,42,0.28)",
+            shadowOffset: { width: 0, height: 17 },
+            shadowOpacity: 0.22,
+            shadowRadius: 24,
+            elevation: 12,
+          }}
+        >
+
+          <View
+            className="mb-2 flex-row items-center justify-between"
+            style={{ height: analyticsHeaderHeight }}
+          >
+            <Text className="font-soraMedium">Analytics Overview</Text>
+
+            <TouchableOpacity
+              activeOpacity={0.72}
+              accessibilityRole="button"
+              accessibilityLabel="Open analytics menu"
+              hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-full bg-white/80"
+            >
+              <Feather name="more-horizontal" size={20} color="#52525b" />
+            </TouchableOpacity>
+          </View>
+          <View className="-m-1 flex-row flex-wrap">
+            <View className="w-1/2 p-1">
+            <View
+              className="rounded-2xl border border-teal-100/70 bg-white/80 p-2.5"
+              style={{ height: metricTileHeight }}
+            >
+                <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
+              <Ionicons name="wallet-outline" size={20} color="#0f766e" />
+            </View>
+              <Text className="text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
+                {isLoadingAnalytics ? "..." : formatPesoValue(stats?.total_value)}
+              </Text>
+              <Text className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500" numberOfLines={2}>
+              Total Asset Value
+            </Text>
+              </View>
+            </View>
+
+            <View className="w-1/2 p-1">
+            <View
+              className="rounded-2xl border border-sky-100/80 bg-white/80 p-2.5"
+              style={{ height: metricTileHeight }}
+            >
+                <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-sky-50">
+              <Feather name="percent" size={20} color="#0f766e" />
+            </View>
+              <Text className="text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
+                {isLoadingAnalytics ? "..." : `${stats?.avg_yield ?? 0}%`}
+              </Text>
+              <Text className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500" numberOfLines={2}>
+              Average Yield
+            </Text>
+              </View>
+            </View>
+
+            <View className="w-1/2 p-1">
+            <View
+              className="rounded-2xl border border-emerald-100/80 bg-white/80 p-2.5"
+              style={{ height: metricTileHeight }}
+            >
+                <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-emerald-50">
+              <MaterialCommunityIcons name="cash-clock" size={20} color="#16A34A" />
+            </View>
+              <Text className="text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
+                {isLoadingAnalytics ? "..." : formatPesoValue(stats?.total_arrears)}
+              </Text>
+              <Text className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500" numberOfLines={2}>
+              Total Arrears
+            </Text>
+              </View>
+            </View>
+
+            <View className="w-1/2 p-1">
+            <View
+              className="rounded-2xl border border-teal-100/70 bg-white/80 p-2.5"
+              style={{ height: metricTileHeight }}
+            >
+                <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
+                <MaterialCommunityIcons name="chart-line" size={20} color="#16A34A" />
+            </View>
+              <Text className="text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
+                {isLoadingAnalytics
+                  ? "..."
+                  : formatPesoValue(stats?.net_operating_income)}
+              </Text>
+              <Text className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500" numberOfLines={2}>
+              Net Operating Income
+            </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+      <View className='my-5'>
+          <Text className='font-soraSemiBold'>Portfolio Assets</Text>
+          <Text className='font-regular text-description'>High-value holdings</Text>
+        </View>
+
+        <View className="rounded-[22px] border border-teal-100 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
+          <View className="flex-row items-center gap-3">
+            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-teal-50">
+              <Feather name="search" size={20} color="#0f766e" />
+            </View>
+
+            <View className="min-w-0 flex-1">
+              <Text className="mb-0.5 text-[11px] font-soraSemiBold uppercase text-teal-700">
+                Find property
+              </Text>
+              <TextInput
+                accessibilityLabel="Search portfolio assets"
+                className="h-7 p-0 font-soraMedium text-sm text-zinc-950"
+                placeholder="Location, unit, tenant, or asset"
+                placeholderTextColor="#94a3b8"
+                returnKeyType="search"
+                value={assetSearchQuery}
+                onChangeText={setAssetSearchQuery}
+              />
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel={
+                showAssetFilters ? "Close search filters" : "Open search filters"
+              }
+              onPress={() =>
+                setShowAssetFilters((current) => {
+                  if (current) {
+                    setAssetStatusFilter("ALL");
+                  }
+
+                  return !current;
+                })
+              }
+              className={`h-11 w-11 items-center justify-center rounded-2xl ${
+                showAssetFilters ? "bg-teal-50" : "bg-[#0f766e]"
+              }`}
+            >
+              <Feather
+                name="sliders"
+                size={18}
+                color={showAssetFilters ? "#0f766e" : "#ffffff"}
+              />
+            </TouchableOpacity>
+          </View>
+
+          {showAssetFilters && (
+            <View className="mt-4 gap-3 border-t border-teal-50 pt-3">
+              <View>
+                <Text className="mb-2 text-[10px] font-soraSemiBold uppercase text-zinc-400">
+                  Sort by
+                </Text>
+                <View className="flex-row gap-2">
+                  {(["value", "roi", "name"] as AssetSortBy[]).map((sortKey) => {
+                    const isActive = assetSortBy === sortKey;
+                    const label =
+                      sortKey === "value" ? "Value" : sortKey === "roi" ? "ROI" : "Name";
+
+                    return (
+                      <TouchableOpacity
+                        key={sortKey}
+                        activeOpacity={0.75}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Sort assets by ${label}`}
+                        onPress={() => {
+                          if (assetSortBy === sortKey) {
+                            setAssetSortOrder((current) =>
+                              current === "desc" ? "asc" : "desc",
+                            );
+                          } else {
+                            setAssetSortBy(sortKey);
+                            setAssetSortOrder(sortKey === "name" ? "asc" : "desc");
+                          }
+                        }}
+                        className={`flex-row items-center gap-1 rounded-full px-3 py-1.5 ${
+                          isActive ? "bg-[#0f766e]" : "bg-zinc-50"
+                        }`}
+                      >
+                        <Text
+                          className={`text-[11px] font-soraSemiBold ${
+                            isActive ? "text-white" : "text-zinc-500"
+                          }`}
+                        >
+                          {label}
+                        </Text>
+                        {isActive && (
+                          <Feather
+                            name={assetSortOrder === "desc" ? "arrow-down" : "arrow-up"}
+                            size={11}
+                            color="#ffffff"
+                          />
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+
+              <View>
+                <Text className="mb-2 text-[10px] font-soraSemiBold uppercase text-zinc-400">
+                  Status
+                </Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {assetStatusFilters.map((status) => {
+                    const isActive = assetStatusFilter === status;
+                    const label =
+                      status === "ALL" ? "All" : formatPropertyStatus(status);
+
+                    return (
+                      <TouchableOpacity
+                        key={status}
+                        activeOpacity={0.75}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Show ${label} assets`}
+                        onPress={() => setAssetStatusFilter(status)}
+                        className={`rounded-full px-3 py-1.5 ${
+                          isActive ? "bg-teal-50" : "bg-zinc-50"
+                        }`}
+                      >
+                        <Text
+                          className={`text-[10px] font-soraSemiBold ${
+                            isActive ? "text-teal-700" : "text-zinc-500"
+                          }`}
+                        >
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            </View>
+          )}
+        </View>
+          <View className="mt-4 gap-3">
+            {isLoadingProperties ? (
+              Array.from({ length: 2 }).map((_, index) => (
+                <View
+                  key={index}
+                  className="h-24 rounded-2xl border border-zinc-100 bg-zinc-50"
+                />
+              ))
+            ) : visibleAssets.length > 0 ? (
+              visibleAssets.map((property) => (
+                <TouchableOpacity
+                  key={property.id}
+                  activeOpacity={0.82}
+                  accessibilityRole="button"
+                  accessibilityLabel={`View ${property.title}`}
+                  onPress={() => setSelectedProperty(property)}
+                  className="flex-row gap-3 rounded-2xl border border-zinc-100 bg-white p-2.5"
+                >
+                  <Image
+                    source={{ uri: property.image }}
+                    className="h-20 w-20 rounded-xl bg-zinc-100"
+                    resizeMode="cover"
+                  />
+
+                  <View className="min-w-0 flex-1 justify-between py-0.5">
+                    <View>
+                      <View className="flex-row items-start justify-between gap-2">
+                        <Text
+                          className="min-w-0 flex-1 font-soraSemiBold text-sm text-zinc-950"
+                          numberOfLines={1}
+                        >
+                          {property.title}
+                        </Text>
+                        <Text className="rounded-full bg-teal-50 px-2 py-0.5 text-[9px] font-soraSemiBold uppercase text-teal-700">
+                          {property.roi}% ROI
+                        </Text>
+                      </View>
+
+                      <View className="mt-1 flex-row items-center gap-1">
+                        <Feather name="map-pin" size={11} color="#71717a" />
+                        <Text
+                          className="min-w-0 flex-1 text-[11px] text-zinc-500"
+                          numberOfLines={1}
+                        >
+                          {property.location}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View className="flex-row items-center justify-between">
+                      <Text className="text-[11px] font-soraMedium text-zinc-500">
+                        {formatPropertyStatus(property.status)}
+                      </Text>
+                      <Text className="font-soraSemiBold text-xs text-zinc-950">
+                        {formatPesoValue(property.value)}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View className="items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-6">
+                <Feather name="search" size={22} color="#a1a1aa" />
+                <Text className="mt-2 text-xs font-soraMedium text-zinc-500">
+                  No assets found
+                </Text>
+              </View>
+            )}
+          </View>
+      <Modal
+        visible={!!selectedProperty}
+        transparent
+        animationType="slide"
+        statusBarTranslucent
+        onRequestClose={() => setSelectedProperty(null)}
+      >
+        <View className="flex-1 justify-end bg-black/45">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Close property details"
+            className="flex-1"
+            onPress={() => setSelectedProperty(null)}
+          />
+
+          {selectedProperty && (
+            <View
+              className="overflow-hidden rounded-t-[30px] bg-white"
+              style={{ maxHeight: height * 0.86 }}
+            >
+              <View className="h-1.5 w-12 self-center rounded-full bg-zinc-200 mt-3" />
+
+              <ScrollView
+                bounces={false}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 28 }}
+              >
+                <View className="relative mt-4 h-56 overflow-hidden">
+                  <Image
+                    source={{ uri: selectedProperty.image }}
+                    className="h-full w-full bg-zinc-100"
+                    resizeMode="cover"
+                  />
+                  <View className="absolute inset-0 bg-black/35" />
+
+                  <TouchableOpacity
+                    activeOpacity={0.78}
+                    accessibilityRole="button"
+                    accessibilityLabel="Close property details"
+                    onPress={() => setSelectedProperty(null)}
+                    className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-black/35"
+                  >
+                    <Feather name="x" size={20} color="#ffffff" />
+                  </TouchableOpacity>
+
+                  <View className="absolute bottom-5 left-5 right-5">
+                    <Text className="self-start rounded-md bg-teal-600 px-2 py-1 text-[10px] font-soraSemiBold uppercase text-white">
+                      {formatPropertyStatus(selectedProperty.status)}
+                    </Text>
+                    <Text
+                      className="mt-2 text-2xl font-soraSemiBold text-white"
+                      numberOfLines={2}
+                    >
+                      {selectedProperty.title}
+                    </Text>
+                    <View className="mt-1 flex-row items-center gap-1">
+                      <Feather name="map-pin" size={13} color="#ffffff" />
+                      <Text className="min-w-0 flex-1 text-xs text-white/80" numberOfLines={1}>
+                        {selectedProperty.location}
+                        {selectedProperty.country ? `, ${selectedProperty.country}` : ""}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View className="px-5 pt-5">
+                  <View className="flex-row flex-wrap">
+                    <View className="w-1/2 p-1.5">
+                      <View className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
+                        <Text className="text-[10px] font-soraSemiBold uppercase text-zinc-400">
+                          Market Value
+                        </Text>
+                        <Text className="mt-1 text-xl font-bold text-zinc-950">
+                          {formatPesoValue(selectedProperty.value)}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View className="w-1/2 p-1.5">
+                      <View className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3">
+                        <Text className="text-[10px] font-soraSemiBold uppercase text-emerald-700/70">
+                          Annual ROI
+                        </Text>
+                        <View className="mt-1 flex-row items-center gap-1">
+                          <Text className="text-xl font-bold text-emerald-700">
+                            {selectedProperty.roi}%
+                          </Text>
+                          <Feather name="trending-up" size={16} color="#047857" />
+                        </View>
+                      </View>
+                    </View>
+
+                    <View className="w-1/2 p-1.5">
+                      <View className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
+                        <Text className="text-[10px] font-soraSemiBold uppercase text-zinc-400">
+                          {selectedProperty.occupancy !== undefined
+                            ? "Occupancy"
+                            : selectedProperty.bedrooms
+                              ? "Configuration"
+                              : "Asset Type"}
+                        </Text>
+                        <Text className="mt-1 text-lg font-bold text-zinc-950">
+                          {selectedProperty.occupancy !== undefined
+                            ? `${selectedProperty.occupancy}%`
+                            : selectedProperty.bedrooms
+                              ? `${selectedProperty.bedrooms} BR / ${selectedProperty.bathrooms ?? 0} BA`
+                              : selectedProperty.type ?? "N/A"}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View className="w-1/2 p-1.5">
+                      <View className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
+                        <Text className="text-[10px] font-soraSemiBold uppercase text-zinc-400">
+                          Status
+                        </Text>
+                        <Text className="mt-1 text-lg font-bold text-zinc-950" numberOfLines={1} adjustsFontSizeToFit>
+                          {formatPropertyStatus(selectedProperty.status)}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View className="mt-4 flex-row gap-3">
+                    <View className="flex-1 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+                      <View className="flex-row items-center gap-2">
+                        <Feather name="users" size={16} color="#0f766e" />
+                        <Text className="text-[10px] font-soraSemiBold uppercase text-teal-700">
+                          Tenants
+                        </Text>
+                      </View>
+                      <Text className="mt-2 text-2xl font-bold text-zinc-950">
+                        {isLoadingPropertyDetails ? "..." : selectedPropertyTenantCount}
+                      </Text>
+                    </View>
+
+                    <View className="flex-1 rounded-2xl border border-sky-100 bg-sky-50 p-4">
+                      <View className="flex-row items-center gap-2">
+                        <Feather name="file-text" size={16} color="#0369a1" />
+                        <Text className="text-[10px] font-soraSemiBold uppercase text-sky-700">
+                          Documents
+                        </Text>
+                      </View>
+                      <Text className="mt-2 text-2xl font-bold text-zinc-950">
+                        {isLoadingPropertyDetails ? "..." : selectedPropertyDocuments.length}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="mt-6 border-t border-zinc-100 pt-5">
+                    <Text className="text-xs font-soraSemiBold uppercase text-zinc-400">
+                      Current Tenants
+                    </Text>
+                    <View className="mt-3 gap-2">
+                      {isLoadingPropertyDetails ? (
+                        <View className="h-16 rounded-2xl bg-zinc-50" />
+                      ) : selectedPropertyLeases.length > 0 ? (
+                        selectedPropertyLeases.map((lease) => {
+                          const lessee =
+                            lease.lessee ??
+                            lessees.find((item) => item.id === lease.lesseeId);
+
+                          return (
+                            <View
+                              key={lease.id}
+                              className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
+                            >
+                              <View className="flex-row items-start justify-between gap-2">
+                                <View className="min-w-0 flex-1">
+                                  <Text className="font-soraSemiBold text-sm text-zinc-950" numberOfLines={1}>
+                                    {lessee?.name ?? "Linked tenant"}
+                                  </Text>
+                                  <Text className="mt-0.5 text-[11px] text-zinc-500" numberOfLines={1}>
+                                    {getLeaseRoomNumber(lease.roomNumber)} | {lease.startDate} to {lease.endDate}
+                                  </Text>
+                                </View>
+                                <Text className="rounded-full bg-white px-2 py-0.5 text-[9px] font-soraSemiBold uppercase text-zinc-500">
+                                  {lease.status}
+                                </Text>
+                              </View>
+                            </View>
+                          );
+                        })
+                      ) : (
+                        <View className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5">
+                          <Text className="text-xs font-soraMedium text-zinc-500">
+                            No tenants linked to this property.
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+
+                  <View className="mt-6 border-t border-zinc-100 pt-5">
+                    <Text className="text-xs font-soraSemiBold uppercase text-zinc-400">
+                      Property Documents
+                    </Text>
+                    <View className="mt-3 gap-2">
+                      {isLoadingPropertyDetails ? (
+                        <View className="h-16 rounded-2xl bg-zinc-50" />
+                      ) : selectedPropertyDocuments.length > 0 ? (
+                        selectedPropertyDocuments.map((document) => (
+                          <View
+                            key={document.id}
+                            className="flex-row items-center gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
+                          >
+                            <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+                              <Feather name="file-text" size={17} color="#0f766e" />
+                            </View>
+                            <View className="min-w-0 flex-1">
+                              <Text className="font-soraSemiBold text-sm text-zinc-950" numberOfLines={1}>
+                                {document.name}
+                              </Text>
+                              <Text className="mt-0.5 text-[11px] text-zinc-500" numberOfLines={1}>
+                                {document.category} | {document.size}
+                              </Text>
+                            </View>
+                          </View>
+                        ))
+                      ) : (
+                        <View className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5">
+                          <Text className="text-xs font-soraMedium text-zinc-500">
+                            No documents attached to this property.
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+
+                  <View className="mt-6 flex-row gap-3 border-t border-zinc-100 pt-5">
+                    <View className="flex-1 flex-row items-center gap-3 rounded-2xl bg-zinc-50 p-3">
+                      <View className="h-9 w-9 items-center justify-center rounded-xl bg-white">
+                        <Feather name="maximize-2" size={15} color="#52525b" />
+                      </View>
+                      <View className="min-w-0 flex-1">
+                        <Text className="text-[9px] font-soraSemiBold uppercase text-zinc-400">
+                          Total Area
+                        </Text>
+                        <Text className="text-xs font-soraSemiBold text-zinc-950" numberOfLines={1}>
+                          {selectedProperty.area || "N/A"}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View className="flex-1 flex-row items-center gap-3 rounded-2xl bg-zinc-50 p-3">
+                      <View className="h-9 w-9 items-center justify-center rounded-xl bg-white">
+                        <Feather name="zap" size={15} color="#52525b" />
+                      </View>
+                      <View className="min-w-0 flex-1">
+                        <Text className="text-[9px] font-soraSemiBold uppercase text-zinc-400">
+                          Utility Score
+                        </Text>
+                        <Text className="text-xs font-soraSemiBold text-zinc-950">
+                          {selectedProperty.utilityScore || "A+"}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </ScrollView>
+            </View>
+          )}
+        </View>
+      </Modal>
     </Screen>
   );
 }
