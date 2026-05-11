@@ -211,18 +211,18 @@ function Field({
 }) {
   return (
     <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-teal-900/70">
+      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
         {label}
       </Text>
       <TextInput
-        className={`rounded-2xl border border-teal-900/10 bg-white px-4 text-base text-zinc-950 shadow-sm ${
+        className={`rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 text-base text-[#1d1d1f] shadow-sm ${
           multiline ? "min-h-28 py-4" : "h-14"
         }`}
         keyboardType={keyboardType}
         multiline={multiline}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#A1A1AA"
+        placeholderTextColor="#6F6D6D"
         textAlignVertical={multiline ? "top" : "center"}
         value={value}
       />
@@ -254,14 +254,14 @@ function ChoiceGroup<T extends string>({
             activeOpacity={0.8}
             className={`rounded-full border px-3.5 py-2.5 ${
               selected
-                ? "border-teal-700 bg-teal-700"
-                : "border-teal-900/10 bg-teal-50/70"
+                ? "border-[#2563EB] bg-[#2563EB]"
+                : "border-[#1d1d1f]/10 bg-[#2563EB]/5"
             }`}
             onPress={() => onSelect(choice.value)}
           >
             <Text
               className={`text-xs font-semibold ${
-                selected ? "text-white" : "text-zinc-700"
+                selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"
               }`}
             >
               {choice.label}
@@ -275,7 +275,7 @@ function ChoiceGroup<T extends string>({
   return (
     <View className={label ? "gap-3" : ""}>
       {label ? (
-        <Text className="text-[11px] font-bold uppercase tracking-wide text-teal-900/70">
+        <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
           {label}
         </Text>
       ) : null}
@@ -290,88 +290,137 @@ function ChoiceGroup<T extends string>({
   );
 }
 
-function PropertyCard({ property }: { property: Property }) {
-  console.log(property.image)
+function MetricPill({
+  icon,
+  label,
+  value,
+}: {
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  label: string;
+  value: string;
+}) {
   return (
-    <View className="overflow-hidden rounded-[28px] border border-teal-900/10 bg-white shadow-sm">
+    <View className="flex-1 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+      <View className="mb-3 h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">
+        <MaterialCommunityIcons name={icon} color="#2563EB" size={20} />
+      </View>
+      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+        {label}
+      </Text>
+      <Text className="mt-1 text-lg font-bold text-[#1d1d1f]">{value}</Text>
+    </View>
+  );
+}
+
+function LoadingState({ label }: { label: string }) {
+  return (
+    <View className="flex-1 justify-center rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-6 shadow-sm">
+      <View className="items-center">
+        <ActivityIndicator color="#2563EB" />
+        <Text className="mt-3 text-sm font-semibold text-[#1d1d1f]">
+          {label}
+        </Text>
+        <Text className="mt-1 text-center text-xs leading-5 text-[#6F6D6D]">
+          Preparing your real estate portfolio workspace.
+        </Text>
+      </View>
+      <View className="mt-6 gap-3">
+        <View className="h-16 rounded-2xl bg-[#1d1d1f]/5" />
+        <View className="h-16 rounded-2xl bg-[#1d1d1f]/5" />
+        <View className="h-16 rounded-2xl bg-[#1d1d1f]/5" />
+      </View>
+    </View>
+  );
+}
+
+function PropertyCard({ property }: { property: Property }) {
+  return (
+    <View className="overflow-hidden rounded-[30px] border border-[#1d1d1f]/10 bg-[#FFFFFF] shadow-sm">
       <View>
         <Image
-          className="h-44 w-full bg-teal-50"
+          className="h-48 w-full bg-[#1d1d1f]/5"
           resizeMode="cover"
           source={{ uri: property.image }}
-           onError={(error) => {
-    console.log("Image load error:", error.nativeEvent);
-  }}
         />
-        <View className="absolute left-4 top-4 rounded-full border border-white/70 bg-white/90 px-3 py-1.5">
-          <Text className="text-[11px] font-bold uppercase tracking-wide text-teal-900">
+        <View className="absolute left-4 top-4 rounded-full border border-[#FFFFFF]/70 bg-[#FFFFFF]/95 px-3 py-1.5">
+          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#2563EB]">
             {property.type ?? "Property"}
           </Text>
         </View>
-        <View className="absolute bottom-4 right-4 rounded-full bg-teal-950/85 px-3 py-1.5">
-          <Text className="text-[11px] font-bold text-white">
+        <View className="absolute bottom-4 right-4 rounded-full bg-[#1d1d1f]/85 px-3 py-1.5">
+          <Text className="text-[11px] font-bold text-[#FFFFFF]">
             {property.roi.toFixed(1)}% ROI
           </Text>
         </View>
       </View>
 
-      <View className="gap-4 p-4">
+      <View className="gap-4 p-5">
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1 gap-1.5">
-            <Text className="text-xl font-bold text-zinc-950">
+            <Text className="text-xl font-bold text-[#1d1d1f]">
               {property.title}
             </Text>
             <View className="flex-row items-center gap-1.5">
               <MaterialCommunityIcons
                 name="map-marker-outline"
-                color="#0F766E"
+                color="#2563EB"
                 size={15}
               />
-              <Text className="flex-1 text-sm font-medium text-zinc-500">
+              <Text className="flex-1 text-sm font-medium text-[#6F6D6D]">
                 {property.location}
               </Text>
             </View>
           </View>
-          <View className="rounded-full bg-sky-50 px-3 py-1.5">
-            <Text className="text-[11px] font-bold text-sky-700">
+          <View className="rounded-full bg-[#2563EB]/10 px-3 py-1.5">
+            <Text className="text-[11px] font-bold text-[#2563EB]">
               {formatStatus(property.status)}
             </Text>
           </View>
         </View>
 
-        <View className="rounded-2xl bg-teal-50 p-3.5">
-          <View className="flex-row items-center gap-2">
-            <MaterialCommunityIcons
-              name="cash-multiple"
-              color="#0F766E"
-              size={16}
-            />
-            <Text className="text-[11px] font-bold uppercase tracking-wide text-teal-900/70">
-              Value
+        <View className="flex-row gap-3">
+          <View className="flex-1 rounded-2xl bg-[#2563EB]/5 p-3.5">
+            <View className="flex-row items-center gap-2">
+              <MaterialCommunityIcons
+                name="cash-multiple"
+                color="#2563EB"
+                size={16}
+              />
+              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                Value
+              </Text>
+            </View>
+            <Text className="mt-2 text-base font-bold text-[#1d1d1f]">
+              {formatPeso(property.value)}
             </Text>
           </View>
-          <Text className="mt-2 text-base font-bold text-teal-950">
-            {formatPeso(property.value)}
-          </Text>
+          <View className="w-28 rounded-2xl bg-[#1d1d1f]/5 p-3.5">
+            <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+              Occupancy
+            </Text>
+            <Text className="mt-2 text-base font-bold text-[#1d1d1f]">
+              {property.occupancy ?? 0}%
+            </Text>
+          </View>
         </View>
 
         <View className="flex-row flex-wrap items-center gap-2">
           {property.bedrooms !== undefined ? (
-            <View className="flex-row items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1.5">
+            <View className="flex-row items-center gap-1.5 rounded-full bg-[#1d1d1f]/5 px-3 py-1.5">
               <MaterialCommunityIcons
                 name="bed-king-outline"
-                color="#52525B"
+                color="#6F6D6D"
                 size={15}
               />
-              <Text className="text-xs font-bold text-zinc-600">
+              <Text className="text-xs font-bold text-[#6F6D6D]">
                 {property.bedrooms} bed
               </Text>
             </View>
           ) : null}
           {property.bathrooms !== undefined ? (
-            <View className="flex-row items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1.5">
-              <MaterialCommunityIcons name="shower" color="#52525B" size={15} />
-              <Text className="text-xs font-bold text-zinc-600">
+            <View className="flex-row items-center gap-1.5 rounded-full bg-[#1d1d1f]/5 px-3 py-1.5">
+              <MaterialCommunityIcons name="shower" color="#6F6D6D" size={15} />
+              <Text className="text-xs font-bold text-[#6F6D6D]">
                 {property.bathrooms} bath
               </Text>
             </View>
@@ -440,6 +489,26 @@ export default function PropertiesScreen() {
       .filter((location) => location.toLowerCase().includes(query))
       .slice(0, 5);
   }, [form.location]);
+
+  const portfolioValue = useMemo(
+    () => properties.reduce((sum, property) => sum + property.value, 0),
+    [properties],
+  );
+  const averageRoi = useMemo(() => {
+    if (properties.length === 0) return 0;
+
+    const totalRoi = properties.reduce(
+      (sum, property) => sum + property.roi,
+      0,
+    );
+    return totalRoi / properties.length;
+  }, [properties]);
+  const revenueGeneratingCount = useMemo(
+    () =>
+      properties.filter((property) => property.status === "REVENUE_GENERATING")
+        .length,
+    [properties],
+  );
 
   function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -594,49 +663,80 @@ export default function PropertiesScreen() {
   }
 
   return (
-    <Screen className="bg-teal-50">
+    <Screen className="bg-[#2563EB]/5">
       <View className="flex-1 gap-5">
-        <View className="overflow-hidden rounded-[32px] bg-teal-900 p-5 shadow-sm">
-          <View className="absolute -right-16 -top-12 h-36 w-36 rounded-full bg-teal-500/25" />
-          <View className="absolute -bottom-16 left-10 h-32 w-32 rounded-full bg-sky-400/20" />
+        <View className="overflow-hidden rounded-[32px] bg-[#1d1d1f] p-5 shadow-sm">
           <View className="flex-row items-start justify-between gap-4">
             <View className="flex-1">
               <View className="mb-3 flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-full bg-white/15">
+                <View className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]/15">
                   <MaterialCommunityIcons
                     name="office-building-marker-outline"
-                    color="#CCFBF1"
+                    color="#FFFFFF"
                     size={18}
                   />
                 </View>
-                <Text className="text-xs font-bold uppercase tracking-wide text-teal-100/80">
+                <Text className="text-xs font-bold uppercase tracking-wide text-[#FFFFFF]/70">
                   Portfolio
                 </Text>
               </View>
-              <Text className="text-3xl font-bold text-white">Properties</Text>
-              <Text className="mt-2 text-sm leading-5 text-teal-50/80">
+              <Text className="text-3xl font-bold text-[#FFFFFF]">
+                Properties
+              </Text>
+              <Text className="mt-2 text-sm leading-5 text-[#FFFFFF]/70">
                 Manage {properties.length} portfolio assets across locations,
                 yields, and property types.
               </Text>
             </View>
             <TouchableOpacity
               activeOpacity={0.85}
-              className="h-14 w-14 items-center justify-center rounded-2xl bg-white"
+              className="h-14 w-14 items-center justify-center rounded-2xl bg-[#FFFFFF]"
               onPress={openForm}
             >
-              <MaterialCommunityIcons name="plus" color="#0F766E" size={25} />
+              <MaterialCommunityIcons name="plus" color="#2563EB" size={25} />
             </TouchableOpacity>
           </View>
         </View>
 
-        <View className="gap-3 rounded-[28px] border border-teal-900/10 bg-white/90 p-3 shadow-sm">
-          <View className="h-14 flex-row items-center rounded-2xl border border-teal-900/10 bg-teal-50/70 px-4">
-            <MaterialCommunityIcons name="magnify" color="#0F766E" size={21} />
+        <View className="flex-row gap-3">
+          <MetricPill
+            icon="domain"
+            label="Assets"
+            value={String(properties.length)}
+          />
+          <MetricPill
+            icon="chart-line"
+            label="Avg ROI"
+            value={`${averageRoi.toFixed(1)}%`}
+          />
+        </View>
+
+        <View className="rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+          <View className="flex-row items-center justify-between gap-4">
+            <View className="flex-1">
+              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                Portfolio Value
+              </Text>
+              <Text className="mt-1 text-xl font-bold text-[#1d1d1f]">
+                {formatPeso(portfolioValue)}
+              </Text>
+            </View>
+            <View className="rounded-full bg-[#2563EB]/10 px-3 py-1.5">
+              <Text className="text-xs font-bold text-[#2563EB]">
+                {revenueGeneratingCount} revenue ready
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View className="gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-3 shadow-sm">
+          <View className="h-14 flex-row items-center rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 px-4">
+            <MaterialCommunityIcons name="magnify" color="#2563EB" size={21} />
             <TextInput
-              className="ml-2 flex-1 text-base text-zinc-950"
+              className="ml-2 flex-1 text-base text-[#1d1d1f]"
               onChangeText={setSearchQuery}
               placeholder="Search properties"
-              placeholderTextColor="#A1A1AA"
+              placeholderTextColor="#6F6D6D"
               value={searchQuery}
             />
           </View>
@@ -650,12 +750,7 @@ export default function PropertiesScreen() {
         </View>
 
         {isLoading ? (
-          <View className="flex-1 items-center justify-center rounded-[28px] border border-teal-900/10 bg-white/80">
-            <ActivityIndicator color="#0F766E" />
-            <Text className="mt-3 text-sm font-medium text-teal-900/70">
-              Loading properties
-            </Text>
-          </View>
+          <LoadingState label="Loading properties" />
         ) : (
           <ScrollView showsVerticalScrollIndicator={false}>
             <View className="gap-4 pb-8">
@@ -664,16 +759,16 @@ export default function PropertiesScreen() {
               ))}
 
               {filteredProperties.length === 0 ? (
-                <View className="items-center rounded-[28px] border border-dashed border-teal-900/20 bg-white/90 p-8 shadow-sm">
+                <View className="items-center rounded-[28px] border border-dashed border-[#1d1d1f]/20 bg-[#FFFFFF]/95 p-8 shadow-sm">
                   <MaterialCommunityIcons
                     name="home-search-outline"
-                    color="#0F766E"
+                    color="#2563EB"
                     size={38}
                   />
-                  <Text className="mt-3 text-base font-bold text-zinc-900">
+                  <Text className="mt-3 text-base font-bold text-[#1d1d1f]">
                     No properties found
                   </Text>
-                  <Text className="mt-1 text-center text-sm leading-5 text-zinc-500">
+                  <Text className="mt-1 text-center text-sm leading-5 text-[#6F6D6D]">
                     Try another search or create a new property.
                   </Text>
                 </View>
@@ -691,22 +786,21 @@ export default function PropertiesScreen() {
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 bg-teal-50"
+          className="flex-1 bg-[#2563EB]/5"
         >
-          <View className="bg-teal-900 px-6 pb-5 pt-6">
-            <View className="absolute -right-12 -top-16 h-32 w-32 rounded-full bg-teal-500/25" />
+          <View className="bg-[#1d1d1f] px-6 pb-5 pt-6">
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-2xl font-bold text-white">
+                <Text className="text-2xl font-bold text-[#FFFFFF]">
                   Add Property
                 </Text>
-                <Text className="mt-1 text-sm text-teal-50/80">
+                <Text className="mt-1 text-sm text-[#FFFFFF]/70">
                   Create a portfolio asset.
                 </Text>
               </View>
               <TouchableOpacity
                 activeOpacity={0.8}
-                className="h-10 w-10 items-center justify-center rounded-full bg-white/15"
+                className="h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/15"
                 onPress={closeForm}
               >
                 <MaterialCommunityIcons
@@ -742,10 +836,10 @@ export default function PropertiesScreen() {
                 <TouchableOpacity
                   key={location}
                   activeOpacity={0.8}
-                  className="rounded-full border border-teal-900/10 bg-white px-3.5 py-2.5 shadow-sm"
+                  className="rounded-full border border-[#1d1d1f]/10 bg-[#FFFFFF] px-3.5 py-2.5 shadow-sm"
                   onPress={() => selectLocation(location)}
                 >
-                  <Text className="text-xs font-bold text-teal-900">
+                  <Text className="text-xs font-bold text-[#2563EB]">
                     {location}
                   </Text>
                 </TouchableOpacity>
@@ -758,7 +852,7 @@ export default function PropertiesScreen() {
               value={form.country}
             />
 
-            <View className="gap-4 rounded-3xl border border-teal-900/10 bg-white/90 p-4 shadow-sm">
+            <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
               <ChoiceGroup
                 choices={propertyStatusChoices}
                 label="Property Status"
@@ -767,7 +861,7 @@ export default function PropertiesScreen() {
               />
             </View>
 
-            <View className="gap-4 rounded-3xl border border-teal-900/10 bg-white/90 p-4 shadow-sm">
+            <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
               <ChoiceGroup
                 choices={propertyTypeChoices}
                 label="Property Type"
@@ -851,21 +945,21 @@ export default function PropertiesScreen() {
               </View>
             ) : null}
 
-            <View className="rounded-3xl border border-teal-900/10 bg-white p-4 shadow-sm">
+            <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
               <View className="flex-row items-center justify-between gap-4">
                 <View className="flex-1 flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-teal-50">
+                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
                     <MaterialCommunityIcons
                       name="calendar-clock"
-                      color="#0F766E"
+                      color="#2563EB"
                       size={22}
                     />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-sm font-bold text-zinc-950">
+                    <Text className="text-sm font-bold text-[#1d1d1f]">
                       Transient Booking Enabled
                     </Text>
-                    <Text className="mt-1 text-xs leading-4 text-zinc-500">
+                    <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
                       Allow short-term reservations for this property.
                     </Text>
                   </View>
@@ -875,7 +969,7 @@ export default function PropertiesScreen() {
                     updateForm("isTransientBookable", value)
                   }
                   thumbColor="#FFFFFF"
-                  trackColor={{ false: "#D4D4D8", true: "#0F766E" }}
+                  trackColor={{ false: "#6F6D6D", true: "#2563EB" }}
                   value={form.isTransientBookable}
                 />
               </View>
@@ -906,38 +1000,38 @@ export default function PropertiesScreen() {
               value={form.description}
             />
 
-            <View className="gap-4 rounded-3xl border border-teal-900/10 bg-white/90 p-4 shadow-sm">
+            <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
               <View className="flex-row items-center justify-between gap-3">
                 <View className="flex-1 flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-teal-50">
+                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
                     <MaterialCommunityIcons
                       name="image-outline"
-                      color="#0F766E"
+                      color="#2563EB"
                       size={22}
                     />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-sm font-bold text-zinc-950">
+                    <Text className="text-sm font-bold text-[#1d1d1f]">
                       Property Image
                     </Text>
-                    <Text className="mt-1 text-xs leading-4 text-zinc-500">
+                    <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
                       JPG, PNG, or WEBP up to 5 MB.
                     </Text>
                   </View>
                 </View>
                 <TouchableOpacity
                   activeOpacity={0.85}
-                  className="rounded-full bg-teal-700 px-4 py-2.5"
+                  className="rounded-full bg-[#2563EB] px-4 py-2.5"
                   onPress={pickImage}
                 >
-                  <Text className="text-xs font-bold text-white">
+                  <Text className="text-xs font-bold text-[#FFFFFF]">
                     {selectedImage ? "Change" : "Choose"}
                   </Text>
                 </TouchableOpacity>
               </View>
 
               {selectedImage ? (
-                <View className="overflow-hidden rounded-2xl border border-teal-900/10 bg-teal-50">
+                <View className="overflow-hidden rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5">
                   <Image
                     className="h-48 w-full"
                     resizeMode="cover"
@@ -945,19 +1039,19 @@ export default function PropertiesScreen() {
                   />
                   <View className="flex-row items-center justify-between gap-3 p-3">
                     <Text
-                      className="flex-1 text-xs font-semibold text-zinc-700"
+                      className="flex-1 text-xs font-semibold text-[#1d1d1f]"
                       numberOfLines={1}
                     >
                       {selectedImage.name}
                     </Text>
                     <TouchableOpacity
                       activeOpacity={0.8}
-                      className="h-8 w-8 items-center justify-center rounded-full bg-white"
+                      className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
                       onPress={() => setSelectedImage(null)}
                     >
                       <MaterialCommunityIcons
                         name="close"
-                        color="#52525B"
+                        color="#6F6D6D"
                         size={17}
                       />
                     </TouchableOpacity>
@@ -967,35 +1061,35 @@ export default function PropertiesScreen() {
             </View>
 
             {formError ? (
-              <View className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-                <Text className="text-sm font-medium text-rose-700">
+              <View className="rounded-2xl border border-[#1d1d1f]/15 bg-[#1d1d1f]/5 p-4">
+                <Text className="text-sm font-medium text-[#1d1d1f]">
                   {formError}
                 </Text>
               </View>
             ) : null}
           </ScrollView>
 
-          <View className="border-t border-teal-900/10 bg-white p-6">
+          <View className="border-t border-[#1d1d1f]/10 bg-[#FFFFFF] p-6">
             <View className="flex-row gap-3">
               <TouchableOpacity
                 activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl border border-teal-900/10 bg-white"
+                className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF]"
                 onPress={closeForm}
               >
-                <Text className="text-base font-bold text-zinc-800">
+                <Text className="text-base font-bold text-[#1d1d1f]">
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl bg-teal-700"
+                className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
                 disabled={createMutation.isPending}
                 onPress={handleSubmit}
               >
                 {createMutation.isPending ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text className="text-base font-semibold text-white">
+                  <Text className="text-base font-semibold text-[#FFFFFF]">
                     Create Property
                   </Text>
                 )}

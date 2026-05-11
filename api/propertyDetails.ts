@@ -4,6 +4,10 @@ type ApiEnvelope<T> = {
   data?: T;
 };
 
+type PaginatedApiData<T> = {
+  data?: T[];
+};
+
 export type Lessee = {
   id: string;
   tenantId?: string;
@@ -68,10 +72,31 @@ function formatDate(value?: string | null) {
   });
 }
 
-function normalizeCollection<T>(payload: ApiEnvelope<T[]> | T[]): T[] {
-  const data = unwrapData(payload);
+function normalizeCollection<T>(
+  payload: ApiEnvelope<T[]> | ApiEnvelope<PaginatedApiData<T>> | T[],
+): T[] {
+  const data =
+    payload &&
+    typeof payload === "object" &&
+    !Array.isArray(payload) &&
+    "data" in payload
+      ? payload.data
+      : payload;
 
-  return Array.isArray(data) ? data : [];
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (
+    data &&
+    typeof data === "object" &&
+    "data" in data &&
+    Array.isArray((data as PaginatedApiData<T>).data)
+  ) {
+    return (data as PaginatedApiData<T>).data ?? [];
+  }
+
+  return [];
 }
 
 const normalizeLessee = (lessee: Record<string, any>): Lessee => ({
@@ -97,8 +122,8 @@ const normalizeLease = (lease: Record<string, any>): Lease => ({
   propertyId: String(lease?.propertyId ?? lease?.property_id ?? ""),
   lesseeId: String(lease?.lesseeId ?? lease?.lessee_id ?? ""),
   roomNumber: lease?.roomNumber ?? lease?.room_number ?? null,
-  startDate: formatDate(lease?.startDate ?? lease?.start_date ?? ""),
-  endDate: formatDate(lease?.endDate ?? lease?.end_date ?? ""),
+  startDate: String(lease?.startDate ?? lease?.start_date ?? "").slice(0, 10),
+  endDate: String(lease?.endDate ?? lease?.end_date ?? "").slice(0, 10),
   monthlyRent: Number(lease?.monthlyRent ?? lease?.monthly_rent ?? 0),
   status: lease?.status ?? "Active",
   lessee: lease?.lessee ? normalizeLessee(lease.lessee) : undefined,
@@ -109,7 +134,11 @@ const normalizeDocumentType = (type: unknown): PropertyDocument["type"] => {
 
   if (rawType.includes("DOCX") || rawType.includes("WORD")) return "DOCX";
   if (rawType.includes("PNG")) return "PNG";
-  if (rawType.includes("JPG") || rawType.includes("JPEG") || rawType.includes("IMAGE")) {
+  if (
+    rawType.includes("JPG") ||
+    rawType.includes("JPEG") ||
+    rawType.includes("IMAGE")
+  ) {
     return "JPG";
   }
 
@@ -133,21 +162,118 @@ const normalizeDocument = (document: Record<string, any>): PropertyDocument => {
 };
 
 export async function fetchLeases(accessToken?: string) {
-  const response = await apiClient.get<ApiEnvelope<Record<string, any>[]> | Record<string, any>[]>(
-    "/leases",
-    { headers: authHeaders(accessToken) },
-  );
+  const response = await apiClient.get<
+    ApiEnvelope<Record<string, any>[]> | Record<string, any>[]
+  >("/leases", { headers: authHeaders(accessToken) });
 
   return normalizeCollection(response).map(normalizeLease);
 }
 
+export type LeasePayload = {
+  propertyId: string;
+  lesseeId: string;
+  startDate: string;
+  endDate: string;
+  monthlyRent: number;
+  roomNumber?: string;
+  status?: string;
+};
+
+function toLeaseApiPayload(payload: LeasePayload) {
+  return {
+    property_id: payload.propertyId,
+    lessee_id: payload.lesseeId,
+    start_date: payload.startDate,
+    end_date: payload.endDate,
+    monthly_rent: payload.monthlyRent,
+    room_number: payload.roomNumber || undefined,
+    status: payload.status || "Active",
+  };
+}
+
+export async function createLease(payload: LeasePayload, accessToken?: string) {
+  const response = await apiClient.post<
+    ApiEnvelope<Record<string, any>> | Record<string, any>
+  >("/leases", toLeaseApiPayload(payload), {
+    headers: authHeaders(accessToken),
+  });
+
+  return normalizeLease(unwrapData(response));
+}
+
+export async function updateLease(
+  id: string,
+  payload: LeasePayload,
+  accessToken?: string,
+) {
+  const response = await apiClient.put<
+    ApiEnvelope<Record<string, any>> | Record<string, any>
+  >(`/leases/${id}`, toLeaseApiPayload(payload), {
+    headers: authHeaders(accessToken),
+  });
+
+  return normalizeLease(unwrapData(response));
+}
+
+export async function deleteLease(id: string, accessToken?: string) {
+  await apiClient.delete(`/leases/${id}`, {
+    headers: authHeaders(accessToken),
+  });
+}
+
 export async function fetchLessees(accessToken?: string) {
-  const response = await apiClient.get<ApiEnvelope<Record<string, any>[]> | Record<string, any>[]>(
-    "/lessees",
-    { headers: authHeaders(accessToken) },
-  );
+  const response = await apiClient.get<
+    ApiEnvelope<Record<string, any>[]> | Record<string, any>[]
+  >("/lessees", { headers: authHeaders(accessToken) });
 
   return normalizeCollection(response).map(normalizeLessee);
+}
+
+export type LesseePayload = {
+  name: string;
+  contactEmail: string;
+  phone: string;
+};
+
+function toLesseeApiPayload(payload: LesseePayload) {
+  return {
+    name: payload.name,
+    contact_email: payload.contactEmail,
+    phone: payload.phone,
+  };
+}
+
+export async function createLessee(
+  payload: LesseePayload,
+  accessToken?: string,
+) {
+  const response = await apiClient.post<
+    ApiEnvelope<Record<string, any>> | Record<string, any>
+  >("/lessees", toLesseeApiPayload(payload), {
+    headers: authHeaders(accessToken),
+  });
+
+  return normalizeLessee(unwrapData(response));
+}
+
+export async function updateLessee(
+  id: string,
+  payload: LesseePayload,
+  accessToken?: string,
+) {
+  const response = await apiClient.put<
+    ApiEnvelope<Record<string, any>> | Record<string, any>
+  >(`/lessees/${id}`, toLesseeApiPayload(payload), {
+    headers: authHeaders(accessToken),
+  });
+
+  return normalizeLessee(unwrapData(response));
+}
+
+export async function deleteLessee(id: string, accessToken?: string) {
+  await apiClient.delete(`/lessees/${id}`, {
+    headers: authHeaders(accessToken),
+  });
 }
 
 export async function fetchDocuments(
@@ -157,10 +283,9 @@ export async function fetchDocuments(
   const query = params?.propertyId
     ? `?property_id=${encodeURIComponent(params.propertyId)}`
     : "";
-  const response = await apiClient.get<ApiEnvelope<Record<string, any>[]> | Record<string, any>[]>(
-    `/documents${query}`,
-    { headers: authHeaders(accessToken) },
-  );
+  const response = await apiClient.get<
+    ApiEnvelope<Record<string, any>[]> | Record<string, any>[]
+  >(`/documents${query}`, { headers: authHeaders(accessToken) });
 
   return normalizeCollection(response).map(normalizeDocument);
 }
