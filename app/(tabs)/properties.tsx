@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   Image,
   KeyboardAvoidingView,
   Modal,
@@ -58,6 +59,11 @@ type SelectedImage = {
   type: string;
   file?: Blob;
 };
+
+type PropertyListItem =
+  | { kind: "search" }
+  | { kind: "property"; property: Property }
+  | { kind: "empty" };
 
 const propertyStatusChoices: Choice<Property["status"]>[] = [
   { label: "Idle", value: "IDLE" },
@@ -334,100 +340,126 @@ function LoadingState({ label }: { label: string }) {
 }
 
 function PropertyCard({ property }: { property: Property }) {
+  const occupancy = property.occupancy ?? 0;
+  const isActive = property.status === "REVENUE_GENERATING";
   return (
-    <View className="overflow-hidden rounded-[30px] border border-[#1d1d1f]/10 bg-[#FFFFFF] shadow-sm">
-      <View>
-        <Image
-          className="h-48 w-full bg-[#1d1d1f]/5"
-          resizeMode="cover"
-          source={{ uri: property.image }}
-        />
-        <View className="absolute left-4 top-4 rounded-full border border-[#FFFFFF]/70 bg-[#FFFFFF]/95 px-3 py-1.5">
-          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#2563EB]">
-            {property.type ?? "Property"}
-          </Text>
-        </View>
-        <View className="absolute bottom-4 right-4 rounded-full bg-[#1d1d1f]/85 px-3 py-1.5">
-          <Text className="text-[11px] font-bold text-[#FFFFFF]">
-            {property.roi.toFixed(1)}% ROI
+    <TouchableOpacity 
+  activeOpacity={0.9} 
+ 
+  className="w-full overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-lg shadow-slate-200/50"
+>
+  {/* --- IMAGE SECTION --- */}
+  <View className="relative h-52 w-full">
+    <Image
+      className="h-full w-full bg-slate-100"
+      resizeMode="cover"
+      source={{ uri: property.image }}
+    />
+    
+    {/* Top Badges: Type & ROI */}
+    <View className="absolute inset-x-4 top-4 flex-row justify-between items-center">
+      <View className="rounded-full bg-white/90 px-3 py-1.5 backdrop-blur-md shadow-sm">
+        <Text className="text-[10px] font-bold uppercase tracking-widest text-slate-800">
+          {property.type ?? "Property"}
+        </Text>
+      </View>
+      
+      <View className="rounded-full bg-[#2563EB] px-3 py-1.5 shadow-md">
+        <Text className="text-[11px] font-bold text-white">
+          {property.roi.toFixed(1)}% ROI
+        </Text>
+      </View>
+    </View>
+
+    {/* Bottom Gradient Overlay (Optional: adds depth for white text if needed) */}
+    <View className="absolute bottom-0 h-16 w-full bg-gradient-to-t from-black/20 to-transparent" />
+  </View>
+
+  {/* --- CONTENT SECTION --- */}
+  <View className="p-5">
+    
+    {/* Title and Status Row */}
+    <View className="flex-row items-start justify-between gap-3">
+      <View className="flex-1">
+        <Text className="font-soraSemiBold text-xl tracking-tight text-[#1d1d1f]">
+          {property.title}
+        </Text>
+        <View className="mt-1 flex-row items-center gap-1">
+          <MaterialCommunityIcons name="map-marker" color="#94A3B8" size={14} />
+          <Text className="text-sm font-medium text-slate-500" numberOfLines={1}>
+            {property.location}
           </Text>
         </View>
       </View>
+      
+      <View className={`rounded-lg px-2.5 py-1 ${
+        isActive ? 'bg-emerald-50' : 'bg-amber-50'
+      }`}>
+        <Text className={`text-[10px] font-bold uppercase tracking-tighter ${
+          isActive ? 'text-emerald-600' : 'text-amber-600'
+        }`}>
+          {formatStatus(property.status)}
+        </Text>
+      </View>
+    </View>
 
-      <View className="gap-4 p-5">
-        <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1 gap-1.5">
-            <Text className="text-xl font-bold text-[#1d1d1f]">
-              {property.title}
-            </Text>
-            <View className="flex-row items-center gap-1.5">
-              <MaterialCommunityIcons
-                name="map-marker-outline"
-                color="#2563EB"
-                size={15}
-              />
-              <Text className="flex-1 text-sm font-medium text-[#6F6D6D]">
-                {property.location}
-              </Text>
-            </View>
-          </View>
-          <View className="rounded-full bg-[#2563EB]/10 px-3 py-1.5">
-            <Text className="text-[11px] font-bold text-[#2563EB]">
-              {formatStatus(property.status)}
-            </Text>
-          </View>
-        </View>
+    {/* --- METRICS GRID: Reuse our standardized logic --- */}
+    <View className="mt-5 flex-row items-center justify-between rounded-2xl bg-slate-50 p-4 border border-slate-100">
+      <View className="flex-1">
+        <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          Property Value
+        </Text>
+        <Text className="mt-1 font-soraSemiBold text-lg text-[#1d1d1f]">
+          {formatPeso(property.value)}
+        </Text>
+      </View>
 
-        <View className="flex-row gap-3">
-          <View className="flex-1 rounded-2xl bg-[#2563EB]/5 p-3.5">
-            <View className="flex-row items-center gap-2">
-              <MaterialCommunityIcons
-                name="cash-multiple"
-                color="#2563EB"
-                size={16}
-              />
-              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                Value
-              </Text>
-            </View>
-            <Text className="mt-2 text-base font-bold text-[#1d1d1f]">
-              {formatPeso(property.value)}
-            </Text>
-          </View>
-          <View className="w-28 rounded-2xl bg-[#1d1d1f]/5 p-3.5">
-            <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-              Occupancy
-            </Text>
-            <Text className="mt-2 text-base font-bold text-[#1d1d1f]">
-              {property.occupancy ?? 0}%
-            </Text>
-          </View>
-        </View>
+      <View className="mx-4 h-8 w-[1px] bg-slate-200" />
 
-        <View className="flex-row flex-wrap items-center gap-2">
-          {property.bedrooms !== undefined ? (
-            <View className="flex-row items-center gap-1.5 rounded-full bg-[#1d1d1f]/5 px-3 py-1.5">
-              <MaterialCommunityIcons
-                name="bed-king-outline"
-                color="#6F6D6D"
-                size={15}
-              />
-              <Text className="text-xs font-bold text-[#6F6D6D]">
-                {property.bedrooms} bed
-              </Text>
-            </View>
-          ) : null}
-          {property.bathrooms !== undefined ? (
-            <View className="flex-row items-center gap-1.5 rounded-full bg-[#1d1d1f]/5 px-3 py-1.5">
-              <MaterialCommunityIcons name="shower" color="#6F6D6D" size={15} />
-              <Text className="text-xs font-bold text-[#6F6D6D]">
-                {property.bathrooms} bath
-              </Text>
-            </View>
-          ) : null}
+      <View className="flex-1">
+        <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          Occupancy
+        </Text>
+        <View className="mt-1 flex-row items-center gap-2">
+          <Text className="font-soraSemiBold text-lg text-[#1d1d1f]">
+            {occupancy}%
+          </Text>
+          {/* Visual Indicator */}
+          <View className="h-1.5 flex-1 rounded-full bg-slate-200 overflow-hidden">
+            <View 
+              className="h-full bg-[#2563EB]" 
+              style={{ width: `${occupancy}%` }} 
+            />
+          </View>
         </View>
       </View>
     </View>
+
+    {/* --- FOOTER: Features --- */}
+    <View className="mt-5 flex-row items-center gap-4">
+      {property.bedrooms !== undefined && (
+        <View className="flex-row items-center gap-1.5">
+          <MaterialCommunityIcons name="bed-king-outline" color="#64748B" size={18} />
+          <Text className="text-sm font-bold text-slate-600">{property.bedrooms}</Text>
+        </View>
+      )}
+      
+      {property.bathrooms !== undefined && (
+        <View className="flex-row items-center gap-1.5">
+          <MaterialCommunityIcons name="shower" color="#64748B" size={18} />
+          <Text className="text-sm font-bold text-slate-600">{property.bathrooms}</Text>
+        </View>
+      )}
+
+      {/* Added a spacer to push things left, or add more features here */}
+      <View className="flex-1" />
+      
+      <View className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5">
+        <MaterialCommunityIcons name="chevron-right" color="#2563EB" size={20} />
+      </View>
+    </View>
+  </View>
+</TouchableOpacity>
   );
 }
 
@@ -479,6 +511,17 @@ export default function PropertiesScreen() {
       return statusMatches && searchMatches;
     });
   }, [properties, searchQuery, statusFilter]);
+  const propertyListItems = useMemo<PropertyListItem[]>(() => {
+    const propertyItems = filteredProperties.map((property) => ({
+      kind: "property" as const,
+      property,
+    }));
+
+    return [
+      { kind: "search" },
+      ...(propertyItems.length > 0 ? propertyItems : [{ kind: "empty" as const }]),
+    ];
+  }, [filteredProperties]);
 
   const filteredLocationSuggestions = useMemo(() => {
     const query = form.location.trim().toLowerCase();
@@ -509,6 +552,10 @@ export default function PropertiesScreen() {
         .length,
     [properties],
   );
+  const revenueGeneratingPercentage =
+    properties.length === 0
+      ? 0
+      : (revenueGeneratingCount / properties.length) * 100;
 
   function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -664,117 +711,184 @@ export default function PropertiesScreen() {
 
   return (
     <Screen className="bg-[#2563EB]/5">
-      <View className="flex-1 gap-5">
-        <View className="overflow-hidden rounded-[32px] bg-[#1d1d1f] p-5 shadow-sm">
-          <View className="flex-row items-start justify-between gap-4">
-            <View className="flex-1">
-              <View className="mb-3 flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]/15">
-                  <MaterialCommunityIcons
-                    name="office-building-marker-outline"
-                    color="#FFFFFF"
-                    size={18}
-                  />
-                </View>
-                <Text className="text-xs font-bold uppercase tracking-wide text-[#FFFFFF]/70">
-                  Portfolio
-                </Text>
-              </View>
-              <Text className="text-3xl font-bold text-[#FFFFFF]">
-                Properties
-              </Text>
-              <Text className="mt-2 text-sm leading-5 text-[#FFFFFF]/70">
-                Manage {properties.length} portfolio assets across locations,
-                yields, and property types.
-              </Text>
-            </View>
-            <TouchableOpacity
-              activeOpacity={0.85}
-              className="h-14 w-14 items-center justify-center rounded-2xl bg-[#FFFFFF]"
-              onPress={openForm}
-            >
-              <MaterialCommunityIcons name="plus" color="#2563EB" size={25} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View className="flex-row gap-3">
-          <MetricPill
-            icon="domain"
-            label="Assets"
-            value={String(properties.length)}
-          />
-          <MetricPill
-            icon="chart-line"
-            label="Avg ROI"
-            value={`${averageRoi.toFixed(1)}%`}
-          />
-        </View>
-
-        <View className="rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-          <View className="flex-row items-center justify-between gap-4">
-            <View className="flex-1">
-              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                Portfolio Value
-              </Text>
-              <Text className="mt-1 text-xl font-bold text-[#1d1d1f]">
-                {formatPeso(portfolioValue)}
-              </Text>
-            </View>
-            <View className="rounded-full bg-[#2563EB]/10 px-3 py-1.5">
-              <Text className="text-xs font-bold text-[#2563EB]">
-                {revenueGeneratingCount} revenue ready
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <View className="gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-3 shadow-sm">
-          <View className="h-14 flex-row items-center rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 px-4">
-            <MaterialCommunityIcons name="magnify" color="#2563EB" size={21} />
-            <TextInput
-              className="ml-2 flex-1 text-base text-[#1d1d1f]"
-              onChangeText={setSearchQuery}
-              placeholder="Search properties"
-              placeholderTextColor="#6F6D6D"
-              value={searchQuery}
-            />
-          </View>
-
-          <ChoiceGroup
-            choices={statusFilterChoices}
-            horizontal
-            onSelect={setStatusFilter}
-            value={statusFilter}
-          />
-        </View>
-
+      <View className="flex-1">
         {isLoading ? (
           <LoadingState label="Loading properties" />
         ) : (
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <View className="gap-4 pb-8">
-              {filteredProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
+          <FlatList
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+            data={propertyListItems}
+            ItemSeparatorComponent={() => <View className="h-4" />}
+            keyExtractor={(item) =>
+              item.kind === "property" ? item.property.id : item.kind
+            }
+            ListHeaderComponent={
+              <View className="gap-6 pb-6">
+                {/* --- HEADER SECTION: Brand & Quick Action --- */}
+                <View className="flex-row items-center justify-between px-1">
+                  <View>
+                    <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
+                      Asset Management
+                    </Text>
+                    <Text className="font-soraSemiBold text-3xl tracking-tight text-[#1d1d1f]">
+                      Properties
+                    </Text>
+                  </View>
 
-              {filteredProperties.length === 0 ? (
-                <View className="items-center rounded-[28px] border border-dashed border-[#1d1d1f]/20 bg-[#FFFFFF]/95 p-8 shadow-sm">
-                  <MaterialCommunityIcons
-                    name="home-search-outline"
-                    color="#2563EB"
-                    size={38}
-                  />
-                  <Text className="mt-3 text-base font-bold text-[#1d1d1f]">
-                    No properties found
-                  </Text>
-                  <Text className="mt-1 text-center text-sm leading-5 text-[#6F6D6D]">
-                    Try another search or create a new property.
-                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={openForm}
+                    className="flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200"
+                  >
+                    <MaterialCommunityIcons
+                      name="plus"
+                      color="#FFFFFF"
+                      size={20}
+                    />
+                    <Text className="font-bold text-white">Add Asset</Text>
+                  </TouchableOpacity>
                 </View>
-              ) : null}
-            </View>
-          </ScrollView>
+
+                {/* --- MAIN PORTFOLIO CARD: The "Hero" Data --- */}
+                <View className="overflow-hidden rounded-[32px] bg-[#1d1d1f] p-6 shadow-xl shadow-slate-900/20">
+                  {/* Background Decorative Element (Optional) */}
+                  <View className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/5" />
+
+                  <View className="flex-row items-start justify-between">
+                    <View>
+                      <Text className="text-xs font-medium uppercase tracking-widest text-white/60">
+                        Total Portfolio Value
+                      </Text>
+                      <Text className="mt-2 font-soraSemiBold text-4xl text-white">
+                        {formatPeso(portfolioValue)}
+                      </Text>
+                    </View>
+                    <View className="rounded-full border border-emerald-500/30 bg-emerald-500/20 px-3 py-1">
+                      <Text className="text-[10px] font-bold text-emerald-400">
+                        +{averageRoi.toFixed(1)}% YIELD
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Integrated Health Bar */}
+                  <View className="mt-8">
+                    <View className="mb-2 flex-row items-end justify-between">
+                      <Text className="text-xs font-medium text-white/60">
+                        Revenue Generating Assets
+                      </Text>
+                      <Text className="text-xs font-bold text-white">
+                        {revenueGeneratingCount} / {properties.length}
+                      </Text>
+                    </View>
+                    <View className="h-2 w-full flex-row gap-1">
+                      <View
+                        className="h-full rounded-l-full bg-[#2563EB]"
+                        style={{ width: `${revenueGeneratingPercentage}%` }}
+                      />
+                      <View
+                        className="h-full rounded-r-full bg-white/10"
+                        style={{
+                          width: `${100 - revenueGeneratingPercentage}%`,
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+
+                {/* --- QUICK METRICS: Assets & Distribution --- */}
+                <View className="flex-row gap-4">
+                  <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+                    <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50">
+                      <MaterialCommunityIcons
+                        name="domain"
+                        color="#2563EB"
+                        size={20}
+                      />
+                    </View>
+                    <View>
+                      <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Total Assets
+                      </Text>
+                      <Text className="font-soraSemiBold text-lg text-[#1d1d1f]">
+                        {properties.length}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+                    <View className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50">
+                      <MaterialCommunityIcons
+                        name="chart-donut"
+                        color="#2563EB"
+                        size={20}
+                      />
+                    </View>
+                    <View>
+                      <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        Avg. ROI
+                      </Text>
+                      <Text className="font-soraSemiBold text-lg text-[#1d1d1f]">
+                        {averageRoi.toFixed(1)}%
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            }
+            renderItem={({ item }) => {
+              if (item.kind === "search") {
+                return (
+                  <View className=" bg-white pb-1">
+                    <View className="gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-3 shadow-sm">
+                      <View className="h-14 flex-row items-center rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 px-4">
+                        <MaterialCommunityIcons
+                          name="magnify"
+                          color="#2563EB"
+                          size={21}
+                        />
+                        <TextInput
+                          className="ml-2 flex-1 text-base text-[#1d1d1f]"
+                          onChangeText={setSearchQuery}
+                          placeholder="Search properties"
+                          placeholderTextColor="#6F6D6D"
+                          value={searchQuery}
+                        />
+                      </View>
+
+                      <ChoiceGroup
+                        choices={statusFilterChoices}
+                        horizontal
+                        onSelect={setStatusFilter}
+                        value={statusFilter}
+                      />
+                    </View>
+                  </View>
+                );
+              }
+
+              if (item.kind === "empty") {
+                return (
+                  <View className="items-center rounded-[28px] border border-dashed border-[#1d1d1f]/20 bg-[#FFFFFF]/95 p-8 shadow-sm">
+                    <MaterialCommunityIcons
+                      name="home-search-outline"
+                      color="#2563EB"
+                      size={38}
+                    />
+                    <Text className="mt-3 text-base font-bold text-[#1d1d1f]">
+                      No properties found
+                    </Text>
+                    <Text className="mt-1 text-center text-sm leading-5 text-[#6F6D6D]">
+                      Try another search or create a new property.
+                    </Text>
+                  </View>
+                );
+              }
+
+              return <PropertyCard property={item.property} />;
+            }}
+            showsVerticalScrollIndicator={false}
+            stickyHeaderIndices={[1]}
+          />
         )}
       </View>
 
