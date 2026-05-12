@@ -27,9 +27,12 @@ export type Property = {
   utilityScore?: string;
   bedrooms?: number;
   bathrooms?: number;
+  lat?: number;
+  lng?: number;
   image: string;
   images?: string[];
   parentId?: string;
+  isTransientBookable?: boolean;
 };
 
 export type CreatePropertyPayload = {
@@ -55,6 +58,8 @@ export type CreatePropertyPayload = {
     file?: Blob;
   };
 };
+
+export type UpdatePropertyPayload = CreatePropertyPayload;
 
 const DEFAULT_PROPERTY_IMAGE =
   "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800";
@@ -125,6 +130,14 @@ function normalizePropertyStatus(status: unknown): Property["status"] {
   return "IDLE";
 }
 
+function normalizeBoolean(value: unknown) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value === 1;
+
+  const normalized = String(value ?? "").trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes";
+}
+
 function getImageUrl(imagePath?: string | null) {
   if (!imagePath) return "";
 
@@ -158,6 +171,20 @@ function normalizeProperty(property: Record<string, any>): Property {
     media?.preview_url;
   const image =
     getImageUrl(rawImage) || normalizedImages[0] || DEFAULT_PROPERTY_IMAGE;
+  const lat =
+    property?.lat ??
+    property?.latitude ??
+    property?.coordinates?.lat ??
+    property?.coordinates?.latitude;
+  const lng =
+    property?.lng ??
+    property?.lon ??
+    property?.long ??
+    property?.longitude ??
+    property?.coordinates?.lng ??
+    property?.coordinates?.lon ??
+    property?.coordinates?.long ??
+    property?.coordinates?.longitude;
 
   return {
     ...property,
@@ -181,9 +208,17 @@ function normalizeProperty(property: Record<string, any>): Property {
       property?.bathrooms !== undefined && property?.bathrooms !== null
         ? Number(property.bathrooms)
         : undefined,
+    lat: lat !== undefined && lat !== null ? Number(lat) : undefined,
+    lng: lng !== undefined && lng !== null ? Number(lng) : undefined,
     image,
     images: Array.from(new Set([image, ...normalizedImages].filter(Boolean))),
     parentId: property?.parentId ?? property?.parent_id,
+    isTransientBookable: normalizeBoolean(
+      property?.isTransientBookable ??
+        property?.is_transient_bookable ??
+        property?.transient_bookable ??
+        false,
+    ),
   };
 }
 
@@ -213,9 +248,32 @@ export async function createProperty(
   return normalizeProperty(unwrapData<Property>(response));
 }
 
+export async function updateProperty(
+  id: string,
+  payload: UpdatePropertyPayload,
+  accessToken?: string,
+) {
+  const { image, ...propertyFields } = payload;
+  const body = image ? toPropertyFormData(propertyFields, image, "PUT") : payload;
+  const response = image
+    ? await apiClient.post<ApiEnvelope<Property> | Property>(
+        `/properties/${id}`,
+        body,
+        { headers: authHeaders(accessToken) },
+      )
+    : await apiClient.post<ApiEnvelope<Property> | Property>(
+        `/properties/${id}?_method=PUT`,
+        { ...payload, _method: "PUT" },
+        { headers: authHeaders(accessToken) },
+      );
+
+  return normalizeProperty(unwrapData<Property>(response));
+}
+
 function toPropertyFormData(
   payload: Omit<CreatePropertyPayload, "image">,
   image: NonNullable<CreatePropertyPayload["image"]>,
+  method?: "PUT",
 ) {
   const formData = new FormData();
 
@@ -228,6 +286,7 @@ function toPropertyFormData(
   });
 
   formData.append("images[]", (image.file ?? image) as unknown as Blob);
+  if (method) formData.append("_method", method);
 
   return formData;
 }

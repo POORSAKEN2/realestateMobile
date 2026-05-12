@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -21,8 +22,10 @@ import {
 import {
   createProperty,
   fetchProperties,
+  updateProperty,
   type CreatePropertyPayload,
   type Property,
+  type UpdatePropertyPayload,
 } from "../../api/properties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
@@ -64,6 +67,8 @@ type PropertyListItem =
   | { kind: "search" }
   | { kind: "property"; property: Property }
   | { kind: "empty" };
+
+type PropertyFormPayload = CreatePropertyPayload | UpdatePropertyPayload;
 
 const propertyStatusChoices: Choice<Property["status"]>[] = [
   { label: "Idle", value: "IDLE" },
@@ -183,6 +188,47 @@ function cleanDecimal(value: string, allowNegative = false) {
 
 function cleanInteger(value: string) {
   return value.replace(/\D/g, "");
+}
+
+function toFormState(property: Property): FormState {
+  const propertyType = property.type ?? "Residential";
+
+  return {
+    title: property.title,
+    location: property.location,
+    country: property.country ?? "Philippines",
+    status: property.status,
+    type: propertyType,
+    value: String(property.value || ""),
+    roi: String(property.roi || ""),
+    occupancy:
+      property.occupancy !== undefined && property.occupancy !== null
+        ? String(property.occupancy)
+        : "",
+    bedrooms:
+      property.bedrooms !== undefined && property.bedrooms !== null
+        ? String(property.bedrooms)
+        : isResidential(propertyType)
+          ? "2"
+          : "",
+    bathrooms:
+      property.bathrooms !== undefined && property.bathrooms !== null
+        ? String(property.bathrooms)
+        : isResidential(propertyType)
+          ? "1"
+          : "",
+    lat:
+      property.lat !== undefined && property.lat !== null
+        ? String(property.lat)
+        : "",
+    lng:
+      property.lng !== undefined && property.lng !== null
+        ? String(property.lng)
+        : "",
+    area: property.area ?? "",
+    description: "",
+    isTransientBookable: Boolean(property.isTransientBookable),
+  };
 }
 
 function getImageName(asset: ImagePicker.ImagePickerAsset) {
@@ -339,13 +385,20 @@ function LoadingState({ label }: { label: string }) {
   );
 }
 
-function PropertyCard({ property }: { property: Property }) {
+function PropertyCard({
+  property,
+  onEdit,
+  onOpenBookings,
+}: {
+  property: Property;
+  onEdit: () => void;
+  onOpenBookings?: () => void;
+}) {
   const occupancy = property.occupancy ?? 0;
   const isActive = property.status === "REVENUE_GENERATING";
   return (
     <TouchableOpacity 
   activeOpacity={0.9} 
- 
   className="w-full overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-lg shadow-slate-200/50"
 >
   {/* --- IMAGE SECTION --- */}
@@ -453,10 +506,27 @@ function PropertyCard({ property }: { property: Property }) {
 
       {/* Added a spacer to push things left, or add more features here */}
       <View className="flex-1" />
+      {onOpenBookings ? (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5"
+          onPress={onOpenBookings}
+        >
+          <MaterialCommunityIcons
+            name="calendar-clock"
+            color="#2563EB"
+            size={17}
+          />
+        </TouchableOpacity>
+      ) : null}
       
-      <View className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5">
-        <MaterialCommunityIcons name="chevron-right" color="#2563EB" size={20} />
-      </View>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5"
+        onPress={onEdit}
+      >
+        <MaterialCommunityIcons name="pencil" color="#2563EB" size={17} />
+      </TouchableOpacity>
     </View>
   </View>
 </TouchableOpacity>
@@ -467,12 +537,14 @@ export default function PropertiesScreen() {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState("");
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(
     null,
   );
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
@@ -482,17 +554,22 @@ export default function PropertiesScreen() {
     enabled: Boolean(accessToken),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (payload: CreatePropertyPayload) =>
-      createProperty(payload, accessToken),
+  const saveMutation = useMutation({
+    mutationFn: (payload: PropertyFormPayload) =>
+      editingProperty
+        ? updateProperty(editingProperty.id, payload, accessToken)
+        : createProperty(payload, accessToken),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["properties"] });
+      await queryClient.invalidateQueries({
+        queryKey: ["transientBookablePropertyIds"],
+      });
       await queryClient.invalidateQueries({ queryKey: ["analytics"] });
       closeForm();
     },
     onError: (error) => {
       setFormError(
-        error instanceof Error ? error.message : "Failed to create property.",
+        error instanceof Error ? error.message : "Failed to save property.",
       );
     },
   });
@@ -565,6 +642,15 @@ export default function PropertiesScreen() {
     setForm(emptyForm);
     setSelectedImage(null);
     setFormError("");
+    setEditingProperty(null);
+    setIsFormVisible(true);
+  }
+
+  function openEditForm(property: Property) {
+    setForm(toFormState(property));
+    setSelectedImage(null);
+    setFormError("");
+    setEditingProperty(property);
     setIsFormVisible(true);
   }
 
@@ -572,6 +658,7 @@ export default function PropertiesScreen() {
     setForm(emptyForm);
     setSelectedImage(null);
     setFormError("");
+    setEditingProperty(null);
     setIsFormVisible(false);
   }
 
@@ -621,7 +708,7 @@ export default function PropertiesScreen() {
   function handleSubmit() {
     setFormError("");
 
-    if (createMutation.isPending) return;
+    if (saveMutation.isPending) return;
 
     if (!accessToken) {
       setFormError("Please log in before creating a property.");
@@ -679,7 +766,7 @@ export default function PropertiesScreen() {
       return;
     }
 
-    const payload: CreatePropertyPayload = {
+    const payload: PropertyFormPayload = {
       title,
       location,
       country,
@@ -706,7 +793,7 @@ export default function PropertiesScreen() {
       payload.bathrooms = bathrooms;
     }
 
-    createMutation.mutate(payload);
+    saveMutation.mutate(payload);
   }
 
   return (
@@ -884,7 +971,21 @@ export default function PropertiesScreen() {
                 );
               }
 
-              return <PropertyCard property={item.property} />;
+              return (
+                <PropertyCard
+                  property={item.property}
+                  onEdit={() => openEditForm(item.property)}
+                  onOpenBookings={
+                    item.property.isTransientBookable
+                      ? () =>
+                          router.push({
+                            pathname: "/(tabs)/bookings",
+                            params: { propertyId: item.property.id },
+                          })
+                      : undefined
+                  }
+                />
+              );
             }}
             showsVerticalScrollIndicator={false}
             stickyHeaderIndices={[1]}
@@ -906,10 +1007,12 @@ export default function PropertiesScreen() {
             <View className="flex-row items-center justify-between">
               <View>
                 <Text className="text-2xl font-bold text-[#FFFFFF]">
-                  Add Property
+                  {editingProperty ? "Edit Property" : "Add Property"}
                 </Text>
                 <Text className="mt-1 text-sm text-[#FFFFFF]/70">
-                  Create a portfolio asset.
+                  {editingProperty
+                    ? "Update this portfolio asset."
+                    : "Create a portfolio asset."}
                 </Text>
               </View>
               <TouchableOpacity
@@ -1197,14 +1300,14 @@ export default function PropertiesScreen() {
               <TouchableOpacity
                 activeOpacity={0.85}
                 className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
-                disabled={createMutation.isPending}
+                disabled={saveMutation.isPending}
                 onPress={handleSubmit}
               >
-                {createMutation.isPending ? (
+                {saveMutation.isPending ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
                   <Text className="text-base font-semibold text-[#FFFFFF]">
-                    Create Property
+                    {editingProperty ? "Save Property" : "Create Property"}
                   </Text>
                 )}
               </TouchableOpacity>
