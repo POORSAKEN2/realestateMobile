@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { Feather } from "@expo/vector-icons";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -88,7 +89,7 @@ function MetricCard({
   value: string;
 }) {
   return (
-    <View className="flex-1 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+    <View className="flex-1 rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
       <View className="mb-3 h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">
         <Ionicons name={icon} color="#2563EB" size={19} />
       </View>
@@ -139,77 +140,102 @@ function TenantCard({
   onOpen: () => void;
 }) {
   return (
-    <View className="gap-4 rounded-[30px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-sm">
-      <View className="flex-row items-start justify-between gap-3">
-        <TouchableOpacity
-          activeOpacity={0.75}
-          className="flex-1 flex-row items-start gap-3"
-          onPress={onOpen}
-        >
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-            <Ionicons name="person-outline" color="#2563EB" size={21} />
-          </View>
-          <View className="flex-1">
-            <Text className="text-lg font-bold text-[#1d1d1f]">
+  <TouchableOpacity
+  activeOpacity={0.7}
+  onPress={onOpen}
+  className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm shadow-slate-300/30"
+>
+  <View className="p-5">
+    {/* --- HEADER: Identity & Actions --- */}
+    <View className="flex-row items-start justify-between gap-3">
+      
+      {/* Avatar & Info */}
+      <View className="flex-1 min-w-0 flex-row gap-3.5">
+        <View className="h-12 w-12 items-center justify-center rounded-full bg-[#2563EB]/10">
+          <Ionicons name="person" color="#2563EB" size={20} />
+        </View>
+
+        <View className="flex-1 min-w-0 pt-0.5">
+          <View className="flex-row items-center gap-2">
+            <Text className="font-soraSemiBold text-lg tracking-tight text-[#1d1d1f]" numberOfLines={1}>
               {tenant.name}
             </Text>
-            <Text className="mt-1 text-sm text-[#6F6D6D]">
-              {tenant.contactEmail || "No email on file"}
-            </Text>
-            <Text className="mt-1 text-sm text-[#6F6D6D]">
-              {tenant.phone || "No phone on file"}
-            </Text>
+            {/* Subtle Inline Badge */}
+            <View className="rounded-md bg-slate-100 px-2 py-0.5">
+              <Text className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+                {leaseCount} Lease{leaseCount === 1 ? "" : "s"}
+              </Text>
+            </View>
           </View>
-        </TouchableOpacity>
 
-        <View className="rounded-full bg-[#2563EB]/5 px-3 py-1.5">
-          <Text className="text-xs font-bold text-[#2563EB]">
-            {leaseCount} lease{leaseCount === 1 ? "" : "s"}
-          </Text>
+          {/* Contact Info (Simplified layout) */}
+          <View className="mt-1 flex-row items-center gap-3">
+            <View className="flex-row items-center gap-1.5 min-w-0 flex-1">
+              <Ionicons name="mail" size={12} color="#94A3B8" />
+              <Text className="text-sm text-slate-500" numberOfLines={1}>
+                {tenant.contactEmail || "No email"}
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
 
-      <View className="rounded-2xl bg-[#2563EB]/5 p-4">
-        <View className="flex-row items-center justify-between gap-3">
-          <View>
-            <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-              Monthly Rent
-            </Text>
-            <Text className="mt-1 text-base font-bold text-[#1d1d1f]">
-              {formatCurrency(monthlyRent)}
-            </Text>
-          </View>
-          <Ionicons name="wallet-outline" color="#2563EB" size={21} />
-        </View>
-      </View>
-
-      {propertyNames.length > 0 ? (
-        <Text className="text-xs font-medium leading-5 text-[#6F6D6D]">
-          Linked to {propertyNames.join(", ")}
-        </Text>
-      ) : (
-        <Text className="text-xs font-medium leading-5 text-[#6F6D6D]">
-          No linked properties yet.
-        </Text>
-      )}
-
-      <View className="flex-row justify-end gap-2">
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/5"
-          onPress={onEdit}
-        >
-          <Ionicons name="create-outline" size={18} color="#1d1d1f" />
+      {/* Quick Actions (Moved to top right to declutter bottom) */}
+      <View className="flex-row items-center gap-1 bg-slate-50 rounded-full border border-slate-100 p-1">
+        <TouchableOpacity activeOpacity={0.7} onPress={onEdit} className="p-1.5 rounded-full hover:bg-slate-200">
+          <Ionicons name="pencil" size={16} color="#64748B" />
         </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/5"
-          onPress={onDelete}
-        >
-          <Ionicons name="trash-outline" size={18} color="#1d1d1f" />
+        <TouchableOpacity activeOpacity={0.7} onPress={onDelete} className="p-1.5 rounded-full hover:bg-red-50">
+          <Ionicons name="trash" size={16} color="#EF4444" />
         </TouchableOpacity>
       </View>
     </View>
+
+    {/* --- DIVIDER --- */}
+    <View className="my-4 h-[1px] w-full bg-slate-100" />
+
+    {/* --- METRICS GRID: Rent & Properties Side-by-Side --- */}
+    <View className="flex-row items-center justify-between gap-4">
+      
+      {/* Financials */}
+      <View className="flex-1 min-w-0">
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons name="wallet-outline" color="#94A3B8" size={14} />
+          <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            Monthly Rent
+          </Text>
+        </View>
+        <Text 
+          className="mt-1.5 font-soraSemiBold text-2xl tracking-tight text-[#2563EB]" 
+          numberOfLines={1} 
+          adjustsFontSizeToFit
+        >
+          {formatCurrency(monthlyRent)}
+        </Text>
+      </View>
+
+      {/* Vertical Separator */}
+      <View className="h-10 w-[1px] bg-slate-100" />
+
+      {/* Assets/Properties */}
+      <View className="flex-1 min-w-0">
+        <View className="flex-row items-center gap-1.5">
+          <Ionicons name="business-outline" color="#94A3B8" size={14} />
+          <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+            Properties
+          </Text>
+        </View>
+        <Text 
+          className="mt-1.5 text-sm font-medium leading-5 text-[#1d1d1f]" 
+          numberOfLines={2}
+        >
+          {propertyNames.length > 0 ? propertyNames.join(", ") : "Unassigned"}
+        </Text>
+      </View>
+
+    </View>
+  </View>
+</TouchableOpacity>
   );
 }
 
@@ -374,73 +400,130 @@ export default function TenantsScreen() {
 
   return (
     <Screen className="bg-[#2563EB]/5">
-      <View className="flex-1 gap-5">
-        <View className="overflow-hidden rounded-[32px] bg-[#1d1d1f] p-5 shadow-sm">
-          <View className="flex-row items-start justify-between gap-4">
-            <View className="flex-1">
-              <View className="mb-3 flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]/15">
-                  <Ionicons name="people-outline" color="#FFFFFF" size={18} />
-                </View>
-                <Text className="text-xs font-bold uppercase tracking-wide text-[#FFFFFF]/70">
-                  Tenant Desk
-                </Text>
-              </View>
-              <Text className="text-3xl font-bold text-[#FFFFFF]">Tenants</Text>
-              <Text className="mt-2 text-sm leading-5 text-[#FFFFFF]/70">
-                Manage lessee records, contact details, and linked lease
-                activity.
-              </Text>
-            </View>
-            <TouchableOpacity
-              activeOpacity={0.85}
-              className="h-14 w-14 items-center justify-center rounded-2xl bg-[#FFFFFF]"
-              onPress={openCreateForm}
-            >
-              <Ionicons name="add" color="#2563EB" size={25} />
-            </TouchableOpacity>
+     
+       <View className="flex-1 gap-6">
+  {/* --- TOP HEADER: Title & Global Action --- */}
+  <View className="flex-row items-center justify-between px-1">
+    <View>
+      <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
+        CRM Dashboard
+      </Text>
+      <Text className="font-soraSemiBold text-3xl tracking-tight text-[#1d1d1f]">
+        Tenants
+      </Text>
+    </View>
+
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={openCreateForm}
+      className="flex-row items-center gap-2 rounded-2xl bg-[#2563EB] py-3 px-4 shadow-md shadow-blue-200"
+    >
+      <Ionicons name="add" color="#FFFFFF" size={20} />
+      <Text className="font-bold text-white text-sm">New Tenant</Text>
+    </TouchableOpacity>
+  </View>
+
+  {/* --- THE HERO: REVENUE SNAPSHOT --- */}
+  <View className="relative overflow-hidden rounded-[32px] bg-[#1d1d1f] p-6 shadow-xl shadow-slate-900/20">
+    {/* Decorative Background Accent */}
+    <View className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-[#2563EB]/10" />
+    
+    <View className="flex-row items-center gap-3">
+      <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
+        <Ionicons name="wallet-outline" color="#FFFFFF" size={20} />
+      </View>
+      <Text className="text-xs font-bold uppercase tracking-widest text-white/60">
+        Linked Revenue
+      </Text>
+    </View>
+
+    <View className="mt-5">
+      <Text className="font-soraSemiBold text-4xl text-white">
+        {formatCurrency(tenantMonthlyRent)}
+      </Text>
+      <Text className="mt-2 text-sm text-white/50 leading-5">
+        Monthly recurring revenue from {linkedTenantCount} active lease agreements.
+      </Text>
+    </View>
+  </View>
+
+  {/* --- METRIC ROW: Clean & Borderless --- */}
+  <View className="flex-row gap-4 px-1">
+    {/* Total Tenants */}
+    <View className="flex-1 rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+      <View className="flex-row items-center gap-2">
+        <View className="h-8 w-8 items-center justify-center rounded-xl bg-slate-50">
+          <Ionicons name="people" color="#2563EB" size={16} />
+        </View>
+        <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          Capacity
+        </Text>
+      </View>
+      <View className="mt-3 flex-row items-end gap-1">
+        <Text className="font-soraSemiBold text-2xl text-[#1d1d1f]">
+          {tenants.length}
+        </Text>
+        <Text className="mb-1 text-xs font-medium text-slate-400">Profiles</Text>
+      </View>
+    </View>
+
+    {/* Lease Linkage Health */}
+    <View className="flex-1 rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+      <View className="flex-row items-center justify-between">
+        <View className="flex-row items-center gap-2">
+          <View className="h-8 w-8 items-center justify-center rounded-xl bg-emerald-50">
+            <Ionicons name="link" color="#10B981" size={16} />
           </View>
+          <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Linkage
+          </Text>
         </View>
-
-        <View className="flex-row gap-3">
-          <MetricCard
-            icon="people-outline"
-            label="Tenants"
-            value={String(tenants.length)}
-          />
-          <MetricCard
-            icon="link-outline"
-            label="Linked"
-            value={String(linkedTenantCount)}
+        {/* Simple Health Badge */}
+        <Text className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+          {Math.round((linkedTenantCount / tenants.length) * 100)}%
+        </Text>
+      </View>
+      
+      <View className="mt-3">
+        <Text className="font-soraSemiBold text-2xl text-[#1d1d1f]">
+          {linkedTenantCount}
+        </Text>
+        {/* Mini Progress Bar for Linkage Health */}
+        <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+          <View 
+            className="h-full bg-emerald-500" 
+            style={{ width: `${(linkedTenantCount / tenants.length) * 100}%` }} 
           />
         </View>
+      </View>
+    </View>
+  </View>
 
-        <View className="rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-          <View className="flex-row items-center justify-between gap-4">
-            <View className="flex-1">
-              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                Tenant-Linked Monthly Rent
-              </Text>
-              <Text className="mt-1 text-xl font-bold text-[#1d1d1f]">
-                {formatCurrency(tenantMonthlyRent)}
-              </Text>
-            </View>
+       
+
+        <View className="rounded-[22px] border border-[#1d1d1f]/10 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
+          <View className="flex-row items-center gap-3">
             <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-              <Ionicons name="business-outline" color="#2563EB" size={21} />
+              <Feather name="search" size={20} color="#2563EB" />
+            </View>
+
+            <View className="min-w-0 flex-1">
+              <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-[#1d1d1f]">
+                Find tenant
+              </Text>
+
+              <TextInput
+                accessibilityLabel="Search tenants"
+                autoCapitalize="none"
+                className="h-10 p-0 font-soraMedium text-sm text-zinc-950"
+                placeholder="Name, email, phone, or unit"
+                placeholderTextColor="#94a3b8"
+                returnKeyType="search"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
             </View>
           </View>
-        </View>
-
-        <View className="h-14 flex-row items-center rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm">
-          <Ionicons name="search-outline" color="#2563EB" size={20} />
-          <TextInput
-            autoCapitalize="none"
-            className="ml-2 flex-1 text-base text-[#1d1d1f]"
-            onChangeText={setSearchQuery}
-            placeholder="Search tenants"
-            placeholderTextColor="#6F6D6D"
-            value={searchQuery}
-          />
         </View>
 
         {isLoading ? (
