@@ -26,12 +26,15 @@ import {
   rangesOverlap,
   toBookingDateTime,
   updateTransientBooking,
-  type TransientBooking,
-  type TransientBookingPayload,
 } from "../../api/bookings";
-import { fetchProperties, type Property } from "../../api/properties";
+import { fetchProperties } from "../../api/properties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
+import type {
+  Property,
+  TransientBooking,
+  TransientBookingPayload,
+} from "../../types";
 
 type BookingFormMode = "create" | "edit";
 type StatusFilter = "Booked" | "All";
@@ -249,12 +252,11 @@ export default function BookingsScreen() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("Booked");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<BookingFormMode>("create");
-  const [editingBooking, setEditingBooking] =
-    useState<TransientBooking | null>(null);
-  const [formMessage, setFormMessage] = useState("");
-  const [formData, setFormData] = useState<BookingFormState>(() =>
-    emptyForm(),
+  const [editingBooking, setEditingBooking] = useState<TransientBooking | null>(
+    null,
   );
+  const [formMessage, setFormMessage] = useState("");
+  const [formData, setFormData] = useState<BookingFormState>(() => emptyForm());
 
   const { data: properties = [], isLoading: isLoadingProperties } = useQuery({
     queryKey: ["properties", accessToken],
@@ -406,7 +408,10 @@ export default function BookingsScreen() {
     setFormData((current) => ({ ...current, [key]: value }));
   }
 
-  function resetForm(propertyId = selectedPropertyId, date = dateKey(new Date())) {
+  function resetForm(
+    propertyId = selectedPropertyId,
+    date = dateKey(new Date()),
+  ) {
     setFormData(emptyForm(propertyId, date));
     setFormMessage("");
   }
@@ -714,11 +719,7 @@ export default function BookingsScreen() {
               </View>
             ) : buildingOptions.length === 0 ? (
               <View className="items-center rounded-[28px] border border-dashed border-[#1d1d1f]/20 bg-[#FFFFFF]/95 p-8 shadow-sm">
-                <Ionicons
-                  name="calendar-outline"
-                  color="#2563EB"
-                  size={38}
-                />
+                <Ionicons name="calendar-outline" color="#2563EB" size={38} />
                 <Text className="mt-3 text-base font-bold text-[#1d1d1f]">
                   No transient-bookable buildings yet
                 </Text>
@@ -767,9 +768,7 @@ export default function BookingsScreen() {
                       >
                         <Text
                           className={`text-xs font-bold ${
-                            isCurrentMonth
-                              ? "text-[#1d1d1f]"
-                              : "text-[#6F6D6D]"
+                            isCurrentMonth ? "text-[#1d1d1f]" : "text-[#6F6D6D]"
                           }`}
                         >
                           {day.getDate()}

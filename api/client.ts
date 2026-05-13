@@ -1,13 +1,5 @@
 import Constants from "expo-constants";
-
-type RequestOptions = Omit<RequestInit, "body"> & {
-  body?: unknown;
-};
-
-type ApiErrorResponse = {
-  message?: string;
-  errors?: Record<string, string[]>;
-};
+import type { ApiErrorResponse, RequestOptions } from "../types";
 
 const extra = Constants.expoConfig?.extra as
   | { apiBaseUrl?: string }

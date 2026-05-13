@@ -26,31 +26,18 @@ import {
   fetchPortfolioHistory,
   fetchPortfolioStats,
 } from "../../api/analytics";
-import { fetchProperties, type Property } from "../../api/properties";
+import { fetchProperties } from "../../api/properties";
 import {
   fetchDocuments,
   fetchLeases,
   fetchLessees,
-  type PropertyDocument,
 } from "../../api/propertyDetails";
 import { useAuth } from "../../hooks/useAuth";
+import type { AuthUser, Property, PropertyDocument } from "../../types";
 
 type AssetSortBy = "value" | "roi" | "name";
 type AssetSortOrder = "asc" | "desc";
 type AssetStatusFilter = "ALL" | Property["status"];
-type AuthUser = {
-  id?: string | number;
-  name?: string;
-  email?: string;
-  role?: string;
-  company?: string;
-  phone?: string;
-  profile_image?: string;
-  profile_image_url?: string;
-  profileImage?: string;
-  avatar?: string;
-};
-
 const assetStatusFilters: AssetStatusFilter[] = [
   "ALL",
   "REVENUE_GENERATING",
@@ -472,78 +459,116 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
       </ImageBackground>
-        <View
-  className="w-full rounded-[32px] border border-white/80 bg-white"
-  style={{
-    height: floatingCardHeight,
-    padding: floatingCardPadding,
-    marginTop: -176, 
-    zIndex: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.12,
-    shadowRadius: 16,
-    elevation: 8,
-  }}
->
-  {/* --- HEADER --- */}
-  <View
-    className="flex-row items-center justify-between"
-    style={{ height: analyticsHeaderHeight }}
-  >
-    <View className="flex-row items-center gap-2">
-      <View className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" />
-      <Text className="font-soraSemiBold text-[13px] tracking-tight text-slate-900">
-        Analytics Overview
-      </Text>
-    </View>
-    <TouchableOpacity className="h-8 w-8 items-center justify-center rounded-full bg-slate-50">
-      <Feather name="more-horizontal" size={18} color="#64748B" />
-    </TouchableOpacity>
-  </View>
-
-  {/* --- THE 2x2 GRID --- */}
-  {/* We use negative margin to counteract the padding on the children */}
-  <View 
-    className="flex-row flex-wrap" 
-    style={{ margin: -(metricGridGap / 2) }} 
-  >
-    {[
-      { label: 'Value', val: formatPesoValue(stats?.total_value), icon: 'wallet', color: 'teal', iconFamily: 'Ionicons' },
-      { label: 'Yield', val: `${Number(stats?.avg_yield ?? 0).toFixed(1)}%`, icon: 'trending-up', color: 'blue', iconFamily: 'Feather' },
-      { label: 'Arrears', val: formatPesoValue(stats?.total_arrears), icon: 'alert-circle-outline', color: 'rose', iconFamily: 'MaterialCommunityIcons' },
-      { label: 'Income', val: formatPesoValue(stats?.net_operating_income), icon: 'chart-line', color: 'emerald', iconFamily: 'MaterialCommunityIcons' },
-    ].map((item, idx) => (
-      <View 
-        key={idx} 
-        className="w-1/2" // Forces 2 items per row
-        style={{ padding: metricGridGap / 2 }} 
+      <View
+        className="w-full rounded-[32px] border border-white/80 bg-white"
+        style={{
+          height: floatingCardHeight,
+          padding: floatingCardPadding,
+          marginTop: -176,
+          zIndex: 10,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 12 },
+          shadowOpacity: 0.12,
+          shadowRadius: 16,
+          elevation: 8,
+        }}
       >
-        <View 
-          className={`rounded-[22px] border border-${item.color}-50 bg-${item.color}-50/30 px-3 justify-center`}
-          style={{ height: metricTileHeight }}
+        {/* --- HEADER --- */}
+        <View
+          className="flex-row items-center justify-between"
+          style={{ height: analyticsHeaderHeight }}
         >
-          <View className={`mb-1 h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm`}>
-            {item.iconFamily === 'Ionicons' && <Ionicons name="wallet" size={14} color="#475569" />}
-            {item.iconFamily === 'Feather' && <Feather name="trending-up" size={14} color="#2563EB" />}
-            {item.iconFamily === 'MaterialCommunityIcons' && <MaterialCommunityIcons name="alert-circle-outline" size={14} color={item.color === 'rose' ? "#E11D48" : "#059669"} />}
+          <View className="flex-row items-center gap-2">
+            <View className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" />
+            <Text className="font-soraSemiBold text-[13px] tracking-tight text-slate-900">
+              Analytics Overview
+            </Text>
           </View>
-          
-          <Text 
-            className="font-soraSemiBold text-base tracking-tighter text-slate-900" 
-            numberOfLines={1} 
-            adjustsFontSizeToFit
-          >
-            {isLoadingAnalytics ? "..." : item.val}
-          </Text>
-          <Text className={`text-[9px] font-bold uppercase tracking-wider text-${item.color}-500/60`}>
-            {item.label}
-          </Text>
+          <TouchableOpacity className="h-8 w-8 items-center justify-center rounded-full bg-slate-50">
+            <Feather name="more-horizontal" size={18} color="#64748B" />
+          </TouchableOpacity>
+        </View>
+
+        {/* --- THE 2x2 GRID --- */}
+        {/* We use negative margin to counteract the padding on the children */}
+        <View
+          className="flex-row flex-wrap"
+          style={{ margin: -(metricGridGap / 2) }}
+        >
+          {[
+            {
+              label: "Value",
+              val: formatPesoValue(stats?.total_value),
+              icon: "wallet",
+              color: "teal",
+              iconFamily: "Ionicons",
+            },
+            {
+              label: "Yield",
+              val: `${Number(stats?.avg_yield ?? 0).toFixed(1)}%`,
+              icon: "trending-up",
+              color: "blue",
+              iconFamily: "Feather",
+            },
+            {
+              label: "Arrears",
+              val: formatPesoValue(stats?.total_arrears),
+              icon: "alert-circle-outline",
+              color: "rose",
+              iconFamily: "MaterialCommunityIcons",
+            },
+            {
+              label: "Income",
+              val: formatPesoValue(stats?.net_operating_income),
+              icon: "chart-line",
+              color: "emerald",
+              iconFamily: "MaterialCommunityIcons",
+            },
+          ].map((item, idx) => (
+            <View
+              key={idx}
+              className="w-1/2" // Forces 2 items per row
+              style={{ padding: metricGridGap / 2 }}
+            >
+              <View
+                className={`rounded-[22px] border border-${item.color}-50 bg-${item.color}-50/30 justify-center px-3`}
+                style={{ height: metricTileHeight }}
+              >
+                <View
+                  className={`mb-1 h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm`}
+                >
+                  {item.iconFamily === "Ionicons" && (
+                    <Ionicons name="wallet" size={14} color="#475569" />
+                  )}
+                  {item.iconFamily === "Feather" && (
+                    <Feather name="trending-up" size={14} color="#2563EB" />
+                  )}
+                  {item.iconFamily === "MaterialCommunityIcons" && (
+                    <MaterialCommunityIcons
+                      name="alert-circle-outline"
+                      size={14}
+                      color={item.color === "rose" ? "#E11D48" : "#059669"}
+                    />
+                  )}
+                </View>
+
+                <Text
+                  className="font-soraSemiBold text-base tracking-tighter text-slate-900"
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  {isLoadingAnalytics ? "..." : item.val}
+                </Text>
+                <Text
+                  className={`text-[9px] font-bold uppercase tracking-wider text-${item.color}-500/60`}
+                >
+                  {item.label}
+                </Text>
+              </View>
+            </View>
+          ))}
         </View>
       </View>
-    ))}
-  </View>
-</View>
 
       <View className="my-5">
         <Text className="font-soraSemiBold">Portfolio Assets</Text>

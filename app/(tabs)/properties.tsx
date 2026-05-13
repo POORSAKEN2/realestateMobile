@@ -26,18 +26,20 @@ import {
   createProperty,
   fetchProperties,
   updateProperty,
-  type CreatePropertyPayload,
-  type Property,
-  type UpdatePropertyPayload,
 } from "../../api/properties";
 import {
   fetchDocuments,
   uploadPropertyDocuments,
-  type DocumentUpload,
-  type PropertyDocument,
 } from "../../api/propertyDetails";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
+import type {
+  CreatePropertyPayload,
+  DocumentUpload,
+  Property,
+  PropertyDocument,
+  UpdatePropertyPayload,
+} from "../../types";
 
 type PropertyType = NonNullable<Property["type"]>;
 type StatusFilter = Property["status"] | "ALL";
@@ -458,139 +460,157 @@ function PropertyCard({
   const occupancy = property.occupancy ?? 0;
   const isActive = property.status === "REVENUE_GENERATING";
   return (
-    <TouchableOpacity 
-  activeOpacity={0.9} 
-  className="w-full overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-lg shadow-slate-200/50"
->
-  {/* --- IMAGE SECTION --- */}
-  <View className="relative h-52 w-full">
-    <Image
-      className="h-full w-full bg-slate-100"
-      resizeMode="cover"
-      source={{ uri: property.image }}
-    />
-    
-    {/* Top Badges: Type & ROI */}
-    <View className="absolute inset-x-4 top-4 flex-row justify-between items-center">
-      <View className="rounded-full bg-white/90 px-3 py-1.5 backdrop-blur-md shadow-sm">
-        <Text className="text-[10px] font-bold uppercase tracking-widest text-slate-800">
-          {property.type ?? "Property"}
-        </Text>
-      </View>
-      
-      <View className="rounded-full bg-[#2563EB] px-3 py-1.5 shadow-md">
-        <Text className="text-[11px] font-bold text-white">
-          {property.roi.toFixed(1)}% ROI
-        </Text>
-      </View>
-    </View>
+    <TouchableOpacity
+      activeOpacity={0.9}
+      className="w-full overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-lg shadow-slate-200/50"
+    >
+      {/* --- IMAGE SECTION --- */}
+      <View className="relative h-52 w-full">
+        <Image
+          className="h-full w-full bg-slate-100"
+          resizeMode="cover"
+          source={{ uri: property.image }}
+        />
 
-    {/* Bottom Gradient Overlay (Optional: adds depth for white text if needed) */}
-    <View className="absolute bottom-0 h-16 w-full bg-gradient-to-t from-black/20 to-transparent" />
-  </View>
+        {/* Top Badges: Type & ROI */}
+        <View className="absolute inset-x-4 top-4 flex-row items-center justify-between">
+          <View className="rounded-full bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-md">
+            <Text className="text-[10px] font-bold uppercase tracking-widest text-slate-800">
+              {property.type ?? "Property"}
+            </Text>
+          </View>
 
-  {/* --- CONTENT SECTION --- */}
-  <View className="p-5">
-    
-    {/* Title and Status Row */}
-    <View className="flex-row items-start justify-between gap-3">
-      <View className="flex-1">
-        <Text className="font-soraSemiBold text-xl tracking-tight text-[#1d1d1f]">
-          {property.title}
-        </Text>
-        <View className="mt-1 flex-row items-center gap-1">
-          <MaterialCommunityIcons name="map-marker" color="#94A3B8" size={14} />
-          <Text className="text-sm font-medium text-slate-500" numberOfLines={1}>
-            {property.location}
-          </Text>
-        </View>
-      </View>
-      
-      <View className={`rounded-lg px-2.5 py-1 ${
-        isActive ? 'bg-emerald-50' : 'bg-amber-50'
-      }`}>
-        <Text className={`text-[10px] font-bold uppercase tracking-tighter ${
-          isActive ? 'text-emerald-600' : 'text-amber-600'
-        }`}>
-          {formatStatus(property.status)}
-        </Text>
-      </View>
-    </View>
-
-    {/* --- METRICS GRID: Reuse our standardized logic --- */}
-    <View className="mt-5 flex-row items-center justify-between rounded-2xl bg-slate-50 p-4 border border-slate-100">
-      <View className="flex-1">
-        <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          Property Value
-        </Text>
-        <Text className="mt-1 font-soraSemiBold text-lg text-[#1d1d1f]">
-          {formatPeso(property.value)}
-        </Text>
-      </View>
-
-      <View className="mx-4 h-8 w-[1px] bg-slate-200" />
-
-      <View className="flex-1">
-        <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-          Occupancy
-        </Text>
-        <View className="mt-1 flex-row items-center gap-2">
-          <Text className="font-soraSemiBold text-lg text-[#1d1d1f]">
-            {occupancy}%
-          </Text>
-          {/* Visual Indicator */}
-          <View className="h-1.5 flex-1 rounded-full bg-slate-200 overflow-hidden">
-            <View 
-              className="h-full bg-[#2563EB]" 
-              style={{ width: `${occupancy}%` }} 
-            />
+          <View className="rounded-full bg-[#2563EB] px-3 py-1.5 shadow-md">
+            <Text className="text-[11px] font-bold text-white">
+              {property.roi.toFixed(1)}% ROI
+            </Text>
           </View>
         </View>
+
+        {/* Bottom Gradient Overlay (Optional: adds depth for white text if needed) */}
+        <View className="absolute bottom-0 h-16 w-full bg-gradient-to-t from-black/20 to-transparent" />
       </View>
-    </View>
 
-    {/* --- FOOTER: Features --- */}
-    <View className="mt-5 flex-row items-center gap-4">
-      {property.bedrooms !== undefined && (
-        <View className="flex-row items-center gap-1.5">
-          <MaterialCommunityIcons name="bed-king-outline" color="#64748B" size={18} />
-          <Text className="text-sm font-bold text-slate-600">{property.bedrooms}</Text>
-        </View>
-      )}
-      
-      {property.bathrooms !== undefined && (
-        <View className="flex-row items-center gap-1.5">
-          <MaterialCommunityIcons name="shower" color="#64748B" size={18} />
-          <Text className="text-sm font-bold text-slate-600">{property.bathrooms}</Text>
-        </View>
-      )}
+      {/* --- CONTENT SECTION --- */}
+      <View className="p-5">
+        {/* Title and Status Row */}
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="flex-1">
+            <Text className="font-soraSemiBold text-xl tracking-tight text-[#1d1d1f]">
+              {property.title}
+            </Text>
+            <View className="mt-1 flex-row items-center gap-1">
+              <MaterialCommunityIcons
+                name="map-marker"
+                color="#94A3B8"
+                size={14}
+              />
+              <Text
+                className="text-sm font-medium text-slate-500"
+                numberOfLines={1}
+              >
+                {property.location}
+              </Text>
+            </View>
+          </View>
 
-      {/* Added a spacer to push things left, or add more features here */}
-      <View className="flex-1" />
-      {onOpenBookings ? (
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5"
-          onPress={onOpenBookings}
-        >
-          <MaterialCommunityIcons
-            name="calendar-clock"
-            color="#2563EB"
-            size={17}
-          />
-        </TouchableOpacity>
-      ) : null}
-      
-      <TouchableOpacity
-        activeOpacity={0.8}
-        className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5"
-        onPress={onEdit}
-      >
-        <MaterialCommunityIcons name="pencil" color="#2563EB" size={17} />
-      </TouchableOpacity>
-    </View>
-  </View>
-</TouchableOpacity>
+          <View
+            className={`rounded-lg px-2.5 py-1 ${
+              isActive ? "bg-emerald-50" : "bg-amber-50"
+            }`}
+          >
+            <Text
+              className={`text-[10px] font-bold uppercase tracking-tighter ${
+                isActive ? "text-emerald-600" : "text-amber-600"
+              }`}
+            >
+              {formatStatus(property.status)}
+            </Text>
+          </View>
+        </View>
+
+        {/* --- METRICS GRID: Reuse our standardized logic --- */}
+        <View className="mt-5 flex-row items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4">
+          <View className="flex-1">
+            <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Property Value
+            </Text>
+            <Text className="mt-1 font-soraSemiBold text-lg text-[#1d1d1f]">
+              {formatPeso(property.value)}
+            </Text>
+          </View>
+
+          <View className="mx-4 h-8 w-[1px] bg-slate-200" />
+
+          <View className="flex-1">
+            <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Occupancy
+            </Text>
+            <View className="mt-1 flex-row items-center gap-2">
+              <Text className="font-soraSemiBold text-lg text-[#1d1d1f]">
+                {occupancy}%
+              </Text>
+              {/* Visual Indicator */}
+              <View className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
+                <View
+                  className="h-full bg-[#2563EB]"
+                  style={{ width: `${occupancy}%` }}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* --- FOOTER: Features --- */}
+        <View className="mt-5 flex-row items-center gap-4">
+          {property.bedrooms !== undefined && (
+            <View className="flex-row items-center gap-1.5">
+              <MaterialCommunityIcons
+                name="bed-king-outline"
+                color="#64748B"
+                size={18}
+              />
+              <Text className="text-sm font-bold text-slate-600">
+                {property.bedrooms}
+              </Text>
+            </View>
+          )}
+
+          {property.bathrooms !== undefined && (
+            <View className="flex-row items-center gap-1.5">
+              <MaterialCommunityIcons name="shower" color="#64748B" size={18} />
+              <Text className="text-sm font-bold text-slate-600">
+                {property.bathrooms}
+              </Text>
+            </View>
+          )}
+
+          {/* Added a spacer to push things left, or add more features here */}
+          <View className="flex-1" />
+          {onOpenBookings ? (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5"
+              onPress={onOpenBookings}
+            >
+              <MaterialCommunityIcons
+                name="calendar-clock"
+                color="#2563EB"
+                size={17}
+              />
+            </TouchableOpacity>
+          ) : null}
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5"
+            onPress={onEdit}
+          >
+            <MaterialCommunityIcons name="pencil" color="#2563EB" size={17} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 }
 
@@ -604,9 +624,9 @@ export default function PropertiesScreen() {
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(
     null,
   );
-  const [selectedDocuments, setSelectedDocuments] = useState<SelectedDocument[]>(
-    [],
-  );
+  const [selectedDocuments, setSelectedDocuments] = useState<
+    SelectedDocument[]
+  >([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -681,7 +701,9 @@ export default function PropertiesScreen() {
 
     return [
       { kind: "search" },
-      ...(propertyItems.length > 0 ? propertyItems : [{ kind: "empty" as const }]),
+      ...(propertyItems.length > 0
+        ? propertyItems
+        : [{ kind: "empty" as const }]),
     ];
   }, [filteredProperties]);
 

@@ -1,38 +1,19 @@
 import { apiClient } from "./client";
-import {
-  createLessee,
-  fetchLessees,
-  type Lessee,
-} from "./propertyDetails";
+import { createLessee, fetchLessees } from "./propertyDetails";
 import { fetchProperties } from "./properties";
+import type {
+  ApiEnvelope,
+  Lessee,
+  PaginatedApiData,
+  TransientBooking,
+  TransientBookingPayload,
+} from "../types";
 
-type ApiEnvelope<T> = {
-  data?: T;
-};
-
-type PaginatedApiData<T> = {
-  data?: T[];
-};
-
-export type TransientBookingStatus = "Booked" | "Cancelled";
-
-export type TransientBooking = {
-  id: string;
-  propertyId: string;
-  roomNumber: string;
-  guestName: string;
-  guestEmail: string;
-  guestPhone: string;
-  startDate: string;
-  checkInTime: string;
-  endDate: string;
-  checkOutTime: string;
-  dailyRate: number;
-  status: TransientBookingStatus;
-  notes?: string;
-};
-
-export type TransientBookingPayload = Omit<TransientBooking, "id">;
+export type {
+  TransientBooking,
+  TransientBookingPayload,
+  TransientBookingStatus,
+} from "../types";
 
 export const DEFAULT_CHECK_IN_TIME = "14:00";
 export const DEFAULT_CHECK_OUT_TIME = "11:00";
@@ -93,10 +74,7 @@ function normalizeBooking(lease: Record<string, any>): TransientBooking {
     roomNumber: String(lease?.roomNumber ?? lease?.room_number ?? ""),
     guestName: String(lessee?.name ?? lease?.guestName ?? "Unknown"),
     guestEmail: String(
-      lessee?.contactEmail ??
-        lessee?.contact_email ??
-        lease?.guestEmail ??
-        "",
+      lessee?.contactEmail ?? lessee?.contact_email ?? lease?.guestEmail ?? "",
     ),
     guestPhone: String(lessee?.phone ?? lease?.guestPhone ?? ""),
     startDate: String(lease?.startDate ?? lease?.start_date ?? "").slice(0, 10),
@@ -276,10 +254,7 @@ export async function updateTransientBooking(
   return normalizeBooking(unwrapData(response));
 }
 
-export async function cancelTransientBooking(
-  id: string,
-  accessToken?: string,
-) {
+export async function cancelTransientBooking(id: string, accessToken?: string) {
   const response = await apiClient.post<
     ApiEnvelope<Record<string, any>> | Record<string, any>
   >(

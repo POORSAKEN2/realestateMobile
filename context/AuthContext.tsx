@@ -1,21 +1,10 @@
-import { createContext, PropsWithChildren, useMemo, useState } from 'react';
+import { createContext, PropsWithChildren, useMemo, useState } from "react";
 
-type AuthSession = {
-  accessToken?: string;
-  user?: unknown;
-  onboarding?: unknown;
-};
+import type { AuthContextValue, AuthSession } from "../types";
 
-type AuthContextValue = {
-  session: AuthSession | null;
-  hasCompletedOnboarding: boolean;
-  isAuthenticated: boolean;
-  completeOnboarding: () => void;
-  signIn: (session?: AuthSession) => void;
-  signOut: () => void;
-};
-
-export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+export const AuthContext = createContext<AuthContextValue | undefined>(
+  undefined,
+);
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);

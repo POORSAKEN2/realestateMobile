@@ -1,7 +1,4 @@
-type ApiErrorResponse = {
-  message?: string;
-  errors?: Record<string, string[]>;
-};
+import type { ApiErrorResponse } from "../types";
 
 function getFirstValidationError(errors?: Record<string, string[]>) {
   if (!errors) {
