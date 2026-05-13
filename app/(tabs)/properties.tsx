@@ -1,13 +1,16 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Image,
   KeyboardAvoidingView,
+  Linking,
   Modal,
   Platform,
   ScrollView,
@@ -27,6 +30,12 @@ import {
   type Property,
   type UpdatePropertyPayload,
 } from "../../api/properties";
+import {
+  fetchDocuments,
+  uploadPropertyDocuments,
+  type DocumentUpload,
+  type PropertyDocument,
+} from "../../api/propertyDetails";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -62,6 +71,8 @@ type SelectedImage = {
   type: string;
   file?: Blob;
 };
+
+type SelectedDocument = DocumentUpload;
 
 type PropertyListItem =
   | { kind: "search" }
@@ -244,6 +255,56 @@ function getImageType(asset: ImagePicker.ImagePickerAsset) {
   if (asset.uri.toLowerCase().endsWith(".webp")) return "image/webp";
 
   return "image/jpeg";
+}
+
+function getDocumentType(asset: DocumentPicker.DocumentPickerAsset) {
+  if (asset.mimeType) return asset.mimeType;
+
+  const extension = asset.name.split(".").pop()?.toLowerCase();
+
+  if (extension === "pdf") return "application/pdf";
+  if (extension === "doc") return "application/msword";
+  if (extension === "docx") {
+    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  }
+  if (extension === "png") return "image/png";
+  if (extension === "jpg" || extension === "jpeg") return "image/jpeg";
+
+  return "application/octet-stream";
+}
+
+function formatSelectedDocumentSize(size?: number | null) {
+  if (!size) return "N/A";
+  if (size >= 1_000_000) return `${(size / 1_000_000).toFixed(1)} MB`;
+  if (size >= 1_000) return `${Math.round(size / 1_000)} KB`;
+
+  return `${size} B`;
+}
+
+async function openDocument(document: PropertyDocument) {
+  if (!document.url) {
+    Alert.alert(
+      "Document unavailable",
+      "This document does not have a viewable file URL.",
+    );
+    return;
+  }
+
+  try {
+    const canOpen = await Linking.canOpenURL(document.url);
+
+    if (!canOpen) {
+      Alert.alert(
+        "Cannot open document",
+        "No app is available to open this document.",
+      );
+      return;
+    }
+
+    await Linking.openURL(document.url);
+  } catch {
+    Alert.alert("Cannot open document", "The document could not be opened.");
+  }
 }
 
 function Field({
@@ -543,6 +604,9 @@ export default function PropertiesScreen() {
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(
     null,
   );
+  const [selectedDocuments, setSelectedDocuments] = useState<SelectedDocument[]>(
+    [],
+  );
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -553,14 +617,35 @@ export default function PropertiesScreen() {
     queryFn: () => fetchProperties(accessToken),
     enabled: Boolean(accessToken),
   });
+  const {
+    data: existingPropertyDocuments = [],
+    isLoading: isLoadingExistingDocuments,
+  } = useQuery({
+    queryKey: ["documents", accessToken, editingProperty?.id],
+    queryFn: () =>
+      fetchDocuments(accessToken, { propertyId: editingProperty?.id }),
+    enabled: Boolean(accessToken && editingProperty?.id && isFormVisible),
+  });
 
   const saveMutation = useMutation({
-    mutationFn: (payload: PropertyFormPayload) =>
-      editingProperty
-        ? updateProperty(editingProperty.id, payload, accessToken)
-        : createProperty(payload, accessToken),
+    mutationFn: async (payload: PropertyFormPayload) => {
+      const property = editingProperty
+        ? await updateProperty(editingProperty.id, payload, accessToken)
+        : await createProperty(payload, accessToken);
+
+      if (selectedDocuments.length > 0) {
+        await uploadPropertyDocuments(
+          property.id,
+          selectedDocuments,
+          accessToken,
+        );
+      }
+
+      return property;
+    },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["properties"] });
+      await queryClient.invalidateQueries({ queryKey: ["documents"] });
       await queryClient.invalidateQueries({
         queryKey: ["transientBookablePropertyIds"],
       });
@@ -641,6 +726,7 @@ export default function PropertiesScreen() {
   function openForm() {
     setForm(emptyForm);
     setSelectedImage(null);
+    setSelectedDocuments([]);
     setFormError("");
     setEditingProperty(null);
     setIsFormVisible(true);
@@ -649,6 +735,7 @@ export default function PropertiesScreen() {
   function openEditForm(property: Property) {
     setForm(toFormState(property));
     setSelectedImage(null);
+    setSelectedDocuments([]);
     setFormError("");
     setEditingProperty(property);
     setIsFormVisible(true);
@@ -657,6 +744,7 @@ export default function PropertiesScreen() {
   function closeForm() {
     setForm(emptyForm);
     setSelectedImage(null);
+    setSelectedDocuments([]);
     setFormError("");
     setEditingProperty(null);
     setIsFormVisible(false);
@@ -703,6 +791,52 @@ export default function PropertiesScreen() {
       type: getImageType(asset),
       file: asset.file,
     });
+  }
+
+  async function pickDocuments() {
+    setFormError("");
+
+    const result = await DocumentPicker.getDocumentAsync({
+      copyToCacheDirectory: true,
+      multiple: true,
+      type: [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "image/jpeg",
+        "image/png",
+      ],
+    });
+
+    if (result.canceled || !result.assets?.length) {
+      return;
+    }
+
+    const pickedDocuments = result.assets.map((asset) => ({
+      uri: asset.uri,
+      name: asset.name,
+      type: getDocumentType(asset),
+      size: asset.size,
+      file: asset.file,
+    }));
+
+    setSelectedDocuments((current) => {
+      const existingKeys = new Set(
+        current.map((document) => `${document.name}:${document.size ?? ""}`),
+      );
+      const newDocuments = pickedDocuments.filter((document) => {
+        const key = `${document.name}:${document.size ?? ""}`;
+        return !existingKeys.has(key);
+      });
+
+      return [...current, ...newDocuments];
+    });
+  }
+
+  function removeDocument(index: number) {
+    setSelectedDocuments((current) =>
+      current.filter((_, documentIndex) => documentIndex !== index),
+    );
   }
 
   function handleSubmit() {
@@ -1273,6 +1407,142 @@ export default function PropertiesScreen() {
                       />
                     </TouchableOpacity>
                   </View>
+                </View>
+              ) : null}
+            </View>
+
+            <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+              <View className="flex-row items-center justify-between gap-3">
+                <View className="flex-1 flex-row items-center gap-3">
+                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
+                    <MaterialCommunityIcons
+                      name="file-document-outline"
+                      color="#2563EB"
+                      size={22}
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm font-bold text-[#1d1d1f]">
+                      Property Documents
+                    </Text>
+                    <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+                      PDF, DOC, DOCX, JPG, or PNG files.
+                    </Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  className="rounded-full bg-[#2563EB] px-4 py-2.5"
+                  onPress={pickDocuments}
+                >
+                  <Text className="text-xs font-bold text-[#FFFFFF]">
+                    {selectedDocuments.length > 0 ? "Add More" : "Choose"}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {editingProperty ? (
+                <View className="rounded-2xl bg-[#2563EB]/5 px-3 py-2">
+                  <Text className="text-xs leading-5 text-[#6F6D6D]">
+                    Existing documents stay attached. Add files here to upload
+                    more documents to this property.
+                  </Text>
+                </View>
+              ) : null}
+
+              {editingProperty ? (
+                <View className="gap-2">
+                  <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                    Attached Documents
+                  </Text>
+                  {isLoadingExistingDocuments ? (
+                    <View className="h-14 justify-center rounded-2xl bg-[#2563EB]/5 px-3">
+                      <ActivityIndicator color="#2563EB" />
+                    </View>
+                  ) : existingPropertyDocuments.length > 0 ? (
+                    existingPropertyDocuments.map((document) => (
+                      <TouchableOpacity
+                        key={document.id}
+                        activeOpacity={0.8}
+                        className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
+                        onPress={() => openDocument(document)}
+                      >
+                        <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
+                          <MaterialCommunityIcons
+                            name="file-eye-outline"
+                            color="#2563EB"
+                            size={18}
+                          />
+                        </View>
+                        <View className="min-w-0 flex-1">
+                          <Text
+                            className="text-xs font-bold text-[#1d1d1f]"
+                            numberOfLines={1}
+                          >
+                            {document.name}
+                          </Text>
+                          <Text className="mt-0.5 text-[11px] text-[#6F6D6D]">
+                            {document.category} | {document.size}
+                          </Text>
+                        </View>
+                        <MaterialCommunityIcons
+                          name="open-in-new"
+                          color={document.url ? "#6F6D6D" : "#C8C8C8"}
+                          size={17}
+                        />
+                      </TouchableOpacity>
+                    ))
+                  ) : (
+                    <View className="rounded-2xl border border-dashed border-[#1d1d1f]/15 bg-[#2563EB]/5 px-3 py-4">
+                      <Text className="text-center text-xs font-semibold text-[#6F6D6D]">
+                        No documents attached yet.
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ) : null}
+
+              {selectedDocuments.length > 0 ? (
+                <View className="gap-2">
+                  <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                    New Uploads
+                  </Text>
+                  {selectedDocuments.map((document, index) => (
+                    <View
+                      key={`${document.name}-${document.size ?? index}`}
+                      className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
+                    >
+                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
+                        <MaterialCommunityIcons
+                          name="file-document-outline"
+                          color="#2563EB"
+                          size={18}
+                        />
+                      </View>
+                      <View className="min-w-0 flex-1">
+                        <Text
+                          className="text-xs font-bold text-[#1d1d1f]"
+                          numberOfLines={1}
+                        >
+                          {document.name}
+                        </Text>
+                        <Text className="mt-0.5 text-[11px] text-[#6F6D6D]">
+                          {formatSelectedDocumentSize(document.size)}
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
+                        onPress={() => removeDocument(index)}
+                      >
+                        <MaterialCommunityIcons
+                          name="close"
+                          color="#6F6D6D"
+                          size={17}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
                 </View>
               ) : null}
             </View>
