@@ -507,21 +507,24 @@ export default function DashboardScreen() {
               label: "Yield",
               val: `${Number(stats?.avg_yield ?? 0).toFixed(1)}%`,
               icon: "trending-up",
-              color: "blue",
+              color: "teal",
+              bgcolor:"",
               iconFamily: "Feather",
             },
             {
               label: "Arrears",
               val: formatPesoValue(stats?.total_arrears),
               icon: "alert-circle-outline",
-              color: "rose",
+              color: "teal",
+        
               iconFamily: "MaterialCommunityIcons",
             },
             {
               label: "Income",
               val: formatPesoValue(stats?.net_operating_income),
               icon: "chart-line",
-              color: "emerald",
+              color: "teal",
+       
               iconFamily: "MaterialCommunityIcons",
             },
           ].map((item, idx) => (
