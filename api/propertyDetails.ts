@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { API_BASE_URL, apiClient } from "./client";
 
 type ApiEnvelope<T> = {
   data?: T;
@@ -35,8 +35,33 @@ export type PropertyDocument = {
   category: "Leases" | "Compliance" | "Maintenance" | "Contracts" | string;
   size: string;
   date: string;
+  url?: string;
+  mimeType?: string;
   propertyId?: string;
   lesseeId?: string;
+};
+
+export type DocumentUpload = {
+  uri: string;
+  name: string;
+  type: string;
+  size?: number | null;
+  file?: Blob;
+};
+
+export type DocumentCategory =
+  | "Leases"
+  | "Compliance"
+  | "Maintenance"
+  | "Contracts";
+
+export type DocumentUpdatePayload = {
+  name?: string;
+  category?: DocumentCategory;
+  propertyId?: string | null;
+  lesseeId?: string | null;
+  file?: DocumentUpload;
+  revisionComment?: string;
 };
 
 function authHeaders(accessToken?: string) {
@@ -145,17 +170,60 @@ const normalizeDocumentType = (type: unknown): PropertyDocument["type"] => {
   return "PDF";
 };
 
+function getStorageUrl(path?: string | null) {
+  if (!path) return undefined;
+
+  const raw = path.trim();
+  if (!raw) return undefined;
+  if (/^https?:\/\//i.test(raw)) return raw;
+
+  const apiUrl = API_BASE_URL || "http://localhost:8000/api";
+  const backendOrigin = apiUrl.replace(/\/api\/?$/, "");
+
+  if (raw.startsWith("/storage/")) return `${backendOrigin}${raw}`;
+  if (raw.startsWith("storage/")) return `${backendOrigin}/${raw}`;
+
+  return `${backendOrigin}/storage/${raw.replace(/^\/+/, "")}`;
+}
+
+function formatFileSize(value: unknown) {
+  const bytes = Number(value);
+
+  if (!Number.isFinite(bytes) || bytes <= 0) return "N/A";
+  if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
+  if (bytes >= 1_000) return `${Math.round(bytes / 1_000)} KB`;
+
+  return `${bytes} B`;
+}
+
 const normalizeDocument = (document: Record<string, any>): PropertyDocument => {
   const media = Array.isArray(document?.media) ? document.media[0] : undefined;
+  const rawUrl =
+    document?.url ??
+    document?.file_url ??
+    document?.fileUrl ??
+    document?.path ??
+    document?.file_path ??
+    media?.original_url ??
+    media?.url ??
+    media?.preview_url;
+  const mimeType = String(
+    document?.mimeType ?? document?.mime_type ?? media?.mime_type ?? "",
+  );
 
   return {
     ...document,
     id: String(document?.id ?? ""),
     name: String(document?.name ?? document?.file_name ?? "Untitled document"),
-    type: normalizeDocumentType(document?.type ?? media?.mime_type),
+    type: normalizeDocumentType(document?.type ?? mimeType),
     category: String(document?.category ?? "Compliance"),
-    size: String(document?.size ?? media?.size ?? "N/A"),
+    size:
+      typeof document?.size === "string"
+        ? document.size
+        : formatFileSize(document?.size ?? media?.size),
     date: formatDate(document?.date ?? document?.created_at ?? ""),
+    url: getStorageUrl(rawUrl),
+    mimeType: mimeType || undefined,
     propertyId: document?.propertyId ?? document?.property_id ?? undefined,
     lesseeId: document?.lesseeId ?? document?.lessee_id ?? undefined,
   };
@@ -288,4 +356,111 @@ export async function fetchDocuments(
   >(`/documents${query}`, { headers: authHeaders(accessToken) });
 
   return normalizeCollection(response).map(normalizeDocument);
+}
+
+export async function uploadPropertyDocuments(
+  propertyId: string,
+  documents: DocumentUpload[],
+  accessToken?: string,
+  category: DocumentCategory = "Compliance",
+) {
+  if (documents.length === 0) return [];
+
+  const uploadedDocuments = await Promise.all(
+    documents.map((document) =>
+      uploadDocument(
+        {
+          propertyId,
+          name: document.name,
+          category,
+          file: document,
+        },
+        accessToken,
+      ),
+    ),
+  );
+
+  return uploadedDocuments;
+}
+
+export async function uploadDocument(
+  payload: {
+    name: string;
+    category: DocumentCategory;
+    file: DocumentUpload;
+    propertyId?: string;
+    lesseeId?: string;
+  },
+  accessToken?: string,
+) {
+  const response = await apiClient.post<
+    ApiEnvelope<Record<string, any>> | Record<string, any>
+  >("/documents", toDocumentFormData(payload), {
+    headers: authHeaders(accessToken),
+  });
+
+  return normalizeDocument(unwrapData(response));
+}
+
+export async function updateDocument(
+  id: string,
+  payload: DocumentUpdatePayload,
+  accessToken?: string,
+) {
+  const response = await apiClient.post<
+    ApiEnvelope<Record<string, any>> | Record<string, any>
+  >(`/documents/${id}`, toDocumentUpdateFormData(payload), {
+    headers: authHeaders(accessToken),
+  });
+
+  return normalizeDocument(unwrapData(response));
+}
+
+function appendOptionalFormValue(
+  formData: FormData,
+  key: string,
+  value?: string | null,
+) {
+  if (value === undefined || value === null) return;
+  formData.append(key, value);
+}
+
+function appendDocumentFile(formData: FormData, document: DocumentUpload) {
+  formData.append("file", (document.file ?? document) as unknown as Blob);
+}
+
+function toDocumentFormData(payload: {
+  name: string;
+  category: DocumentCategory;
+  file: DocumentUpload;
+  propertyId?: string;
+  lesseeId?: string;
+}) {
+  const formData = new FormData();
+
+  formData.append("name", payload.name);
+  formData.append("category", payload.category);
+  appendOptionalFormValue(formData, "property_id", payload.propertyId);
+  appendOptionalFormValue(formData, "lessee_id", payload.lesseeId);
+  appendDocumentFile(formData, payload.file);
+
+  return formData;
+}
+
+function toDocumentUpdateFormData(payload: DocumentUpdatePayload) {
+  const formData = new FormData();
+
+  formData.append("_method", "PUT");
+  appendOptionalFormValue(formData, "name", payload.name);
+  appendOptionalFormValue(formData, "category", payload.category);
+  appendOptionalFormValue(formData, "property_id", payload.propertyId);
+  appendOptionalFormValue(formData, "lessee_id", payload.lesseeId);
+  appendOptionalFormValue(
+    formData,
+    "revision_comment",
+    payload.revisionComment,
+  );
+  if (payload.file) appendDocumentFile(formData, payload.file);
+
+  return formData;
 }

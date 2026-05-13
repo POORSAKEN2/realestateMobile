@@ -1,6 +1,8 @@
 import {
+  Alert,
   Image,
   ImageBackground,
+  Linking,
   Text,
   TextInput,
   View,
@@ -28,6 +30,7 @@ import {
   fetchDocuments,
   fetchLeases,
   fetchLessees,
+  type PropertyDocument,
 } from "../../api/propertyDetails";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -81,6 +84,32 @@ const formatPropertyStatus = (status: string) =>
     .split("_")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+
+async function openDocument(document: PropertyDocument) {
+  if (!document.url) {
+    Alert.alert(
+      "Document unavailable",
+      "This document does not have a viewable file URL.",
+    );
+    return;
+  }
+
+  try {
+    const canOpen = await Linking.canOpenURL(document.url);
+
+    if (!canOpen) {
+      Alert.alert(
+        "Cannot open document",
+        "No app is available to open this document.",
+      );
+      return;
+    }
+
+    await Linking.openURL(document.url);
+  } catch {
+    Alert.alert("Cannot open document", "The document could not be opened.");
+  }
+}
 
 const isAuthUser = (value: unknown): value is AuthUser =>
   typeof value === "object" && value !== null;
@@ -1033,9 +1062,11 @@ export default function DashboardScreen() {
                         <View className="h-16 rounded-2xl bg-zinc-50" />
                       ) : selectedPropertyDocuments.length > 0 ? (
                         selectedPropertyDocuments.map((document) => (
-                          <View
+                          <TouchableOpacity
                             key={document.id}
+                            activeOpacity={0.8}
                             className="flex-row items-center gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
+                            onPress={() => openDocument(document)}
                           >
                             <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
                               <Feather
@@ -1058,7 +1089,12 @@ export default function DashboardScreen() {
                                 {document.category} | {document.size}
                               </Text>
                             </View>
-                          </View>
+                            <Feather
+                              name="external-link"
+                              size={15}
+                              color={document.url ? "#71717a" : "#d4d4d8"}
+                            />
+                          </TouchableOpacity>
                         ))
                       ) : (
                         <View className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5">
