@@ -32,7 +32,9 @@ export type AuthContextValue = {
   session: AuthSession | null;
   hasCompletedOnboarding: boolean;
   isAuthenticated: boolean;
+  isLoading: boolean;
   completeOnboarding: () => void;
+  setOnboardingCompleted: (completed: boolean) => void;
   signIn: (session?: AuthSession) => void;
   signOut: () => void;
 };

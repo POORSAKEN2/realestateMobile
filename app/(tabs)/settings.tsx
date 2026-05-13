@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Alert,
   ScrollView,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -63,11 +64,12 @@ function PasswordField({
 }
 
 export default function SettingsScreen() {
-  const { signOut } = useAuth();
+  const { hasCompletedOnboarding, setOnboardingCompleted, signOut } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const shouldShowOnboarding = !hasCompletedOnboarding;
 
   function handleSignOut() {
     signOut();
@@ -141,7 +143,45 @@ export default function SettingsScreen() {
             Manage your password, account security, and secure access.
           </Text>
 
-          <View className="mt-8 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/10">
+          <View className="mt-8 rounded-[28px] border border-amber-200 bg-amber-50 p-5 shadow-sm shadow-amber-900/5">
+            <View className="flex-row items-center justify-between gap-4">
+              <View className="min-w-0 flex-1">
+                <View className="flex-row items-center gap-2">
+                  <View className="h-9 w-9 items-center justify-center rounded-2xl bg-white">
+                    <Ionicons name="construct-outline" color="#D97706" size={19} />
+                  </View>
+                  <Text className="text-lg font-bold text-slate-950">
+                    Onboarding Preview
+                  </Text>
+                </View>
+                <Text className="mt-3 text-sm leading-6 text-slate-600">
+                  Temporarily show onboarding on launch while this flow is being
+                  worked on.
+                </Text>
+              </View>
+              <Switch
+                value={shouldShowOnboarding}
+                trackColor={{ false: "#CBD5E1", true: "#F59E0B" }}
+                thumbColor="#FFFFFF"
+                ios_backgroundColor="#CBD5E1"
+                onValueChange={(enabled) => setOnboardingCompleted(!enabled)}
+              />
+            </View>
+
+            <TouchableOpacity
+              activeOpacity={0.82}
+              className="mt-4 h-12 flex-row items-center justify-center rounded-2xl bg-slate-950"
+              onPress={() => {
+                setOnboardingCompleted(false);
+                router.replace("/(onboarding)/screen-1");
+              }}
+            >
+              <Ionicons name="play-outline" color="#FFFFFF" size={19} />
+              <Text className="ml-2 font-bold text-white">Open Onboarding</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View className="mt-5 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/10">
             <View className="flex-row items-center justify-between">
               <View>
                 <Text className="text-lg font-bold text-slate-950">
