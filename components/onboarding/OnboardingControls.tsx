@@ -9,19 +9,32 @@ type OnboardingProgressProps = {
   activeIndex: number;
 };
 
+const progressAccentColors = [
+  '#2DD4BF',
+  '#38BDF8',
+  '#FCD34D',
+  '#FDA4AF',
+  '#C4B5FD',
+  '#BEF264',
+  '#67E8F9',
+];
+
 export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
   const totalScreens = onboardingScreens.length;
   const currentStep = activeIndex + 1;
   const progress = (currentStep / totalScreens) * 100;
-  const accentClassName = onboardingScreens[activeIndex]?.accent ?? 'bg-primary';
+  const accentColor = progressAccentColors[activeIndex] ?? '#2563EB';
 
   return (
     <View className="w-full">
       <View className="flex-row items-center gap-3">
         <View className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200">
           <View
-            className={`h-full rounded-full ${accentClassName}`}
-            style={{ width: `${progress}%` as `${number}%` }}
+            className="h-full rounded-full"
+            style={{
+              backgroundColor: accentColor,
+              width: `${progress}%` as `${number}%`,
+            }}
           />
         </View>
 
