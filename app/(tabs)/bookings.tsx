@@ -814,7 +814,7 @@ export default function BookingsScreen() {
               </View>
             )}
 
-            <View className="gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+            <View className="gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm mb-16">
               <View>
                 <Text className="text-lg font-bold text-[#1d1d1f]">
                   Booking History

@@ -628,6 +628,8 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
 
+      
+
         {showAssetFilters && (
           <View className="mt-4 gap-3 border-t border-teal-50 pt-3">
             <View>
@@ -723,9 +725,14 @@ export default function DashboardScreen() {
                 })}
               </View>
             </View>
+            
           </View>
         )}
+        
+       
       </View>
+
+
       <View className="mt-4 flex-1">
         {isLoadingProperties ? (
           <View className="gap-3">
@@ -739,9 +746,10 @@ export default function DashboardScreen() {
         ) : visibleAssets.length > 0 ? (
           <FlatList
             data={visibleAssets}
+          
             keyExtractor={(property) => property.id}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 24 }}
+            contentContainerStyle={{ paddingBottom: 140 }}
             ItemSeparatorComponent={() => <View className="h-3" />}
             renderItem={({ item: property }) => (
               <TouchableOpacity
@@ -803,6 +811,8 @@ export default function DashboardScreen() {
           </View>
         )}
       </View>
+
+      
       <Modal
         visible={!!selectedProperty}
         transparent

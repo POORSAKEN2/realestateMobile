@@ -959,7 +959,7 @@ export default function PropertiesScreen() {
           <LoadingState label="Loading properties" />
         ) : (
           <FlatList
-            contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
             data={propertyListItems}
             ItemSeparatorComponent={() => <View className="h-4" />}
             keyExtractor={(item) =>
