@@ -80,6 +80,11 @@ const sections: MenuSection[] = [
     title: "Account",
     items: [
       {
+        label: "Profile",
+        href: "/(tabs)/profile",
+        icon: { family: "Ionicons", name: "person-outline" },
+      },
+      {
         label: "Settings",
         href: "/(tabs)/settings",
         icon: { family: "Ionicons", name: "settings-outline" },

@@ -4,6 +4,7 @@ import { Alert } from "react-native";
 
 import { API_BASE_URL } from "../api/client";
 import { parseApiResponse } from "../api/response";
+import { normalizeUser } from "../api/user";
 import type { AuthResponse, RegisterFormData } from "../types";
 import { useAuth } from "./useAuth";
 
@@ -111,7 +112,11 @@ export function useRegister() {
 
       const { access_token, user, onboarding } = result.data ?? {};
 
-      signIn({ accessToken: access_token, user, onboarding });
+      signIn({
+        accessToken: access_token,
+        user: user && typeof user === "object" ? normalizeUser(user) : user,
+        onboarding,
+      });
       Alert.alert("Registered", "Registration successful!");
       router.replace("/");
     } catch (err) {
