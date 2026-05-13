@@ -1,5 +1,6 @@
 import {
   Alert,
+  FlatList,
   Image,
   ImageBackground,
   Linking,
@@ -471,148 +472,78 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
       </ImageBackground>
-      <View
-        className="-mt-44 w-full rounded-[28px] border border-white/80 bg-[#fffafa]"
-        style={{
-          height: floatingCardHeight,
-          padding: floatingCardPadding,
-          alignSelf: "stretch",
-          zIndex: 10,
-          shadowColor: "rgba(15,23,42,0.28)",
-          shadowOffset: { width: 0, height: 17 },
-          shadowOpacity: 0.22,
-          shadowRadius: 24,
-          elevation: 12,
-        }}
-      >
         <View
-          className="mb-2 flex-row items-center justify-between"
-          style={{ height: analyticsHeaderHeight }}
+  className="w-full rounded-[32px] border border-white/80 bg-white"
+  style={{
+    height: floatingCardHeight,
+    padding: floatingCardPadding,
+    marginTop: -176, 
+    zIndex: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 8,
+  }}
+>
+  {/* --- HEADER --- */}
+  <View
+    className="flex-row items-center justify-between"
+    style={{ height: analyticsHeaderHeight }}
+  >
+    <View className="flex-row items-center gap-2">
+      <View className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" />
+      <Text className="font-soraSemiBold text-[13px] tracking-tight text-slate-900">
+        Analytics Overview
+      </Text>
+    </View>
+    <TouchableOpacity className="h-8 w-8 items-center justify-center rounded-full bg-slate-50">
+      <Feather name="more-horizontal" size={18} color="#64748B" />
+    </TouchableOpacity>
+  </View>
+
+  {/* --- THE 2x2 GRID --- */}
+  {/* We use negative margin to counteract the padding on the children */}
+  <View 
+    className="flex-row flex-wrap" 
+    style={{ margin: -(metricGridGap / 2) }} 
+  >
+    {[
+      { label: 'Value', val: formatPesoValue(stats?.total_value), icon: 'wallet', color: 'teal', iconFamily: 'Ionicons' },
+      { label: 'Yield', val: `${Number(stats?.avg_yield ?? 0).toFixed(1)}%`, icon: 'trending-up', color: 'blue', iconFamily: 'Feather' },
+      { label: 'Arrears', val: formatPesoValue(stats?.total_arrears), icon: 'alert-circle-outline', color: 'rose', iconFamily: 'MaterialCommunityIcons' },
+      { label: 'Income', val: formatPesoValue(stats?.net_operating_income), icon: 'chart-line', color: 'emerald', iconFamily: 'MaterialCommunityIcons' },
+    ].map((item, idx) => (
+      <View 
+        key={idx} 
+        className="w-1/2" // Forces 2 items per row
+        style={{ padding: metricGridGap / 2 }} 
+      >
+        <View 
+          className={`rounded-[22px] border border-${item.color}-50 bg-${item.color}-50/30 px-3 justify-center`}
+          style={{ height: metricTileHeight }}
         >
-          <Text className="font-soraMedium">Analytics Overview</Text>
-
-          <TouchableOpacity
-            activeOpacity={0.72}
-            accessibilityRole="button"
-            accessibilityLabel="Open analytics menu"
-            hitSlop={8}
-            className="h-9 w-9 items-center justify-center rounded-full bg-white/80"
+          <View className={`mb-1 h-7 w-7 items-center justify-center rounded-lg bg-white shadow-sm`}>
+            {item.iconFamily === 'Ionicons' && <Ionicons name="wallet" size={14} color="#475569" />}
+            {item.iconFamily === 'Feather' && <Feather name="trending-up" size={14} color="#2563EB" />}
+            {item.iconFamily === 'MaterialCommunityIcons' && <MaterialCommunityIcons name="alert-circle-outline" size={14} color={item.color === 'rose' ? "#E11D48" : "#059669"} />}
+          </View>
+          
+          <Text 
+            className="font-soraSemiBold text-base tracking-tighter text-slate-900" 
+            numberOfLines={1} 
+            adjustsFontSizeToFit
           >
-            <Feather name="more-horizontal" size={20} color="#52525b" />
-          </TouchableOpacity>
-        </View>
-        <View className="-m-1 flex-row flex-wrap">
-          <View className="w-1/2 p-1">
-            <View
-              className="rounded-2xl border border-teal-100/70 bg-white/80 p-2.5"
-              style={{ height: metricTileHeight }}
-            >
-              <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
-                <Ionicons name="wallet-outline" size={20} color="#0f766e" />
-              </View>
-              <Text
-                className="text-lg font-bold text-zinc-950"
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                {isLoadingAnalytics
-                  ? "..."
-                  : formatPesoValue(stats?.total_value)}
-              </Text>
-              <Text
-                className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500"
-                numberOfLines={2}
-              >
-                Total Asset Value
-              </Text>
-            </View>
-          </View>
-
-          <View className="w-1/2 p-1">
-            <View
-              className="rounded-2xl border border-sky-100/80 bg-white/80 p-2.5"
-              style={{ height: metricTileHeight }}
-            >
-              <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-sky-50">
-                <Feather name="percent" size={20} color="#0f766e" />
-              </View>
-              <Text
-                className="text-lg font-bold text-zinc-950"
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                 {isLoadingAnalytics ? "..." : `${Number(stats?.avg_yield ?? 0).toFixed(1)}%`}
-              </Text>
-              <Text
-                className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500"
-                numberOfLines={2}
-              >
-                Average Yield
-              </Text>
-            </View>
-          </View>
-
-          <View className="w-1/2 p-1">
-            <View
-              className="rounded-2xl border border-emerald-100/80 bg-white/80 p-2.5"
-              style={{ height: metricTileHeight }}
-            >
-              <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-emerald-50">
-                <MaterialCommunityIcons
-                  name="cash-clock"
-                  size={20}
-                  color="#16A34A"
-                />
-              </View>
-              <Text
-                className="text-lg font-bold text-zinc-950"
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                {isLoadingAnalytics
-                  ? "..."
-                  : formatPesoValue(stats?.total_arrears)}
-              </Text>
-              <Text
-                className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500"
-                numberOfLines={2}
-              >
-                Total Arrears
-              </Text>
-            </View>
-          </View>
-
-          <View className="w-1/2 p-1">
-            <View
-              className="rounded-2xl border border-teal-100/70 bg-white/80 p-2.5"
-              style={{ height: metricTileHeight }}
-            >
-              <View className="mb-2 h-8 w-8 items-center justify-center rounded-xl bg-teal-50">
-                <MaterialCommunityIcons
-                  name="chart-line"
-                  size={20}
-                  color="#16A34A"
-                />
-              </View>
-              <Text
-                className="text-lg font-bold text-zinc-950"
-                numberOfLines={1}
-                adjustsFontSizeToFit
-              >
-                {isLoadingAnalytics
-                  ? "..."
-                  : formatPesoValue(stats?.net_operating_income)}
-              </Text>
-              <Text
-                className="mt-0.5 text-[11px] font-medium leading-3 text-zinc-500"
-                numberOfLines={2}
-              >
-                Net Operating Income
-              </Text>
-            </View>
-          </View>
+            {isLoadingAnalytics ? "..." : item.val}
+          </Text>
+          <Text className={`text-[9px] font-bold uppercase tracking-wider text-${item.color}-500/60`}>
+            {item.label}
+          </Text>
         </View>
       </View>
+    ))}
+  </View>
+</View>
 
       <View className="my-5">
         <Text className="font-soraSemiBold">Portfolio Assets</Text>
@@ -621,14 +552,14 @@ export default function DashboardScreen() {
         </Text>
       </View>
 
-      <View className="rounded-[22px] border border-teal-100 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
+      <View className="rounded-[22px] border border-[#2563EB]/10 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
         <View className="flex-row items-center gap-3">
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-teal-50">
-            <Feather name="search" size={20} color="#0f766e" />
+          <View className="h-11 w-11 items-center justify-center rounded-2xl ">
+            <Feather name="search" size={20} color="#2563EB" />
           </View>
 
           <View className="min-w-0 flex-1">
-            <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-teal-700">
+            <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-primary">
               Find property
             </Text>
             <TextInput
@@ -658,13 +589,13 @@ export default function DashboardScreen() {
               })
             }
             className={`h-11 w-11 items-center justify-center rounded-2xl ${
-              showAssetFilters ? "bg-teal-50" : "bg-[#0f766e]"
+              showAssetFilters ? "bg-teal-50" : "bg-[#2563EB]"
             }`}
           >
             <Feather
               name="sliders"
               size={18}
-              color={showAssetFilters ? "#0f766e" : "#ffffff"}
+              color={showAssetFilters ? "#2563EB" : "#ffffff"}
             />
           </TouchableOpacity>
         </View>
@@ -704,7 +635,7 @@ export default function DashboardScreen() {
                         }
                       }}
                       className={`flex-row items-center gap-1 rounded-full px-3 py-1.5 ${
-                        isActive ? "bg-[#0f766e]" : "bg-zinc-50"
+                        isActive ? "bg-[#2563EB]" : "bg-zinc-50"
                       }`}
                     >
                       <Text
@@ -749,12 +680,12 @@ export default function DashboardScreen() {
                       accessibilityLabel={`Show ${label} assets`}
                       onPress={() => setAssetStatusFilter(status)}
                       className={`rounded-full px-3 py-1.5 ${
-                        isActive ? "bg-teal-50" : "bg-zinc-50"
+                        isActive ? "bg-[#2563EB]" : "bg-zinc-50"
                       }`}
                     >
                       <Text
                         className={`font-soraSemiBold text-[10px] ${
-                          isActive ? "text-teal-700" : "text-zinc-500"
+                          isActive ? "text-white" : "text-zinc-500"
                         }`}
                       >
                         {label}
@@ -767,66 +698,74 @@ export default function DashboardScreen() {
           </View>
         )}
       </View>
-      <View className="mt-4 gap-3">
+      <View className="mt-4 flex-1">
         {isLoadingProperties ? (
-          Array.from({ length: 2 }).map((_, index) => (
-            <View
-              key={index}
-              className="h-24 rounded-2xl border border-zinc-100 bg-zinc-50"
-            />
-          ))
-        ) : visibleAssets.length > 0 ? (
-          visibleAssets.map((property) => (
-            <TouchableOpacity
-              key={property.id}
-              activeOpacity={0.82}
-              accessibilityRole="button"
-              accessibilityLabel={`View ${property.title}`}
-              onPress={() => setSelectedProperty(property)}
-              className="flex-row gap-3 rounded-2xl border border-zinc-100 bg-white p-2.5"
-            >
-              <Image
-                source={{ uri: property.image }}
-                className="h-20 w-20 rounded-xl bg-zinc-100"
-                resizeMode="cover"
+          <View className="gap-3">
+            {Array.from({ length: 2 }).map((_, index) => (
+              <View
+                key={index}
+                className="h-24 rounded-2xl border border-zinc-100 bg-zinc-50"
               />
+            ))}
+          </View>
+        ) : visibleAssets.length > 0 ? (
+          <FlatList
+            data={visibleAssets}
+            keyExtractor={(property) => property.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 24 }}
+            ItemSeparatorComponent={() => <View className="h-3" />}
+            renderItem={({ item: property }) => (
+              <TouchableOpacity
+                activeOpacity={0.82}
+                accessibilityRole="button"
+                accessibilityLabel={`View ${property.title}`}
+                onPress={() => setSelectedProperty(property)}
+                className="flex-row gap-3 rounded-2xl border border-zinc-100 bg-white p-2.5"
+              >
+                <Image
+                  source={{ uri: property.image }}
+                  className="h-20 w-20 rounded-xl bg-zinc-100"
+                  resizeMode="cover"
+                />
 
-              <View className="min-w-0 flex-1 justify-between py-0.5">
-                <View>
-                  <View className="flex-row items-start justify-between gap-2">
-                    <Text
-                      className="min-w-0 flex-1 font-soraSemiBold text-sm text-zinc-950"
-                      numberOfLines={1}
-                    >
-                      {property.title}
-                    </Text>
-                    <Text className="rounded-full bg-teal-50 px-2 py-0.5 font-soraSemiBold text-[9px] uppercase text-teal-700">
-                      {property.roi}% ROI
-                    </Text>
+                <View className="min-w-0 flex-1 justify-between py-0.5">
+                  <View>
+                    <View className="flex-row items-start justify-between gap-2">
+                      <Text
+                        className="min-w-0 flex-1 font-soraSemiBold text-sm text-zinc-950"
+                        numberOfLines={1}
+                      >
+                        {property.title}
+                      </Text>
+                      <Text className="rounded-full bg-teal-50 px-2 py-0.5 font-soraSemiBold text-[9px] uppercase text-teal-700">
+                        {property.roi}% ROI
+                      </Text>
+                    </View>
+
+                    <View className="mt-1 flex-row items-center gap-1">
+                      <Feather name="map-pin" size={11} color="#71717a" />
+                      <Text
+                        className="min-w-0 flex-1 text-[11px] text-zinc-500"
+                        numberOfLines={1}
+                      >
+                        {property.location}
+                      </Text>
+                    </View>
                   </View>
 
-                  <View className="mt-1 flex-row items-center gap-1">
-                    <Feather name="map-pin" size={11} color="#71717a" />
-                    <Text
-                      className="min-w-0 flex-1 text-[11px] text-zinc-500"
-                      numberOfLines={1}
-                    >
-                      {property.location}
+                  <View className="flex-row items-center justify-between">
+                    <Text className="font-soraMedium text-[11px] text-zinc-500">
+                      {formatPropertyStatus(property.status)}
+                    </Text>
+                    <Text className="font-soraSemiBold text-xs text-zinc-950">
+                      {formatPesoValue(property.value)}
                     </Text>
                   </View>
                 </View>
-
-                <View className="flex-row items-center justify-between">
-                  <Text className="font-soraMedium text-[11px] text-zinc-500">
-                    {formatPropertyStatus(property.status)}
-                  </Text>
-                  <Text className="font-soraSemiBold text-xs text-zinc-950">
-                    {formatPesoValue(property.value)}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))
+              </TouchableOpacity>
+            )}
+          />
         ) : (
           <View className="items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-6">
             <Feather name="search" size={22} color="#a1a1aa" />
