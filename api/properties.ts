@@ -1,65 +1,17 @@
 import { API_BASE_URL, apiClient } from "./client";
+import type {
+  ApiEnvelope,
+  CreatePropertyPayload,
+  PaginatedApiData,
+  Property,
+  UpdatePropertyPayload,
+} from "../types";
 
-type ApiEnvelope<T> = {
-  data?: T;
-};
-
-type PaginatedApiData<T> = {
-  data?: T[];
-};
-
-export type Property = {
-  id: string;
-  title: string;
-  location: string;
-  country?: string;
-  status:
-    | "UNDER_CONSTRUCTION"
-    | "PRE_LEASED"
-    | "REVENUE_GENERATING"
-    | "PERSONAL_USE"
-    | "IDLE";
-  type?: "Residential" | "Commercial" | "Industrial" | "Retail" | "Condominium";
-  value: number;
-  roi: number;
-  occupancy?: number;
-  area?: string;
-  utilityScore?: string;
-  bedrooms?: number;
-  bathrooms?: number;
-  lat?: number;
-  lng?: number;
-  image: string;
-  images?: string[];
-  parentId?: string;
-  isTransientBookable?: boolean;
-};
-
-export type CreatePropertyPayload = {
-  title: string;
-  location: string;
-  country: string;
-  status: Property["status"];
-  type: NonNullable<Property["type"]>;
-  value: number;
-  roi: number;
-  occupancy?: number;
-  bedrooms?: number;
-  bathrooms?: number;
-  lat: number;
-  lng: number;
-  is_transient_bookable?: boolean;
-  description?: string;
-  area?: string;
-  image?: {
-    uri: string;
-    name: string;
-    type: string;
-    file?: Blob;
-  };
-};
-
-export type UpdatePropertyPayload = CreatePropertyPayload;
+export type {
+  CreatePropertyPayload,
+  Property,
+  UpdatePropertyPayload,
+} from "../types";
 
 const DEFAULT_PROPERTY_IMAGE =
   "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800";
@@ -134,7 +86,9 @@ function normalizeBoolean(value: unknown) {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return value === 1;
 
-  const normalized = String(value ?? "").trim().toLowerCase();
+  const normalized = String(value ?? "")
+    .trim()
+    .toLowerCase();
   return normalized === "1" || normalized === "true" || normalized === "yes";
 }
 
@@ -254,7 +208,9 @@ export async function updateProperty(
   accessToken?: string,
 ) {
   const { image, ...propertyFields } = payload;
-  const body = image ? toPropertyFormData(propertyFields, image, "PUT") : payload;
+  const body = image
+    ? toPropertyFormData(propertyFields, image, "PUT")
+    : payload;
   const response = image
     ? await apiClient.post<ApiEnvelope<Property> | Property>(
         `/properties/${id}`,

@@ -1,68 +1,27 @@
 import { API_BASE_URL, apiClient } from "./client";
+import type {
+  ApiEnvelope,
+  DocumentCategory,
+  DocumentUpdatePayload,
+  DocumentUpload,
+  Lease,
+  LeasePayload,
+  Lessee,
+  LesseePayload,
+  PaginatedApiData,
+  PropertyDocument,
+} from "../types";
 
-type ApiEnvelope<T> = {
-  data?: T;
-};
-
-type PaginatedApiData<T> = {
-  data?: T[];
-};
-
-export type Lessee = {
-  id: string;
-  tenantId?: string;
-  name: string;
-  contactEmail: string;
-  phone: string;
-};
-
-export type Lease = {
-  id: string;
-  propertyId: string;
-  lesseeId: string;
-  roomNumber?: string | null;
-  startDate: string;
-  endDate: string;
-  monthlyRent: number;
-  status: "Active" | "Expired" | "Terminated" | string;
-  lessee?: Lessee;
-};
-
-export type PropertyDocument = {
-  id: string;
-  name: string;
-  type: "PDF" | "DOCX" | "JPG" | "PNG";
-  category: "Leases" | "Compliance" | "Maintenance" | "Contracts" | string;
-  size: string;
-  date: string;
-  url?: string;
-  mimeType?: string;
-  propertyId?: string;
-  lesseeId?: string;
-};
-
-export type DocumentUpload = {
-  uri: string;
-  name: string;
-  type: string;
-  size?: number | null;
-  file?: Blob;
-};
-
-export type DocumentCategory =
-  | "Leases"
-  | "Compliance"
-  | "Maintenance"
-  | "Contracts";
-
-export type DocumentUpdatePayload = {
-  name?: string;
-  category?: DocumentCategory;
-  propertyId?: string | null;
-  lesseeId?: string | null;
-  file?: DocumentUpload;
-  revisionComment?: string;
-};
+export type {
+  DocumentCategory,
+  DocumentUpdatePayload,
+  DocumentUpload,
+  Lease,
+  LeasePayload,
+  Lessee,
+  LesseePayload,
+  PropertyDocument,
+} from "../types";
 
 function authHeaders(accessToken?: string) {
   return {
@@ -237,16 +196,6 @@ export async function fetchLeases(accessToken?: string) {
   return normalizeCollection(response).map(normalizeLease);
 }
 
-export type LeasePayload = {
-  propertyId: string;
-  lesseeId: string;
-  startDate: string;
-  endDate: string;
-  monthlyRent: number;
-  roomNumber?: string;
-  status?: string;
-};
-
 function toLeaseApiPayload(payload: LeasePayload) {
   return {
     property_id: payload.propertyId,
@@ -296,12 +245,6 @@ export async function fetchLessees(accessToken?: string) {
 
   return normalizeCollection(response).map(normalizeLessee);
 }
-
-export type LesseePayload = {
-  name: string;
-  contactEmail: string;
-  phone: string;
-};
 
 function toLesseeApiPayload(payload: LesseePayload) {
   return {

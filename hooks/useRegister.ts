@@ -4,26 +4,10 @@ import { Alert } from "react-native";
 
 import { API_BASE_URL } from "../api/client";
 import { parseApiResponse } from "../api/response";
+import type { AuthResponse, RegisterFormData } from "../types";
 import { useAuth } from "./useAuth";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-type RegisterFormData = {
-  name: string;
-  email: string;
-  password: string;
-  password_confirmation: string;
-  company: string;
-};
-
-type RegisterResponse = {
-  data?: {
-    access_token?: string;
-    user?: unknown;
-    onboarding?: unknown;
-  };
-  message?: string;
-};
 
 const initialFormData: RegisterFormData = {
   name: "",
@@ -120,7 +104,7 @@ export function useRegister() {
         }),
       });
 
-      const result = await parseApiResponse<RegisterResponse>(
+      const result = await parseApiResponse<AuthResponse>(
         response,
         "Registration failed.",
       );

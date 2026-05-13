@@ -24,14 +24,12 @@ import {
   deleteLease,
   fetchLeases,
   fetchLessees,
-  type Lease,
-  type LeasePayload,
-  type Lessee,
   updateLease,
 } from "../../api/propertyDetails";
-import { fetchProperties, type Property } from "../../api/properties";
+import { fetchProperties } from "../../api/properties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
+import type { Lease, LeasePayload, Lessee, Property } from "../../types";
 
 type LeaseFormState = {
   propertyId: string;
@@ -301,108 +299,123 @@ function LeaseCard({
   const isExpired = lease.status === "Expired";
 
   return (
-   <TouchableOpacity
-  activeOpacity={0.7}
-  onPress={onOpenTenant}
-  className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm shadow-slate-300/30"
->
-  <View className="p-5">
-    
-    {/* --- HEADER: Identity, Status & Actions --- */}
-    <View className="flex-row items-start justify-between gap-3">
-      
-      {/* Identity & Location */}
-      <View className="min-w-0 flex-1">
-        <View className="flex-row items-center gap-2">
-          <Text 
-            className="min-w-0 flex-1 font-soraSemiBold text-lg tracking-tight text-[#1d1d1f]" 
-            numberOfLines={1}
-          >
-            {lessee?.name ?? lease.lessee?.name ?? "Unknown Tenant"}
-          </Text>
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={onOpenTenant}
+      className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm shadow-slate-300/30"
+    >
+      <View className="p-5">
+        {/* --- HEADER: Identity, Status & Actions --- */}
+        <View className="flex-row items-start justify-between gap-3">
+          {/* Identity & Location */}
+          <View className="min-w-0 flex-1">
+            <View className="flex-row items-center gap-2">
+              <Text
+                className="min-w-0 flex-1 font-soraSemiBold text-lg tracking-tight text-[#1d1d1f]"
+                numberOfLines={1}
+              >
+                {lessee?.name ?? lease.lessee?.name ?? "Unknown Tenant"}
+              </Text>
 
-          {/* Semantic Status Pill */}
-          <View 
-            className={`shrink-0 rounded-md px-2 py-0.5 ${
-              isActive ? "bg-emerald-50" : isExpired ? "bg-rose-50" : "bg-slate-100"
-            }`}
-          >
-            <Text 
-              className={`text-[10px] font-bold uppercase tracking-wider ${
-                isActive ? "text-emerald-600" : isExpired ? "text-rose-600" : "text-slate-600"
-              }`}
+              {/* Semantic Status Pill */}
+              <View
+                className={`shrink-0 rounded-md px-2 py-0.5 ${
+                  isActive
+                    ? "bg-emerald-50"
+                    : isExpired
+                      ? "bg-rose-50"
+                      : "bg-slate-100"
+                }`}
+              >
+                <Text
+                  className={`text-[10px] font-bold uppercase tracking-wider ${
+                    isActive
+                      ? "text-emerald-600"
+                      : isExpired
+                        ? "text-rose-600"
+                        : "text-slate-600"
+                  }`}
+                >
+                  {lease.status}
+                </Text>
+              </View>
+            </View>
+
+            {/* Grouped Property Details */}
+            <View className="mt-1 flex-row items-center gap-1.5">
+              <Ionicons name="business-outline" size={14} color="#94A3B8" />
+              <Text
+                className="min-w-0 flex-1 text-sm font-medium text-slate-500"
+                numberOfLines={1}
+              >
+                {property?.title ?? "Unknown Property"}
+                {lease.roomNumber ? ` • Room ${lease.roomNumber}` : ""}
+              </Text>
+            </View>
+          </View>
+
+          {/* Quick Actions (Top Right to match Tenant Card) */}
+          <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-slate-100 bg-slate-50 p-1">
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onEdit}
+              className="rounded-full p-1.5 hover:bg-slate-200"
             >
-              {lease.status}
-            </Text>
+              <Ionicons name="pencil" size={16} color="#64748B" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={onDelete}
+              className="rounded-full p-1.5 hover:bg-red-50"
+            >
+              <Ionicons name="trash" size={16} color="#EF4444" />
+            </TouchableOpacity>
           </View>
         </View>
 
-        {/* Grouped Property Details */}
-        <View className="mt-1 flex-row items-center gap-1.5">
-          <Ionicons name="business-outline" size={14} color="#94A3B8" />
-          <Text className="min-w-0 flex-1 text-sm font-medium text-slate-500" numberOfLines={1}>
-            {property?.title ?? "Unknown Property"}
-            {lease.roomNumber ? ` • Room ${lease.roomNumber}` : ""}
-          </Text>
+        {/* --- DIVIDER --- */}
+        <View className="my-4 h-[1px] w-full bg-slate-100" />
+
+        {/* --- METRICS GRID: Rent & Terms Side-by-Side --- */}
+        <View className="flex-row items-center justify-between gap-4">
+          {/* Financials */}
+          <View className="min-w-0 flex-1">
+            <View className="flex-row items-center gap-1.5">
+              <Ionicons name="wallet-outline" color="#94A3B8" size={14} />
+              <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                Monthly Rent
+              </Text>
+            </View>
+            <Text
+              className="mt-1.5 font-soraSemiBold text-xl tracking-tight text-[#2563EB]"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              {formatCurrency(lease.monthlyRent)}
+            </Text>
+          </View>
+
+          {/* Vertical Separator */}
+          <View className="h-10 w-[1px] bg-slate-100" />
+
+          {/* Lease Term */}
+          <View className="min-w-0 flex-1">
+            <View className="flex-row items-center gap-1.5">
+              <Ionicons name="calendar-outline" color="#94A3B8" size={14} />
+              <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                Lease Term
+              </Text>
+            </View>
+            <Text
+              className="mt-1.5 text-sm font-medium leading-5 text-[#1d1d1f]"
+              numberOfLines={1}
+            >
+              {lease.startDate} to {lease.endDate}
+            </Text>
+          </View>
         </View>
       </View>
-
-      {/* Quick Actions (Top Right to match Tenant Card) */}
-      <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-slate-100 bg-slate-50 p-1">
-        <TouchableOpacity activeOpacity={0.7} onPress={onEdit} className="rounded-full p-1.5 hover:bg-slate-200">
-          <Ionicons name="pencil" size={16} color="#64748B" />
-        </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7} onPress={onDelete} className="rounded-full p-1.5 hover:bg-red-50">
-          <Ionicons name="trash" size={16} color="#EF4444" />
-        </TouchableOpacity>
-      </View>
-    </View>
-
-    {/* --- DIVIDER --- */}
-    <View className="my-4 h-[1px] w-full bg-slate-100" />
-
-    {/* --- METRICS GRID: Rent & Terms Side-by-Side --- */}
-    <View className="flex-row items-center justify-between gap-4">
-      
-      {/* Financials */}
-      <View className="flex-1 min-w-0">
-        <View className="flex-row items-center gap-1.5">
-          <Ionicons name="wallet-outline" color="#94A3B8" size={14} />
-          <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            Monthly Rent
-          </Text>
-        </View>
-        <Text 
-          className="mt-1.5 font-soraSemiBold text-xl tracking-tight text-[#2563EB]" 
-          numberOfLines={1} 
-          adjustsFontSizeToFit
-        >
-          {formatCurrency(lease.monthlyRent)}
-        </Text>
-      </View>
-
-      {/* Vertical Separator */}
-      <View className="h-10 w-[1px] bg-slate-100" />
-
-      {/* Lease Term */}
-      <View className="flex-1 min-w-0">
-        <View className="flex-row items-center gap-1.5">
-          <Ionicons name="calendar-outline" color="#94A3B8" size={14} />
-          <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            Lease Term
-          </Text>
-        </View>
-        <Text 
-          className="mt-1.5 text-sm font-medium leading-5 text-[#1d1d1f]" 
-          numberOfLines={1}
-        >
-          {lease.startDate} to {lease.endDate}
-        </Text>
-      </View>
-
-    </View>
-  </View>
-</TouchableOpacity>
+    </TouchableOpacity>
   );
 }
 
@@ -682,11 +695,7 @@ export default function LeasesScreen() {
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <View className="h-8 w-8 items-center justify-center rounded-xl bg-blue-50">
-                  <Ionicons
-                    name="checkmark-circle"
-                    color="#2563EB"
-                    size={16}
-                  />
+                  <Ionicons name="checkmark-circle" color="#2563EB" size={16} />
                 </View>
                 <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   Active
@@ -713,31 +722,30 @@ export default function LeasesScreen() {
           </View>
         </View>
 
-      <View className="rounded-[22px] border border-[#1d1d1f]/10 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
-        <View className="flex-row items-center gap-3">
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-            <Feather name="search" size={20} color="#2563EB" />
-          </View>
-
-              <View className="min-w-0 flex-1">
-                <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-[#1d1d1f]">
-                  Find lease
-                </Text>
-
-                <TextInput
-                  accessibilityLabel="Search leases"
-                  className="h-10 p-0 font-soraMedium text-sm text-zinc-950"
-                  placeholder="Tenant, unit, property, or lease"
-                  placeholderTextColor="#94a3b8"
-                  returnKeyType="search"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                />
-              </View>
+        <View className="rounded-[22px] border border-[#1d1d1f]/10 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
+          <View className="flex-row items-center gap-3">
+            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/10">
+              <Feather name="search" size={20} color="#2563EB" />
             </View>
-      </View>
-   
-  
+
+            <View className="min-w-0 flex-1">
+              <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-[#1d1d1f]">
+                Find lease
+              </Text>
+
+              <TextInput
+                accessibilityLabel="Search leases"
+                className="h-10 p-0 font-soraMedium text-sm text-zinc-950"
+                placeholder="Tenant, unit, property, or lease"
+                placeholderTextColor="#94a3b8"
+                returnKeyType="search"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+            </View>
+          </View>
+        </View>
+
         {isLoading ? (
           <LoadingState />
         ) : (

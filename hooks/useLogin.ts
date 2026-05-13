@@ -4,18 +4,10 @@ import { Alert } from "react-native";
 
 import { API_BASE_URL } from "../api/client";
 import { parseApiResponse } from "../api/response";
+import type { AuthResponse } from "../types";
 import { useAuth } from "./useAuth";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-type LoginResponse = {
-  data?: {
-    access_token?: string;
-    user?: unknown;
-    onboarding?: unknown;
-  };
-  message?: string;
-};
 
 function isValidEmail(value: string) {
   return EMAIL_PATTERN.test(value.trim());
@@ -62,7 +54,7 @@ export function useLogin() {
         body: JSON.stringify({ email: email.trim(), password }),
       });
 
-      const result = await parseApiResponse<LoginResponse>(
+      const result = await parseApiResponse<AuthResponse>(
         response,
         "Login failed. Please check your credentials.",
       );
