@@ -12,6 +12,8 @@ export type AuthUser = {
   name?: string;
   email?: string;
   role?: string;
+  job_title?: string;
+  jobTitle?: string;
   company?: string;
   phone?: string;
   profile_image?: string;
