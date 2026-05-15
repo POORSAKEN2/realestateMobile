@@ -33,3 +33,12 @@ export type {
   TransientBookingPayload,
   TransientBookingStatus,
 } from "./domain/bookings";
+export type {
+  AppNotification,
+  AppNotificationSeverity,
+  DevicePushToken,
+  NotificationModule,
+  PushNotificationData,
+  PushTokenPlatform,
+  RegisterPushTokenPayload,
+} from "./domain/notifications";
