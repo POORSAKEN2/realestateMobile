@@ -516,6 +516,7 @@ export default function DashboardScreen() {
             accessibilityLabel="Open notifications"
             hitSlop={10}
             className="relative overflow-hidden rounded-full border border-white/45 bg-white/10"
+            onPress={() => router.push("/(tabs)/notificationScreen")}
             style={{
               width: 45,
               height: 45,

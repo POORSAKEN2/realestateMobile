@@ -29,10 +29,15 @@ module.exports = ({ config }) => ({
   plugins: [
     ...(config.plugins ?? []),
     "@react-native-community/datetimepicker",
+    "expo-notifications",
     "expo-secure-store",
   ],
   extra: {
     ...config.extra,
+    projectId:
+      process.env.EXPO_PROJECT_ID ??
+      readDotEnvValue("EXPO_PROJECT_ID") ??
+      config.extra?.projectId,
     apiBaseUrl:
       process.env.VITE_API_BASE_URL ??
       process.env.EXPO_PUBLIC_API_BASE_URL ??

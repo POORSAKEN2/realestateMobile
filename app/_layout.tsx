@@ -11,6 +11,7 @@ import { useState } from "react";
 import { Text, TextInput } from "react-native";
 
 import "../global.css";
+import { NotificationBootstrap } from "../components/notifications/NotificationBootstrap";
 import { AuthProvider } from "../context/AuthContext";
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
 
@@ -66,6 +67,7 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <DefaultLocationProvider>
+          <NotificationBootstrap />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
