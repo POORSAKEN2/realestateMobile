@@ -49,6 +49,7 @@ export type CreatePropertyPayload = {
   description?: string;
   area?: string;
   image?: PropertyImageUpload;
+  images?: PropertyImageUpload[];
 };
 
 export type UpdatePropertyPayload = CreatePropertyPayload;

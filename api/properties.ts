@@ -15,6 +15,7 @@ export type {
 
 const DEFAULT_PROPERTY_IMAGE =
   "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800";
+const MAX_PROPERTY_IMAGES = 5;
 
 function authHeaders(accessToken?: string) {
   return {
@@ -109,10 +110,15 @@ function getImageUrl(imagePath?: string | null) {
 }
 
 function normalizeProperty(property: Record<string, any>): Property {
-  const media = Array.isArray(property?.media) ? property.media[0] : undefined;
+  const mediaItems = Array.isArray(property?.media) ? property.media : [];
+  const media = mediaItems[0];
   const images = Array.isArray(property?.images) ? property.images : [];
   const normalizedImages = images
     .map((image: any) => image?.url ?? image?.original_url ?? image)
+    .map((image: string) => getImageUrl(image))
+    .filter(Boolean);
+  const normalizedMediaImages = mediaItems
+    .map((image: any) => image?.original_url ?? image?.url ?? image?.preview_url)
     .map((image: string) => getImageUrl(image))
     .filter(Boolean);
   const rawImage =
@@ -120,6 +126,7 @@ function normalizeProperty(property: Record<string, any>): Property {
     property?.image_url ??
     property?.imageUrl ??
     normalizedImages[0] ??
+    normalizedMediaImages[0] ??
     media?.original_url ??
     media?.url ??
     media?.preview_url;
@@ -165,7 +172,9 @@ function normalizeProperty(property: Record<string, any>): Property {
     lat: lat !== undefined && lat !== null ? Number(lat) : undefined,
     lng: lng !== undefined && lng !== null ? Number(lng) : undefined,
     image,
-    images: Array.from(new Set([image, ...normalizedImages].filter(Boolean))),
+    images: Array.from(
+      new Set([image, ...normalizedImages, ...normalizedMediaImages].filter(Boolean)),
+    ),
     parentId: property?.parentId ?? property?.parent_id,
     isTransientBookable: normalizeBoolean(
       property?.isTransientBookable ??
@@ -191,8 +200,11 @@ export async function createProperty(
   payload: CreatePropertyPayload,
   accessToken?: string,
 ) {
-  const { image, ...propertyFields } = payload;
-  const body = image ? toPropertyFormData(propertyFields, image) : payload;
+  const { image, images, ...propertyFields } = payload;
+  const imageUploads = normalizeImageUploads(images ?? image);
+  const body = imageUploads.length
+    ? toPropertyFormData(propertyFields, imageUploads)
+    : payload;
   const response = await apiClient.post<ApiEnvelope<Property> | Property>(
     "/properties",
     body,
@@ -207,11 +219,12 @@ export async function updateProperty(
   payload: UpdatePropertyPayload,
   accessToken?: string,
 ) {
-  const { image, ...propertyFields } = payload;
-  const body = image
-    ? toPropertyFormData(propertyFields, image, "PUT")
+  const { image, images, ...propertyFields } = payload;
+  const imageUploads = normalizeImageUploads(images ?? image);
+  const body = imageUploads.length
+    ? toPropertyFormData(propertyFields, imageUploads, "PUT")
     : payload;
-  const response = image
+  const response = imageUploads.length
     ? await apiClient.post<ApiEnvelope<Property> | Property>(
         `/properties/${id}`,
         body,
@@ -227,8 +240,8 @@ export async function updateProperty(
 }
 
 function toPropertyFormData(
-  payload: Omit<CreatePropertyPayload, "image">,
-  image: NonNullable<CreatePropertyPayload["image"]>,
+  payload: Omit<CreatePropertyPayload, "image" | "images">,
+  images: NonNullable<CreatePropertyPayload["images"]>,
   method?: "PUT",
 ) {
   const formData = new FormData();
@@ -241,8 +254,17 @@ function toPropertyFormData(
     );
   });
 
-  formData.append("images[]", (image.file ?? image) as unknown as Blob);
+  images.slice(0, MAX_PROPERTY_IMAGES).forEach((image) => {
+    formData.append("images[]", (image.file ?? image) as unknown as Blob);
+  });
   if (method) formData.append("_method", method);
 
   return formData;
+}
+
+function normalizeImageUploads(
+  images?: CreatePropertyPayload["images"] | CreatePropertyPayload["image"],
+) {
+  const imageList = Array.isArray(images) ? images : images ? [images] : [];
+  return imageList.slice(0, MAX_PROPERTY_IMAGES);
 }
