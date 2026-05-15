@@ -359,6 +359,12 @@ export async function updateDocument(
   return normalizeDocument(unwrapData(response));
 }
 
+export async function deleteDocument(id: string, accessToken?: string) {
+  await apiClient.delete(`/documents/${id}`, {
+    headers: authHeaders(accessToken),
+  });
+}
+
 function appendOptionalFormValue(
   formData: FormData,
   key: string,
