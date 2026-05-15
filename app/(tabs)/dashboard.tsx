@@ -34,6 +34,7 @@ import {
 } from "../../api/propertyDetails";
 import { useAuth } from "../../hooks/useAuth";
 import type { AuthUser, Property, PropertyDocument } from "../../types";
+import { router } from "expo-router";
 
 type AssetSortBy = "value" | "roi" | "name";
 type AssetSortOrder = "asc" | "desc";
@@ -46,6 +47,7 @@ const assetStatusFilters: AssetStatusFilter[] = [
   "PERSONAL_USE",
   "IDLE",
 ];
+const MAX_PROPERTY_IMAGES = 5;
 
 const calculateTrend = (current: number, previous?: number) => {
   if (previous === undefined || previous === 0) return null;
@@ -72,6 +74,90 @@ const formatPropertyStatus = (status: string) =>
     .split("_")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+
+function getPropertyImages(property: Property) {
+  const images = property.images?.length ? property.images : [property.image];
+  return Array.from(new Set(images.filter(Boolean))).slice(0, MAX_PROPERTY_IMAGES);
+}
+
+function PropertyImageGallery({
+  images,
+  title,
+  visible,
+  onClose,
+}: {
+  images: string[];
+  title: string;
+  visible: boolean;
+  onClose: () => void;
+}) {
+  const [galleryWidth, setGalleryWidth] = useState(0);
+
+  return (
+    <Modal
+      animationType="fade"
+      onRequestClose={onClose}
+      transparent
+      visible={visible}
+    >
+      <View className="flex-1 bg-black/95">
+        <View className="absolute left-5 right-5 top-14 z-10 flex-row items-center justify-between gap-4">
+          <Text
+            className="min-w-0 flex-1 font-soraSemiBold text-base text-white"
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Close image gallery"
+            className="h-10 w-10 items-center justify-center rounded-full bg-white/15"
+            onPress={onClose}
+          >
+            <Feather name="x" size={22} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          className="flex-1 justify-center"
+          onLayout={(event) => setGalleryWidth(event.nativeEvent.layout.width)}
+        >
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+          >
+            {images.map((image, index) => (
+              <View
+                className="justify-center"
+                key={`${image}:gallery:${index}`}
+                style={{ width: galleryWidth || 1 }}
+              >
+                <Image
+                  className="h-[72%] w-full"
+                  resizeMode="contain"
+                  source={{ uri: image }}
+                />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        {images.length > 1 ? (
+          <View className="absolute bottom-12 left-0 right-0 flex-row justify-center gap-2">
+            {images.map((image, index) => (
+              <View
+                className="h-2 w-2 rounded-full bg-white/80"
+                key={`${image}:gallery-dot:${index}`}
+              />
+            ))}
+          </View>
+        ) : null}
+      </View>
+    </Modal>
+  );
+}
 
 async function openDocument(document: PropertyDocument) {
   if (!document.url) {
@@ -158,6 +244,8 @@ export default function DashboardScreen() {
   const [assetSortOrder, setAssetSortOrder] = useState<AssetSortOrder>("desc");
   const [assetStatusFilter, setAssetStatusFilter] =
     useState<AssetStatusFilter>("ALL");
+  const [imageGalleryProperty, setImageGalleryProperty] =
+    useState<Property | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
   );
@@ -191,7 +279,7 @@ export default function DashboardScreen() {
       enabled: !!selectedProperty,
     });
 
-  const { height } = Dimensions.get("window");
+  const { height, width } = Dimensions.get("window");
   const floatingCardHeight = Math.min(Math.max(height * 0.28, 230), 340);
   const floatingCardPadding = 14;
   const analyticsHeaderHeight = 44;
@@ -573,12 +661,24 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      <View className="my-5">
+      <View className="flex flex-row items-center justify-between">
+
+          <View className="my-5">
         <Text className="font-soraSemiBold">Portfolio Assets</Text>
         <Text className="font-regular text-description">
           High-value holdings
         </Text>
       </View>
+
+      <View>
+          <TouchableOpacity className="bg-teal-50"  onPress={() => router.navigate('/(tabs)/mapCanvas')} >
+            <Feather name= "map" color="teal-500"/>
+          </TouchableOpacity>
+      </View>
+
+
+      </View>
+
 
       <View className="rounded-[22px] border border-[#2563EB]/10 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
         <View className="flex-row items-center gap-3">
@@ -759,11 +859,29 @@ export default function DashboardScreen() {
                 onPress={() => setSelectedProperty(property)}
                 className="flex-row gap-3 rounded-2xl border border-zinc-100 bg-white p-2.5"
               >
-                <Image
-                  source={{ uri: property.image }}
-                  className="h-20 w-20 rounded-xl bg-zinc-100"
-                  resizeMode="cover"
-                />
+                <TouchableOpacity
+                  activeOpacity={0.86}
+                  accessibilityRole="button"
+                  accessibilityLabel={`View images for ${property.title}`}
+                  className="relative h-20 w-20 overflow-hidden rounded-xl bg-zinc-100"
+                  onPress={(event) => {
+                    event.stopPropagation();
+                    setImageGalleryProperty(property);
+                  }}
+                >
+                  <Image
+                    source={{ uri: getPropertyImages(property)[0] }}
+                    className="h-full w-full"
+                    resizeMode="cover"
+                  />
+                  {getPropertyImages(property).length > 1 ? (
+                    <View className="absolute bottom-1.5 right-1.5 rounded-full bg-black/55 px-1.5 py-0.5">
+                      <Text className="font-soraSemiBold text-[9px] text-white">
+                        {getPropertyImages(property).length}
+                      </Text>
+                    </View>
+                  ) : null}
+                </TouchableOpacity>
 
                 <View className="min-w-0 flex-1 justify-between py-0.5">
                   <View>
@@ -841,11 +959,21 @@ export default function DashboardScreen() {
                 contentContainerStyle={{ paddingBottom: 28 }}
               >
                 <View className="relative mt-4 h-56 overflow-hidden">
-                  <Image
-                    source={{ uri: selectedProperty.image }}
-                    className="h-full w-full bg-zinc-100"
-                    resizeMode="cover"
-                  />
+                  <ScrollView
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                  >
+                    {getPropertyImages(selectedProperty).map((image, index) => (
+                      <Image
+                        source={{ uri: image }}
+                        className="h-full bg-zinc-100"
+                        key={`${image}:${index}`}
+                        resizeMode="cover"
+                        style={{ width }}
+                      />
+                    ))}
+                  </ScrollView>
                   <View className="absolute inset-0 bg-black/35" />
 
                   <TouchableOpacity
@@ -859,6 +987,18 @@ export default function DashboardScreen() {
                   </TouchableOpacity>
 
                   <View className="absolute bottom-5 left-5 right-5">
+                    {getPropertyImages(selectedProperty).length > 1 ? (
+                      <View className="mb-3 flex-row gap-1.5">
+                        {getPropertyImages(selectedProperty).map(
+                          (image, index) => (
+                            <View
+                              className="h-1.5 w-1.5 rounded-full bg-white/85"
+                              key={`${image}:dot:${index}`}
+                            />
+                          ),
+                        )}
+                      </View>
+                    ) : null}
                     <Text className="self-start rounded-md bg-teal-600 px-2 py-1 font-soraSemiBold text-[10px] uppercase text-white">
                       {formatPropertyStatus(selectedProperty.status)}
                     </Text>
@@ -1121,6 +1261,15 @@ export default function DashboardScreen() {
           )}
         </View>
       </Modal>
+
+      {imageGalleryProperty ? (
+        <PropertyImageGallery
+          images={getPropertyImages(imageGalleryProperty)}
+          onClose={() => setImageGalleryProperty(null)}
+          title={imageGalleryProperty.title}
+          visible={!!imageGalleryProperty}
+        />
+      ) : null}
     </Screen>
   );
 }

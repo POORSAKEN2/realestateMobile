@@ -119,6 +119,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="documents" options={{ href: null, title: "Documents" }} />
         <Tabs.Screen name="settings" options={{ href: null, title: "Settings" }} />
         <Tabs.Screen name="profile" options={{ href: null, title: "Profile" }} />
+        <Tabs.Screen name="mapCanvas" options={{ href: null, title: "mapcanvas" }} />
       </Tabs>
 
       <MoreBottomSheet

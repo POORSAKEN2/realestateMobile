@@ -14,6 +14,7 @@ import {
   Modal,
   Platform,
   ScrollView,
+  StyleSheet,
   Switch,
   Text,
   TextInput,
@@ -21,6 +22,11 @@ import {
   View,
   type TextInputProps,
 } from "react-native";
+import MapView, {
+  Marker,
+  type MapPressEvent,
+  type Region,
+} from "react-native-maps";
 
 import {
   createProperty,
@@ -99,6 +105,20 @@ const propertyTypeChoices: Choice<PropertyType>[] = [
   { label: "Retail", value: "Retail" },
 ];
 
+const seaCountryChoices: Choice<string>[] = [
+  { label: "Brunei", value: "Brunei" },
+  { label: "Cambodia", value: "Cambodia" },
+  { label: "Indonesia", value: "Indonesia" },
+  { label: "Laos", value: "Laos" },
+  { label: "Malaysia", value: "Malaysia" },
+  { label: "Myanmar", value: "Myanmar" },
+  { label: "Philippines", value: "Philippines" },
+  { label: "Singapore", value: "Singapore" },
+  { label: "Thailand", value: "Thailand" },
+  { label: "Timor-Leste", value: "Timor-Leste" },
+  { label: "Vietnam", value: "Vietnam" },
+];
+
 const statusFilterChoices: Choice<StatusFilter>[] = [
   { label: "All", value: "ALL" },
   ...propertyStatusChoices.map((choice) => ({
@@ -140,6 +160,19 @@ const locationCoordinates: Record<string, { lat: number; lng: number }> = {
   "Bacoor City, Cavite": { lat: 14.459, lng: 120.929 },
   "Santa Rosa, Laguna": { lat: 14.2843, lng: 121.0889 },
 };
+
+const PHILIPPINES_REGION: Region = {
+  latitude: 12.8797,
+  longitude: 121.774,
+  latitudeDelta: 12,
+  longitudeDelta: 12,
+};
+
+const PINNED_LOCATION_DELTA = {
+  latitudeDelta: 0.02,
+  longitudeDelta: 0.02,
+};
+const MAX_PROPERTY_IMAGES = 5;
 
 const emptyForm: FormState = {
   title: "",
@@ -203,6 +236,10 @@ function cleanInteger(value: string) {
   return value.replace(/\D/g, "");
 }
 
+function formatCoordinate(value: number) {
+  return value.toFixed(6);
+}
+
 function toFormState(property: Property): FormState {
   const propertyType = property.type ?? "Residential";
 
@@ -257,6 +294,97 @@ function getImageType(asset: ImagePicker.ImagePickerAsset) {
   if (asset.uri.toLowerCase().endsWith(".webp")) return "image/webp";
 
   return "image/jpeg";
+}
+
+function toSelectedImage(asset: ImagePicker.ImagePickerAsset): SelectedImage {
+  return {
+    uri: asset.uri,
+    name: getImageName(asset),
+    type: getImageType(asset),
+    file: asset.file,
+  };
+}
+
+function getPropertyImages(property: Property) {
+  const images = property.images?.length ? property.images : [property.image];
+  return Array.from(new Set(images.filter(Boolean))).slice(0, MAX_PROPERTY_IMAGES);
+}
+
+function PropertyImageGallery({
+  images,
+  title,
+  visible,
+  onClose,
+}: {
+  images: string[];
+  title: string;
+  visible: boolean;
+  onClose: () => void;
+}) {
+  const [galleryWidth, setGalleryWidth] = useState(0);
+
+  return (
+    <Modal
+      animationType="fade"
+      onRequestClose={onClose}
+      transparent
+      visible={visible}
+    >
+      <View className="flex-1 bg-black/95">
+        <View className="absolute left-5 right-5 top-14 z-10 flex-row items-center justify-between gap-4">
+          <Text
+            className="min-w-0 flex-1 text-base font-bold text-white"
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            className="h-10 w-10 items-center justify-center rounded-full bg-white/15"
+            onPress={onClose}
+          >
+            <MaterialCommunityIcons name="close" color="#FFFFFF" size={22} />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          className="flex-1 justify-center"
+          onLayout={(event) => setGalleryWidth(event.nativeEvent.layout.width)}
+        >
+          <ScrollView
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+          >
+            {images.map((image, index) => (
+              <View
+                className="justify-center"
+                key={`${image}:gallery:${index}`}
+                style={{ width: galleryWidth || 1 }}
+              >
+                <Image
+                  className="h-[72%] w-full"
+                  resizeMode="contain"
+                  source={{ uri: image }}
+                />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        {images.length > 1 ? (
+          <View className="absolute bottom-12 left-0 right-0 flex-row justify-center gap-2">
+            {images.map((image, index) => (
+              <View
+                className="h-2 w-2 rounded-full bg-white/80"
+                key={`${image}:gallery-dot:${index}`}
+              />
+            ))}
+          </View>
+        ) : null}
+      </View>
+    </Modal>
+  );
 }
 
 function getDocumentType(asset: DocumentPicker.DocumentPickerAsset) {
@@ -405,6 +533,259 @@ function ChoiceGroup<T extends string>({
   );
 }
 
+function CountryDropdown({
+  value,
+  onSelect,
+}: {
+  value: string;
+  onSelect: (value: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedCountry =
+    seaCountryChoices.find((choice) => choice.value === value)?.label || value;
+
+  function selectCountry(country: string) {
+    onSelect(country);
+    setIsOpen(false);
+  }
+
+  return (
+    <View className="gap-2">
+      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+        Country
+      </Text>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+        onPress={() => setIsOpen(true)}
+      >
+        <Text className="text-base font-semibold text-[#1d1d1f]">
+          {selectedCountry || "Select a country"}
+        </Text>
+        <MaterialCommunityIcons
+          name="chevron-down"
+          color="#6F6D6D"
+          size={22}
+        />
+      </TouchableOpacity>
+
+      <Modal
+        animationType="fade"
+        onRequestClose={() => setIsOpen(false)}
+        transparent
+        visible={isOpen}
+      >
+        <View className="flex-1 justify-end bg-[#000000]/35">
+          <TouchableOpacity
+            activeOpacity={1}
+            className="flex-1"
+            onPress={() => setIsOpen(false)}
+          />
+          <View className="max-h-[72%] rounded-t-[28px] bg-[#FFFFFF] px-5 pb-8 pt-5">
+            <View className="mb-4 flex-row items-center justify-between">
+              <View>
+                <Text className="text-lg font-bold text-[#1d1d1f]">
+                  Select Country
+                </Text>
+                <Text className="mt-1 text-xs font-semibold text-[#6F6D6D]">
+                  Southeast Asia
+                </Text>
+              </View>
+              <TouchableOpacity
+                activeOpacity={0.85}
+                className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/10"
+                onPress={() => setIsOpen(false)}
+              >
+                <MaterialCommunityIcons
+                  name="close"
+                  color="#1d1d1f"
+                  size={20}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View className="gap-2">
+                {seaCountryChoices.map((country) => {
+                  const selected = country.value === value;
+
+                  return (
+                    <TouchableOpacity
+                      key={country.value}
+                      activeOpacity={0.85}
+                      className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
+                        selected
+                          ? "border-[#2563EB] bg-[#2563EB]/10"
+                          : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
+                      }`}
+                      onPress={() => selectCountry(country.value)}
+                    >
+                      <Text
+                        className={`text-base font-semibold ${
+                          selected ? "text-[#2563EB]" : "text-[#1d1d1f]"
+                        }`}
+                      >
+                        {country.label}
+                      </Text>
+                      {selected ? (
+                        <MaterialCommunityIcons
+                          name="check"
+                          color="#2563EB"
+                          size={21}
+                        />
+                      ) : null}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+function LocationPinPicker({
+  lat,
+  lng,
+  onChange,
+}: {
+  lat: string;
+  lng: string;
+  onChange: (coordinates: { lat: string; lng: string }) => void;
+}) {
+  const [isMapVisible, setIsMapVisible] = useState(false);
+  const latitude = parseNumber(lat);
+  const longitude = parseNumber(lng);
+  const hasPinnedLocation =
+    latitude !== undefined && longitude !== undefined;
+  const markerCoordinate = hasPinnedLocation
+    ? { latitude: latitude as number, longitude: longitude as number }
+    : undefined;
+  const mapRegion = markerCoordinate
+    ? { ...markerCoordinate, ...PINNED_LOCATION_DELTA }
+    : PHILIPPINES_REGION;
+
+  function setPinnedLocation(latitudeValue: number, longitudeValue: number) {
+    onChange({
+      lat: formatCoordinate(latitudeValue),
+      lng: formatCoordinate(longitudeValue),
+    });
+  }
+
+  function handleMapPress(event: MapPressEvent) {
+    const { latitude: nextLatitude, longitude: nextLongitude } =
+      event.nativeEvent.coordinate;
+    setPinnedLocation(nextLatitude, nextLongitude);
+  }
+
+  return (
+    <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+      <View className="flex-row items-center justify-between gap-3">
+        <View className="min-w-0 flex-1">
+          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+            Pin Location
+          </Text>
+          <Text className="mt-1 text-sm font-bold text-[#1d1d1f]">
+            {markerCoordinate
+              ? `${formatCoordinate(markerCoordinate.latitude)}, ${formatCoordinate(
+                  markerCoordinate.longitude,
+                )}`
+              : "No pin selected"}
+          </Text>
+        </View>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]"
+          onPress={() => setIsMapVisible(true)}
+        >
+          <MaterialCommunityIcons
+            name="map-marker-radius-outline"
+            color="#FFFFFF"
+            size={22}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity
+        activeOpacity={0.85}
+        className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-[#2563EB]/10"
+        onPress={() => setIsMapVisible(true)}
+      >
+        <MaterialCommunityIcons name="map-search" color="#2563EB" size={19} />
+        <Text className="text-sm font-bold text-[#2563EB]">
+          {markerCoordinate ? "Update Pin on Map" : "Pin Property on Map"}
+        </Text>
+      </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        onRequestClose={() => setIsMapVisible(false)}
+        visible={isMapVisible}
+      >
+        <View className="flex-1 bg-[#FFFFFF]">
+          <MapView
+            initialRegion={mapRegion}
+            onPress={handleMapPress}
+            style={propertyMapStyles.locationMap}
+          >
+            {markerCoordinate ? (
+              <Marker
+                coordinate={markerCoordinate}
+                draggable
+                onDragEnd={(event) => {
+                  const { latitude: nextLatitude, longitude: nextLongitude } =
+                    event.nativeEvent.coordinate;
+                  setPinnedLocation(nextLatitude, nextLongitude);
+                }}
+              />
+            ) : null}
+          </MapView>
+
+          <View className="absolute left-5 right-5 top-14 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+            <View className="flex-row items-center justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                  Property Pin
+                </Text>
+                <Text className="mt-1 text-sm font-bold text-[#1d1d1f]">
+                  {markerCoordinate
+                    ? `${formatCoordinate(markerCoordinate.latitude)}, ${formatCoordinate(
+                        markerCoordinate.longitude,
+                      )}`
+                    : "Tap the map to place the pin"}
+                </Text>
+              </View>
+              <TouchableOpacity
+                activeOpacity={0.85}
+                className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/10"
+                onPress={() => setIsMapVisible(false)}
+              >
+                <MaterialCommunityIcons
+                  name="close"
+                  color="#1d1d1f"
+                  size={20}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View className="absolute bottom-8 left-5 right-5">
+            <TouchableOpacity
+              activeOpacity={0.85}
+              className="h-14 items-center justify-center rounded-2xl bg-[#2563EB]"
+              onPress={() => setIsMapVisible(false)}
+            >
+              <Text className="text-base font-bold text-[#FFFFFF]">Done</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
 function MetricPill({
   icon,
   label,
@@ -459,18 +840,39 @@ function PropertyCard({
 }) {
   const occupancy = property.occupancy ?? 0;
   const isActive = property.status === "REVENUE_GENERATING";
+  const propertyImages = getPropertyImages(property);
+  const [imageWidth, setImageWidth] = useState(0);
+  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
+
   return (
     <TouchableOpacity
       activeOpacity={0.9}
       className="w-full overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-lg shadow-slate-200/50"
     >
       {/* --- IMAGE SECTION --- */}
-      <View className="relative h-52 w-full">
-        <Image
-          className="h-full w-full bg-slate-100"
-          resizeMode="cover"
-          source={{ uri: property.image }}
-        />
+      <TouchableOpacity
+        activeOpacity={0.92}
+        accessibilityRole="button"
+        accessibilityLabel={`View images for ${property.title}`}
+        className="relative h-52 w-full"
+        onLayout={(event) => setImageWidth(event.nativeEvent.layout.width)}
+        onPress={() => setIsGalleryVisible(true)}
+      >
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+        >
+          {propertyImages.map((image, index) => (
+            <Image
+              className="h-full bg-slate-100"
+              key={`${image}:${index}`}
+              resizeMode="cover"
+              source={{ uri: image }}
+              style={{ width: imageWidth || 1 }}
+            />
+          ))}
+        </ScrollView>
 
         {/* Top Badges: Type & ROI */}
         <View className="absolute inset-x-4 top-4 flex-row items-center justify-between">
@@ -489,7 +891,25 @@ function PropertyCard({
 
         {/* Bottom Gradient Overlay (Optional: adds depth for white text if needed) */}
         <View className="absolute bottom-0 h-16 w-full bg-gradient-to-t from-black/20 to-transparent" />
-      </View>
+
+        {propertyImages.length > 1 ? (
+          <View className="absolute bottom-3 left-0 right-0 flex-row justify-center gap-1.5">
+            {propertyImages.map((image, index) => (
+              <View
+                className="h-1.5 w-1.5 rounded-full bg-white/85"
+                key={`${image}:dot:${index}`}
+              />
+            ))}
+          </View>
+        ) : null}
+      </TouchableOpacity>
+
+      <PropertyImageGallery
+        images={propertyImages}
+        onClose={() => setIsGalleryVisible(false)}
+        title={property.title}
+        visible={isGalleryVisible}
+      />
 
       {/* --- CONTENT SECTION --- */}
       <View className="p-5">
@@ -621,9 +1041,7 @@ export default function PropertiesScreen() {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [formError, setFormError] = useState("");
-  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(
-    null,
-  );
+  const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<
     SelectedDocument[]
   >([]);
@@ -747,7 +1165,7 @@ export default function PropertiesScreen() {
 
   function openForm() {
     setForm(emptyForm);
-    setSelectedImage(null);
+    setSelectedImages([]);
     setSelectedDocuments([]);
     setFormError("");
     setEditingProperty(null);
@@ -756,7 +1174,7 @@ export default function PropertiesScreen() {
 
   function openEditForm(property: Property) {
     setForm(toFormState(property));
-    setSelectedImage(null);
+    setSelectedImages([]);
     setSelectedDocuments([]);
     setFormError("");
     setEditingProperty(property);
@@ -765,7 +1183,7 @@ export default function PropertiesScreen() {
 
   function closeForm() {
     setForm(emptyForm);
-    setSelectedImage(null);
+    setSelectedImages([]);
     setSelectedDocuments([]);
     setFormError("");
     setEditingProperty(null);
@@ -787,6 +1205,11 @@ export default function PropertiesScreen() {
   async function pickImage() {
     setFormError("");
 
+    if (selectedImages.length >= MAX_PROPERTY_IMAGES) {
+      setFormError(`You can upload up to ${MAX_PROPERTY_IMAGES} property images.`);
+      return;
+    }
+
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permission.granted) {
@@ -795,24 +1218,37 @@ export default function PropertiesScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
+      allowsMultipleSelection: true,
       mediaTypes: ["images"],
       quality: 0.85,
+      selectionLimit: MAX_PROPERTY_IMAGES - selectedImages.length,
     });
 
-    if (result.canceled || !result.assets?.[0]) {
+    if (result.canceled || !result.assets?.length) {
       return;
     }
 
-    const asset = result.assets[0];
+    const pickedImages = result.assets.map(toSelectedImage);
 
-    setSelectedImage({
-      uri: asset.uri,
-      name: getImageName(asset),
-      type: getImageType(asset),
-      file: asset.file,
+    setSelectedImages((current) => {
+      const existingUris = new Set(current.map((image) => image.uri));
+      const newImages = pickedImages.filter(
+        (image) => !existingUris.has(image.uri),
+      );
+      const nextImages = [...current, ...newImages].slice(0, MAX_PROPERTY_IMAGES);
+
+      if (current.length + newImages.length > MAX_PROPERTY_IMAGES) {
+        setFormError(`Only ${MAX_PROPERTY_IMAGES} property images can be uploaded.`);
+      }
+
+      return nextImages;
     });
+  }
+
+  function removeImage(index: number) {
+    setSelectedImages((current) =>
+      current.filter((_, imageIndex) => imageIndex !== index),
+    );
   }
 
   async function pickDocuments() {
@@ -935,7 +1371,7 @@ export default function PropertiesScreen() {
       is_transient_bookable: form.isTransientBookable,
     };
 
-    if (selectedImage) payload.image = selectedImage;
+    if (selectedImages.length > 0) payload.images = selectedImages;
 
     const area = form.area.trim();
     const description = form.description.trim();
@@ -1219,10 +1655,21 @@ export default function PropertiesScreen() {
               ))}
             </View>
 
-            <Field
-              label="Country"
-              onChangeText={(value) => updateForm("country", value)}
+            <CountryDropdown
+              onSelect={(value) => updateForm("country", value)}
               value={form.country}
+            />
+
+            <LocationPinPicker
+              lat={form.lat}
+              lng={form.lng}
+              onChange={(coordinates) =>
+                setForm((current) => ({
+                  ...current,
+                  lat: coordinates.lat,
+                  lng: coordinates.lng,
+                }))
+              }
             />
 
             <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
@@ -1385,10 +1832,10 @@ export default function PropertiesScreen() {
                   </View>
                   <View className="flex-1">
                     <Text className="text-sm font-bold text-[#1d1d1f]">
-                      Property Image
+                      Property Images
                     </Text>
                     <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
-                      JPG, PNG, or WEBP up to 5 MB.
+                      JPG, PNG, or WEBP. Upload up to {MAX_PROPERTY_IMAGES}.
                     </Text>
                   </View>
                 </View>
@@ -1398,38 +1845,49 @@ export default function PropertiesScreen() {
                   onPress={pickImage}
                 >
                   <Text className="text-xs font-bold text-[#FFFFFF]">
-                    {selectedImage ? "Change" : "Choose"}
+                    {selectedImages.length ? "Add" : "Choose"}
                   </Text>
                 </TouchableOpacity>
               </View>
 
-              {selectedImage ? (
-                <View className="overflow-hidden rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5">
-                  <Image
-                    className="h-48 w-full"
-                    resizeMode="cover"
-                    source={{ uri: selectedImage.uri }}
-                  />
-                  <View className="flex-row items-center justify-between gap-3 p-3">
-                    <Text
-                      className="flex-1 text-xs font-semibold text-[#1d1d1f]"
-                      numberOfLines={1}
+              {selectedImages.length ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 12, paddingRight: 4 }}
+                >
+                  {selectedImages.map((image, index) => (
+                    <View
+                      className="w-64 overflow-hidden rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5"
+                      key={`${image.uri}:${index}`}
                     >
-                      {selectedImage.name}
-                    </Text>
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
-                      onPress={() => setSelectedImage(null)}
-                    >
-                      <MaterialCommunityIcons
-                        name="close"
-                        color="#6F6D6D"
-                        size={17}
+                      <Image
+                        className="h-40 w-full"
+                        resizeMode="cover"
+                        source={{ uri: image.uri }}
                       />
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                      <View className="flex-row items-center justify-between gap-3 p-3">
+                        <Text
+                          className="flex-1 text-xs font-semibold text-[#1d1d1f]"
+                          numberOfLines={1}
+                        >
+                          {index + 1}. {image.name}
+                        </Text>
+                        <TouchableOpacity
+                          activeOpacity={0.8}
+                          className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
+                          onPress={() => removeImage(index)}
+                        >
+                          <MaterialCommunityIcons
+                            name="close"
+                            color="#6F6D6D"
+                            size={17}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+                </ScrollView>
               ) : null}
             </View>
 
@@ -1610,3 +2068,9 @@ export default function PropertiesScreen() {
     </Screen>
   );
 }
+
+const propertyMapStyles = StyleSheet.create({
+  locationMap: {
+    flex: 1,
+  },
+});

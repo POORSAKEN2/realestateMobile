@@ -12,6 +12,7 @@ import { Text, TextInput } from "react-native";
 
 import "../global.css";
 import { AuthProvider } from "../context/AuthContext";
+import { DefaultLocationProvider } from "../context/DefaultLocationContext";
 
 type TextWithDefaultProps = typeof Text & {
   defaultProps?: {
@@ -64,10 +65,12 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
+        <DefaultLocationProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+        </DefaultLocationProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
