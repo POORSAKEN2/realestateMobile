@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import MapView, { Marker, type LatLng, type Region } from "react-native-maps";
 
-import { fetchProperties } from "../../api/properties";
+import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { Property } from "../../types";
@@ -88,15 +88,13 @@ export default function MapCanvasScreen() {
     null,
   );
 
+  const { useList } = useProperties();
   const {
     data: properties = [],
     isError,
     isLoading,
     refetch,
-  } = useQuery({
-    queryKey: ["properties", accessToken],
-    queryFn: () => fetchProperties(accessToken),
-  });
+  } = useList();
 
   const mappedProperties = useMemo(
     () => properties.filter(hasMapCoordinate),

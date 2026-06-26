@@ -26,7 +26,7 @@ import {
   fetchLessees,
   updateLease,
 } from "../../api/propertyDetails";
-import { fetchProperties } from "../../api/properties";
+import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { Lease, LeasePayload, Lessee, Property } from "../../types";
@@ -446,11 +446,8 @@ export default function LeasesScreen() {
     queryFn: () => fetchLessees(accessToken),
     enabled: Boolean(accessToken),
   });
-  const { data: properties = [], isLoading: isLoadingProperties } = useQuery({
-    queryKey: ["properties", accessToken],
-    queryFn: () => fetchProperties(accessToken),
-    enabled: Boolean(accessToken),
-  });
+  const { useList } = useProperties();
+  const { data: properties = [], isLoading: isLoadingProperties } = useList();
 
   const saveMutation = useMutation({
     mutationFn: (payload: LeasePayload) =>

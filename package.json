@@ -4,8 +4,8 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
@@ -14,6 +14,8 @@
     "@react-native-community/datetimepicker": "8.4.4",
     "@sbaiahmed1/react-native-blur": "^4.6.2",
     "@tanstack/react-query": "^5.100.9",
+    "axios": "^1.18.1",
+    "dotenv": "^17.4.2",
     "expo": "~54.0.33",
     "expo-blur": "~15.0.8",
     "expo-constants": "~18.0.13",

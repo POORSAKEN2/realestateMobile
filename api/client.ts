@@ -11,77 +11,45 @@ export const API_BASE_URL =
   process.env.VITE_API_BASE_URL ??
   "";
 
+import { axiosInstance } from "./axios";
+
 function getFirstValidationError(errors?: Record<string, string[]>) {
-  if (!errors) {
-    return undefined;
-  }
-
+  if (!errors) return undefined;
   const [firstError] = Object.values(errors).flat();
-
   return firstError;
-}
-
-function parseJsonError(text: string, isJson: boolean) {
-  if (!text || !isJson) {
-    return null;
-  }
-
-  try {
-    return (JSON.parse(text) as ApiErrorResponse) ?? null;
-  } catch {
-    return null;
-  }
 }
 
 async function request<T>(
   path: string,
-  options: RequestOptions = {},
+  options: RequestOptions & { method: string; body?: unknown } = { method: "GET" },
 ): Promise<T> {
-  const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
-  const headers = new Headers(options.headers);
-  const isFormData =
-    typeof FormData !== "undefined" && options.body instanceof FormData;
-
-  if (
-    options.body !== undefined &&
-    !isFormData &&
-    !headers.has("Content-Type")
-  ) {
-    headers.set("Content-Type", "application/json");
+  const url = path;
+  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+  const headers = { ...options.headers } as Record<string, any>;
+  if (isFormData) {
+    headers["Content-Type"] = undefined;
   }
 
-  const requestBody =
-    options.body === undefined
-      ? undefined
-      : typeof options.body === "string" || isFormData
-        ? (options.body as BodyInit)
-        : JSON.stringify(options.body);
+  try {
+    const response = await axiosInstance({
+      url,
+      method: options.method,
+      data: options.body,
+      headers,
+    });
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    body: requestBody,
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    const contentType = response.headers.get("content-type") ?? "";
-    const isJson = contentType.includes("application/json");
-    const data = parseJsonError(text, isJson);
-    const validationMessage = getFirstValidationError(data?.errors);
-
-    throw new Error(
-      data?.message ||
-        validationMessage ||
-        `API request failed with status ${response.status}`,
-    );
+    return response.data as T;
+  } catch (error: any) {
+    if (error.response) {
+      const data = error.response.data as ApiErrorResponse;
+      const validationMessage = getFirstValidationError(data?.errors);
+      
+      throw new Error(
+        data?.message || validationMessage || `API request failed with status ${error.response.status}`
+      );
+    }
+    throw error;
   }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as Promise<T>;
 }
 
 export const apiClient = {

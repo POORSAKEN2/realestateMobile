@@ -27,7 +27,7 @@ import {
   toBookingDateTime,
   updateTransientBooking,
 } from "../../api/bookings";
-import { fetchProperties } from "../../api/properties";
+import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type {
@@ -258,11 +258,8 @@ export default function BookingsScreen() {
   const [formMessage, setFormMessage] = useState("");
   const [formData, setFormData] = useState<BookingFormState>(() => emptyForm());
 
-  const { data: properties = [], isLoading: isLoadingProperties } = useQuery({
-    queryKey: ["properties", accessToken],
-    queryFn: () => fetchProperties(accessToken),
-    enabled: Boolean(accessToken),
-  });
+  const { useList } = useProperties();
+  const { data: properties = [], isLoading: isLoadingProperties } = useList();
   const { data: bookings = [], isLoading: isLoadingBookings } = useQuery({
     queryKey: ["transientBookings", accessToken],
     queryFn: () => fetchTransientBookings(accessToken),

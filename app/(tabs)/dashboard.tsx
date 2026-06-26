@@ -26,7 +26,7 @@ import {
   fetchPortfolioHistory,
   fetchPortfolioStats,
 } from "../../api/analytics";
-import { fetchProperties } from "../../api/properties";
+import { useProperties } from "../../hooks/api/useProperties";
 import {
   fetchDocuments,
   fetchLeases,
@@ -257,10 +257,8 @@ export default function DashboardScreen() {
     queryKey: ["analytics", "history", accessToken],
     queryFn: () => fetchPortfolioHistory(accessToken),
   });
-  const { data: properties = [], isLoading: isLoadingProperties } = useQuery({
-    queryKey: ["properties", accessToken],
-    queryFn: () => fetchProperties(accessToken),
-  });
+  const { useList } = useProperties();
+  const { data: properties = [], isLoading: isLoadingProperties } = useList();
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),

@@ -22,7 +22,7 @@ import {
   updateDocument,
   uploadDocument,
 } from "../../api/propertyDetails";
-import { fetchProperties } from "../../api/properties";
+import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type {
@@ -163,11 +163,8 @@ export default function DocumentsScreen() {
     queryFn: () => fetchDocuments(accessToken),
     enabled: Boolean(accessToken),
   });
-  const { data: properties = [] } = useQuery({
-    queryKey: ["properties", accessToken],
-    queryFn: () => fetchProperties(accessToken),
-    enabled: Boolean(accessToken),
-  });
+  const { useList } = useProperties();
+  const { data: properties = [] } = useList();
   const { data: lessees = [] } = useQuery({
     queryKey: ["lessees", accessToken],
     queryFn: () => fetchLessees(accessToken),

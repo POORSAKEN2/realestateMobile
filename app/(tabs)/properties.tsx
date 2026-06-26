@@ -28,11 +28,7 @@ import MapView, {
   type Region,
 } from "react-native-maps";
 
-import {
-  createProperty,
-  fetchProperties,
-  updateProperty,
-} from "../../api/properties";
+import { useProperties, propertyFetchers } from "../../hooks/api/useProperties";
 import {
   fetchDocuments,
   uploadPropertyDocuments,
@@ -1050,11 +1046,8 @@ export default function PropertiesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
-  const { data: properties = [], isLoading } = useQuery({
-    queryKey: ["properties", accessToken],
-    queryFn: () => fetchProperties(accessToken),
-    enabled: Boolean(accessToken),
-  });
+  const { useList, useCreate, useUpdate } = useProperties();
+  const { data: properties = [], isLoading } = useList();
   const {
     data: existingPropertyDocuments = [],
     isLoading: isLoadingExistingDocuments,
@@ -1068,8 +1061,8 @@ export default function PropertiesScreen() {
   const saveMutation = useMutation({
     mutationFn: async (payload: PropertyFormPayload) => {
       const property = editingProperty
-        ? await updateProperty(editingProperty.id, payload, accessToken)
-        : await createProperty(payload, accessToken);
+        ? await propertyFetchers.update({ id: editingProperty.id, payload })
+        : await propertyFetchers.create(payload);
 
       if (selectedDocuments.length > 0) {
         await uploadPropertyDocuments(

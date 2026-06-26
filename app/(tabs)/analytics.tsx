@@ -16,7 +16,7 @@ import {
   fetchPortfolioHistory,
   fetchPortfolioStats,
 } from "../../api/analytics";
-import { fetchProperties } from "../../api/properties";
+import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
@@ -313,10 +313,8 @@ export default function AnalyticsScreen() {
     queryKey: ["analytics", "history", accessToken],
     queryFn: () => fetchPortfolioHistory(accessToken),
   });
-  const { data: properties = [] } = useQuery({
-    queryKey: ["properties", accessToken],
-    queryFn: () => fetchProperties(accessToken),
-  });
+  const { useList } = useProperties();
+  const { data: properties = [] } = useList();
 
   const metricCards = useMemo<MetricCard[]>(
     () => [
