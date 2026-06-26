@@ -32,6 +32,7 @@ export function useLogin() {
   const handleLogin = async () => {
     setIsLoading(true);
     setError(null);
+    console.log("Attempting login at URL:", `${API_BASE_URL}/login`);
 
     if (!isValidEmail(email)) {
       setError("Please enter a valid email address.");

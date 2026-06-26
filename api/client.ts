@@ -1,15 +1,7 @@
 import Constants from "expo-constants";
 import type { ApiErrorResponse, RequestOptions } from "../types";
 
-const extra = Constants.expoConfig?.extra as
-  | { apiBaseUrl?: string }
-  | undefined;
-
-export const API_BASE_URL =
-  extra?.apiBaseUrl ??
-  process.env.EXPO_PUBLIC_API_BASE_URL ??
-  process.env.VITE_API_BASE_URL ??
-  "";
+export { API_BASE_URL } from "./config";
 
 import { axiosInstance } from "./axios";
 

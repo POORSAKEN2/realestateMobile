@@ -1,8 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import { Link, Stack } from "expo-router";
 import { useState } from "react";
-  
 import {
+  Alert,
+  BackHandler,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -12,6 +13,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useEffect } from "react";
 
 import { Screen } from "../../components/ui/Screen";
 import { useLogin } from "../../hooks/useLogin";
@@ -30,6 +32,27 @@ export default function LoginScreen() {
   const [focusedField, setFocusedField] = useState<"email" | "password" | null>(
     null,
   );
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert("Hold on!", "Are you sure you want to exit the app?", [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel",
+        },
+        { text: "YES", onPress: () => BackHandler.exitApp() },
+      ]);
+      return true; // Prevents default back behavior
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <Screen className="=">

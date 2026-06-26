@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { API_BASE_URL } from "./client";
+import { API_BASE_URL } from "./config";
 
 const AUTH_STORAGE_KEY = "realestate.auth.session";
 
