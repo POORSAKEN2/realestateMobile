@@ -26,6 +26,7 @@ import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { Lessee, LesseePayload, Property } from "../../types";
+import { AddEditModal } from "../../components/ui/AddEditModal";
 
 type TenantFormState = {
   name: string;
@@ -576,99 +577,37 @@ export default function TenantsScreen() {
         )}
       </View>
 
-      <Modal
-        animationType="slide"
-        visible={isFormOpen}
-        onRequestClose={closeForm}
+      <AddEditModal
+        isVisible={isFormOpen}
+        onClose={closeForm}
+        title={editingTenant ? "Edit Tenant" : "Add Tenant"}
+        subtitle="Keep tenant contact details current."
+        isPending={saveMutation.isPending}
+        submitText={editingTenant ? "Save Tenant" : "Create Tenant"}
+        onSubmit={handleSubmit}
+        formError={formError}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 bg-[#2563EB]/5"
-        >
-          <View className="bg-[#1d1d1f] px-6 pb-5 pt-6">
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-2xl font-bold text-[#FFFFFF]">
-                  {editingTenant ? "Edit Tenant" : "Add Tenant"}
-                </Text>
-                <Text className="mt-1 text-sm text-[#FFFFFF]/70">
-                  Keep tenant contact details current.
-                </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/15"
-                onPress={closeForm}
-              >
-                <Ionicons name="close" color="#FFFFFF" size={22} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <ScrollView
-            className="flex-1"
-            contentContainerClassName="gap-5 px-6 py-6"
-            keyboardShouldPersistTaps="handled"
-          >
-            <Field
-              label="Full Name"
-              onChangeText={(value) => updateForm("name", value)}
-              placeholder="e.g. Juan Dela Cruz"
-              value={form.name}
-            />
-            <Field
-              keyboardType="email-address"
-              label="Email"
-              onChangeText={(value) => updateForm("contactEmail", value)}
-              placeholder="tenant@example.com"
-              value={form.contactEmail}
-            />
-            <Field
-              keyboardType="phone-pad"
-              label="Phone"
-              onChangeText={(value) => updateForm("phone", value)}
-              placeholder="+63..."
-              value={form.phone}
-            />
-
-            {formError ? (
-              <View className="rounded-2xl border border-[#1d1d1f]/15 bg-[#1d1d1f]/5 p-4">
-                <Text className="text-sm font-medium text-[#1d1d1f]">
-                  {formError}
-                </Text>
-              </View>
-            ) : null}
-          </ScrollView>
-
-          <View className="border-t border-[#1d1d1f]/10 bg-[#FFFFFF] p-6">
-            <View className="flex-row gap-3">
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF]"
-                onPress={closeForm}
-              >
-                <Text className="text-base font-bold text-[#1d1d1f]">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
-                disabled={saveMutation.isPending}
-                onPress={handleSubmit}
-              >
-                {saveMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-base font-semibold text-[#FFFFFF]">
-                    {editingTenant ? "Save Tenant" : "Create Tenant"}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        <Field
+          label="Full Name"
+          onChangeText={(value) => updateForm("name", value)}
+          placeholder="e.g. Juan Dela Cruz"
+          value={form.name}
+        />
+        <Field
+          keyboardType="email-address"
+          label="Email"
+          onChangeText={(value) => updateForm("contactEmail", value)}
+          placeholder="tenant@example.com"
+          value={form.contactEmail}
+        />
+        <Field
+          keyboardType="phone-pad"
+          label="Phone"
+          onChangeText={(value) => updateForm("phone", value)}
+          placeholder="+63..."
+          value={form.phone}
+        />
+      </AddEditModal>
 
       <Modal
         animationType="fade"
