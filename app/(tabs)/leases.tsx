@@ -30,6 +30,7 @@ import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { Lease, LeasePayload, Lessee, Property } from "../../types";
+import { AddEditModal } from "../../components/ui/AddEditModal";
 
 type LeaseFormState = {
   propertyId: string;
@@ -789,167 +790,103 @@ export default function LeasesScreen() {
         )}
       </View>
 
-      <Modal
-        animationType="slide"
-        visible={isFormOpen}
-        onRequestClose={closeForm}
+      <AddEditModal
+        isVisible={isFormOpen}
+        onClose={closeForm}
+        title={editingLease ? "Edit Lease" : "Add Lease"}
+        subtitle= "Link a property with a tenant."
+        isPending={saveMutation.isPending}
+        submitText={editingLease ? "Save Lease" : "Create Lease"}
+        onSubmit={handleSubmit}
+        formError={formError}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 bg-[#2563EB]/5"
-        >
-          <View className="bg-[#1d1d1f] px-6 pb-5 pt-6">
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-2xl font-bold text-[#FFFFFF]">
-                  {editingLease ? "Edit Lease" : "Add Lease"}
-                </Text>
-                <Text className="mt-1 text-sm text-[#FFFFFF]/70">
-                  Link a property with a tenant.
-                </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/15"
-                onPress={closeForm}
-              >
-                <Ionicons name="close" color="#FFFFFF" size={22} />
-              </TouchableOpacity>
-            </View>
+        <ChoiceField
+          emptyText="Create a property first before adding leases."
+          label="Property"
+          onChange={(value) => updateForm("propertyId", value)}
+          options={propertyOptions}
+          value={form.propertyId}
+        />
+        <ChoiceField
+          emptyText="Create a tenant first before adding leases."
+          label="Tenant"
+          onChange={(value) => updateForm("lesseeId", value)}
+          options={lesseeOptions}
+          value={form.lesseeId}
+        />
+        <View className="flex-row gap-3">
+          <View className="flex-1">
+            <DateField
+              label="Start Date"
+              onPress={() => setActiveDateField("startDate")}
+              placeholder="YYYY-MM-DD"
+              value={form.startDate}
+            />
           </View>
+          <View className="flex-1">
+            <DateField
+              label="End Date"
+              onPress={() => setActiveDateField("endDate")}
+              placeholder="YYYY-MM-DD"
+              value={form.endDate}
+            />
+          </View>
+        </View>
 
-          <ScrollView
-            className="flex-1"
-            contentContainerClassName="gap-5 px-6 py-6"
-            keyboardShouldPersistTaps="handled"
-          >
-            <ChoiceField
-              emptyText="Create a property first before adding leases."
-              label="Property"
-              onChange={(value) => updateForm("propertyId", value)}
-              options={propertyOptions}
-              value={form.propertyId}
-            />
-            <ChoiceField
-              emptyText="Create a tenant first before adding leases."
-              label="Tenant"
-              onChange={(value) => updateForm("lesseeId", value)}
-              options={lesseeOptions}
-              value={form.lesseeId}
-            />
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <DateField
-                  label="Start Date"
-                  onPress={() => setActiveDateField("startDate")}
-                  placeholder="YYYY-MM-DD"
-                  value={form.startDate}
-                />
-              </View>
-              <View className="flex-1">
-                <DateField
-                  label="End Date"
-                  onPress={() => setActiveDateField("endDate")}
-                  placeholder="YYYY-MM-DD"
-                  value={form.endDate}
-                />
-              </View>
+        {activeDateField ? (
+          <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+            <View className="mb-2 flex-row items-center justify-between">
+              <Text className="text-sm font-bold text-[#1d1d1f]">
+                {activeDateField === "startDate"
+                  ? "Select Start Date"
+                  : "Select End Date"}
+              </Text>
+              {Platform.OS === "ios" ? (
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
+                  onPress={() => setActiveDateField(null)}
+                >
+                  <Text className="text-xs font-bold text-[#2563EB]">Done</Text>
+                </TouchableOpacity>
+              ) : null}
             </View>
-
-            {activeDateField ? (
-              <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-                <View className="mb-2 flex-row items-center justify-between">
-                  <Text className="text-sm font-bold text-[#1d1d1f]">
-                    {activeDateField === "startDate"
-                      ? "Select Start Date"
-                      : "Select End Date"}
-                  </Text>
-                  {Platform.OS === "ios" ? (
-                    <TouchableOpacity
-                      activeOpacity={0.8}
-                      className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
-                      onPress={() => setActiveDateField(null)}
-                    >
-                      <Text className="text-xs font-bold text-[#2563EB]">
-                        Done
-                      </Text>
-                    </TouchableOpacity>
-                  ) : null}
-                </View>
-                <DateTimePicker
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
-                  minimumDate={
-                    activeDateField === "endDate" && form.startDate
-                      ? getDateValue(form.startDate)
-                      : undefined
-                  }
-                  mode="date"
-                  onChange={handleDateChange}
-                  value={getDateValue(form[activeDateField])}
-                />
-              </View>
-            ) : null}
-
-            <Field
-              keyboardType="decimal-pad"
-              label="Monthly Rent"
-              onChangeText={(value) =>
-                updateForm("monthlyRent", cleanNumber(value))
+            <DateTimePicker
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              minimumDate={
+                activeDateField === "endDate" && form.startDate
+                  ? getDateValue(form.startDate)
+                  : undefined
               }
-              placeholder="0"
-              value={form.monthlyRent}
+              mode="date"
+              onChange={handleDateChange}
+              value={getDateValue(form[activeDateField])}
             />
-            <Field
-              label="Room Number"
-              onChangeText={(value) => updateForm("roomNumber", value)}
-              placeholder="Optional"
-              value={form.roomNumber}
-            />
-            <ChoiceField
-              label="Status"
-              onChange={(value) => updateForm("status", value)}
-              options={statusOptions}
-              value={form.status}
-            />
-
-            {formError ? (
-              <View className="rounded-2xl border border-[#1d1d1f]/15 bg-[#1d1d1f]/5 p-4">
-                <Text className="text-sm font-medium text-[#1d1d1f]">
-                  {formError}
-                </Text>
-              </View>
-            ) : null}
-          </ScrollView>
-
-          <View className="border-t border-[#1d1d1f]/10 bg-[#FFFFFF] p-6">
-            <View className="flex-row gap-3">
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF]"
-                onPress={closeForm}
-              >
-                <Text className="text-base font-bold text-[#1d1d1f]">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
-                disabled={saveMutation.isPending}
-                onPress={handleSubmit}
-              >
-                {saveMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-base font-semibold text-[#FFFFFF]">
-                    {editingLease ? "Save Lease" : "Create Lease"}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        ) : null}
+
+        <Field
+          keyboardType="decimal-pad"
+          label="Monthly Rent"
+          onChangeText={(value) =>
+            updateForm("monthlyRent", cleanNumber(value))
+          }
+          placeholder="0"
+          value={form.monthlyRent}
+        />
+        <Field
+          label="Room Number"
+          onChangeText={(value) => updateForm("roomNumber", value)}
+          placeholder="Optional"
+          value={form.roomNumber}
+        />
+        <ChoiceField
+          label="Status"
+          onChange={(value) => updateForm("status", value)}
+          options={statusOptions}
+          value={form.status}
+        />
+      </AddEditModal>
 
       <Modal
         animationType="fade"

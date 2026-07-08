@@ -42,6 +42,7 @@ import type {
   PropertyDocument,
   UpdatePropertyPayload,
 } from "../../types";
+import { AddEditModal } from "../../components/ui/AddEditModal";
 
 type PropertyType = NonNullable<Property["type"]>;
 type StatusFilter = Property["status"] | "ALL";
@@ -303,7 +304,10 @@ function toSelectedImage(asset: ImagePicker.ImagePickerAsset): SelectedImage {
 
 function getPropertyImages(property: Property) {
   const images = property.images?.length ? property.images : [property.image];
-  return Array.from(new Set(images.filter(Boolean))).slice(0, MAX_PROPERTY_IMAGES);
+  return Array.from(new Set(images.filter(Boolean))).slice(
+    0,
+    MAX_PROPERTY_IMAGES,
+  );
 }
 
 function PropertyImageGallery({
@@ -558,11 +562,7 @@ function CountryDropdown({
         <Text className="text-base font-semibold text-[#1d1d1f]">
           {selectedCountry || "Select a country"}
         </Text>
-        <MaterialCommunityIcons
-          name="chevron-down"
-          color="#6F6D6D"
-          size={22}
-        />
+        <MaterialCommunityIcons name="chevron-down" color="#6F6D6D" size={22} />
       </TouchableOpacity>
 
       <Modal
@@ -654,8 +654,7 @@ function LocationPinPicker({
   const [isMapVisible, setIsMapVisible] = useState(false);
   const latitude = parseNumber(lat);
   const longitude = parseNumber(lng);
-  const hasPinnedLocation =
-    latitude !== undefined && longitude !== undefined;
+  const hasPinnedLocation = latitude !== undefined && longitude !== undefined;
   const markerCoordinate = hasPinnedLocation
     ? { latitude: latitude as number, longitude: longitude as number }
     : undefined;
@@ -1199,7 +1198,9 @@ export default function PropertiesScreen() {
     setFormError("");
 
     if (selectedImages.length >= MAX_PROPERTY_IMAGES) {
-      setFormError(`You can upload up to ${MAX_PROPERTY_IMAGES} property images.`);
+      setFormError(
+        `You can upload up to ${MAX_PROPERTY_IMAGES} property images.`,
+      );
       return;
     }
 
@@ -1228,10 +1229,15 @@ export default function PropertiesScreen() {
       const newImages = pickedImages.filter(
         (image) => !existingUris.has(image.uri),
       );
-      const nextImages = [...current, ...newImages].slice(0, MAX_PROPERTY_IMAGES);
+      const nextImages = [...current, ...newImages].slice(
+        0,
+        MAX_PROPERTY_IMAGES,
+      );
 
       if (current.length + newImages.length > MAX_PROPERTY_IMAGES) {
-        setFormError(`Only ${MAX_PROPERTY_IMAGES} property images can be uploaded.`);
+        setFormError(
+          `Only ${MAX_PROPERTY_IMAGES} property images can be uploaded.`,
+        );
       }
 
       return nextImages;
@@ -1578,486 +1584,417 @@ export default function PropertiesScreen() {
         )}
       </View>
 
-      <Modal
-        animationType="slide"
-        onRequestClose={closeForm}
-        presentationStyle="fullScreen"
-        visible={isFormVisible}
+      <AddEditModal
+        isVisible={isFormVisible}
+        onClose={closeForm}
+        title={editingProperty ? "Edit Property" : "Add Property"}
+        subtitle={
+          editingProperty
+            ? "Update this portfolio asset."
+            : "Create a portfolio asset."
+        }
+        isPending={saveMutation.isPending}
+        submitText={editingProperty ? "Save Property" : "Create Property"}
+        onSubmit={handleSubmit}
+        formError={formError}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 bg-[#2563EB]/5"
-        >
-          <View className="bg-[#1d1d1f] px-6 pb-5 pt-6">
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-2xl font-bold text-[#FFFFFF]">
-                  {editingProperty ? "Edit Property" : "Add Property"}
-                </Text>
-                <Text className="mt-1 text-sm text-[#FFFFFF]/70">
-                  {editingProperty
-                    ? "Update this portfolio asset."
-                    : "Create a portfolio asset."}
-                </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/15"
-                onPress={closeForm}
-              >
-                <MaterialCommunityIcons
-                  name="close"
-                  color="#FFFFFF"
-                  size={22}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
+        <Field
+          label="Property Title"
+          onChangeText={(value) => updateForm("title", value)}
+          placeholder="e.g. The Shard"
+          value={form.title}
+        />
 
-          <ScrollView
-            className="flex-1"
-            contentContainerClassName="gap-5 px-6 py-6"
-            keyboardShouldPersistTaps="handled"
-          >
-            <Field
-              label="Property Title"
-              onChangeText={(value) => updateForm("title", value)}
-              placeholder="e.g. The Shard"
-              value={form.title}
-            />
+        <Field
+          label="Location"
+          onChangeText={(value) => updateForm("location", value)}
+          placeholder="City, area, or address"
+          value={form.location}
+        />
 
-            <Field
-              label="Location"
-              onChangeText={(value) => updateForm("location", value)}
-              placeholder="City, area, or address"
-              value={form.location}
-            />
+        <View className="flex-row flex-wrap gap-2">
+          {filteredLocationSuggestions.map((location) => (
+            <TouchableOpacity
+              key={location}
+              activeOpacity={0.8}
+              className="rounded-full border border-[#1d1d1f]/10 bg-[#FFFFFF] px-3.5 py-2.5 shadow-sm"
+              onPress={() => selectLocation(location)}
+            >
+              <Text className="text-xs font-bold text-[#2563EB]">
+                {location}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-            <View className="flex-row flex-wrap gap-2">
-              {filteredLocationSuggestions.map((location) => (
-                <TouchableOpacity
-                  key={location}
-                  activeOpacity={0.8}
-                  className="rounded-full border border-[#1d1d1f]/10 bg-[#FFFFFF] px-3.5 py-2.5 shadow-sm"
-                  onPress={() => selectLocation(location)}
-                >
-                  <Text className="text-xs font-bold text-[#2563EB]">
-                    {location}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+        <CountryDropdown
+          onSelect={(value) => updateForm("country", value)}
+          value={form.country}
+        />
 
-            <CountryDropdown
-              onSelect={(value) => updateForm("country", value)}
-              value={form.country}
-            />
+        <LocationPinPicker
+          lat={form.lat}
+          lng={form.lng}
+          onChange={(coordinates) =>
+            setForm((current) => ({
+              ...current,
+              lat: coordinates.lat,
+              lng: coordinates.lng,
+            }))
+          }
+        />
 
-            <LocationPinPicker
-              lat={form.lat}
-              lng={form.lng}
-              onChange={(coordinates) =>
-                setForm((current) => ({
-                  ...current,
-                  lat: coordinates.lat,
-                  lng: coordinates.lng,
-                }))
-              }
-            />
+        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+          <ChoiceGroup
+            choices={propertyStatusChoices}
+            label="Property Status"
+            onSelect={(value) => updateForm("status", value)}
+            value={form.status}
+          />
+        </View>
 
-            <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
-              <ChoiceGroup
-                choices={propertyStatusChoices}
-                label="Property Status"
-                onSelect={(value) => updateForm("status", value)}
-                value={form.status}
-              />
-            </View>
+        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+          <ChoiceGroup
+            choices={propertyTypeChoices}
+            label="Property Type"
+            onSelect={(value) => updateForm("type", value)}
+            value={form.type}
+          />
+        </View>
 
-            <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
-              <ChoiceGroup
-                choices={propertyTypeChoices}
-                label="Property Type"
-                onSelect={(value) => updateForm("type", value)}
-                value={form.type}
-              />
-            </View>
-
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <Field
-                  keyboardType="decimal-pad"
-                  label="Market Value"
-                  onChangeText={(value) =>
-                    updateForm("value", cleanDecimal(value))
-                  }
-                  placeholder="0"
-                  value={form.value}
-                />
-              </View>
-              <View className="w-28">
-                <Field
-                  keyboardType="decimal-pad"
-                  label="ROI %"
-                  onChangeText={(value) =>
-                    updateForm("roi", cleanDecimal(value))
-                  }
-                  placeholder="0"
-                  value={form.roi}
-                />
-              </View>
-            </View>
-
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <Field
-                  keyboardType="numbers-and-punctuation"
-                  label="Latitude"
-                  onChangeText={(value) =>
-                    updateForm("lat", cleanDecimal(value, true))
-                  }
-                  placeholder="0"
-                  value={form.lat}
-                />
-              </View>
-              <View className="flex-1">
-                <Field
-                  keyboardType="numbers-and-punctuation"
-                  label="Longitude"
-                  onChangeText={(value) =>
-                    updateForm("lng", cleanDecimal(value, true))
-                  }
-                  placeholder="0"
-                  value={form.lng}
-                />
-              </View>
-            </View>
-
-            {isResidential(form.type) ? (
-              <View className="flex-row gap-3">
-                <View className="flex-1">
-                  <Field
-                    keyboardType="numeric"
-                    label="Bedrooms"
-                    onChangeText={(value) =>
-                      updateForm("bedrooms", cleanInteger(value))
-                    }
-                    value={form.bedrooms}
-                  />
-                </View>
-                <View className="flex-1">
-                  <Field
-                    keyboardType="numeric"
-                    label="Bathrooms"
-                    onChangeText={(value) =>
-                      updateForm("bathrooms", cleanInteger(value))
-                    }
-                    value={form.bathrooms}
-                  />
-                </View>
-              </View>
-            ) : null}
-
-            <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-              <View className="flex-row items-center justify-between gap-4">
-                <View className="flex-1 flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
-                    <MaterialCommunityIcons
-                      name="calendar-clock"
-                      color="#2563EB"
-                      size={22}
-                    />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-sm font-bold text-[#1d1d1f]">
-                      Transient Booking Enabled
-                    </Text>
-                    <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
-                      Allow short-term reservations for this property.
-                    </Text>
-                  </View>
-                </View>
-                <Switch
-                  onValueChange={(value) =>
-                    updateForm("isTransientBookable", value)
-                  }
-                  thumbColor="#FFFFFF"
-                  trackColor={{ false: "#6F6D6D", true: "#2563EB" }}
-                  value={form.isTransientBookable}
-                />
-              </View>
-            </View>
-
+        <View className="flex-row gap-3">
+          <View className="flex-1">
             <Field
               keyboardType="decimal-pad"
-              label="Occupancy %"
+              label="Market Value"
+              onChangeText={(value) => updateForm("value", cleanDecimal(value))}
+              placeholder="0"
+              value={form.value}
+            />
+          </View>
+          <View className="w-28">
+            <Field
+              keyboardType="decimal-pad"
+              label="ROI %"
+              onChangeText={(value) => updateForm("roi", cleanDecimal(value))}
+              placeholder="0"
+              value={form.roi}
+            />
+          </View>
+        </View>
+
+        <View className="flex-row gap-3">
+          <View className="flex-1">
+            <Field
+              keyboardType="numbers-and-punctuation"
+              label="Latitude"
               onChangeText={(value) =>
-                updateForm("occupancy", cleanDecimal(value))
+                updateForm("lat", cleanDecimal(value, true))
               }
-              placeholder="Optional"
-              value={form.occupancy}
+              placeholder="0"
+              value={form.lat}
             />
-
+          </View>
+          <View className="flex-1">
             <Field
-              label="Area"
-              onChangeText={(value) => updateForm("area", value)}
-              placeholder="Optional"
-              value={form.area}
+              keyboardType="numbers-and-punctuation"
+              label="Longitude"
+              onChangeText={(value) =>
+                updateForm("lng", cleanDecimal(value, true))
+              }
+              placeholder="0"
+              value={form.lng}
             />
+          </View>
+        </View>
 
-            <Field
-              label="Description"
-              multiline
-              onChangeText={(value) => updateForm("description", value)}
-              placeholder="Optional notes"
-              value={form.description}
+        {isResidential(form.type) ? (
+          <View className="flex-row gap-3">
+            <View className="flex-1">
+              <Field
+                keyboardType="numeric"
+                label="Bedrooms"
+                onChangeText={(value) =>
+                  updateForm("bedrooms", cleanInteger(value))
+                }
+                value={form.bedrooms}
+              />
+            </View>
+            <View className="flex-1">
+              <Field
+                keyboardType="numeric"
+                label="Bathrooms"
+                onChangeText={(value) =>
+                  updateForm("bathrooms", cleanInteger(value))
+                }
+                value={form.bathrooms}
+              />
+            </View>
+          </View>
+        ) : null}
+
+        <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+          <View className="flex-row items-center justify-between gap-4">
+            <View className="flex-1 flex-row items-center gap-3">
+              <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
+                <MaterialCommunityIcons
+                  name="calendar-clock"
+                  color="#2563EB"
+                  size={22}
+                />
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-bold text-[#1d1d1f]">
+                  Transient Booking Enabled
+                </Text>
+                <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+                  Allow short-term reservations for this property.
+                </Text>
+              </View>
+            </View>
+            <Switch
+              onValueChange={(value) =>
+                updateForm("isTransientBookable", value)
+              }
+              thumbColor="#FFFFFF"
+              trackColor={{ false: "#6F6D6D", true: "#2563EB" }}
+              value={form.isTransientBookable}
             />
+          </View>
+        </View>
 
-            <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
-              <View className="flex-row items-center justify-between gap-3">
-                <View className="flex-1 flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
-                    <MaterialCommunityIcons
-                      name="image-outline"
-                      color="#2563EB"
-                      size={22}
-                    />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-sm font-bold text-[#1d1d1f]">
-                      Property Images
+        <Field
+          keyboardType="decimal-pad"
+          label="Occupancy %"
+          onChangeText={(value) => updateForm("occupancy", cleanDecimal(value))}
+          placeholder="Optional"
+          value={form.occupancy}
+        />
+
+        <Field
+          label="Area"
+          onChangeText={(value) => updateForm("area", value)}
+          placeholder="Optional"
+          value={form.area}
+        />
+
+        <Field
+          label="Description"
+          multiline
+          onChangeText={(value) => updateForm("description", value)}
+          placeholder="Optional notes"
+          value={form.description}
+        />
+
+        {/* Property Images Section */}
+        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="flex-1 flex-row items-center gap-3">
+              <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
+                <MaterialCommunityIcons
+                  name="image-outline"
+                  color="#2563EB"
+                  size={22}
+                />
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-bold text-[#1d1d1f]">
+                  Property Images
+                </Text>
+                <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+                  JPG, PNG, or WEBP. Upload up to {MAX_PROPERTY_IMAGES}.
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              className="rounded-full bg-[#2563EB] px-4 py-2.5"
+              onPress={pickImage}
+            >
+              <Text className="text-xs font-bold text-[#FFFFFF]">
+                {selectedImages.length ? "Add" : "Choose"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {selectedImages.length ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 12, paddingRight: 4 }}
+            >
+              {selectedImages.map((image, index) => (
+                <View
+                  className="w-64 overflow-hidden rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5"
+                  key={`${image.uri}:${index}`}
+                >
+                  <Image
+                    className="h-40 w-full"
+                    resizeMode="cover"
+                    source={{ uri: image.uri }}
+                  />
+                  <View className="flex-row items-center justify-between gap-3 p-3">
+                    <Text
+                      className="flex-1 text-xs font-semibold text-[#1d1d1f]"
+                      numberOfLines={1}
+                    >
+                      {index + 1}. {image.name}
                     </Text>
-                    <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
-                      JPG, PNG, or WEBP. Upload up to {MAX_PROPERTY_IMAGES}.
-                    </Text>
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
+                      onPress={() => removeImage(index)}
+                    >
+                      <MaterialCommunityIcons
+                        name="close"
+                        color="#6F6D6D"
+                        size={17}
+                      />
+                    </TouchableOpacity>
                   </View>
                 </View>
-                <TouchableOpacity
-                  activeOpacity={0.85}
-                  className="rounded-full bg-[#2563EB] px-4 py-2.5"
-                  onPress={pickImage}
-                >
-                  <Text className="text-xs font-bold text-[#FFFFFF]">
-                    {selectedImages.length ? "Add" : "Choose"}
-                  </Text>
-                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          ) : null}
+        </View>
+
+        {/* Property Documents Section */}
+        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+          <View className="flex-row items-center justify-between gap-3">
+            <View className="flex-1 flex-row items-center gap-3">
+              <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
+                <MaterialCommunityIcons
+                  name="file-document-outline"
+                  color="#2563EB"
+                  size={22}
+                />
               </View>
-
-              {selectedImages.length ? (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 12, paddingRight: 4 }}
-                >
-                  {selectedImages.map((image, index) => (
-                    <View
-                      className="w-64 overflow-hidden rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5"
-                      key={`${image.uri}:${index}`}
-                    >
-                      <Image
-                        className="h-40 w-full"
-                        resizeMode="cover"
-                        source={{ uri: image.uri }}
-                      />
-                      <View className="flex-row items-center justify-between gap-3 p-3">
-                        <Text
-                          className="flex-1 text-xs font-semibold text-[#1d1d1f]"
-                          numberOfLines={1}
-                        >
-                          {index + 1}. {image.name}
-                        </Text>
-                        <TouchableOpacity
-                          activeOpacity={0.8}
-                          className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
-                          onPress={() => removeImage(index)}
-                        >
-                          <MaterialCommunityIcons
-                            name="close"
-                            color="#6F6D6D"
-                            size={17}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  ))}
-                </ScrollView>
-              ) : null}
+              <View className="flex-1">
+                <Text className="text-sm font-bold text-[#1d1d1f]">
+                  Property Documents
+                </Text>
+                <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+                  PDF, DOC, DOCX, JPG, or PNG files.
+                </Text>
+              </View>
             </View>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              className="rounded-full bg-[#2563EB] px-4 py-2.5"
+              onPress={pickDocuments}
+            >
+              <Text className="text-xs font-bold text-[#FFFFFF]">
+                {selectedDocuments.length > 0 ? "Add More" : "Choose"}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-            <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
-              <View className="flex-row items-center justify-between gap-3">
-                <View className="flex-1 flex-row items-center gap-3">
-                  <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
+          {editingProperty && (
+            <View className="rounded-2xl bg-[#2563EB]/5 px-3 py-2">
+              <Text className="text-xs leading-5 text-[#6F6D6D]">
+                Existing documents stay attached. Add files here to upload more
+                documents to this property.
+              </Text>
+            </View>
+          )}
+
+          {editingProperty && (
+            <View className="gap-2">
+              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                Attached Documents
+              </Text>
+              {isLoadingExistingDocuments ? (
+                <View className="h-14 justify-center rounded-2xl bg-[#2563EB]/5 px-3">
+                  <ActivityIndicator color="#2563EB" />
+                </View>
+              ) : existingPropertyDocuments.length > 0 ? (
+                existingPropertyDocuments.map((document) => (
+                  <TouchableOpacity
+                    key={document.id}
+                    activeOpacity={0.8}
+                    className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
+                    onPress={() => openDocument(document)}
+                  >
+                    <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
+                      <MaterialCommunityIcons
+                        name="file-eye-outline"
+                        color="#2563EB"
+                        size={18}
+                      />
+                    </View>
+                    <View className="min-w-0 flex-1">
+                      <Text
+                        className="text-xs font-bold text-[#1d1d1f]"
+                        numberOfLines={1}
+                      >
+                        {document.name}
+                      </Text>
+                      <Text className="mt-0.5 text-[11px] text-[#6F6D6D]">
+                        {document.category} | {document.size}
+                      </Text>
+                    </View>
+                    <MaterialCommunityIcons
+                      name="open-in-new"
+                      color={document.url ? "#6F6D6D" : "#C8C8C8"}
+                      size={17}
+                    />
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <View className="rounded-2xl border border-dashed border-[#1d1d1f]/15 bg-[#2563EB]/5 px-3 py-4">
+                  <Text className="text-center text-xs font-semibold text-[#6F6D6D]">
+                    No documents attached yet.
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          {selectedDocuments.length > 0 && (
+            <View className="gap-2">
+              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                New Uploads
+              </Text>
+              {selectedDocuments.map((document, index) => (
+                <View
+                  key={`${document.name}-${document.size ?? index}`}
+                  className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
+                >
+                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
                     <MaterialCommunityIcons
                       name="file-document-outline"
                       color="#2563EB"
-                      size={22}
+                      size={18}
                     />
                   </View>
-                  <View className="flex-1">
-                    <Text className="text-sm font-bold text-[#1d1d1f]">
-                      Property Documents
+                  <View className="min-w-0 flex-1">
+                    <Text
+                      className="text-xs font-bold text-[#1d1d1f]"
+                      numberOfLines={1}
+                    >
+                      {document.name}
                     </Text>
-                    <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
-                      PDF, DOC, DOCX, JPG, or PNG files.
+                    <Text className="mt-0.5 text-[11px] text-[#6F6D6D]">
+                      {formatSelectedDocumentSize(document.size)}
                     </Text>
                   </View>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
+                    onPress={() => removeDocument(index)}
+                  >
+                    <MaterialCommunityIcons
+                      name="close"
+                      color="#6F6D6D"
+                      size={17}
+                    />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  activeOpacity={0.85}
-                  className="rounded-full bg-[#2563EB] px-4 py-2.5"
-                  onPress={pickDocuments}
-                >
-                  <Text className="text-xs font-bold text-[#FFFFFF]">
-                    {selectedDocuments.length > 0 ? "Add More" : "Choose"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              {editingProperty ? (
-                <View className="rounded-2xl bg-[#2563EB]/5 px-3 py-2">
-                  <Text className="text-xs leading-5 text-[#6F6D6D]">
-                    Existing documents stay attached. Add files here to upload
-                    more documents to this property.
-                  </Text>
-                </View>
-              ) : null}
-
-              {editingProperty ? (
-                <View className="gap-2">
-                  <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                    Attached Documents
-                  </Text>
-                  {isLoadingExistingDocuments ? (
-                    <View className="h-14 justify-center rounded-2xl bg-[#2563EB]/5 px-3">
-                      <ActivityIndicator color="#2563EB" />
-                    </View>
-                  ) : existingPropertyDocuments.length > 0 ? (
-                    existingPropertyDocuments.map((document) => (
-                      <TouchableOpacity
-                        key={document.id}
-                        activeOpacity={0.8}
-                        className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
-                        onPress={() => openDocument(document)}
-                      >
-                        <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
-                          <MaterialCommunityIcons
-                            name="file-eye-outline"
-                            color="#2563EB"
-                            size={18}
-                          />
-                        </View>
-                        <View className="min-w-0 flex-1">
-                          <Text
-                            className="text-xs font-bold text-[#1d1d1f]"
-                            numberOfLines={1}
-                          >
-                            {document.name}
-                          </Text>
-                          <Text className="mt-0.5 text-[11px] text-[#6F6D6D]">
-                            {document.category} | {document.size}
-                          </Text>
-                        </View>
-                        <MaterialCommunityIcons
-                          name="open-in-new"
-                          color={document.url ? "#6F6D6D" : "#C8C8C8"}
-                          size={17}
-                        />
-                      </TouchableOpacity>
-                    ))
-                  ) : (
-                    <View className="rounded-2xl border border-dashed border-[#1d1d1f]/15 bg-[#2563EB]/5 px-3 py-4">
-                      <Text className="text-center text-xs font-semibold text-[#6F6D6D]">
-                        No documents attached yet.
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              ) : null}
-
-              {selectedDocuments.length > 0 ? (
-                <View className="gap-2">
-                  <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                    New Uploads
-                  </Text>
-                  {selectedDocuments.map((document, index) => (
-                    <View
-                      key={`${document.name}-${document.size ?? index}`}
-                      className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
-                    >
-                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
-                        <MaterialCommunityIcons
-                          name="file-document-outline"
-                          color="#2563EB"
-                          size={18}
-                        />
-                      </View>
-                      <View className="min-w-0 flex-1">
-                        <Text
-                          className="text-xs font-bold text-[#1d1d1f]"
-                          numberOfLines={1}
-                        >
-                          {document.name}
-                        </Text>
-                        <Text className="mt-0.5 text-[11px] text-[#6F6D6D]">
-                          {formatSelectedDocumentSize(document.size)}
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
-                        onPress={() => removeDocument(index)}
-                      >
-                        <MaterialCommunityIcons
-                          name="close"
-                          color="#6F6D6D"
-                          size={17}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </View>
-              ) : null}
+              ))}
             </View>
-
-            {formError ? (
-              <View className="rounded-2xl border border-[#1d1d1f]/15 bg-[#1d1d1f]/5 p-4">
-                <Text className="text-sm font-medium text-[#1d1d1f]">
-                  {formError}
-                </Text>
-              </View>
-            ) : null}
-          </ScrollView>
-
-          <View className="border-t border-[#1d1d1f]/10 bg-[#FFFFFF] p-6">
-            <View className="flex-row gap-3">
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF]"
-                onPress={closeForm}
-              >
-                <Text className="text-base font-bold text-[#1d1d1f]">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
-                disabled={saveMutation.isPending}
-                onPress={handleSubmit}
-              >
-                {saveMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-base font-semibold text-[#FFFFFF]">
-                    {editingProperty ? "Save Property" : "Create Property"}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+          )}
+        </View>
+      </AddEditModal>
     </Screen>
   );
 }
