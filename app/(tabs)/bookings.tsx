@@ -35,6 +35,8 @@ import type {
   TransientBooking,
   TransientBookingPayload,
 } from "../../types";
+import { BaseField } from "../../components/ui/fields/BaseField";
+import ChoiceChips from "../../components/ui/chips/ChoiceChips";
 
 type BookingFormMode = "create" | "edit";
 type StatusFilter = "Booked" | "All";
@@ -166,80 +168,6 @@ function parseMoney(value: string) {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-function Field({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  keyboardType = "default",
-  multiline = false,
-}: {
-  label: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder?: string;
-  keyboardType?: TextInputProps["keyboardType"];
-  multiline?: boolean;
-}) {
-  return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        {label}
-      </Text>
-      <TextInput
-        className={`rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 text-base text-[#1d1d1f] shadow-sm ${
-          multiline ? "min-h-24 py-4" : "h-14"
-        }`}
-        keyboardType={keyboardType}
-        multiline={multiline}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#6F6D6D"
-        textAlignVertical={multiline ? "top" : "center"}
-        value={value}
-      />
-    </View>
-  );
-}
-
-function ChoiceChips<T extends string>({
-  options,
-  value,
-  onSelect,
-}: {
-  options: Array<{ label: string; value: T }>;
-  value: T;
-  onSelect: (value: T) => void;
-}) {
-  return (
-    <View className="flex-row flex-wrap gap-2">
-      {options.map((option) => {
-        const selected = option.value === value;
-
-        return (
-          <TouchableOpacity
-            key={option.value}
-            activeOpacity={0.8}
-            className={`rounded-full border px-3.5 py-2.5 ${
-              selected
-                ? "border-[#2563EB] bg-[#2563EB]"
-                : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
-            }`}
-            onPress={() => onSelect(option.value)}
-          >
-            <Text
-              className={`text-xs font-bold ${
-                selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"
-              }`}
-            >
-              {option.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
 
 export default function BookingsScreen() {
   const { session } = useAuth();
@@ -951,7 +879,7 @@ export default function BookingsScreen() {
               />
             </View>
 
-            <Field
+            <BaseField
               keyboardType="number-pad"
               label="Room Number"
               onChangeText={(value) => updateForm("roomNumber", value)}
@@ -959,7 +887,7 @@ export default function BookingsScreen() {
               value={formData.roomNumber}
             />
 
-            <Field
+            <BaseField
               keyboardType="decimal-pad"
               label="Daily Rate"
               onChangeText={(value) => updateForm("dailyRate", value)}
@@ -978,18 +906,18 @@ export default function BookingsScreen() {
               </View>
             ) : null}
 
-            <Field
+            <BaseField
               label="Guest Name"
               onChangeText={(value) => updateForm("guestName", value)}
               value={formData.guestName}
             />
-            <Field
+            <BaseField
               keyboardType="phone-pad"
               label="Guest Phone"
               onChangeText={(value) => updateForm("guestPhone", value)}
               value={formData.guestPhone}
             />
-            <Field
+            <BaseField
               keyboardType="email-address"
               label="Guest Email"
               onChangeText={(value) => updateForm("guestEmail", value)}
@@ -998,7 +926,7 @@ export default function BookingsScreen() {
 
             <View className="flex-row gap-3">
               <View className="flex-1">
-                <Field
+                <BaseField
                   label="Check-in Date"
                   onChangeText={(value) => updateForm("startDate", value)}
                   placeholder="YYYY-MM-DD"
@@ -1006,7 +934,7 @@ export default function BookingsScreen() {
                 />
               </View>
               <View className="w-28">
-                <Field
+                <BaseField
                   label="Time"
                   onChangeText={(value) => updateForm("checkInTime", value)}
                   placeholder="14:00"
@@ -1017,7 +945,7 @@ export default function BookingsScreen() {
 
             <View className="flex-row gap-3">
               <View className="flex-1">
-                <Field
+                <BaseField
                   label="Check-out Date"
                   onChangeText={(value) => updateForm("endDate", value)}
                   placeholder="YYYY-MM-DD"
@@ -1025,7 +953,7 @@ export default function BookingsScreen() {
                 />
               </View>
               <View className="w-28">
-                <Field
+                <BaseField
                   label="Time"
                   onChangeText={(value) => updateForm("checkOutTime", value)}
                   placeholder="11:00"
@@ -1059,7 +987,7 @@ export default function BookingsScreen() {
               </View>
             ) : null}
 
-            <Field
+            <BaseField
               label="Notes"
               multiline
               onChangeText={(value) => updateForm("notes", value)}

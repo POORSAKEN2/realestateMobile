@@ -43,6 +43,7 @@ import type {
   UpdatePropertyPayload,
 } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
+import { BaseField } from "../../components/ui/fields/BaseField";
 
 type PropertyType = NonNullable<Property["type"]>;
 type StatusFilter = Property["status"] | "ALL";
@@ -435,42 +436,6 @@ async function openDocument(document: PropertyDocument) {
   } catch {
     Alert.alert("Cannot open document", "The document could not be opened.");
   }
-}
-
-function Field({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  keyboardType = "default",
-  multiline = false,
-}: {
-  label: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder?: string;
-  keyboardType?: TextInputProps["keyboardType"];
-  multiline?: boolean;
-}) {
-  return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        {label}
-      </Text>
-      <TextInput
-        className={`rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 text-base text-[#1d1d1f] shadow-sm ${
-          multiline ? "min-h-28 py-4" : "h-14"
-        }`}
-        keyboardType={keyboardType}
-        multiline={multiline}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#6F6D6D"
-        textAlignVertical={multiline ? "top" : "center"}
-        value={value}
-      />
-    </View>
-  );
 }
 
 function ChoiceGroup<T extends string>({
@@ -1598,14 +1563,14 @@ export default function PropertiesScreen() {
         onSubmit={handleSubmit}
         formError={formError}
       >
-        <Field
+        <BaseField
           label="Property Title"
           onChangeText={(value) => updateForm("title", value)}
           placeholder="e.g. The Shard"
           value={form.title}
         />
 
-        <Field
+        <BaseField
           label="Location"
           onChangeText={(value) => updateForm("location", value)}
           placeholder="City, area, or address"
@@ -1664,7 +1629,7 @@ export default function PropertiesScreen() {
 
         <View className="flex-row gap-3">
           <View className="flex-1">
-            <Field
+            <BaseField
               keyboardType="decimal-pad"
               label="Market Value"
               onChangeText={(value) => updateForm("value", cleanDecimal(value))}
@@ -1673,7 +1638,7 @@ export default function PropertiesScreen() {
             />
           </View>
           <View className="w-28">
-            <Field
+            <BaseField
               keyboardType="decimal-pad"
               label="ROI %"
               onChangeText={(value) => updateForm("roi", cleanDecimal(value))}
@@ -1685,7 +1650,7 @@ export default function PropertiesScreen() {
 
         <View className="flex-row gap-3">
           <View className="flex-1">
-            <Field
+            <BaseField
               keyboardType="numbers-and-punctuation"
               label="Latitude"
               onChangeText={(value) =>
@@ -1696,7 +1661,7 @@ export default function PropertiesScreen() {
             />
           </View>
           <View className="flex-1">
-            <Field
+            <BaseField
               keyboardType="numbers-and-punctuation"
               label="Longitude"
               onChangeText={(value) =>
@@ -1711,7 +1676,7 @@ export default function PropertiesScreen() {
         {isResidential(form.type) ? (
           <View className="flex-row gap-3">
             <View className="flex-1">
-              <Field
+              <BaseField
                 keyboardType="numeric"
                 label="Bedrooms"
                 onChangeText={(value) =>
@@ -1721,7 +1686,7 @@ export default function PropertiesScreen() {
               />
             </View>
             <View className="flex-1">
-              <Field
+              <BaseField
                 keyboardType="numeric"
                 label="Bathrooms"
                 onChangeText={(value) =>
@@ -1763,7 +1728,7 @@ export default function PropertiesScreen() {
           </View>
         </View>
 
-        <Field
+        <BaseField
           keyboardType="decimal-pad"
           label="Occupancy %"
           onChangeText={(value) => updateForm("occupancy", cleanDecimal(value))}
@@ -1771,14 +1736,14 @@ export default function PropertiesScreen() {
           value={form.occupancy}
         />
 
-        <Field
+        <BaseField
           label="Area"
           onChangeText={(value) => updateForm("area", value)}
           placeholder="Optional"
           value={form.area}
         />
 
-        <Field
+        <BaseField
           label="Description"
           multiline
           onChangeText={(value) => updateForm("description", value)}

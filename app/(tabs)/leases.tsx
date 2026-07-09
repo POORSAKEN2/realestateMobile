@@ -31,6 +31,9 @@ import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { Lease, LeasePayload, Lessee, Property } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
+import { BaseField } from "../../components/ui/fields/BaseField";
+import { ChoiceField } from "../../components/ui/fields/ChoiceField";
+import { PickerField } from "../../components/ui/fields/PickerField";
 
 type LeaseFormState = {
   propertyId: string;
@@ -148,92 +151,6 @@ function DateField({
         </Text>
         <Ionicons name="calendar-outline" color="#2563EB" size={20} />
       </TouchableOpacity>
-    </View>
-  );
-}
-
-function Field({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  keyboardType = "default",
-}: {
-  label: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder?: string;
-  keyboardType?: TextInputProps["keyboardType"];
-}) {
-  return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        {label}
-      </Text>
-      <TextInput
-        className="h-14 rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 text-base text-[#1d1d1f] shadow-sm"
-        keyboardType={keyboardType}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#6F6D6D"
-        value={value}
-      />
-    </View>
-  );
-}
-
-function ChoiceField({
-  label,
-  options,
-  value,
-  onChange,
-  emptyText,
-}: {
-  label: string;
-  options: Option[];
-  value: string;
-  onChange: (value: string) => void;
-  emptyText?: string;
-}) {
-  return (
-    <View className="gap-3">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        {label}
-      </Text>
-      {options.length === 0 ? (
-        <View className="rounded-2xl border border-dashed border-[#1d1d1f]/20 bg-[#FFFFFF]/90 p-4">
-          <Text className="text-sm font-medium text-[#6F6D6D]">
-            {emptyText ?? "No options available."}
-          </Text>
-        </View>
-      ) : (
-        <View className="flex-row flex-wrap gap-2">
-          {options.map((option) => {
-            const selected = option.value === value;
-
-            return (
-              <TouchableOpacity
-                key={option.value}
-                activeOpacity={0.8}
-                className={`rounded-full border px-3.5 py-2.5 ${
-                  selected
-                    ? "border-[#2563EB] bg-[#2563EB]"
-                    : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
-                }`}
-                onPress={() => onChange(option.value)}
-              >
-                <Text
-                  className={`text-xs font-semibold ${
-                    selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"
-                  }`}
-                >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      )}
     </View>
   );
 }
@@ -794,7 +711,7 @@ export default function LeasesScreen() {
         isVisible={isFormOpen}
         onClose={closeForm}
         title={editingLease ? "Edit Lease" : "Add Lease"}
-        subtitle= "Link a property with a tenant."
+        subtitle="Link a property with a tenant."
         isPending={saveMutation.isPending}
         submitText={editingLease ? "Save Lease" : "Create Lease"}
         onSubmit={handleSubmit}
@@ -803,32 +720,34 @@ export default function LeasesScreen() {
         <ChoiceField
           emptyText="Create a property first before adding leases."
           label="Property"
-          onChange={(value) => updateForm("propertyId", value)}
+          onChange={(value) => updateForm("propertyId", value as string)}
           options={propertyOptions}
           value={form.propertyId}
         />
         <ChoiceField
           emptyText="Create a tenant first before adding leases."
           label="Tenant"
-          onChange={(value) => updateForm("lesseeId", value)}
+          onChange={(value) => updateForm("lesseeId", value as string)}
           options={lesseeOptions}
           value={form.lesseeId}
         />
         <View className="flex-row gap-3">
           <View className="flex-1">
-            <DateField
-              label="Start Date"
-              onPress={() => setActiveDateField("startDate")}
-              placeholder="YYYY-MM-DD"
+            <PickerField
+              label="Check-In Date"
               value={form.startDate}
+              placeholder="Select date"
+              onPress={() => setActiveDateField("startDate")}
+              // Automatically uses calendar icon & blue styling by default
             />
           </View>
           <View className="flex-1">
-            <DateField
+            <PickerField
               label="End Date"
-              onPress={() => setActiveDateField("endDate")}
-              placeholder="YYYY-MM-DD"
               value={form.endDate}
+              placeholder="Select date"
+              onPress={() => setActiveDateField("endDate")}
+              // Automatically uses calendar icon & blue styling by default
             />
           </View>
         </View>
@@ -865,7 +784,7 @@ export default function LeasesScreen() {
           </View>
         ) : null}
 
-        <Field
+        <BaseField
           keyboardType="decimal-pad"
           label="Monthly Rent"
           onChangeText={(value) =>
@@ -874,7 +793,7 @@ export default function LeasesScreen() {
           placeholder="0"
           value={form.monthlyRent}
         />
-        <Field
+        <BaseField
           label="Room Number"
           onChangeText={(value) => updateForm("roomNumber", value)}
           placeholder="Optional"
@@ -882,7 +801,7 @@ export default function LeasesScreen() {
         />
         <ChoiceField
           label="Status"
-          onChange={(value) => updateForm("status", value)}
+          onChange={(value) => updateForm("status", value as string)}
           options={statusOptions}
           value={form.status}
         />

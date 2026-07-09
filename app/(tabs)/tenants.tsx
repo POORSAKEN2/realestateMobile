@@ -27,6 +27,7 @@ import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { Lessee, LesseePayload, Property } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
+import { BaseField } from "../../components/ui/fields/BaseField";
 
 type TenantFormState = {
   name: string;
@@ -48,36 +49,6 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-function Field({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  keyboardType = "default",
-}: {
-  label: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder?: string;
-  keyboardType?: "default" | "email-address" | "phone-pad";
-}) {
-  return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        {label}
-      </Text>
-      <TextInput
-        autoCapitalize={keyboardType === "email-address" ? "none" : "words"}
-        className="h-14 rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 text-base text-[#1d1d1f] shadow-sm"
-        keyboardType={keyboardType}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#6F6D6D"
-        value={value}
-      />
-    </View>
-  );
-}
 
 function MetricCard({
   icon,
@@ -587,20 +558,20 @@ export default function TenantsScreen() {
         onSubmit={handleSubmit}
         formError={formError}
       >
-        <Field
+        <BaseField
           label="Full Name"
           onChangeText={(value) => updateForm("name", value)}
           placeholder="e.g. Juan Dela Cruz"
           value={form.name}
         />
-        <Field
+        <BaseField
           keyboardType="email-address"
           label="Email"
           onChangeText={(value) => updateForm("contactEmail", value)}
           placeholder="tenant@example.com"
           value={form.contactEmail}
         />
-        <Field
+        <BaseField
           keyboardType="phone-pad"
           label="Phone"
           onChangeText={(value) => updateForm("phone", value)}

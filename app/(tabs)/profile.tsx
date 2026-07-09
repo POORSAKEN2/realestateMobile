@@ -25,6 +25,7 @@ import {
 } from "../../api/user";
 import { useAuth } from "../../hooks/useAuth";
 import type { AuthUser } from "../../types";
+import { BaseField } from "../../components/ui/fields/BaseField";
 
 type ProfileForm = {
   fullName: string;
@@ -65,41 +66,6 @@ function getProfileImageUri(user?: AuthUser | null) {
     user?.profileImage ||
     user?.avatar ||
     ""
-  );
-}
-
-function Field({
-  icon,
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  keyboardType = "default",
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder: string;
-  keyboardType?: TextInputProps["keyboardType"];
-}) {
-  return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
-        {label}
-      </Text>
-      <View className="h-14 flex-row items-center rounded-2xl border border-slate-200 bg-white px-4 shadow-sm shadow-slate-900/5">
-        <Ionicons name={icon} color="#64748B" size={19} />
-        <TextInput
-          className="ml-3 flex-1 text-base font-semibold text-slate-950"
-          keyboardType={keyboardType}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor="#94A3B8"
-          value={value}
-        />
-      </View>
-    </View>
   );
 }
 
@@ -380,28 +346,28 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            <Field
+            <BaseField
               icon="person-outline"
               label="Full name"
               placeholder="Enter full name"
               value={form.fullName}
               onChangeText={(value) => updateField("fullName", value)}
             />
-            <Field
+            <BaseField
               icon="business-outline"
               label="Company name"
               placeholder="Enter company name"
               value={form.companyName}
               onChangeText={(value) => updateField("companyName", value)}
             />
-            <Field
+            <BaseField
               icon="briefcase-outline"
               label="Job title"
               placeholder="Enter job title"
               value={form.jobTitle}
               onChangeText={(value) => updateField("jobTitle", value)}
             />
-            <Field
+            <BaseField
               icon="call-outline"
               label="Phone number"
               keyboardType="phone-pad"
