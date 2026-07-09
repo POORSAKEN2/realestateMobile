@@ -31,6 +31,7 @@ import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { Lease, LeasePayload, Lessee, Property } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
+import { BaseField } from "../../components/ui/fields/BaseField";
 
 type LeaseFormState = {
   propertyId: string;
@@ -148,36 +149,6 @@ function DateField({
         </Text>
         <Ionicons name="calendar-outline" color="#2563EB" size={20} />
       </TouchableOpacity>
-    </View>
-  );
-}
-
-function Field({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  keyboardType = "default",
-}: {
-  label: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder?: string;
-  keyboardType?: TextInputProps["keyboardType"];
-}) {
-  return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        {label}
-      </Text>
-      <TextInput
-        className="h-14 rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 text-base text-[#1d1d1f] shadow-sm"
-        keyboardType={keyboardType}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#6F6D6D"
-        value={value}
-      />
     </View>
   );
 }
@@ -865,7 +836,7 @@ export default function LeasesScreen() {
           </View>
         ) : null}
 
-        <Field
+        <BaseField
           keyboardType="decimal-pad"
           label="Monthly Rent"
           onChangeText={(value) =>
@@ -874,7 +845,7 @@ export default function LeasesScreen() {
           placeholder="0"
           value={form.monthlyRent}
         />
-        <Field
+        <BaseField
           label="Room Number"
           onChangeText={(value) => updateForm("roomNumber", value)}
           placeholder="Optional"
