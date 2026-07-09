@@ -34,6 +34,7 @@ import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { ChoiceField } from "../../components/ui/fields/ChoiceField";
 import { PickerField } from "../../components/ui/fields/PickerField";
+import AddButton from "../../components/ui/buttons/AddButton";
 
 type LeaseFormState = {
   propertyId: string;
@@ -549,14 +550,7 @@ export default function LeasesScreen() {
             </Text>
           </View>
 
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={openCreateForm}
-            className="flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200"
-          >
-            <Ionicons name="add" color="#FFFFFF" size={20} />
-            <Text className="text-sm font-bold text-white">New Lease</Text>
-          </TouchableOpacity>
+          <AddButton onPress={openCreateForm} />
         </View>
 
         {/* --- THE HERO: REVENUE SNAPSHOT --- */}

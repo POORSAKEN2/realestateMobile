@@ -44,6 +44,7 @@ import type {
 } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
+import AddButton from "../../components/ui/buttons/AddButton";
 
 type PropertyType = NonNullable<Property["type"]>;
 type StatusFilter = Property["status"] | "ALL";
@@ -1378,18 +1379,7 @@ export default function PropertiesScreen() {
                     </Text>
                   </View>
 
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={openForm}
-                    className="flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200"
-                  >
-                    <MaterialCommunityIcons
-                      name="plus"
-                      color="#FFFFFF"
-                      size={20}
-                    />
-                    <Text className="font-bold text-white">Add Asset</Text>
-                  </TouchableOpacity>
+                  <AddButton onPress={openForm}/>
                 </View>
 
                 {/* --- MAIN PORTFOLIO CARD: The "Hero" Data --- */}
