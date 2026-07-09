@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, Text } from 'react-native';
 
-import { colors } from '../../constants/colors';
+import { colors } from '../../../constants/colors';
 
 type ButtonProps = {
   title: string;

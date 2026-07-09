@@ -37,6 +37,7 @@ import type {
 } from "../../types";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import ChoiceChips from "../../components/ui/chips/ChoiceChips";
+import AddButton from "../../components/ui/buttons/AddButton";
 
 type BookingFormMode = "create" | "edit";
 type StatusFilter = "Booked" | "All";
@@ -167,7 +168,6 @@ function parseMoney(value: string) {
   const parsed = Number(value.trim().replace(/,/g, ""));
   return Number.isFinite(parsed) ? parsed : undefined;
 }
-
 
 export default function BookingsScreen() {
   const { session } = useAuth();
@@ -557,16 +557,11 @@ export default function BookingsScreen() {
               Bookings
             </Text>
           </View>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            className="flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200"
+          <AddButton
+          
             disabled={!selectedBuilding}
             onPress={() => openCreate()}
-          >
-            <Ionicons name="add" color="#FFFFFF" size={20} />
-            <Text className="text-sm font-bold text-white">New</Text>
-          </TouchableOpacity>
+          />
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -739,7 +734,7 @@ export default function BookingsScreen() {
               </View>
             )}
 
-            <View className="gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm mb-16">
+            <View className="mb-16 gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
               <View>
                 <Text className="text-lg font-bold text-[#1d1d1f]">
                   Booking History
