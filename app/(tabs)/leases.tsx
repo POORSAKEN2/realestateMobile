@@ -33,6 +33,7 @@ import type { Lease, LeasePayload, Lessee, Property } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { ChoiceField } from "../../components/ui/fields/ChoiceField";
+import { PickerField } from "../../components/ui/fields/PickerField";
 
 type LeaseFormState = {
   propertyId: string;
@@ -710,7 +711,7 @@ export default function LeasesScreen() {
         isVisible={isFormOpen}
         onClose={closeForm}
         title={editingLease ? "Edit Lease" : "Add Lease"}
-        subtitle= "Link a property with a tenant."
+        subtitle="Link a property with a tenant."
         isPending={saveMutation.isPending}
         submitText={editingLease ? "Save Lease" : "Create Lease"}
         onSubmit={handleSubmit}
@@ -732,19 +733,21 @@ export default function LeasesScreen() {
         />
         <View className="flex-row gap-3">
           <View className="flex-1">
-            <DateField
-              label="Start Date"
-              onPress={() => setActiveDateField("startDate")}
-              placeholder="YYYY-MM-DD"
+            <PickerField
+              label="Check-In Date"
               value={form.startDate}
+              placeholder="Select date"
+              onPress={() => setActiveDateField("startDate")}
+              // Automatically uses calendar icon & blue styling by default
             />
           </View>
           <View className="flex-1">
-            <DateField
+            <PickerField
               label="End Date"
-              onPress={() => setActiveDateField("endDate")}
-              placeholder="YYYY-MM-DD"
               value={form.endDate}
+              placeholder="Select date"
+              onPress={() => setActiveDateField("endDate")}
+              // Automatically uses calendar icon & blue styling by default
             />
           </View>
         </View>
