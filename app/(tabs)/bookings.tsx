@@ -36,6 +36,7 @@ import type {
   TransientBookingPayload,
 } from "../../types";
 import { BaseField } from "../../components/ui/fields/BaseField";
+import ChoiceChips from "../../components/ui/chips/ChoiceChips";
 
 type BookingFormMode = "create" | "edit";
 type StatusFilter = "Booked" | "All";
@@ -167,45 +168,6 @@ function parseMoney(value: string) {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-
-function ChoiceChips<T extends string>({
-  options,
-  value,
-  onSelect,
-}: {
-  options: Array<{ label: string; value: T }>;
-  value: T;
-  onSelect: (value: T) => void;
-}) {
-  return (
-    <View className="flex-row flex-wrap gap-2">
-      {options.map((option) => {
-        const selected = option.value === value;
-
-        return (
-          <TouchableOpacity
-            key={option.value}
-            activeOpacity={0.8}
-            className={`rounded-full border px-3.5 py-2.5 ${
-              selected
-                ? "border-[#2563EB] bg-[#2563EB]"
-                : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
-            }`}
-            onPress={() => onSelect(option.value)}
-          >
-            <Text
-              className={`text-xs font-bold ${
-                selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"
-              }`}
-            >
-              {option.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
 
 export default function BookingsScreen() {
   const { session } = useAuth();
