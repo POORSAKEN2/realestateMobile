@@ -37,6 +37,7 @@ export type CreatePropertyPayload = {
   location: string;
   country: string;
   status: Property["status"];
+  classification: string;
   type: NonNullable<Property["type"]>;
   value: number;
   roi: number;
