@@ -44,6 +44,8 @@ import type {
 } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
+import { DropdownField } from "../../components/ui/fields/DropdownField";
+import { ChoiceGroup } from "../../components/ui/groups/ChoiceGroup";
 
 type PropertyType = NonNullable<Property["type"]>;
 type StatusFilter = Property["status"] | "ALL";
@@ -66,7 +68,7 @@ type FormState = {
   isTransientBookable: boolean;
 };
 
-type Choice<T extends string> = {
+export type Choice<T extends string> = {
   label: string;
   value: T;
 };
@@ -436,175 +438,6 @@ async function openDocument(document: PropertyDocument) {
   } catch {
     Alert.alert("Cannot open document", "The document could not be opened.");
   }
-}
-
-function ChoiceGroup<T extends string>({
-  label,
-  choices,
-  value,
-  onSelect,
-  horizontal = false,
-}: {
-  label?: string;
-  choices: Choice<T>[];
-  value: T;
-  onSelect: (value: T) => void;
-  horizontal?: boolean;
-}) {
-  const content = (
-    <View className="flex-row flex-wrap gap-2">
-      {choices.map((choice) => {
-        const selected = choice.value === value;
-
-        return (
-          <TouchableOpacity
-            key={choice.value}
-            activeOpacity={0.8}
-            className={`rounded-full border px-3.5 py-2.5 ${
-              selected
-                ? "border-[#2563EB] bg-[#2563EB]"
-                : "border-[#1d1d1f]/10 bg-[#2563EB]/5"
-            }`}
-            onPress={() => onSelect(choice.value)}
-          >
-            <Text
-              className={`text-xs font-semibold ${
-                selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"
-              }`}
-            >
-              {choice.label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-
-  return (
-    <View className={label ? "gap-3" : ""}>
-      {label ? (
-        <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-          {label}
-        </Text>
-      ) : null}
-      {horizontal ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View className="pr-6">{content}</View>
-        </ScrollView>
-      ) : (
-        content
-      )}
-    </View>
-  );
-}
-
-function CountryDropdown({
-  value,
-  onSelect,
-}: {
-  value: string;
-  onSelect: (value: string) => void;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const selectedCountry =
-    seaCountryChoices.find((choice) => choice.value === value)?.label || value;
-
-  function selectCountry(country: string) {
-    onSelect(country);
-    setIsOpen(false);
-  }
-
-  return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        Country
-      </Text>
-      <TouchableOpacity
-        activeOpacity={0.85}
-        className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
-        onPress={() => setIsOpen(true)}
-      >
-        <Text className="text-base font-semibold text-[#1d1d1f]">
-          {selectedCountry || "Select a country"}
-        </Text>
-        <MaterialCommunityIcons name="chevron-down" color="#6F6D6D" size={22} />
-      </TouchableOpacity>
-
-      <Modal
-        animationType="fade"
-        onRequestClose={() => setIsOpen(false)}
-        transparent
-        visible={isOpen}
-      >
-        <View className="flex-1 justify-end bg-[#000000]/35">
-          <TouchableOpacity
-            activeOpacity={1}
-            className="flex-1"
-            onPress={() => setIsOpen(false)}
-          />
-          <View className="max-h-[72%] rounded-t-[28px] bg-[#FFFFFF] px-5 pb-8 pt-5">
-            <View className="mb-4 flex-row items-center justify-between">
-              <View>
-                <Text className="text-lg font-bold text-[#1d1d1f]">
-                  Select Country
-                </Text>
-                <Text className="mt-1 text-xs font-semibold text-[#6F6D6D]">
-                  Southeast Asia
-                </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/10"
-                onPress={() => setIsOpen(false)}
-              >
-                <MaterialCommunityIcons
-                  name="close"
-                  color="#1d1d1f"
-                  size={20}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View className="gap-2">
-                {seaCountryChoices.map((country) => {
-                  const selected = country.value === value;
-
-                  return (
-                    <TouchableOpacity
-                      key={country.value}
-                      activeOpacity={0.85}
-                      className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
-                        selected
-                          ? "border-[#2563EB] bg-[#2563EB]/10"
-                          : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
-                      }`}
-                      onPress={() => selectCountry(country.value)}
-                    >
-                      <Text
-                        className={`text-base font-semibold ${
-                          selected ? "text-[#2563EB]" : "text-[#1d1d1f]"
-                        }`}
-                      >
-                        {country.label}
-                      </Text>
-                      {selected ? (
-                        <MaterialCommunityIcons
-                          name="check"
-                          color="#2563EB"
-                          size={21}
-                        />
-                      ) : null}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-    </View>
-  );
 }
 
 function LocationPinPicker({
@@ -1327,7 +1160,8 @@ export default function PropertiesScreen() {
       location,
       country,
       status: form.status,
-      type: form.type,
+      classification: form.type,
+      type: "Warehouse",
       value,
       roi,
       lat,
@@ -1592,9 +1426,13 @@ export default function PropertiesScreen() {
           ))}
         </View>
 
-        <CountryDropdown
-          onSelect={(value) => updateForm("country", value)}
+        <DropdownField
+          label="Country"
+          subtitle="Southeast Asia"
+          placeholder="Select a country"
           value={form.country}
+          options={seaCountryChoices}
+          onSelect={(value) => updateForm("country", value)}
         />
 
         <LocationPinPicker
