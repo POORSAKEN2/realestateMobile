@@ -38,7 +38,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
     <Modal
       animationType="slide"
       onRequestClose={onClose}
-      presentationStyle="fullScreen"
+      presentationStyle="formSheet"
       visible={isVisible}
     >
       {/* Explicit style layout string replaces 'modal-container' */}
