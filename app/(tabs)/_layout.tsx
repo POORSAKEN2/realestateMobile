@@ -20,7 +20,6 @@ export default function TabsLayout() {
           tabBarLabelStyle: {
             fontSize: 11,
             fontWeight: "700",
-            
           },
           tabBarItemStyle: {
             paddingVertical: 6,
@@ -29,14 +28,14 @@ export default function TabsLayout() {
             position: "absolute",
             backgroundColor: colors.whitePrimary,
             borderColor: "#E2E8F0",
-            borderRadius: 999,
-            borderTopWidth: 1,
-            borderWidth: 1,
-            bottom: 18,
+            borderRadius: 24,
+            borderTopWidth: 2,
+            borderWidth: 2,
+            bottom: 32,
             height: 80,
-            marginHorizontal: 16,
+            marginHorizontal: 12,
             paddingBottom: 8,
-            paddingTop: 7,
+            paddingTop: 6,
             shadowColor: "#0F172A",
             shadowOffset: { width: 0, height: 10 },
             shadowOpacity: 0.14,
@@ -113,13 +112,31 @@ export default function TabsLayout() {
             ),
           }}
         />
-        <Tabs.Screen name="analytics" options={{ href: null, title: "Analytics" }} />
+        <Tabs.Screen
+          name="analytics"
+          options={{ href: null, title: "Analytics" }}
+        />
         <Tabs.Screen name="leases" options={{ href: null, title: "Leases" }} />
-        <Tabs.Screen name="tenants" options={{ href: null, title: "Tenants" }} />
-        <Tabs.Screen name="documents" options={{ href: null, title: "Documents" }} />
-        <Tabs.Screen name="settings" options={{ href: null, title: "Settings" }} />
-        <Tabs.Screen name="profile" options={{ href: null, title: "Profile" }} />
-        <Tabs.Screen name="mapCanvas" options={{ href: null, title: "mapcanvas" }} />
+        <Tabs.Screen
+          name="tenants"
+          options={{ href: null, title: "Tenants" }}
+        />
+        <Tabs.Screen
+          name="documents"
+          options={{ href: null, title: "Documents" }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{ href: null, title: "Settings" }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{ href: null, title: "Profile" }}
+        />
+        <Tabs.Screen
+          name="mapCanvas"
+          options={{ href: null, title: "mapcanvas" }}
+        />
         <Tabs.Screen
           name="notificationScreen"
           options={{ href: null, title: "Notifications" }}
