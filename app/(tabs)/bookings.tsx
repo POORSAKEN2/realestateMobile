@@ -692,25 +692,21 @@ export default function BookingsScreen() {
         subtitle="Manage transient reservations."
         title={modalMode === "create" ? "Create Booking" : "Edit Booking"}
       >
-        <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-            Building
-          </Text>
-          <ChoiceChips
-            options={buildingOptions.map((building) => ({
-              label: building.title,
-              value: building.id,
-            }))}
-            onSelect={(value) => {
-              setFormData((current) => ({
-                ...current,
-                propertyId: value,
-                roomNumber: "",
-              }));
-            }}
-            value={formData.propertyId}
-          />
-        </View>
+        <DropdownField
+          label={"Building"}
+          options={buildingOptions.map((building) => ({
+            label: building.title,
+            value: building.id,
+          }))}
+          onSelect={(value) => {
+            setFormData((current) => ({
+              ...current,
+              propertyId: value,
+              roomNumber: "",
+            }));
+          }}
+          value={formData.propertyId}
+        />
 
         <BaseField
           keyboardType="number-pad"
