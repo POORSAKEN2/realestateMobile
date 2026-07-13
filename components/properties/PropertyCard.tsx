@@ -14,7 +14,7 @@ import {
   formatPeso,
   formatStatus,
   MAX_PROPERTY_IMAGES,
-} from "../../utils/propertyForm";
+} from "../../utils/properties/propertyForm";
 
 function getPropertyImages(property: Property) {
   const images = property.images?.length ? property.images : [property.image];

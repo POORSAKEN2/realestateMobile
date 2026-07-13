@@ -4,15 +4,11 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  type TextInputProps,
 } from "react-native";
 
 import {
@@ -35,139 +31,27 @@ import type {
   TransientBooking,
   TransientBookingPayload,
 } from "../../types";
+import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import ChoiceChips from "../../components/ui/chips/ChoiceChips";
-
-type BookingFormMode = "create" | "edit";
-type StatusFilter = "Booked" | "All";
-
-type BookingFormState = {
-  propertyId: string;
-  roomNumber: string;
-  guestName: string;
-  guestEmail: string;
-  guestPhone: string;
-  startDate: string;
-  checkInTime: string;
-  endDate: string;
-  checkOutTime: string;
-  dailyRate: string;
-  notes: string;
-};
-
-type Availability = {
-  label: string;
-  bg: string;
-  text: string;
-};
-
-const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function dateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function parseDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
-
-function getMonthDays(monthDate: Date) {
-  const firstOfMonth = new Date(
-    monthDate.getFullYear(),
-    monthDate.getMonth(),
-    1,
-  );
-  const start = addDays(firstOfMonth, -firstOfMonth.getDay());
-
-  return Array.from({ length: 42 }, (_, index) => addDays(start, index));
-}
-
-function formatDisplayDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(parseDate(value));
-}
-
-function formatDisplayTime(value: string) {
-  const [hours, minutes] = value.split(":").map(Number);
-
-  return new Intl.DateTimeFormat("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(2026, 0, 1, hours, minutes));
-}
-
-function getDateRangeLabel(booking: TransientBooking) {
-  const start = `${formatDisplayDate(booking.startDate)} ${formatDisplayTime(
-    booking.checkInTime,
-  )}`;
-  const end = `${formatDisplayDate(booking.endDate)} ${formatDisplayTime(
-    booking.checkOutTime,
-  )}`;
-
-  return `${start} - ${end}`;
-}
-
-function getDayWindow(day: Date) {
-  const key = dateKey(day);
-
-  return {
-    key,
-    start: `${key}T00:00`,
-    end: `${key}T23:59`,
-  };
-}
-
-function getBookingStatusLabel(booking: TransientBooking) {
-  const today = dateKey(new Date());
-
-  if (booking.status === "Cancelled") return "Cancelled";
-  if (booking.endDate === today) return "Checking out today";
-
-  return "Occupied";
-}
-
-function getParamValue(value?: string | string[]) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
-function emptyForm(
-  propertyId = "",
-  date = dateKey(new Date()),
-): BookingFormState {
-  return {
-    propertyId,
-    roomNumber: "",
-    guestName: "",
-    guestEmail: "",
-    guestPhone: "",
-    startDate: date,
-    checkInTime: DEFAULT_CHECK_IN_TIME,
-    endDate: date,
-    checkOutTime: DEFAULT_CHECK_OUT_TIME,
-    dailyRate: "",
-    notes: "",
-  };
-}
-
-function parseMoney(value: string) {
-  const parsed = Number(value.trim().replace(/,/g, ""));
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
-
+import { BuildingChoices } from "../../components/bookings/BuildingChoices";
+import {
+  dateKey,
+  emptyForm,
+  formatDisplayDate,
+  formatDisplayTime,
+  getBookingStatusLabel,
+  getDateRangeLabel,
+  getDayWindow,
+  getMonthDays,
+  getParamValue,
+  parseMoney,
+  weekdayLabels,
+  type Availability,
+  type BookingFormMode,
+  type BookingFormState,
+  type StatusFilter,
+} from "../../utils/bookings/bookingCalendar";
 
 export default function BookingsScreen() {
   const { session } = useAuth();
@@ -510,41 +394,6 @@ export default function BookingsScreen() {
     });
   }
 
-  function renderBuildingChoices() {
-    return (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-2"
-      >
-        {buildingOptions.map((building) => {
-          const selected = building.id === selectedPropertyId;
-
-          return (
-            <TouchableOpacity
-              key={building.id}
-              activeOpacity={0.8}
-              className={`rounded-full border px-3.5 py-2.5 ${
-                selected
-                  ? "border-[#2563EB] bg-[#2563EB]"
-                  : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
-              }`}
-              onPress={() => setSelectedPropertyId(building.id)}
-            >
-              <Text
-                className={`text-xs font-bold ${
-                  selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"
-                }`}
-              >
-                {building.title}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-    );
-  }
-
   return (
     <Screen className="bg-[#2563EB]/5">
       <View className="flex-1 gap-5">
@@ -561,7 +410,7 @@ export default function BookingsScreen() {
           <TouchableOpacity
             activeOpacity={0.8}
             className="flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200"
-            disabled={!selectedBuilding}
+            disabled={!selectedBuilding || buildingOptions.length < 1}
             onPress={() => openCreate()}
           >
             <Ionicons name="add" color="#FFFFFF" size={20} />
@@ -623,7 +472,13 @@ export default function BookingsScreen() {
                 {monthLabel}
               </Text>
 
-              {buildingOptions.length > 0 ? renderBuildingChoices() : null}
+              {buildingOptions.length > 0 ? (
+                <BuildingChoices
+                  buildings={buildingOptions}
+                  onSelect={setSelectedPropertyId}
+                  selectedId={selectedPropertyId}
+                />
+              ) : null}
 
               <ChoiceChips<StatusFilter>
                 options={[
@@ -739,7 +594,7 @@ export default function BookingsScreen() {
               </View>
             )}
 
-            <View className="gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm mb-16">
+            <View className="mb-16 gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
               <View>
                 <Text className="text-lg font-bold text-[#1d1d1f]">
                   Booking History
@@ -824,234 +679,169 @@ export default function BookingsScreen() {
         </ScrollView>
       </View>
 
-      <Modal
-        animationType="slide"
-        onRequestClose={closeModal}
-        presentationStyle="fullScreen"
-        visible={isModalOpen}
+      <AddEditModal
+        formError={formMessage}
+        isPending={saveMutation.isPending}
+        isVisible={isModalOpen}
+        onClose={closeModal}
+        onSubmit={handleSubmit}
+        submitText={modalMode === "create" ? "Create" : "Save"}
+        subtitle="Manage transient reservations."
+        title={modalMode === "create" ? "Create Booking" : "Edit Booking"}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 bg-[#2563EB]/5"
-        >
-          <View className="bg-[#1d1d1f] px-6 pb-5 pt-6">
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-2xl font-bold text-[#FFFFFF]">
-                  {modalMode === "create" ? "Create Booking" : "Edit Booking"}
-                </Text>
-                <Text className="mt-1 text-sm text-[#FFFFFF]/70">
-                  Manage transient reservations.
-                </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/15"
-                onPress={closeModal}
-              >
-                <Ionicons name="close" color="#FFFFFF" size={22} />
-              </TouchableOpacity>
-            </View>
-          </View>
+        <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+            Building
+          </Text>
+          <ChoiceChips
+            options={buildingOptions.map((building) => ({
+              label: building.title,
+              value: building.id,
+            }))}
+            onSelect={(value) => {
+              setFormData((current) => ({
+                ...current,
+                propertyId: value,
+                roomNumber: "",
+              }));
+            }}
+            value={formData.propertyId}
+          />
+        </View>
 
-          <ScrollView
-            className="flex-1"
-            contentContainerClassName="gap-5 px-6 py-6"
-            keyboardShouldPersistTaps="handled"
-          >
-            <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                Building
+        <BaseField
+          keyboardType="number-pad"
+          label="Room Number"
+          onChangeText={(value) => updateForm("roomNumber", value)}
+          placeholder="e.g. 101"
+          value={formData.roomNumber}
+        />
+
+        <BaseField
+          keyboardType="decimal-pad"
+          label="Daily Rate"
+          onChangeText={(value) => updateForm("dailyRate", value)}
+          placeholder="e.g. 2500"
+          value={formData.dailyRate}
+        />
+
+        {selectedFormBuilding && formData.roomNumber ? (
+          <View className="rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+            <Text className="text-xs font-medium text-[#6F6D6D]">
+              <Text className="font-bold text-[#1d1d1f]">
+                {selectedFormBuilding.title}
               </Text>
-              <ChoiceChips
-                options={buildingOptions.map((building) => ({
-                  label: building.title,
-                  value: building.id,
-                }))}
-                onSelect={(value) => {
-                  setFormData((current) => ({
-                    ...current,
-                    propertyId: value,
-                    roomNumber: "",
-                  }));
-                }}
-                value={formData.propertyId}
-              />
-            </View>
-
-            <BaseField
-              keyboardType="number-pad"
-              label="Room Number"
-              onChangeText={(value) => updateForm("roomNumber", value)}
-              placeholder="e.g. 101"
-              value={formData.roomNumber}
-            />
-
-            <BaseField
-              keyboardType="decimal-pad"
-              label="Daily Rate"
-              onChangeText={(value) => updateForm("dailyRate", value)}
-              placeholder="e.g. 2500"
-              value={formData.dailyRate}
-            />
-
-            {selectedFormBuilding && formData.roomNumber ? (
-              <View className="rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-                <Text className="text-xs font-medium text-[#6F6D6D]">
-                  <Text className="font-bold text-[#1d1d1f]">
-                    {selectedFormBuilding.title}
-                  </Text>
-                  {` - ${formData.roomNumber}`}
-                </Text>
-              </View>
-            ) : null}
-
-            <BaseField
-              label="Guest Name"
-              onChangeText={(value) => updateForm("guestName", value)}
-              value={formData.guestName}
-            />
-            <BaseField
-              keyboardType="phone-pad"
-              label="Guest Phone"
-              onChangeText={(value) => updateForm("guestPhone", value)}
-              value={formData.guestPhone}
-            />
-            <BaseField
-              keyboardType="email-address"
-              label="Guest Email"
-              onChangeText={(value) => updateForm("guestEmail", value)}
-              value={formData.guestEmail}
-            />
-
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <BaseField
-                  label="Check-in Date"
-                  onChangeText={(value) => updateForm("startDate", value)}
-                  placeholder="YYYY-MM-DD"
-                  value={formData.startDate}
-                />
-              </View>
-              <View className="w-28">
-                <BaseField
-                  label="Time"
-                  onChangeText={(value) => updateForm("checkInTime", value)}
-                  placeholder="14:00"
-                  value={formData.checkInTime}
-                />
-              </View>
-            </View>
-
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <BaseField
-                  label="Check-out Date"
-                  onChangeText={(value) => updateForm("endDate", value)}
-                  placeholder="YYYY-MM-DD"
-                  value={formData.endDate}
-                />
-              </View>
-              <View className="w-28">
-                <BaseField
-                  label="Time"
-                  onChangeText={(value) => updateForm("checkOutTime", value)}
-                  placeholder="11:00"
-                  value={formData.checkOutTime}
-                />
-              </View>
-            </View>
-
-            {formData.propertyId &&
-            formData.roomNumber &&
-            formData.startDate &&
-            formData.endDate ? (
-              <View
-                className={`rounded-2xl border p-4 ${
-                  formConflict
-                    ? "border-amber-500/30 bg-amber-50"
-                    : "border-emerald-500/30 bg-emerald-50"
-                }`}
-              >
-                <Text
-                  className={`text-sm font-semibold ${
-                    formConflict ? "text-amber-700" : "text-emerald-700"
-                  }`}
-                >
-                  {formConflict
-                    ? `Not available. Conflicts with ${formConflict.guestName} from ${getDateRangeLabel(
-                        formConflict,
-                      )}.`
-                    : "Available for this check-in and check-out window."}
-                </Text>
-              </View>
-            ) : null}
-
-            <BaseField
-              label="Notes"
-              multiline
-              onChangeText={(value) => updateForm("notes", value)}
-              placeholder="Optional booking notes"
-              value={formData.notes}
-            />
-
-            {formMessage ? (
-              <View className="rounded-2xl border border-[#1d1d1f]/15 bg-[#1d1d1f]/5 p-4">
-                <Text className="text-sm font-medium text-[#1d1d1f]">
-                  {formMessage}
-                </Text>
-              </View>
-            ) : null}
-          </ScrollView>
-
-          <View className="border-t border-[#1d1d1f]/10 bg-[#FFFFFF] p-6">
-            {modalMode === "edit" && editingBooking?.status === "Booked" ? (
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="mb-3 h-12 items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-50"
-                disabled={cancelMutation.isPending}
-                onPress={() =>
-                  editingBooking && cancelMutation.mutate(editingBooking.id)
-                }
-              >
-                {cancelMutation.isPending ? (
-                  <ActivityIndicator color="#DC2626" />
-                ) : (
-                  <Text className="font-bold text-rose-600">
-                    Cancel Booking
-                  </Text>
-                )}
-              </TouchableOpacity>
-            ) : null}
-
-            <View className="flex-row gap-3">
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF]"
-                onPress={closeModal}
-              >
-                <Text className="text-base font-bold text-[#1d1d1f]">
-                  Close
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
-                disabled={saveMutation.isPending}
-                onPress={handleSubmit}
-              >
-                {saveMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-base font-semibold text-[#FFFFFF]">
-                    {modalMode === "create" ? "Create" : "Save"}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
+              {` - ${formData.roomNumber}`}
+            </Text>
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        ) : null}
+
+        <BaseField
+          label="Guest Name"
+          onChangeText={(value) => updateForm("guestName", value)}
+          value={formData.guestName}
+        />
+        <BaseField
+          keyboardType="phone-pad"
+          label="Guest Phone"
+          onChangeText={(value) => updateForm("guestPhone", value)}
+          value={formData.guestPhone}
+        />
+        <BaseField
+          keyboardType="email-address"
+          label="Guest Email"
+          onChangeText={(value) => updateForm("guestEmail", value)}
+          value={formData.guestEmail}
+        />
+
+        <View className="flex-row gap-3">
+          <View className="flex-1">
+            <BaseField
+              label="Check-in Date"
+              onChangeText={(value) => updateForm("startDate", value)}
+              placeholder="YYYY-MM-DD"
+              value={formData.startDate}
+            />
+          </View>
+          <View className="w-28">
+            <BaseField
+              label="Time"
+              onChangeText={(value) => updateForm("checkInTime", value)}
+              placeholder="14:00"
+              value={formData.checkInTime}
+            />
+          </View>
+        </View>
+
+        <View className="flex-row gap-3">
+          <View className="flex-1">
+            <BaseField
+              label="Check-out Date"
+              onChangeText={(value) => updateForm("endDate", value)}
+              placeholder="YYYY-MM-DD"
+              value={formData.endDate}
+            />
+          </View>
+          <View className="w-28">
+            <BaseField
+              label="Time"
+              onChangeText={(value) => updateForm("checkOutTime", value)}
+              placeholder="11:00"
+              value={formData.checkOutTime}
+            />
+          </View>
+        </View>
+
+        {formData.propertyId &&
+        formData.roomNumber &&
+        formData.startDate &&
+        formData.endDate ? (
+          <View
+            className={`rounded-2xl border p-4 ${
+              formConflict
+                ? "border-amber-500/30 bg-amber-50"
+                : "border-emerald-500/30 bg-emerald-50"
+            }`}
+          >
+            <Text
+              className={`text-sm font-semibold ${
+                formConflict ? "text-amber-700" : "text-emerald-700"
+              }`}
+            >
+              {formConflict
+                ? `Not available. Conflicts with ${formConflict.guestName} from ${getDateRangeLabel(
+                    formConflict,
+                  )}.`
+                : "Available for this check-in and check-out window."}
+            </Text>
+          </View>
+        ) : null}
+
+        <BaseField
+          label="Notes"
+          multiline
+          onChangeText={(value) => updateForm("notes", value)}
+          placeholder="Optional booking notes"
+          value={formData.notes}
+        />
+
+        {modalMode === "edit" && editingBooking?.status === "Booked" ? (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            className="mb-3 h-12 items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-50"
+            disabled={cancelMutation.isPending}
+            onPress={() =>
+              editingBooking && cancelMutation.mutate(editingBooking.id)
+            }
+          >
+            {cancelMutation.isPending ? (
+              <ActivityIndicator color="#DC2626" />
+            ) : (
+              <Text className="font-bold text-rose-600">Cancel Booking</Text>
+            )}
+          </TouchableOpacity>
+        ) : null}
+      </AddEditModal>
     </Screen>
   );
 }

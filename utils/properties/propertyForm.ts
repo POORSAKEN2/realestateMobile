@@ -9,7 +9,7 @@ import {
   type PropertyClassification,
   type PropertyDocument,
   type PropertyType,
-} from "../types";
+} from "../../types";
 
 export type StatusFilter = Property["status"] | "ALL";
 

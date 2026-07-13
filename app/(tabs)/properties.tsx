@@ -59,7 +59,7 @@ import {
   toFormState,
   toSelectedImage,
   type FormState,
-} from "../../utils/propertyForm";
+} from "../../utils/properties/propertyForm";
 
 type PropertyListItem =
   | { kind: "search" }

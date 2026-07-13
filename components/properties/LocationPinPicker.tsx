@@ -7,7 +7,10 @@ import MapView, {
   type Region,
 } from "react-native-maps";
 
-import { formatCoordinate, parseNumber } from "../../utils/propertyForm";
+import {
+  formatCoordinate,
+  parseNumber,
+} from "../../utils/properties/propertyForm";
 
 const PHILIPPINES_REGION: Region = {
   latitude: 12.8797,
