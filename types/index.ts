@@ -15,9 +15,12 @@ export type { PortfolioSnapshot, PortfolioStats } from "./domain/analytics";
 export type {
   CreatePropertyPayload,
   Property,
+  PropertyClassification,
   PropertyImageUpload,
+  PropertyType,
   UpdatePropertyPayload,
 } from "./domain/properties";
+export { PROPERTY_TAXONOMY } from "./domain/properties";
 export type {
   DocumentCategory,
   DocumentUpdatePayload,

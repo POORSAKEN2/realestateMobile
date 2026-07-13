@@ -6,81 +6,60 @@ import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Image,
-  KeyboardAvoidingView,
-  Linking,
-  Modal,
-  Platform,
   ScrollView,
-  StyleSheet,
   Switch,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  type TextInputProps,
 } from "react-native";
-import MapView, {
-  Marker,
-  type MapPressEvent,
-  type Region,
-} from "react-native-maps";
 
-import { useProperties, propertyFetchers } from "../../hooks/api/useProperties";
 import {
   fetchDocuments,
   uploadPropertyDocuments,
 } from "../../api/propertyDetails";
+import { LocationPinPicker } from "../../components/properties/LocationPinPicker";
+import { PropertyCard } from "../../components/properties/PropertyCard";
+import { AddEditModal } from "../../components/ui/AddEditModal";
+import { ChoiceGroup } from "../../components/ui/groups/ChoiceGroup";
+import { BaseField } from "../../components/ui/fields/BaseField";
+import { DropdownField } from "../../components/ui/fields/DropdownField";
 import { Screen } from "../../components/ui/Screen";
+import { useProperties, propertyFetchers } from "../../hooks/api/useProperties";
 import { useAuth } from "../../hooks/useAuth";
 import type {
   CreatePropertyPayload,
-  DocumentUpload,
   Property,
-  PropertyDocument,
   UpdatePropertyPayload,
 } from "../../types";
-import { AddEditModal } from "../../components/ui/AddEditModal";
-import { BaseField } from "../../components/ui/fields/BaseField";
-import { DropdownField } from "../../components/ui/fields/DropdownField";
-import { ChoiceGroup } from "../../components/ui/groups/ChoiceGroup";
-
-type PropertyType = NonNullable<Property["type"]>;
-type StatusFilter = Property["status"] | "ALL";
-
-type FormState = {
-  title: string;
-  location: string;
-  country: string;
-  status: Property["status"];
-  type: PropertyType;
-  value: string;
-  roi: string;
-  occupancy: string;
-  bedrooms: string;
-  bathrooms: string;
-  lat: string;
-  lng: string;
-  area: string;
-  description: string;
-  isTransientBookable: boolean;
-};
-
-export type Choice<T extends string> = {
-  label: string;
-  value: T;
-};
-
-type SelectedImage = {
-  uri: string;
-  name: string;
-  type: string;
-  file?: Blob;
-};
-
-type SelectedDocument = DocumentUpload;
+import {
+  cleanDecimal,
+  cleanInteger,
+  emptyForm,
+  formatPeso,
+  formatSelectedDocumentSize,
+  getDocumentType,
+  getPropertyTypeChoices,
+  locationCoordinates,
+  MAX_PROPERTY_IMAGES,
+  openPropertyDocument,
+  parseInteger,
+  parseNumber,
+  propertyStatusChoices,
+  propertyClassificationChoices,
+  requiresBedroomAndBathroomCounts,
+  seaCountryChoices,
+  SelectedDocument,
+  SelectedImage,
+  statusFilterChoices,
+  StatusFilter,
+  suggestedLocations,
+  toFormState,
+  toSelectedImage,
+  type FormState,
+} from "../../utils/propertyForm";
 
 type PropertyListItem =
   | { kind: "search" }
@@ -88,518 +67,6 @@ type PropertyListItem =
   | { kind: "empty" };
 
 type PropertyFormPayload = CreatePropertyPayload | UpdatePropertyPayload;
-
-const propertyStatusChoices: Choice<Property["status"]>[] = [
-  { label: "Idle", value: "IDLE" },
-  { label: "Under Construction", value: "UNDER_CONSTRUCTION" },
-  { label: "Pre Leased", value: "PRE_LEASED" },
-  { label: "Revenue Generating", value: "REVENUE_GENERATING" },
-  { label: "Personal Use", value: "PERSONAL_USE" },
-];
-
-const propertyTypeChoices: Choice<PropertyType>[] = [
-  { label: "Residential", value: "Residential" },
-  { label: "Condominium", value: "Condominium" },
-  { label: "Commercial", value: "Commercial" },
-  { label: "Industrial", value: "Industrial" },
-  { label: "Retail", value: "Retail" },
-];
-
-const seaCountryChoices: Choice<string>[] = [
-  { label: "Brunei", value: "Brunei" },
-  { label: "Cambodia", value: "Cambodia" },
-  { label: "Indonesia", value: "Indonesia" },
-  { label: "Laos", value: "Laos" },
-  { label: "Malaysia", value: "Malaysia" },
-  { label: "Myanmar", value: "Myanmar" },
-  { label: "Philippines", value: "Philippines" },
-  { label: "Singapore", value: "Singapore" },
-  { label: "Thailand", value: "Thailand" },
-  { label: "Timor-Leste", value: "Timor-Leste" },
-  { label: "Vietnam", value: "Vietnam" },
-];
-
-const statusFilterChoices: Choice<StatusFilter>[] = [
-  { label: "All", value: "ALL" },
-  ...propertyStatusChoices.map((choice) => ({
-    label: formatStatus(choice.value),
-    value: choice.value,
-  })),
-];
-
-const suggestedLocations = [
-  "Makati City, Metro Manila",
-  "Taguig City, Metro Manila (BGC)",
-  "Quezon City, Metro Manila",
-  "Cebu City, Cebu",
-  "Davao City, Davao del Sur",
-  "Pasig City, Metro Manila",
-  "Mandaluyong City, Metro Manila",
-  "Paranaque City, Metro Manila",
-  "Alabang, Muntinlupa City",
-  "Baguio City, Benguet",
-  "Angeles City, Pampanga",
-  "Iloilo City, Iloilo",
-  "Bacoor City, Cavite",
-  "Santa Rosa, Laguna",
-];
-
-const locationCoordinates: Record<string, { lat: number; lng: number }> = {
-  "Makati City, Metro Manila": { lat: 14.5547, lng: 121.0244 },
-  "Taguig City, Metro Manila (BGC)": { lat: 14.5505, lng: 121.0488 },
-  "Quezon City, Metro Manila": { lat: 14.676, lng: 121.0437 },
-  "Cebu City, Cebu": { lat: 10.3157, lng: 123.8854 },
-  "Davao City, Davao del Sur": { lat: 7.1907, lng: 125.4553 },
-  "Pasig City, Metro Manila": { lat: 14.5764, lng: 121.0851 },
-  "Mandaluyong City, Metro Manila": { lat: 14.5794, lng: 121.0359 },
-  "Paranaque City, Metro Manila": { lat: 14.4793, lng: 121.0198 },
-  "Alabang, Muntinlupa City": { lat: 14.423, lng: 121.0386 },
-  "Baguio City, Benguet": { lat: 16.4023, lng: 120.596 },
-  "Angeles City, Pampanga": { lat: 15.145, lng: 120.5887 },
-  "Iloilo City, Iloilo": { lat: 10.7202, lng: 122.5621 },
-  "Bacoor City, Cavite": { lat: 14.459, lng: 120.929 },
-  "Santa Rosa, Laguna": { lat: 14.2843, lng: 121.0889 },
-};
-
-const PHILIPPINES_REGION: Region = {
-  latitude: 12.8797,
-  longitude: 121.774,
-  latitudeDelta: 12,
-  longitudeDelta: 12,
-};
-
-const PINNED_LOCATION_DELTA = {
-  latitudeDelta: 0.02,
-  longitudeDelta: 0.02,
-};
-const MAX_PROPERTY_IMAGES = 5;
-
-const emptyForm: FormState = {
-  title: "",
-  location: "",
-  country: "Philippines",
-  status: "IDLE",
-  type: "Residential",
-  value: "",
-  roi: "",
-  occupancy: "",
-  bedrooms: "2",
-  bathrooms: "1",
-  lat: "",
-  lng: "",
-  area: "",
-  description: "",
-  isTransientBookable: false,
-};
-
-function formatStatus(status: string) {
-  return status
-    .toLowerCase()
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-function formatPeso(value = 0) {
-  if (value >= 1_000_000_000)
-    return `PHP ${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `PHP ${(value / 1_000_000).toFixed(1)}M`;
-  return `PHP ${value.toLocaleString()}`;
-}
-
-function isResidential(type: PropertyType) {
-  return type === "Residential" || type === "Condominium";
-}
-
-function parseNumber(value: string) {
-  const parsed = Number(value.trim().replace(/,/g, ""));
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
-
-function parseInteger(value: string) {
-  const parsed = parseNumber(value);
-  return parsed !== undefined && Number.isInteger(parsed) ? parsed : undefined;
-}
-
-function cleanDecimal(value: string, allowNegative = false) {
-  let cleaned = value.replace(/[^\d.,-]/g, "");
-
-  cleaned = allowNegative
-    ? cleaned.replace(/(?!^)-/g, "")
-    : cleaned.replace(/-/g, "");
-
-  const [firstPart, ...otherParts] = cleaned.split(".");
-  return [firstPart, otherParts.join("")].filter(Boolean).join(".");
-}
-
-function cleanInteger(value: string) {
-  return value.replace(/\D/g, "");
-}
-
-function formatCoordinate(value: number) {
-  return value.toFixed(6);
-}
-
-function toFormState(property: Property): FormState {
-  const propertyType = property.type ?? "Residential";
-
-  return {
-    title: property.title,
-    location: property.location,
-    country: property.country ?? "Philippines",
-    status: property.status,
-    type: propertyType,
-    value: String(property.value || ""),
-    roi: String(property.roi || ""),
-    occupancy:
-      property.occupancy !== undefined && property.occupancy !== null
-        ? String(property.occupancy)
-        : "",
-    bedrooms:
-      property.bedrooms !== undefined && property.bedrooms !== null
-        ? String(property.bedrooms)
-        : isResidential(propertyType)
-          ? "2"
-          : "",
-    bathrooms:
-      property.bathrooms !== undefined && property.bathrooms !== null
-        ? String(property.bathrooms)
-        : isResidential(propertyType)
-          ? "1"
-          : "",
-    lat:
-      property.lat !== undefined && property.lat !== null
-        ? String(property.lat)
-        : "",
-    lng:
-      property.lng !== undefined && property.lng !== null
-        ? String(property.lng)
-        : "",
-    area: property.area ?? "",
-    description: "",
-    isTransientBookable: Boolean(property.isTransientBookable),
-  };
-}
-
-function getImageName(asset: ImagePicker.ImagePickerAsset) {
-  if (asset.fileName) return asset.fileName;
-
-  const [nameFromUri] = asset.uri.split("/").slice(-1);
-  return nameFromUri || `property-${Date.now()}.jpg`;
-}
-
-function getImageType(asset: ImagePicker.ImagePickerAsset) {
-  if (asset.mimeType) return asset.mimeType;
-  if (asset.uri.toLowerCase().endsWith(".png")) return "image/png";
-  if (asset.uri.toLowerCase().endsWith(".webp")) return "image/webp";
-
-  return "image/jpeg";
-}
-
-function toSelectedImage(asset: ImagePicker.ImagePickerAsset): SelectedImage {
-  return {
-    uri: asset.uri,
-    name: getImageName(asset),
-    type: getImageType(asset),
-    file: asset.file,
-  };
-}
-
-function getPropertyImages(property: Property) {
-  const images = property.images?.length ? property.images : [property.image];
-  return Array.from(new Set(images.filter(Boolean))).slice(
-    0,
-    MAX_PROPERTY_IMAGES,
-  );
-}
-
-function PropertyImageGallery({
-  images,
-  title,
-  visible,
-  onClose,
-}: {
-  images: string[];
-  title: string;
-  visible: boolean;
-  onClose: () => void;
-}) {
-  const [galleryWidth, setGalleryWidth] = useState(0);
-
-  return (
-    <Modal
-      animationType="fade"
-      onRequestClose={onClose}
-      transparent
-      visible={visible}
-    >
-      <View className="flex-1 bg-black/95">
-        <View className="absolute left-5 right-5 top-14 z-10 flex-row items-center justify-between gap-4">
-          <Text
-            className="min-w-0 flex-1 text-base font-bold text-white"
-            numberOfLines={1}
-          >
-            {title}
-          </Text>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            className="h-10 w-10 items-center justify-center rounded-full bg-white/15"
-            onPress={onClose}
-          >
-            <MaterialCommunityIcons name="close" color="#FFFFFF" size={22} />
-          </TouchableOpacity>
-        </View>
-
-        <View
-          className="flex-1 justify-center"
-          onLayout={(event) => setGalleryWidth(event.nativeEvent.layout.width)}
-        >
-          <ScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-          >
-            {images.map((image, index) => (
-              <View
-                className="justify-center"
-                key={`${image}:gallery:${index}`}
-                style={{ width: galleryWidth || 1 }}
-              >
-                <Image
-                  className="h-[72%] w-full"
-                  resizeMode="contain"
-                  source={{ uri: image }}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-
-        {images.length > 1 ? (
-          <View className="absolute bottom-12 left-0 right-0 flex-row justify-center gap-2">
-            {images.map((image, index) => (
-              <View
-                className="h-2 w-2 rounded-full bg-white/80"
-                key={`${image}:gallery-dot:${index}`}
-              />
-            ))}
-          </View>
-        ) : null}
-      </View>
-    </Modal>
-  );
-}
-
-function getDocumentType(asset: DocumentPicker.DocumentPickerAsset) {
-  if (asset.mimeType) return asset.mimeType;
-
-  const extension = asset.name.split(".").pop()?.toLowerCase();
-
-  if (extension === "pdf") return "application/pdf";
-  if (extension === "doc") return "application/msword";
-  if (extension === "docx") {
-    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-  }
-  if (extension === "png") return "image/png";
-  if (extension === "jpg" || extension === "jpeg") return "image/jpeg";
-
-  return "application/octet-stream";
-}
-
-function formatSelectedDocumentSize(size?: number | null) {
-  if (!size) return "N/A";
-  if (size >= 1_000_000) return `${(size / 1_000_000).toFixed(1)} MB`;
-  if (size >= 1_000) return `${Math.round(size / 1_000)} KB`;
-
-  return `${size} B`;
-}
-
-async function openDocument(document: PropertyDocument) {
-  if (!document.url) {
-    Alert.alert(
-      "Document unavailable",
-      "This document does not have a viewable file URL.",
-    );
-    return;
-  }
-
-  try {
-    const canOpen = await Linking.canOpenURL(document.url);
-
-    if (!canOpen) {
-      Alert.alert(
-        "Cannot open document",
-        "No app is available to open this document.",
-      );
-      return;
-    }
-
-    await Linking.openURL(document.url);
-  } catch {
-    Alert.alert("Cannot open document", "The document could not be opened.");
-  }
-}
-
-function LocationPinPicker({
-  lat,
-  lng,
-  onChange,
-}: {
-  lat: string;
-  lng: string;
-  onChange: (coordinates: { lat: string; lng: string }) => void;
-}) {
-  const [isMapVisible, setIsMapVisible] = useState(false);
-  const latitude = parseNumber(lat);
-  const longitude = parseNumber(lng);
-  const hasPinnedLocation = latitude !== undefined && longitude !== undefined;
-  const markerCoordinate = hasPinnedLocation
-    ? { latitude: latitude as number, longitude: longitude as number }
-    : undefined;
-  const mapRegion = markerCoordinate
-    ? { ...markerCoordinate, ...PINNED_LOCATION_DELTA }
-    : PHILIPPINES_REGION;
-
-  function setPinnedLocation(latitudeValue: number, longitudeValue: number) {
-    onChange({
-      lat: formatCoordinate(latitudeValue),
-      lng: formatCoordinate(longitudeValue),
-    });
-  }
-
-  function handleMapPress(event: MapPressEvent) {
-    const { latitude: nextLatitude, longitude: nextLongitude } =
-      event.nativeEvent.coordinate;
-    setPinnedLocation(nextLatitude, nextLongitude);
-  }
-
-  return (
-    <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
-      <View className="flex-row items-center justify-between gap-3">
-        <View className="min-w-0 flex-1">
-          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-            Pin Location
-          </Text>
-          <Text className="mt-1 text-sm font-bold text-[#1d1d1f]">
-            {markerCoordinate
-              ? `${formatCoordinate(markerCoordinate.latitude)}, ${formatCoordinate(
-                  markerCoordinate.longitude,
-                )}`
-              : "No pin selected"}
-          </Text>
-        </View>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]"
-          onPress={() => setIsMapVisible(true)}
-        >
-          <MaterialCommunityIcons
-            name="map-marker-radius-outline"
-            color="#FFFFFF"
-            size={22}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        activeOpacity={0.85}
-        className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-[#2563EB]/10"
-        onPress={() => setIsMapVisible(true)}
-      >
-        <MaterialCommunityIcons name="map-search" color="#2563EB" size={19} />
-        <Text className="text-sm font-bold text-[#2563EB]">
-          {markerCoordinate ? "Update Pin on Map" : "Pin Property on Map"}
-        </Text>
-      </TouchableOpacity>
-
-      <Modal
-        animationType="slide"
-        onRequestClose={() => setIsMapVisible(false)}
-        visible={isMapVisible}
-      >
-        <View className="flex-1 bg-[#FFFFFF]">
-          <MapView
-            initialRegion={mapRegion}
-            onPress={handleMapPress}
-            style={propertyMapStyles.locationMap}
-          >
-            {markerCoordinate ? (
-              <Marker
-                coordinate={markerCoordinate}
-                draggable
-                onDragEnd={(event) => {
-                  const { latitude: nextLatitude, longitude: nextLongitude } =
-                    event.nativeEvent.coordinate;
-                  setPinnedLocation(nextLatitude, nextLongitude);
-                }}
-              />
-            ) : null}
-          </MapView>
-
-          <View className="absolute left-5 right-5 top-14 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-            <View className="flex-row items-center justify-between gap-3">
-              <View className="min-w-0 flex-1">
-                <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                  Property Pin
-                </Text>
-                <Text className="mt-1 text-sm font-bold text-[#1d1d1f]">
-                  {markerCoordinate
-                    ? `${formatCoordinate(markerCoordinate.latitude)}, ${formatCoordinate(
-                        markerCoordinate.longitude,
-                      )}`
-                    : "Tap the map to place the pin"}
-                </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/10"
-                onPress={() => setIsMapVisible(false)}
-              >
-                <MaterialCommunityIcons
-                  name="close"
-                  color="#1d1d1f"
-                  size={20}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View className="absolute bottom-8 left-5 right-5">
-            <TouchableOpacity
-              activeOpacity={0.85}
-              className="h-14 items-center justify-center rounded-2xl bg-[#2563EB]"
-              onPress={() => setIsMapVisible(false)}
-            >
-              <Text className="text-base font-bold text-[#FFFFFF]">Done</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </View>
-  );
-}
-
-function MetricPill({
-  icon,
-  label,
-  value,
-}: {
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  label: string;
-  value: string;
-}) {
-  return (
-    <View className="flex-1 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-      <View className="mb-3 h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-        <MaterialCommunityIcons name={icon} color="#2563EB" size={20} />
-      </View>
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        {label}
-      </Text>
-      <Text className="mt-1 text-lg font-bold text-[#1d1d1f]">{value}</Text>
-    </View>
-  );
-}
 
 function LoadingState({ label }: { label: string }) {
   return (
@@ -613,217 +80,7 @@ function LoadingState({ label }: { label: string }) {
           Preparing your real estate portfolio workspace.
         </Text>
       </View>
-      <View className="mt-6 gap-3">
-        <View className="h-16 rounded-2xl bg-[#1d1d1f]/5" />
-        <View className="h-16 rounded-2xl bg-[#1d1d1f]/5" />
-        <View className="h-16 rounded-2xl bg-[#1d1d1f]/5" />
-      </View>
     </View>
-  );
-}
-
-function PropertyCard({
-  property,
-  onEdit,
-  onOpenBookings,
-}: {
-  property: Property;
-  onEdit: () => void;
-  onOpenBookings?: () => void;
-}) {
-  const occupancy = property.occupancy ?? 0;
-  const isActive = property.status === "REVENUE_GENERATING";
-  const propertyImages = getPropertyImages(property);
-  const [imageWidth, setImageWidth] = useState(0);
-  const [isGalleryVisible, setIsGalleryVisible] = useState(false);
-
-  return (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      className="w-full overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-lg shadow-slate-200/50"
-    >
-      {/* --- IMAGE SECTION --- */}
-      <TouchableOpacity
-        activeOpacity={0.92}
-        accessibilityRole="button"
-        accessibilityLabel={`View images for ${property.title}`}
-        className="relative h-52 w-full"
-        onLayout={(event) => setImageWidth(event.nativeEvent.layout.width)}
-        onPress={() => setIsGalleryVisible(true)}
-      >
-        <ScrollView
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-        >
-          {propertyImages.map((image, index) => (
-            <Image
-              className="h-full bg-slate-100"
-              key={`${image}:${index}`}
-              resizeMode="cover"
-              source={{ uri: image }}
-              style={{ width: imageWidth || 1 }}
-            />
-          ))}
-        </ScrollView>
-
-        {/* Top Badges: Type & ROI */}
-        <View className="absolute inset-x-4 top-4 flex-row items-center justify-between">
-          <View className="rounded-full bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-md">
-            <Text className="text-[10px] font-bold uppercase tracking-widest text-slate-800">
-              {property.type ?? "Property"}
-            </Text>
-          </View>
-
-          <View className="rounded-full bg-[#2563EB] px-3 py-1.5 shadow-md">
-            <Text className="text-[11px] font-bold text-white">
-              {property.roi.toFixed(1)}% ROI
-            </Text>
-          </View>
-        </View>
-
-        {/* Bottom Gradient Overlay (Optional: adds depth for white text if needed) */}
-        <View className="absolute bottom-0 h-16 w-full bg-gradient-to-t from-black/20 to-transparent" />
-
-        {propertyImages.length > 1 ? (
-          <View className="absolute bottom-3 left-0 right-0 flex-row justify-center gap-1.5">
-            {propertyImages.map((image, index) => (
-              <View
-                className="h-1.5 w-1.5 rounded-full bg-white/85"
-                key={`${image}:dot:${index}`}
-              />
-            ))}
-          </View>
-        ) : null}
-      </TouchableOpacity>
-
-      <PropertyImageGallery
-        images={propertyImages}
-        onClose={() => setIsGalleryVisible(false)}
-        title={property.title}
-        visible={isGalleryVisible}
-      />
-
-      {/* --- CONTENT SECTION --- */}
-      <View className="p-5">
-        {/* Title and Status Row */}
-        <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1">
-            <Text className="font-soraSemiBold text-xl tracking-tight text-[#1d1d1f]">
-              {property.title}
-            </Text>
-            <View className="mt-1 flex-row items-center gap-1">
-              <MaterialCommunityIcons
-                name="map-marker"
-                color="#94A3B8"
-                size={14}
-              />
-              <Text
-                className="text-sm font-medium text-slate-500"
-                numberOfLines={1}
-              >
-                {property.location}
-              </Text>
-            </View>
-          </View>
-
-          <View
-            className={`rounded-lg px-2.5 py-1 ${
-              isActive ? "bg-emerald-50" : "bg-amber-50"
-            }`}
-          >
-            <Text
-              className={`text-[10px] font-bold uppercase tracking-tighter ${
-                isActive ? "text-emerald-600" : "text-amber-600"
-              }`}
-            >
-              {formatStatus(property.status)}
-            </Text>
-          </View>
-        </View>
-
-        {/* --- METRICS GRID: Reuse our standardized logic --- */}
-        <View className="mt-5 flex-row items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-4">
-          <View className="flex-1">
-            <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Property Value
-            </Text>
-            <Text className="mt-1 font-soraSemiBold text-lg text-[#1d1d1f]">
-              {formatPeso(property.value)}
-            </Text>
-          </View>
-
-          <View className="mx-4 h-8 w-[1px] bg-slate-200" />
-
-          <View className="flex-1">
-            <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Occupancy
-            </Text>
-            <View className="mt-1 flex-row items-center gap-2">
-              <Text className="font-soraSemiBold text-lg text-[#1d1d1f]">
-                {occupancy}%
-              </Text>
-              {/* Visual Indicator */}
-              <View className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
-                <View
-                  className="h-full bg-[#2563EB]"
-                  style={{ width: `${occupancy}%` }}
-                />
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* --- FOOTER: Features --- */}
-        <View className="mt-5 flex-row items-center gap-4">
-          {property.bedrooms !== undefined && (
-            <View className="flex-row items-center gap-1.5">
-              <MaterialCommunityIcons
-                name="bed-king-outline"
-                color="#64748B"
-                size={18}
-              />
-              <Text className="text-sm font-bold text-slate-600">
-                {property.bedrooms}
-              </Text>
-            </View>
-          )}
-
-          {property.bathrooms !== undefined && (
-            <View className="flex-row items-center gap-1.5">
-              <MaterialCommunityIcons name="shower" color="#64748B" size={18} />
-              <Text className="text-sm font-bold text-slate-600">
-                {property.bathrooms}
-              </Text>
-            </View>
-          )}
-
-          {/* Added a spacer to push things left, or add more features here */}
-          <View className="flex-1" />
-          {onOpenBookings ? (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5"
-              onPress={onOpenBookings}
-            >
-              <MaterialCommunityIcons
-                name="calendar-clock"
-                color="#2563EB"
-                size={17}
-              />
-            </TouchableOpacity>
-          ) : null}
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            className="h-8 w-8 items-center justify-center rounded-full bg-[#2563EB]/5"
-            onPress={onEdit}
-          >
-            <MaterialCommunityIcons name="pencil" color="#2563EB" size={17} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
   );
 }
 
@@ -924,6 +181,10 @@ export default function PropertiesScreen() {
       .filter((location) => location.toLowerCase().includes(query))
       .slice(0, 5);
   }, [form.location]);
+  const propertyTypeChoices = useMemo(
+    () => getPropertyTypeChoices(form.classification),
+    [form.classification],
+  );
 
   const portfolioValue = useMemo(
     () => properties.reduce((sum, property) => sum + property.value, 0),
@@ -1145,12 +406,18 @@ export default function PropertiesScreen() {
       return;
     }
 
-    if (isResidential(form.type) && bedrooms === undefined) {
+    if (
+      requiresBedroomAndBathroomCounts(form.classification, form.type) &&
+      bedrooms === undefined
+    ) {
       setFormError("Bedrooms must be a non-negative whole number.");
       return;
     }
 
-    if (isResidential(form.type) && bathrooms === undefined) {
+    if (
+      requiresBedroomAndBathroomCounts(form.classification, form.type) &&
+      bathrooms === undefined
+    ) {
       setFormError("Bathrooms must be a non-negative whole number.");
       return;
     }
@@ -1160,8 +427,8 @@ export default function PropertiesScreen() {
       location,
       country,
       status: form.status,
-      classification: form.type,
-      type: "Warehouse",
+      classification: form.classification,
+      type: form.type,
       value,
       roi,
       lat,
@@ -1178,7 +445,7 @@ export default function PropertiesScreen() {
     if (area) payload.area = area;
     if (description) payload.description = description;
 
-    if (isResidential(form.type)) {
+    if (requiresBedroomAndBathroomCounts(form.classification, form.type)) {
       payload.bedrooms = bedrooms;
       payload.bathrooms = bathrooms;
     }
@@ -1458,6 +725,22 @@ export default function PropertiesScreen() {
 
         <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
           <ChoiceGroup
+            choices={propertyClassificationChoices}
+            label="Property Classification"
+            onSelect={(classification) => {
+              const [type] = getPropertyTypeChoices(classification);
+              setForm((current) => ({
+                ...current,
+                classification,
+                type: type.value,
+              }));
+            }}
+            value={form.classification}
+          />
+        </View>
+
+        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+          <ChoiceGroup
             choices={propertyTypeChoices}
             label="Property Type"
             onSelect={(value) => updateForm("type", value)}
@@ -1511,7 +794,7 @@ export default function PropertiesScreen() {
           </View>
         </View>
 
-        {isResidential(form.type) ? (
+        {requiresBedroomAndBathroomCounts(form.classification, form.type) ? (
           <View className="flex-row gap-3">
             <View className="flex-1">
               <BaseField
@@ -1716,7 +999,7 @@ export default function PropertiesScreen() {
                     key={document.id}
                     activeOpacity={0.8}
                     className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
-                    onPress={() => openDocument(document)}
+                    onPress={() => openPropertyDocument(document)}
                   >
                     <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
                       <MaterialCommunityIcons
@@ -1801,9 +1084,3 @@ export default function PropertiesScreen() {
     </Screen>
   );
 }
-
-const propertyMapStyles = StyleSheet.create({
-  locationMap: {
-    flex: 1,
-  },
-});

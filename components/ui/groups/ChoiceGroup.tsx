@@ -1,5 +1,9 @@
 import { View, TouchableOpacity, Text, ScrollView } from "react-native";
-import { Choice } from "../../../app/(tabs)/properties";
+
+type Choice<T extends string> = {
+  label: string;
+  value: T;
+};
 
 export function ChoiceGroup<T extends string>({
   label,
