@@ -343,16 +343,10 @@ export default function BookingsScreen() {
               Bookings
             </Text>
           </View>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            className="flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200"
-            disabled={!selectedBuilding || buildingOptions.length < 1}
+          <AddButton
+            disabled={!selectedBuilding}
             onPress={() => openCreate()}
-          >
-            <Ionicons name="add" color="#FFFFFF" size={20} />
-            <Text className="text-sm font-bold text-white">New</Text>
-          </TouchableOpacity>
+          />
         </View>
 
         <ScrollView

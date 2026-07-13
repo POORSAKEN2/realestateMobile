@@ -28,6 +28,7 @@ import { useAuth } from "../../hooks/useAuth";
 import type { Lessee, LesseePayload, Property } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
+import AddButton from "../../components/ui/buttons/AddButton";
 
 type TenantFormState = {
   name: string;
@@ -48,7 +49,6 @@ function formatCurrency(value: number) {
     maximumFractionDigits: 0,
   }).format(value);
 }
-
 
 function MetricCard({
   icon,
@@ -390,14 +390,7 @@ export default function TenantsScreen() {
             </Text>
           </View>
 
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={openCreateForm}
-            className="flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200"
-          >
-            <Ionicons name="add" color="#FFFFFF" size={20} />
-            <Text className="text-sm font-bold text-white">New Tenant</Text>
-          </TouchableOpacity>
+          <AddButton onPress={openCreateForm} />
         </View>
 
         {/* --- THE HERO: REVENUE SNAPSHOT --- */}

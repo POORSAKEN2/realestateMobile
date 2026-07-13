@@ -50,11 +50,17 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
         <View className="bg-[#1d1d1f] px-6 pb-5 pt-6">
           <View className="flex-row items-center justify-between">
             <View className="flex-1 pr-4">
-              <Text className="text-2xl font-bold text-white" numberOfLines={1}>
+              <Text
+                className="font-soraBold text-2xl uppercase text-white"
+                numberOfLines={1}
+              >
                 {title}
               </Text>
               {subtitle ? (
-                <Text className="mt-1 text-sm text-white/70" numberOfLines={1}>
+                <Text
+                  className="mt-1 font-sora text-sm text-white/70"
+                  numberOfLines={1}
+                >
                   {subtitle}
                 </Text>
               ) : null}
@@ -94,9 +100,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-white"
               onPress={onClose}
             >
-              <Text className="text-base font-bold text-[#1d1d1f]">
-                Cancel
-              </Text>
+              <Text className="text-base font-bold text-[#1d1d1f]">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.85}
