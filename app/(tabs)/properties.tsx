@@ -60,6 +60,7 @@ import {
   toSelectedImage,
   type FormState,
 } from "../../utils/properties/propertyForm";
+import AddButton from "../../components/ui/buttons/AddButton";
 
 type PropertyListItem =
   | { kind: "search" }

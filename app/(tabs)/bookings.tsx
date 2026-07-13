@@ -53,6 +53,7 @@ import {
   type BookingFormState,
   type StatusFilter,
 } from "../../utils/bookings/bookingCalendar";
+import AddButton from "../../components/ui/buttons/AddButton";
 
 export default function BookingsScreen() {
   const { session } = useAuth();
