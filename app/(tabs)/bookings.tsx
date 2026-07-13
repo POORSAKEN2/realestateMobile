@@ -4,6 +4,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  RefreshControl,
   ScrollView,
   Text,
   TextInput,
@@ -19,8 +20,6 @@ import {
   fetchTransientBookings,
   findTransientBookingConflict,
   isBookingRangeValid,
-  rangesOverlap,
-  toBookingDateTime,
   updateTransientBooking,
 } from "../../api/bookings";
 import { useProperties } from "../../hooks/api/useProperties";
@@ -36,18 +35,20 @@ import { BaseField } from "../../components/ui/fields/BaseField";
 import ChoiceChips from "../../components/ui/chips/ChoiceChips";
 import { BuildingChoices } from "../../components/bookings/BuildingChoices";
 import {
+  getAvailabilityForDay,
+  getBookingsForDay,
+} from "../../utils/bookings/bookingAvailability";
+import {
   dateKey,
   emptyForm,
   formatDisplayDate,
   formatDisplayTime,
   getBookingStatusLabel,
   getDateRangeLabel,
-  getDayWindow,
   getMonthDays,
   getParamValue,
   parseMoney,
   weekdayLabels,
-  type Availability,
   type BookingFormMode,
   type BookingFormState,
   type StatusFilter,
@@ -71,12 +72,21 @@ export default function BookingsScreen() {
   const [formData, setFormData] = useState<BookingFormState>(() => emptyForm());
 
   const { useList } = useProperties();
-  const { data: properties = [], isLoading: isLoadingProperties } = useList();
-  const { data: bookings = [], isLoading: isLoadingBookings } = useQuery({
+  const {
+    data: properties = [],
+    isLoading: isLoadingProperties,
+    refetch: refetchProperties,
+  } = useList();
+  const {
+    data: bookings = [],
+    isLoading: isLoadingBookings,
+    refetch: refetchBookings,
+  } = useQuery({
     queryKey: ["transientBookings", accessToken],
     queryFn: () => fetchTransientBookings(accessToken),
     enabled: Boolean(accessToken),
   });
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const buildingOptions = useMemo(() => {
     return properties
@@ -128,86 +138,13 @@ export default function BookingsScreen() {
   }).format(currentMonth);
   const isLoading = isLoadingProperties || isLoadingBookings;
 
-  function getBookingsForDay(day: Date) {
-    const dayWindow = getDayWindow(day);
-    return visibleBookings.filter((booking) =>
-      rangesOverlap(
-        dayWindow.start,
-        dayWindow.end,
-        toBookingDateTime(booking.startDate, booking.checkInTime),
-        toBookingDateTime(booking.endDate, booking.checkOutTime),
-      ),
-    );
-  }
-
-  function getAvailabilityForDay(day: Date): Availability {
-    const key = dateKey(day);
-    const activeBookings = selectedBuildingBookings.filter(
-      (booking) => booking.status === "Booked",
-    );
-    const dayBookings = activeBookings.filter((booking) => {
-      const dayWindow = getDayWindow(day);
-      return rangesOverlap(
-        dayWindow.start,
-        dayWindow.end,
-        toBookingDateTime(booking.startDate, booking.checkInTime),
-        toBookingDateTime(booking.endDate, booking.checkOutTime),
-      );
-    });
-    const checkingOutToday = activeBookings.some(
-      (booking) =>
-        booking.endDate === key &&
-        booking.checkOutTime <= DEFAULT_CHECK_OUT_TIME,
-    );
-    const checkingInToday = activeBookings.some(
-      (booking) => booking.startDate === key,
-    );
-
-    if (
-      dayBookings.length > 0 &&
-      dayBookings.every(
-        (booking) =>
-          booking.endDate === key &&
-          booking.checkOutTime <= DEFAULT_CHECK_OUT_TIME,
-      ) &&
-      !checkingInToday
-    ) {
-      return {
-        label: "After 2 PM",
-        bg: "bg-sky-50",
-        text: "text-sky-600",
-      };
+  async function refreshBookings() {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([refetchProperties(), refetchBookings()]);
+    } finally {
+      setIsRefreshing(false);
     }
-
-    if (dayBookings.some((booking) => booking.endDate === key)) {
-      return {
-        label: "Checkout",
-        bg: "bg-amber-50",
-        text: "text-amber-600",
-      };
-    }
-
-    if (dayBookings.length > 0) {
-      return {
-        label: "Occupied",
-        bg: "bg-rose-50",
-        text: "text-rose-600",
-      };
-    }
-
-    if (checkingOutToday && !checkingInToday) {
-      return {
-        label: "After 2 PM",
-        bg: "bg-sky-50",
-        text: "text-sky-600",
-      };
-    }
-
-    return {
-      label: "Available",
-      bg: "bg-emerald-50",
-      text: "text-emerald-600",
-    };
   }
 
   function updateForm<K extends keyof BookingFormState>(
@@ -418,7 +355,17 @@ export default function BookingsScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              colors={["#2563EB"]}
+              onRefresh={refreshBookings}
+              refreshing={isRefreshing}
+              tintColor="#2563EB"
+            />
+          }
+          showsVerticalScrollIndicator={false}
+        >
           <View className="gap-5 pb-8">
             <View className="gap-4 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
               <View className="flex-row items-center justify-between gap-3">
@@ -524,8 +471,11 @@ export default function BookingsScreen() {
                 <View className="flex-row flex-wrap p-1">
                   {monthDays.map((day) => {
                     const key = dateKey(day);
-                    const dayBookings = getBookingsForDay(day);
-                    const availability = getAvailabilityForDay(day);
+                    const dayBookings = getBookingsForDay(visibleBookings, day);
+                    const availability = getAvailabilityForDay(
+                      selectedBuildingBookings,
+                      day,
+                    );
                     const isCurrentMonth =
                       day.getMonth() === currentMonth.getMonth();
                     const canCreateFromDay =
