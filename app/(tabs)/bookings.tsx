@@ -1,13 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Modal,
+  Platform,
   RefreshControl,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -22,6 +24,7 @@ import {
   isBookingRangeValid,
   updateTransientBooking,
 } from "../../api/bookings";
+import { fetchLessees } from "../../api/propertyDetails";
 import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
@@ -43,6 +46,9 @@ import {
   emptyForm,
   formatDisplayDate,
   formatDisplayTime,
+  getBookingPickerChange,
+  getBookingPickerTitle,
+  getBookingPickerValue,
   getBookingStatusLabel,
   getDateRangeLabel,
   getMonthDays,
@@ -51,9 +57,12 @@ import {
   weekdayLabels,
   type BookingFormMode,
   type BookingFormState,
+  type BookingPickerField,
   type StatusFilter,
 } from "../../utils/bookings/bookingCalendar";
 import AddButton from "../../components/ui/buttons/AddButton";
+import { PickerField } from "../../components/ui/fields/PickerField";
+import { DropdownField } from "../../components/ui/fields/DropdownField";
 
 export default function BookingsScreen() {
   const { session } = useAuth();
@@ -71,6 +80,10 @@ export default function BookingsScreen() {
   );
   const [formMessage, setFormMessage] = useState("");
   const [formData, setFormData] = useState<BookingFormState>(() => emptyForm());
+  const [activePickerField, setActivePickerField] =
+    useState<BookingPickerField | null>(null);
+  const [selectedGuestId, setSelectedGuestId] = useState("");
+  const [isAddingGuest, setIsAddingGuest] = useState(false);
 
   const { useList } = useProperties();
   const {
@@ -87,6 +100,11 @@ export default function BookingsScreen() {
     queryFn: () => fetchTransientBookings(accessToken),
     enabled: Boolean(accessToken),
   });
+  const { data: guests = [] } = useQuery({
+    queryKey: ["lessees", accessToken],
+    queryFn: () => fetchLessees(accessToken),
+    enabled: Boolean(accessToken),
+  });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const buildingOptions = useMemo(() => {
@@ -94,6 +112,14 @@ export default function BookingsScreen() {
       .filter((property) => property.isTransientBookable)
       .sort((a, b) => a.title.localeCompare(b.title));
   }, [properties]);
+  const guestOptions = useMemo(
+    () =>
+      guests.map((guest) => ({
+        label: `${guest.name}${guest.contactEmail ? ` · ${guest.contactEmail}` : ""}`,
+        value: guest.id,
+      })),
+    [guests],
+  );
 
   useEffect(() => {
     if (
@@ -167,6 +193,9 @@ export default function BookingsScreen() {
     setModalMode("create");
     setEditingBooking(null);
     resetForm(selectedPropertyId, date);
+    setActivePickerField(null);
+    setSelectedGuestId("");
+    setIsAddingGuest(false);
     setIsModalOpen(true);
   }
 
@@ -187,6 +216,13 @@ export default function BookingsScreen() {
       notes: booking.notes ?? "",
     });
     setFormMessage("");
+    setActivePickerField(null);
+    const matchedGuest = guests.find(
+      (guest) =>
+        guest.contactEmail.toLowerCase() === booking.guestEmail.toLowerCase(),
+    );
+    setSelectedGuestId(matchedGuest?.id ?? "");
+    setIsAddingGuest(!matchedGuest);
     setIsModalOpen(true);
   }
 
@@ -194,6 +230,23 @@ export default function BookingsScreen() {
     setIsModalOpen(false);
     setEditingBooking(null);
     setFormMessage("");
+    setActivePickerField(null);
+    setSelectedGuestId("");
+    setIsAddingGuest(false);
+  }
+
+  function selectGuest(guestId: string) {
+    const guest = guests.find((item) => item.id === guestId);
+    if (!guest) return;
+
+    setSelectedGuestId(guestId);
+    setIsAddingGuest(false);
+    setFormData((current) => ({
+      ...current,
+      guestName: guest.name,
+      guestEmail: guest.contactEmail,
+      guestPhone: guest.phone,
+    }));
   }
 
   const formConflict =
@@ -272,6 +325,11 @@ export default function BookingsScreen() {
 
     if (!formData.roomNumber.trim()) {
       setFormMessage("Please enter a room number.");
+      return;
+    }
+
+    if (!isAddingGuest && !selectedGuestId) {
+      setFormMessage("Please select an existing guest or add a new guest.");
       return;
     }
 
@@ -681,38 +739,77 @@ export default function BookingsScreen() {
           </View>
         ) : null}
 
-        <BaseField
-          label="Guest Name"
-          onChangeText={(value) => updateForm("guestName", value)}
-          value={formData.guestName}
-        />
-        <BaseField
-          keyboardType="phone-pad"
-          label="Guest Phone"
-          onChangeText={(value) => updateForm("guestPhone", value)}
-          value={formData.guestPhone}
-        />
-        <BaseField
-          keyboardType="email-address"
-          label="Guest Email"
-          onChangeText={(value) => updateForm("guestEmail", value)}
-          value={formData.guestEmail}
-        />
+        <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+          <DropdownField
+            label="Guest"
+            onSelect={selectGuest}
+            options={guestOptions}
+            placeholder={
+              guests.length ? "Select an existing guest" : "No guests available"
+            }
+            subtitle="Select a saved guest or add a new one."
+            value={selectedGuestId}
+          />
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            className="self-start rounded-full bg-[#2563EB]/10 px-4 py-2.5"
+            onPress={() => {
+              setIsAddingGuest((current) => !current);
+              setSelectedGuestId("");
+              if (!isAddingGuest) {
+                setFormData((current) => ({
+                  ...current,
+                  guestName: "",
+                  guestEmail: "",
+                  guestPhone: "",
+                }));
+              }
+            }}
+          >
+            <Text className="text-xs font-bold text-[#2563EB]">
+              {isAddingGuest ? "Cancel Add Guest" : "Add Guest"}
+            </Text>
+          </TouchableOpacity>
+
+          {isAddingGuest ? (
+            <View className="gap-4 border-t border-[#1d1d1f]/10 pt-4">
+              <BaseField
+                label="Guest Name"
+                onChangeText={(value) => updateForm("guestName", value)}
+                value={formData.guestName}
+              />
+              <BaseField
+                keyboardType="phone-pad"
+                label="Guest Phone"
+                onChangeText={(value) => updateForm("guestPhone", value)}
+                value={formData.guestPhone}
+              />
+              <BaseField
+                keyboardType="email-address"
+                label="Guest Email"
+                onChangeText={(value) => updateForm("guestEmail", value)}
+                value={formData.guestEmail}
+              />
+            </View>
+          ) : null}
+        </View>
 
         <View className="flex-row gap-3">
           <View className="flex-1">
-            <BaseField
+            <PickerField
               label="Check-in Date"
-              onChangeText={(value) => updateForm("startDate", value)}
-              placeholder="YYYY-MM-DD"
+              onPress={() => setActivePickerField("startDate")}
+              placeholder="Select date"
               value={formData.startDate}
             />
           </View>
           <View className="w-28">
-            <BaseField
-              label="Time"
-              onChangeText={(value) => updateForm("checkInTime", value)}
-              placeholder="14:00"
+            <PickerField
+              iconName="time-outline"
+              label="Check-in Time"
+              onPress={() => setActivePickerField("checkInTime")}
+              placeholder="Select time"
               value={formData.checkInTime}
             />
           </View>
@@ -720,22 +817,75 @@ export default function BookingsScreen() {
 
         <View className="flex-row gap-3">
           <View className="flex-1">
-            <BaseField
+            <PickerField
               label="Check-out Date"
-              onChangeText={(value) => updateForm("endDate", value)}
-              placeholder="YYYY-MM-DD"
+              onPress={() => setActivePickerField("endDate")}
+              placeholder="Select date"
               value={formData.endDate}
             />
           </View>
           <View className="w-28">
-            <BaseField
-              label="Time"
-              onChangeText={(value) => updateForm("checkOutTime", value)}
-              placeholder="11:00"
+            <PickerField
+              iconName="time-outline"
+              label="Check-out Time"
+              onPress={() => setActivePickerField("checkOutTime")}
+              placeholder="Select time"
               value={formData.checkOutTime}
             />
           </View>
         </View>
+
+        {activePickerField ? (
+          <Modal
+            animationType="fade"
+            onRequestClose={() => setActivePickerField(null)}
+            transparent
+            visible
+          >
+            <View className="flex-1 justify-center bg-black/40 px-5">
+              <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
+                <View className="mb-2 flex-row items-center justify-between">
+                  <Text className="text-sm font-bold text-[#1d1d1f]">
+                    {getBookingPickerTitle(activePickerField)}
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
+                    onPress={() => setActivePickerField(null)}
+                  >
+                    <Text className="text-xs font-bold text-[#2563EB]">
+                      Done
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePicker
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  minimumDate={
+                    activePickerField === "endDate" && formData.startDate
+                      ? new Date(`${formData.startDate}T12:00:00`)
+                      : undefined
+                  }
+                  mode={
+                    activePickerField === "startDate" ||
+                    activePickerField === "endDate"
+                      ? "date"
+                      : "time"
+                  }
+                  onChange={(event, selectedValue) => {
+                    if (Platform.OS === "android") setActivePickerField(null);
+                    const selection = getBookingPickerChange(
+                      event.type,
+                      activePickerField,
+                      selectedValue,
+                    );
+                    if (selection) updateForm(selection.field, selection.value);
+                  }}
+                  value={getBookingPickerValue(formData, activePickerField)}
+                />
+              </View>
+            </View>
+          </Modal>
+        ) : null}
 
         {formData.propertyId &&
         formData.roomNumber &&

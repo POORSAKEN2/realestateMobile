@@ -22,6 +22,11 @@ export type BookingFormState = {
 };
 
 export type Availability = { label: string; bg: string; text: string };
+export type BookingPickerField =
+  | "startDate"
+  | "checkInTime"
+  | "endDate"
+  | "checkOutTime";
 
 export const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -111,4 +116,56 @@ export function emptyForm(
 export function parseMoney(value: string) {
   const parsed = Number(value.trim().replace(/,/g, ""));
   return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+export function isDatePickerField(field: BookingPickerField) {
+  return field === "startDate" || field === "endDate";
+}
+
+export function getBookingPickerValue(
+  form: BookingFormState,
+  field: BookingPickerField,
+) {
+  if (isDatePickerField(field)) {
+    return new Date(`${form[field]}T12:00:00`);
+  }
+
+  const [hours, minutes] = form[field].split(":").map(Number);
+  return new Date(2026, 0, 1, hours || 0, minutes || 0);
+}
+
+export function getBookingPickerSelection(
+  field: BookingPickerField,
+  selectedValue: Date,
+) {
+  if (isDatePickerField(field)) {
+    return { field, value: dateKey(selectedValue) };
+  }
+
+  const value = `${String(selectedValue.getHours()).padStart(2, "0")}:${String(
+    selectedValue.getMinutes(),
+  ).padStart(2, "0")}`;
+  return { field, value };
+}
+
+export function getBookingPickerChange(
+  eventType: string,
+  field: BookingPickerField,
+  selectedValue?: Date,
+) {
+  if (eventType === "dismissed" || !selectedValue) return null;
+  return getBookingPickerSelection(field, selectedValue);
+}
+
+export function getBookingPickerTitle(field: BookingPickerField) {
+  switch (field) {
+    case "startDate":
+      return "Select Check-in Date";
+    case "endDate":
+      return "Select Check-out Date";
+    case "checkInTime":
+      return "Select Check-in Time";
+    case "checkOutTime":
+      return "Select Check-out Time";
+  }
 }
