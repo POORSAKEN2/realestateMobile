@@ -1,18 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
   Modal,
   Platform,
+  RefreshControl,
   ScrollView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
-  type TextInputProps,
 } from "react-native";
 
 import {
@@ -23,10 +22,9 @@ import {
   fetchTransientBookings,
   findTransientBookingConflict,
   isBookingRangeValid,
-  rangesOverlap,
-  toBookingDateTime,
   updateTransientBooking,
 } from "../../api/bookings";
+import { fetchLessees } from "../../api/propertyDetails";
 import { useProperties } from "../../hooks/api/useProperties";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
@@ -35,139 +33,36 @@ import type {
   TransientBooking,
   TransientBookingPayload,
 } from "../../types";
+import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import ChoiceChips from "../../components/ui/chips/ChoiceChips";
+import { BuildingChoices } from "../../components/bookings/BuildingChoices";
+import {
+  getAvailabilityForDay,
+  getBookingsForDay,
+} from "../../utils/bookings/bookingAvailability";
+import {
+  dateKey,
+  emptyForm,
+  formatDisplayDate,
+  formatDisplayTime,
+  getBookingPickerChange,
+  getBookingPickerTitle,
+  getBookingPickerValue,
+  getBookingStatusLabel,
+  getDateRangeLabel,
+  getMonthDays,
+  getParamValue,
+  parseMoney,
+  weekdayLabels,
+  type BookingFormMode,
+  type BookingFormState,
+  type BookingPickerField,
+  type StatusFilter,
+} from "../../utils/bookings/bookingCalendar";
 import AddButton from "../../components/ui/buttons/AddButton";
-
-type BookingFormMode = "create" | "edit";
-type StatusFilter = "Booked" | "All";
-
-type BookingFormState = {
-  propertyId: string;
-  roomNumber: string;
-  guestName: string;
-  guestEmail: string;
-  guestPhone: string;
-  startDate: string;
-  checkInTime: string;
-  endDate: string;
-  checkOutTime: string;
-  dailyRate: string;
-  notes: string;
-};
-
-type Availability = {
-  label: string;
-  bg: string;
-  text: string;
-};
-
-const weekdayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function dateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function parseDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  return new Date(year, month - 1, day);
-}
-
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
-
-function getMonthDays(monthDate: Date) {
-  const firstOfMonth = new Date(
-    monthDate.getFullYear(),
-    monthDate.getMonth(),
-    1,
-  );
-  const start = addDays(firstOfMonth, -firstOfMonth.getDay());
-
-  return Array.from({ length: 42 }, (_, index) => addDays(start, index));
-}
-
-function formatDisplayDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(parseDate(value));
-}
-
-function formatDisplayTime(value: string) {
-  const [hours, minutes] = value.split(":").map(Number);
-
-  return new Intl.DateTimeFormat("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(new Date(2026, 0, 1, hours, minutes));
-}
-
-function getDateRangeLabel(booking: TransientBooking) {
-  const start = `${formatDisplayDate(booking.startDate)} ${formatDisplayTime(
-    booking.checkInTime,
-  )}`;
-  const end = `${formatDisplayDate(booking.endDate)} ${formatDisplayTime(
-    booking.checkOutTime,
-  )}`;
-
-  return `${start} - ${end}`;
-}
-
-function getDayWindow(day: Date) {
-  const key = dateKey(day);
-
-  return {
-    key,
-    start: `${key}T00:00`,
-    end: `${key}T23:59`,
-  };
-}
-
-function getBookingStatusLabel(booking: TransientBooking) {
-  const today = dateKey(new Date());
-
-  if (booking.status === "Cancelled") return "Cancelled";
-  if (booking.endDate === today) return "Checking out today";
-
-  return "Occupied";
-}
-
-function getParamValue(value?: string | string[]) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
-function emptyForm(
-  propertyId = "",
-  date = dateKey(new Date()),
-): BookingFormState {
-  return {
-    propertyId,
-    roomNumber: "",
-    guestName: "",
-    guestEmail: "",
-    guestPhone: "",
-    startDate: date,
-    checkInTime: DEFAULT_CHECK_IN_TIME,
-    endDate: date,
-    checkOutTime: DEFAULT_CHECK_OUT_TIME,
-    dailyRate: "",
-    notes: "",
-  };
-}
-
-function parseMoney(value: string) {
-  const parsed = Number(value.trim().replace(/,/g, ""));
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
+import { PickerField } from "../../components/ui/fields/PickerField";
+import { DropdownField } from "../../components/ui/fields/DropdownField";
 
 export default function BookingsScreen() {
   const { session } = useAuth();
@@ -185,20 +80,46 @@ export default function BookingsScreen() {
   );
   const [formMessage, setFormMessage] = useState("");
   const [formData, setFormData] = useState<BookingFormState>(() => emptyForm());
+  const [activePickerField, setActivePickerField] =
+    useState<BookingPickerField | null>(null);
+  const [selectedGuestId, setSelectedGuestId] = useState("");
+  const [isAddingGuest, setIsAddingGuest] = useState(false);
 
   const { useList } = useProperties();
-  const { data: properties = [], isLoading: isLoadingProperties } = useList();
-  const { data: bookings = [], isLoading: isLoadingBookings } = useQuery({
+  const {
+    data: properties = [],
+    isLoading: isLoadingProperties,
+    refetch: refetchProperties,
+  } = useList();
+  const {
+    data: bookings = [],
+    isLoading: isLoadingBookings,
+    refetch: refetchBookings,
+  } = useQuery({
     queryKey: ["transientBookings", accessToken],
     queryFn: () => fetchTransientBookings(accessToken),
     enabled: Boolean(accessToken),
   });
+  const { data: guests = [] } = useQuery({
+    queryKey: ["lessees", accessToken],
+    queryFn: () => fetchLessees(accessToken),
+    enabled: Boolean(accessToken),
+  });
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const buildingOptions = useMemo(() => {
     return properties
       .filter((property) => property.isTransientBookable)
       .sort((a, b) => a.title.localeCompare(b.title));
   }, [properties]);
+  const guestOptions = useMemo(
+    () =>
+      guests.map((guest) => ({
+        label: `${guest.name}${guest.contactEmail ? ` · ${guest.contactEmail}` : ""}`,
+        value: guest.id,
+      })),
+    [guests],
+  );
 
   useEffect(() => {
     if (
@@ -244,86 +165,13 @@ export default function BookingsScreen() {
   }).format(currentMonth);
   const isLoading = isLoadingProperties || isLoadingBookings;
 
-  function getBookingsForDay(day: Date) {
-    const dayWindow = getDayWindow(day);
-    return visibleBookings.filter((booking) =>
-      rangesOverlap(
-        dayWindow.start,
-        dayWindow.end,
-        toBookingDateTime(booking.startDate, booking.checkInTime),
-        toBookingDateTime(booking.endDate, booking.checkOutTime),
-      ),
-    );
-  }
-
-  function getAvailabilityForDay(day: Date): Availability {
-    const key = dateKey(day);
-    const activeBookings = selectedBuildingBookings.filter(
-      (booking) => booking.status === "Booked",
-    );
-    const dayBookings = activeBookings.filter((booking) => {
-      const dayWindow = getDayWindow(day);
-      return rangesOverlap(
-        dayWindow.start,
-        dayWindow.end,
-        toBookingDateTime(booking.startDate, booking.checkInTime),
-        toBookingDateTime(booking.endDate, booking.checkOutTime),
-      );
-    });
-    const checkingOutToday = activeBookings.some(
-      (booking) =>
-        booking.endDate === key &&
-        booking.checkOutTime <= DEFAULT_CHECK_OUT_TIME,
-    );
-    const checkingInToday = activeBookings.some(
-      (booking) => booking.startDate === key,
-    );
-
-    if (
-      dayBookings.length > 0 &&
-      dayBookings.every(
-        (booking) =>
-          booking.endDate === key &&
-          booking.checkOutTime <= DEFAULT_CHECK_OUT_TIME,
-      ) &&
-      !checkingInToday
-    ) {
-      return {
-        label: "After 2 PM",
-        bg: "bg-sky-50",
-        text: "text-sky-600",
-      };
+  async function refreshBookings() {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([refetchProperties(), refetchBookings()]);
+    } finally {
+      setIsRefreshing(false);
     }
-
-    if (dayBookings.some((booking) => booking.endDate === key)) {
-      return {
-        label: "Checkout",
-        bg: "bg-amber-50",
-        text: "text-amber-600",
-      };
-    }
-
-    if (dayBookings.length > 0) {
-      return {
-        label: "Occupied",
-        bg: "bg-rose-50",
-        text: "text-rose-600",
-      };
-    }
-
-    if (checkingOutToday && !checkingInToday) {
-      return {
-        label: "After 2 PM",
-        bg: "bg-sky-50",
-        text: "text-sky-600",
-      };
-    }
-
-    return {
-      label: "Available",
-      bg: "bg-emerald-50",
-      text: "text-emerald-600",
-    };
   }
 
   function updateForm<K extends keyof BookingFormState>(
@@ -345,6 +193,9 @@ export default function BookingsScreen() {
     setModalMode("create");
     setEditingBooking(null);
     resetForm(selectedPropertyId, date);
+    setActivePickerField(null);
+    setSelectedGuestId("");
+    setIsAddingGuest(false);
     setIsModalOpen(true);
   }
 
@@ -365,6 +216,13 @@ export default function BookingsScreen() {
       notes: booking.notes ?? "",
     });
     setFormMessage("");
+    setActivePickerField(null);
+    const matchedGuest = guests.find(
+      (guest) =>
+        guest.contactEmail.toLowerCase() === booking.guestEmail.toLowerCase(),
+    );
+    setSelectedGuestId(matchedGuest?.id ?? "");
+    setIsAddingGuest(!matchedGuest);
     setIsModalOpen(true);
   }
 
@@ -372,6 +230,23 @@ export default function BookingsScreen() {
     setIsModalOpen(false);
     setEditingBooking(null);
     setFormMessage("");
+    setActivePickerField(null);
+    setSelectedGuestId("");
+    setIsAddingGuest(false);
+  }
+
+  function selectGuest(guestId: string) {
+    const guest = guests.find((item) => item.id === guestId);
+    if (!guest) return;
+
+    setSelectedGuestId(guestId);
+    setIsAddingGuest(false);
+    setFormData((current) => ({
+      ...current,
+      guestName: guest.name,
+      guestEmail: guest.contactEmail,
+      guestPhone: guest.phone,
+    }));
   }
 
   const formConflict =
@@ -453,6 +328,11 @@ export default function BookingsScreen() {
       return;
     }
 
+    if (!isAddingGuest && !selectedGuestId) {
+      setFormMessage("Please select an existing guest or add a new guest.");
+      return;
+    }
+
     if (!formData.guestName.trim()) {
       setFormMessage("Please enter the guest name.");
       return;
@@ -510,41 +390,6 @@ export default function BookingsScreen() {
     });
   }
 
-  function renderBuildingChoices() {
-    return (
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-2"
-      >
-        {buildingOptions.map((building) => {
-          const selected = building.id === selectedPropertyId;
-
-          return (
-            <TouchableOpacity
-              key={building.id}
-              activeOpacity={0.8}
-              className={`rounded-full border px-3.5 py-2.5 ${
-                selected
-                  ? "border-[#2563EB] bg-[#2563EB]"
-                  : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
-              }`}
-              onPress={() => setSelectedPropertyId(building.id)}
-            >
-              <Text
-                className={`text-xs font-bold ${
-                  selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"
-                }`}
-              >
-                {building.title}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
-    );
-  }
-
   return (
     <Screen className="bg-[#2563EB]/5">
       <View className="flex-1 gap-5">
@@ -558,13 +403,22 @@ export default function BookingsScreen() {
             </Text>
           </View>
           <AddButton
-          
             disabled={!selectedBuilding}
             onPress={() => openCreate()}
           />
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              colors={["#2563EB"]}
+              onRefresh={refreshBookings}
+              refreshing={isRefreshing}
+              tintColor="#2563EB"
+            />
+          }
+          showsVerticalScrollIndicator={false}
+        >
           <View className="gap-5 pb-8">
             <View className="gap-4 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
               <View className="flex-row items-center justify-between gap-3">
@@ -618,7 +472,13 @@ export default function BookingsScreen() {
                 {monthLabel}
               </Text>
 
-              {buildingOptions.length > 0 ? renderBuildingChoices() : null}
+              {buildingOptions.length > 0 ? (
+                <BuildingChoices
+                  buildings={buildingOptions}
+                  onSelect={setSelectedPropertyId}
+                  selectedId={selectedPropertyId}
+                />
+              ) : null}
 
               <ChoiceChips<StatusFilter>
                 options={[
@@ -664,8 +524,11 @@ export default function BookingsScreen() {
                 <View className="flex-row flex-wrap p-1">
                   {monthDays.map((day) => {
                     const key = dateKey(day);
-                    const dayBookings = getBookingsForDay(day);
-                    const availability = getAvailabilityForDay(day);
+                    const dayBookings = getBookingsForDay(visibleBookings, day);
+                    const availability = getAvailabilityForDay(
+                      selectedBuildingBookings,
+                      day,
+                    );
                     const isCurrentMonth =
                       day.getMonth() === currentMonth.getMonth();
                     const canCreateFromDay =
@@ -819,234 +682,257 @@ export default function BookingsScreen() {
         </ScrollView>
       </View>
 
-      <Modal
-        animationType="slide"
-        onRequestClose={closeModal}
-        presentationStyle="fullScreen"
-        visible={isModalOpen}
+      <AddEditModal
+        formError={formMessage}
+        isPending={saveMutation.isPending}
+        isVisible={isModalOpen}
+        onClose={closeModal}
+        onSubmit={handleSubmit}
+        submitText={modalMode === "create" ? "Save Booking" : "Update Booking"}
+        // subtitle="Manage transient reservations."
+        title={modalMode === "create" ? "Create a booking" : "Edit booking"}
       >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 bg-[#2563EB]/5"
-        >
-          <View className="bg-[#1d1d1f] px-6 pb-5 pt-6">
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text className="text-2xl font-bold text-[#FFFFFF]">
-                  {modalMode === "create" ? "Create Booking" : "Edit Booking"}
-                </Text>
-                <Text className="mt-1 text-sm text-[#FFFFFF]/70">
-                  Manage transient reservations.
-                </Text>
-              </View>
-              <TouchableOpacity
-                activeOpacity={0.8}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF]/15"
-                onPress={closeModal}
-              >
-                <Ionicons name="close" color="#FFFFFF" size={22} />
-              </TouchableOpacity>
-            </View>
-          </View>
+        <DropdownField
+          label={"Building"}
+          options={buildingOptions.map((building) => ({
+            label: building.title,
+            value: building.id,
+          }))}
+          onSelect={(value) => {
+            setFormData((current) => ({
+              ...current,
+              propertyId: value,
+              roomNumber: "",
+            }));
+          }}
+          value={formData.propertyId}
+        />
 
-          <ScrollView
-            className="flex-1"
-            contentContainerClassName="gap-5 px-6 py-6"
-            keyboardShouldPersistTaps="handled"
-          >
-            <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                Building
+        <BaseField
+          keyboardType="number-pad"
+          label="Room Number"
+          onChangeText={(value) => updateForm("roomNumber", value)}
+          placeholder="e.g. 101"
+          value={formData.roomNumber}
+        />
+
+        <BaseField
+          keyboardType="decimal-pad"
+          label="Daily Rate"
+          onChangeText={(value) => updateForm("dailyRate", value)}
+          placeholder="e.g. 2500"
+          value={formData.dailyRate}
+        />
+
+        {selectedFormBuilding && formData.roomNumber ? (
+          <View className="rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+            <Text className="text-xs font-medium text-[#6F6D6D]">
+              <Text className="font-bold text-[#1d1d1f]">
+                {selectedFormBuilding.title}
               </Text>
-              <ChoiceChips
-                options={buildingOptions.map((building) => ({
-                  label: building.title,
-                  value: building.id,
-                }))}
-                onSelect={(value) => {
-                  setFormData((current) => ({
-                    ...current,
-                    propertyId: value,
-                    roomNumber: "",
-                  }));
-                }}
-                value={formData.propertyId}
+              {` - ${formData.roomNumber}`}
+            </Text>
+          </View>
+        ) : null}
+
+        <View className="gap-3 rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4">
+          <DropdownField
+            label="Guest"
+            onSelect={selectGuest}
+            options={guestOptions}
+            placeholder={
+              guests.length ? "Select an existing guest" : "No guests available"
+            }
+            subtitle="Select a saved guest or add a new one."
+            value={selectedGuestId}
+          />
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            className="self-start rounded-full bg-[#2563EB]/10 px-4 py-2.5"
+            onPress={() => {
+              setIsAddingGuest((current) => !current);
+              setSelectedGuestId("");
+              if (!isAddingGuest) {
+                setFormData((current) => ({
+                  ...current,
+                  guestName: "",
+                  guestEmail: "",
+                  guestPhone: "",
+                }));
+              }
+            }}
+          >
+            <Text className="text-xs font-bold text-[#2563EB]">
+              {isAddingGuest ? "Cancel Add Guest" : "Add Guest"}
+            </Text>
+          </TouchableOpacity>
+
+          {isAddingGuest ? (
+            <View className="gap-4 border-t border-[#1d1d1f]/10 pt-4">
+              <BaseField
+                label="Guest Name"
+                onChangeText={(value) => updateForm("guestName", value)}
+                value={formData.guestName}
+              />
+              <BaseField
+                keyboardType="phone-pad"
+                label="Guest Phone"
+                onChangeText={(value) => updateForm("guestPhone", value)}
+                value={formData.guestPhone}
+              />
+              <BaseField
+                keyboardType="email-address"
+                label="Guest Email"
+                onChangeText={(value) => updateForm("guestEmail", value)}
+                value={formData.guestEmail}
               />
             </View>
+          ) : null}
+        </View>
 
-            <BaseField
-              keyboardType="number-pad"
-              label="Room Number"
-              onChangeText={(value) => updateForm("roomNumber", value)}
-              placeholder="e.g. 101"
-              value={formData.roomNumber}
+        <View className="flex-row gap-2">
+          <View className="flex-1">
+            <PickerField
+              label="Check-in Date"
+              onPress={() => setActivePickerField("startDate")}
+              placeholder="Select date"
+              value={formData.startDate}
             />
-
-            <BaseField
-              keyboardType="decimal-pad"
-              label="Daily Rate"
-              onChangeText={(value) => updateForm("dailyRate", value)}
-              placeholder="e.g. 2500"
-              value={formData.dailyRate}
-            />
-
-            {selectedFormBuilding && formData.roomNumber ? (
-              <View className="rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-                <Text className="text-xs font-medium text-[#6F6D6D]">
-                  <Text className="font-bold text-[#1d1d1f]">
-                    {selectedFormBuilding.title}
-                  </Text>
-                  {` - ${formData.roomNumber}`}
-                </Text>
-              </View>
-            ) : null}
-
-            <BaseField
-              label="Guest Name"
-              onChangeText={(value) => updateForm("guestName", value)}
-              value={formData.guestName}
-            />
-            <BaseField
-              keyboardType="phone-pad"
-              label="Guest Phone"
-              onChangeText={(value) => updateForm("guestPhone", value)}
-              value={formData.guestPhone}
-            />
-            <BaseField
-              keyboardType="email-address"
-              label="Guest Email"
-              onChangeText={(value) => updateForm("guestEmail", value)}
-              value={formData.guestEmail}
-            />
-
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <BaseField
-                  label="Check-in Date"
-                  onChangeText={(value) => updateForm("startDate", value)}
-                  placeholder="YYYY-MM-DD"
-                  value={formData.startDate}
-                />
-              </View>
-              <View className="w-28">
-                <BaseField
-                  label="Time"
-                  onChangeText={(value) => updateForm("checkInTime", value)}
-                  placeholder="14:00"
-                  value={formData.checkInTime}
-                />
-              </View>
-            </View>
-
-            <View className="flex-row gap-3">
-              <View className="flex-1">
-                <BaseField
-                  label="Check-out Date"
-                  onChangeText={(value) => updateForm("endDate", value)}
-                  placeholder="YYYY-MM-DD"
-                  value={formData.endDate}
-                />
-              </View>
-              <View className="w-28">
-                <BaseField
-                  label="Time"
-                  onChangeText={(value) => updateForm("checkOutTime", value)}
-                  placeholder="11:00"
-                  value={formData.checkOutTime}
-                />
-              </View>
-            </View>
-
-            {formData.propertyId &&
-            formData.roomNumber &&
-            formData.startDate &&
-            formData.endDate ? (
-              <View
-                className={`rounded-2xl border p-4 ${
-                  formConflict
-                    ? "border-amber-500/30 bg-amber-50"
-                    : "border-emerald-500/30 bg-emerald-50"
-                }`}
-              >
-                <Text
-                  className={`text-sm font-semibold ${
-                    formConflict ? "text-amber-700" : "text-emerald-700"
-                  }`}
-                >
-                  {formConflict
-                    ? `Not available. Conflicts with ${formConflict.guestName} from ${getDateRangeLabel(
-                        formConflict,
-                      )}.`
-                    : "Available for this check-in and check-out window."}
-                </Text>
-              </View>
-            ) : null}
-
-            <BaseField
-              label="Notes"
-              multiline
-              onChangeText={(value) => updateForm("notes", value)}
-              placeholder="Optional booking notes"
-              value={formData.notes}
-            />
-
-            {formMessage ? (
-              <View className="rounded-2xl border border-[#1d1d1f]/15 bg-[#1d1d1f]/5 p-4">
-                <Text className="text-sm font-medium text-[#1d1d1f]">
-                  {formMessage}
-                </Text>
-              </View>
-            ) : null}
-          </ScrollView>
-
-          <View className="border-t border-[#1d1d1f]/10 bg-[#FFFFFF] p-6">
-            {modalMode === "edit" && editingBooking?.status === "Booked" ? (
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="mb-3 h-12 items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-50"
-                disabled={cancelMutation.isPending}
-                onPress={() =>
-                  editingBooking && cancelMutation.mutate(editingBooking.id)
-                }
-              >
-                {cancelMutation.isPending ? (
-                  <ActivityIndicator color="#DC2626" />
-                ) : (
-                  <Text className="font-bold text-rose-600">
-                    Cancel Booking
-                  </Text>
-                )}
-              </TouchableOpacity>
-            ) : null}
-
-            <View className="flex-row gap-3">
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF]"
-                onPress={closeModal}
-              >
-                <Text className="text-base font-bold text-[#1d1d1f]">
-                  Close
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
-                disabled={saveMutation.isPending}
-                onPress={handleSubmit}
-              >
-                {saveMutation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="text-base font-semibold text-[#FFFFFF]">
-                    {modalMode === "create" ? "Create" : "Save"}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
           </View>
-        </KeyboardAvoidingView>
-      </Modal>
+          <View className="w-32">
+            <PickerField
+              iconName="time-outline"
+              label="Check-in Time"
+              onPress={() => setActivePickerField("checkInTime")}
+              placeholder="Select time"
+              value={formData.checkInTime}
+            />
+          </View>
+        </View>
+
+        <View className="flex-row gap-2">
+          <View className="flex-1">
+            <PickerField
+              label="Check-out Date"
+              onPress={() => setActivePickerField("endDate")}
+              placeholder="Select date"
+              value={formData.endDate}
+            />
+          </View>
+          <View className="w-32">
+            <PickerField
+              iconName="time-outline"
+              label="Check-out Time"
+              onPress={() => setActivePickerField("checkOutTime")}
+              placeholder="Select time"
+              value={formData.checkOutTime}
+            />
+          </View>
+        </View>
+
+        {activePickerField ? (
+          <Modal
+            animationType="fade"
+            onRequestClose={() => setActivePickerField(null)}
+            transparent
+            visible
+          >
+            <View className="flex-1 justify-center bg-black/40 px-5">
+              <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
+                <View className="mb-2 flex-row items-center justify-between">
+                  <Text className="text-sm font-bold text-[#1d1d1f]">
+                    {getBookingPickerTitle(activePickerField)}
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
+                    onPress={() => setActivePickerField(null)}
+                  >
+                    <Text className="text-xs font-bold text-[#2563EB]">
+                      Done
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePicker
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  minimumDate={
+                    activePickerField === "endDate" && formData.startDate
+                      ? new Date(`${formData.startDate}T12:00:00`)
+                      : undefined
+                  }
+                  mode={
+                    activePickerField === "startDate" ||
+                    activePickerField === "endDate"
+                      ? "date"
+                      : "time"
+                  }
+                  onChange={(event, selectedValue) => {
+                    if (Platform.OS === "android") setActivePickerField(null);
+                    const selection = getBookingPickerChange(
+                      event.type,
+                      activePickerField,
+                      selectedValue,
+                    );
+                    if (selection) updateForm(selection.field, selection.value);
+                  }}
+                  value={getBookingPickerValue(formData, activePickerField)}
+                />
+              </View>
+            </View>
+          </Modal>
+        ) : null}
+
+        {formData.propertyId &&
+        formData.roomNumber &&
+        formData.startDate &&
+        formData.endDate ? (
+          <View
+            className={`rounded-2xl border p-4 ${
+              formConflict
+                ? "border-amber-500/30 bg-amber-50"
+                : "border-emerald-500/30 bg-emerald-50"
+            }`}
+          >
+            <Text
+              className={`text-sm font-semibold ${
+                formConflict ? "text-amber-700" : "text-emerald-700"
+              }`}
+            >
+              {formConflict
+                ? `Not available. Conflicts with ${formConflict.guestName} from ${getDateRangeLabel(
+                    formConflict,
+                  )}.`
+                : "Available for this check-in and check-out window."}
+            </Text>
+          </View>
+        ) : null}
+
+        <BaseField
+          label="Notes"
+          multiline
+          onChangeText={(value) => updateForm("notes", value)}
+          placeholder="Optional booking notes"
+          value={formData.notes}
+        />
+
+        {modalMode === "edit" && editingBooking?.status === "Booked" ? (
+          <TouchableOpacity
+            activeOpacity={0.85}
+            className="mb-3 h-12 items-center justify-center rounded-2xl border border-rose-500/20 bg-rose-50"
+            disabled={cancelMutation.isPending}
+            onPress={() =>
+              editingBooking && cancelMutation.mutate(editingBooking.id)
+            }
+          >
+            {cancelMutation.isPending ? (
+              <ActivityIndicator color="#DC2626" />
+            ) : (
+              <Text className="font-bold text-rose-600">Cancel Booking</Text>
+            )}
+          </TouchableOpacity>
+        ) : null}
+      </AddEditModal>
     </Screen>
   );
 }

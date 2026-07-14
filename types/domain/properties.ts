@@ -1,3 +1,21 @@
+export const PROPERTY_TAXONOMY = {
+  Residential: [
+    "Single Family Home",
+    "Townhouse",
+    "Apartment Unit",
+    "Condominium Unit",
+    "Condominium Building",
+  ],
+  Commercial: ["Office Space", "Coworking Space", "Mixed Use Building"],
+  Industrial: ["Warehouse", "Factory", "Cold Storage"],
+  Retail: ["Mall", "Storefront", "Kiosk / Booth"],
+  Land: ["Empty Lot", "Agricultural Lot", "Commercial Lot"],
+} as const;
+
+export type PropertyClassification = keyof typeof PROPERTY_TAXONOMY;
+export type PropertyType =
+  (typeof PROPERTY_TAXONOMY)[PropertyClassification][number];
+
 export type Property = {
   id: string;
   title: string;
@@ -9,7 +27,8 @@ export type Property = {
     | "REVENUE_GENERATING"
     | "PERSONAL_USE"
     | "IDLE";
-  type?: "Residential" | "Commercial" | "Industrial" | "Retail" | "Condominium";
+  classification?: PropertyClassification;
+  type?: PropertyType;
   value: number;
   roi: number;
   occupancy?: number;
@@ -37,7 +56,8 @@ export type CreatePropertyPayload = {
   location: string;
   country: string;
   status: Property["status"];
-  type: NonNullable<Property["type"]>;
+  classification: PropertyClassification;
+  type: PropertyType;
   value: number;
   roi: number;
   occupancy?: number;

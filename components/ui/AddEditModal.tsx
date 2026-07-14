@@ -38,39 +38,35 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
     <Modal
       animationType="slide"
       onRequestClose={onClose}
-      presentationStyle="fullScreen"
+      presentationStyle="formSheet"
       visible={isVisible}
     >
       {/* Explicit style layout string replaces 'modal-container' */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        className="flex-1 bg-[#2563EB]/5"
+        // className="flex-1 bg-[#2563EB]/5"
+        className="flex-1 bg-white"
       >
         {/* Explicit header background replaces 'modal-header' */}
-        <View className="bg-[#1d1d1f] px-6 pb-5 pt-6">
-          <View className="flex-row items-center justify-between">
+        <View className="p-6">
+          <View className="flex-row items-center">
             <View className="flex-1 pr-4">
-              <Text
-                className="font-soraBold text-2xl uppercase text-white"
-                numberOfLines={1}
-              >
+              <Text className=" font-soraSemiBold text-2xl " numberOfLines={1}>
                 {title}
               </Text>
-              {subtitle ? (
+              {/* {subtitle ? (
                 <Text
                   className="mt-1 font-sora text-sm text-white/70"
                   numberOfLines={1}
-                >
-                  {subtitle}
-                </Text>
-              ) : null}
+                ></Text>
+              ) : null} */}
             </View>
             <TouchableOpacity
               activeOpacity={0.8}
-              className="h-10 w-10 items-center justify-center rounded-full bg-white/15"
+              className="h-10 w-10 items-center justify-center rounded-full bg-black/10"
               onPress={onClose}
             >
-              <Ionicons name="close" color="#FFFFFF" size={22} />
+              <Ionicons name="close" color="#3d3d3d" size={22} />
             </TouchableOpacity>
           </View>
         </View>
@@ -93,25 +89,25 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
         </ScrollView>
 
         {/* Explicit footer layout replaces 'modal-footer' */}
-        <View className="border-t border-[#1d1d1f]/10 bg-white p-6">
+        <View className="border-t border-[#1d1d1f]/10 bg-white py-6">
           <View className="flex-row gap-3">
-            <TouchableOpacity
+            {/* <TouchableOpacity
               activeOpacity={0.85}
               className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-white"
               onPress={onClose}
             >
               <Text className="text-base font-bold text-[#1d1d1f]">Cancel</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               activeOpacity={0.85}
-              className="h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
+              className="mx-6 mb-8 h-16 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
               disabled={isPending}
               onPress={onSubmit}
             >
               {isPending ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text className="text-base font-semibold text-white">
+                <Text className="text-lg font-semibold text-white">
                   {submitText}
                 </Text>
               )}
