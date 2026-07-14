@@ -643,7 +643,7 @@ export default function PropertiesScreen() {
       <AddEditModal
         isVisible={isFormVisible}
         onClose={closeForm}
-        title={editingProperty ? "Edit a property" : "Add a property"}
+        title={editingProperty ? "Edit property" : "Add a property"}
         subtitle={
           editingProperty
             ? "Update this portfolio asset."

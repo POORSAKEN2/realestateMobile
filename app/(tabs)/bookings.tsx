@@ -690,7 +690,7 @@ export default function BookingsScreen() {
         onSubmit={handleSubmit}
         submitText={modalMode === "create" ? "Save Booking" : "Update Booking"}
         // subtitle="Manage transient reservations."
-        title={modalMode === "create" ? "Create a booking" : "Edit a booking"}
+        title={modalMode === "create" ? "Create a booking" : "Edit booking"}
       >
         <DropdownField
           label={"Building"}

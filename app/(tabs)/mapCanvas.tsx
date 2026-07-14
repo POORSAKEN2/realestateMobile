@@ -58,7 +58,9 @@ function hasMapCoordinate(property: Property): property is Property & {
   );
 }
 
-function getPropertyCoordinate(property: Property & { lat: number; lng: number }) {
+function getPropertyCoordinate(
+  property: Property & { lat: number; lng: number },
+) {
   return {
     latitude: property.lat,
     longitude: property.lng,
@@ -75,7 +77,10 @@ function getMarkerColor(status: Property["status"]) {
 
 function getPropertyImages(property: Property) {
   const images = property.images?.length ? property.images : [property.image];
-  return Array.from(new Set(images.filter(Boolean))).slice(0, MAX_PROPERTY_IMAGES);
+  return Array.from(new Set(images.filter(Boolean))).slice(
+    0,
+    MAX_PROPERTY_IMAGES,
+  );
 }
 
 export default function MapCanvasScreen() {
@@ -89,12 +94,7 @@ export default function MapCanvasScreen() {
   );
 
   const { useList } = useProperties();
-  const {
-    data: properties = [],
-    isError,
-    isLoading,
-    refetch,
-  } = useList();
+  const { data: properties = [], isError, isLoading, refetch } = useList();
 
   const mappedProperties = useMemo(
     () => properties.filter(hasMapCoordinate),
@@ -102,6 +102,9 @@ export default function MapCanvasScreen() {
   );
 
   const unmappedPropertyCount = properties.length - mappedProperties.length;
+  const selectedPropertyImages = selectedProperty
+    ? getPropertyImages(selectedProperty)
+    : [];
 
   useEffect(() => {
     if (!isMapReady || mappedProperties.length === 0) return;
@@ -147,13 +150,18 @@ export default function MapCanvasScreen() {
       return;
     }
 
-    mapRef.current?.fitToCoordinates(mappedProperties.map(getPropertyCoordinate), {
-      animated: true,
-      edgePadding: { top: 110, right: 70, bottom: 220, left: 70 },
-    });
+    mapRef.current?.fitToCoordinates(
+      mappedProperties.map(getPropertyCoordinate),
+      {
+        animated: true,
+        edgePadding: { top: 110, right: 70, bottom: 220, left: 70 },
+      },
+    );
   }
 
-  function handleMarkerPress(property: Property & { lat: number; lng: number }) {
+  function handleMarkerPress(
+    property: Property & { lat: number; lng: number },
+  ) {
     setSelectedProperty(property);
     mapRef.current?.animateToRegion(
       {
@@ -188,7 +196,9 @@ export default function MapCanvasScreen() {
                 description={property.location}
                 identifier={property.id}
                 onPress={() => handleMarkerPress(property)}
-                pinColor={isSelected ? "#0F172A" : getMarkerColor(property.status)}
+                pinColor={
+                  isSelected ? "#0F172A" : getMarkerColor(property.status)
+                }
                 title={property.title}
               />
             );
@@ -205,11 +215,20 @@ export default function MapCanvasScreen() {
           </TouchableOpacity>
 
           <View style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Portfolio Map</Text>
-            <Text style={styles.summaryValue}>
-              {mappedProperties.length} mapped{" "}
-              {mappedProperties.length === 1 ? "property" : "properties"}
-            </Text>
+            <View style={styles.summaryIcon}>
+              <MaterialCommunityIcons
+                color="#2563EB"
+                name="map-marker-radius-outline"
+                size={20}
+              />
+            </View>
+            <View style={styles.summaryContent}>
+              <Text style={styles.summaryLabel}>Portfolio Map</Text>
+              <Text style={styles.summaryValue}>
+                {mappedProperties.length} mapped{" "}
+                {mappedProperties.length === 1 ? "property" : "properties"}
+              </Text>
+            </View>
           </View>
 
           <TouchableOpacity
@@ -267,7 +286,12 @@ export default function MapCanvasScreen() {
         ) : null}
 
         {!isLoading && !isError && unmappedPropertyCount > 0 ? (
-          <View style={styles.unmappedNotice}>
+          <View
+            style={[
+              styles.unmappedNotice,
+              selectedProperty && styles.unmappedNoticeRaised,
+            ]}
+          >
             <MaterialCommunityIcons
               name="information-outline"
               color="#2563EB"
@@ -275,7 +299,9 @@ export default function MapCanvasScreen() {
             />
             <Text style={styles.unmappedText}>
               {unmappedPropertyCount}{" "}
-              {unmappedPropertyCount === 1 ? "property needs" : "properties need"}{" "}
+              {unmappedPropertyCount === 1
+                ? "property needs"
+                : "properties need"}{" "}
               a map pin.
             </Text>
           </View>
@@ -284,34 +310,58 @@ export default function MapCanvasScreen() {
         {selectedProperty ? (
           <View style={styles.propertyCard}>
             <View style={styles.propertyImageFrame}>
-              <ScrollView
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-              >
-                {getPropertyImages(selectedProperty).map((image, index) => (
-                  <Image
-                    key={`${image}:${index}`}
-                    source={{ uri: image }}
-                    style={styles.propertyImage}
-                  />
-                ))}
-              </ScrollView>
-              {getPropertyImages(selectedProperty).length > 1 ? (
+              {selectedPropertyImages.length ? (
+                <ScrollView
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {selectedPropertyImages.map((image, index) => (
+                    <Image
+                      key={`${image}:${index}`}
+                      source={{ uri: image }}
+                      style={styles.propertyImage}
+                    />
+                  ))}
+                </ScrollView>
+              ) : (
+                <MaterialCommunityIcons
+                  color="#64748B"
+                  name="home-city-outline"
+                  size={30}
+                />
+              )}
+              {selectedPropertyImages.length > 1 ? (
                 <View style={styles.imageCountBadge}>
                   <Text style={styles.imageCountText}>
-                    {getPropertyImages(selectedProperty).length}
+                    {selectedPropertyImages.length}
                   </Text>
                 </View>
               ) : null}
             </View>
             <View style={styles.propertyDetails}>
-              <Text numberOfLines={1} style={styles.propertyTitle}>
-                {selectedProperty.title}
-              </Text>
+              <View style={styles.propertyTitleRow}>
+                <Text numberOfLines={1} style={styles.propertyTitle}>
+                  {selectedProperty.title}
+                </Text>
+                <TouchableOpacity
+                  accessibilityLabel="Close selected property"
+                  activeOpacity={0.8}
+                  onPress={() => setSelectedProperty(null)}
+                  style={styles.dismissButton}
+                >
+                  <MaterialCommunityIcons
+                    color="#64748B"
+                    name="close"
+                    size={18}
+                  />
+                </TouchableOpacity>
+              </View>
               <Text numberOfLines={1} style={styles.propertyLocation}>
                 {selectedProperty.location}
-                {selectedProperty.country ? `, ${selectedProperty.country}` : ""}
+                {selectedProperty.country
+                  ? `, ${selectedProperty.country}`
+                  : ""}
               </Text>
               <View style={styles.propertyMetaRow}>
                 <View style={styles.statusPill}>
@@ -323,6 +373,9 @@ export default function MapCanvasScreen() {
                   {formatPeso(selectedProperty.value)}
                 </Text>
               </View>
+              <Text numberOfLines={1} style={styles.propertyType}>
+                {selectedProperty.type ?? "Property"}
+              </Text>
             </View>
           </View>
         ) : null}
@@ -346,7 +399,7 @@ const styles = StyleSheet.create({
     left: 16,
     position: "absolute",
     right: 16,
-    top: 12,
+    top: 16,
   },
   iconButton: {
     alignItems: "center",
@@ -365,16 +418,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#2563EB",
   },
   summaryCard: {
+    alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 22,
     elevation: 5,
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    flexDirection: "row",
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
     shadowColor: "#0F172A",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.12,
     shadowRadius: 14,
+  },
+  summaryIcon: {
+    alignItems: "center",
+    backgroundColor: "#EFF6FF",
+    borderRadius: 14,
+    height: 38,
+    justifyContent: "center",
+    width: 38,
+  },
+  summaryContent: {
+    flex: 1,
   },
   summaryLabel: {
     color: "#64748B",
@@ -452,11 +519,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
   },
+  unmappedNoticeRaised: {
+    bottom: 210,
+  },
   propertyCard: {
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
-    bottom: 104,
+    bottom: 24,
     elevation: 8,
     flexDirection: "row",
     gap: 12,
@@ -470,9 +540,11 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
   },
   propertyImageFrame: {
+    alignItems: "center",
     backgroundColor: "#E2E8F0",
     borderRadius: 18,
     height: 74,
+    justifyContent: "center",
     overflow: "hidden",
     width: 74,
   },
@@ -500,10 +572,24 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
   },
+  propertyTitleRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 8,
+  },
   propertyTitle: {
     color: "#0F172A",
+    flex: 1,
     fontSize: 16,
     fontWeight: "800",
+  },
+  dismissButton: {
+    alignItems: "center",
+    backgroundColor: "#F1F5F9",
+    borderRadius: 999,
+    height: 28,
+    justifyContent: "center",
+    width: 28,
   },
   propertyLocation: {
     color: "#64748B",
@@ -534,5 +620,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     fontWeight: "800",
+  },
+  propertyType: {
+    color: "#64748B",
+    fontSize: 11,
+    fontWeight: "700",
+    marginTop: 5,
   },
 });
