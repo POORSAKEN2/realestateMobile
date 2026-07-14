@@ -21,7 +21,7 @@ export function PickerField({
   placeholder,
   onPress,
   iconName = "calendar-outline", // Default to calendar
-  iconColor = "#2563EB",         // Default to your vibrant blue
+  iconColor = "#2563EB", // Default to your vibrant blue
   iconSize = 20,
   rightElement,
   className = "gap-2",
@@ -32,7 +32,7 @@ export function PickerField({
       <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
         {label}
       </Text>
-      
+
       <TouchableOpacity
         activeOpacity={0.85}
         className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
@@ -43,13 +43,13 @@ export function PickerField({
         >
           {value || placeholder}
         </Text>
-        
+
         {/* Render custom element if provided, otherwise fallback to the icon */}
-        {rightElement ? (
-          rightElement
-        ) : (
-          iconName && <Ionicons name={iconName} color={iconColor} size={iconSize} />
-        )}
+        {rightElement
+          ? rightElement
+          : iconName && (
+              <Ionicons name={iconName} color={iconColor} size={iconSize} />
+            )}
       </TouchableOpacity>
     </View>
   );

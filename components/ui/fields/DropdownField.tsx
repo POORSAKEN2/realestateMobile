@@ -42,7 +42,7 @@ export function DropdownField({
 
       <TouchableOpacity
         activeOpacity={0.85}
-        className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+        className="h-14 flex-row items-center justify-between rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
         onPress={() => setIsOpen(true)}
       >
         <Text className="text-base font-semibold text-[#1d1d1f]">
@@ -97,7 +97,7 @@ export function DropdownField({
                     <TouchableOpacity
                       key={option.value}
                       activeOpacity={0.85}
-                      className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
+                      className={`min-h-14 flex-row items-center justify-between rounded-lg border px-4 ${
                         isSelected
                           ? "border-[#2563EB] bg-[#2563EB]/10"
                           : "border-[#1d1d1f]/10 bg-[#FFFFFF]"

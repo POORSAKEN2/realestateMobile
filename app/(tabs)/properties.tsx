@@ -643,7 +643,7 @@ export default function PropertiesScreen() {
       <AddEditModal
         isVisible={isFormVisible}
         onClose={closeForm}
-        title={editingProperty ? "Edit Property" : "Add Property"}
+        title={editingProperty ? "Edit a property" : "Add a property"}
         subtitle={
           editingProperty
             ? "Update this portfolio asset."
@@ -659,6 +659,7 @@ export default function PropertiesScreen() {
           onChangeText={(value) => updateForm("title", value)}
           placeholder="e.g. The Shard"
           value={form.title}
+          required
         />
 
         <BaseField
@@ -666,6 +667,7 @@ export default function PropertiesScreen() {
           onChangeText={(value) => updateForm("location", value)}
           placeholder="City, area, or address"
           value={form.location}
+          required
         />
 
         <View className="flex-row flex-wrap gap-2">
@@ -769,6 +771,7 @@ export default function PropertiesScreen() {
               }
               placeholder="0"
               value={form.lat}
+              required
             />
           </View>
           <View className="flex-1">
@@ -780,6 +783,7 @@ export default function PropertiesScreen() {
               }
               placeholder="0"
               value={form.lng}
+              required
             />
           </View>
         </View>

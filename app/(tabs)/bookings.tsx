@@ -688,9 +688,9 @@ export default function BookingsScreen() {
         isVisible={isModalOpen}
         onClose={closeModal}
         onSubmit={handleSubmit}
-        submitText={modalMode === "create" ? "Create" : "Save"}
-        subtitle="Manage transient reservations."
-        title={modalMode === "create" ? "Create Booking" : "Edit Booking"}
+        submitText={modalMode === "create" ? "Save Booking" : "Update Booking"}
+        // subtitle="Manage transient reservations."
+        title={modalMode === "create" ? "Create a booking" : "Edit a booking"}
       >
         <DropdownField
           label={"Building"}
@@ -735,7 +735,7 @@ export default function BookingsScreen() {
           </View>
         ) : null}
 
-        <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
+        <View className="gap-3 rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4">
           <DropdownField
             label="Guest"
             onSelect={selectGuest}
@@ -791,7 +791,7 @@ export default function BookingsScreen() {
           ) : null}
         </View>
 
-        <View className="flex-row gap-3">
+        <View className="flex-row gap-2">
           <View className="flex-1">
             <PickerField
               label="Check-in Date"
@@ -800,7 +800,7 @@ export default function BookingsScreen() {
               value={formData.startDate}
             />
           </View>
-          <View className="w-28">
+          <View className="w-32">
             <PickerField
               iconName="time-outline"
               label="Check-in Time"
@@ -811,7 +811,7 @@ export default function BookingsScreen() {
           </View>
         </View>
 
-        <View className="flex-row gap-3">
+        <View className="flex-row gap-2">
           <View className="flex-1">
             <PickerField
               label="Check-out Date"
@@ -820,7 +820,7 @@ export default function BookingsScreen() {
               value={formData.endDate}
             />
           </View>
-          <View className="w-28">
+          <View className="w-32">
             <PickerField
               iconName="time-outline"
               label="Check-out Time"
