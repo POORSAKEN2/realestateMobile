@@ -1,5 +1,5 @@
-import type { DefaultDashboardLocation } from "../constants/defaultLocation";
-import type { Property } from "../types";
+import type { DefaultDashboardLocation } from "../../constants/defaultLocation";
+import type { Property } from "../../types";
 
 export function matchesDefaultLocation(
   property: Property,
