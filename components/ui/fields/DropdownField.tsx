@@ -13,6 +13,7 @@ interface DropdownProps {
   subtitle?: string;
   value: string;
   options: DropdownOption[];
+  required?: boolean;
   onSelect: (value: string) => void;
 }
 
@@ -21,6 +22,7 @@ export function DropdownField({
   placeholder = "Select an option",
   subtitle,
   value,
+  required,
   options,
   onSelect,
 }: DropdownProps) {
@@ -38,6 +40,7 @@ export function DropdownField({
     <View className="gap-2">
       <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
         {label}
+        <Text className="text-red-600">{required ? "*" : ""}</Text>
       </Text>
 
       <TouchableOpacity
