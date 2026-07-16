@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Modal,
   Platform,
+  RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -24,7 +25,6 @@ import { ChoiceGroup } from "../../components/ui/groups/ChoiceGroup";
 
 import { useAuth } from "../../hooks/useAuth";
 import { useProperties } from "../../hooks/api/useProperties";
-// NOTE: Replace these imports with your actual API hooks/fetchers for expenses
 
 import {
   emptyForm,
@@ -45,7 +45,6 @@ import { Choice } from "../../constants/propertyChoices";
 
 type ExpenseFormPayload = CreateExpensePayload | UpdateExpensePayload;
 
-// Predefined choices for Expense Categories
 const expenseCategoryChoices = [
   { label: "Maintenance & Repairs", value: "MAINTENANCE" },
   { label: "Utilities (Water, Electricity, etc.)", value: "UTILITIES" },
@@ -102,7 +101,8 @@ export default function ExpensesScreen() {
 
   // --- Fetch Expenses ---
   const { useList: useExpensesList } = useExpenses();
-  const { data: expenses = [], isLoading } = useExpensesList();
+  // Destructured 'isRefetching' and 'refetch' to power the pull-to-refresh
+  const { data: expenses = [], isLoading, refetch } = useExpensesList();
 
   // --- Save / Edit Mutation ---
   const saveMutation = useMutation({
@@ -129,7 +129,10 @@ export default function ExpensesScreen() {
   }
 
   function openForm() {
-    setForm(emptyForm);
+    setForm({
+      ...emptyForm,
+      date: new Date().toISOString().split("T")[0],
+    });
     setFormError("");
     setEditingExpense(null);
     setIsDatePickerVisible(false);
@@ -137,12 +140,11 @@ export default function ExpensesScreen() {
   }
 
   function openEditForm(expense: Expense) {
-    // Correct mapping for edit state using actual values
     setForm({
       propertyId: expense.property_id || "",
       category: expense.category || "",
       amount: expense.amount ? String(expense.amount) : "",
-      date: expense.date || "",
+      date: expense.date || new Date().toISOString().split("T")[0],
       referenceNumber: expense.reference_no || "",
       description: expense.description || "",
       status: expense.status || "PENDING",
@@ -244,7 +246,18 @@ export default function ExpensesScreen() {
             <ActivityIndicator color="#2563EB" />
           </View>
         ) : (
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            // Bind the refresh variables to the RefreshControl[cite: 6]
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={refetch}
+                tintColor="#2563EB" // iOS spinner color
+                colors={["#2563EB"]} // Android spinner color
+              />
+            }
+          >
             {/* Quick Metrics Widget Panel */}
             <View className="mb-6 gap-3">
               {summary.map((item) => (
@@ -316,7 +329,7 @@ export default function ExpensesScreen() {
       <AddEditModal
         isVisible={isFormVisible}
         onClose={closeForm}
-        title={editingExpense ? "Edit expense record" : "Record an expense"}
+        title={editingExpense ? "Expense Details" : "Record an expense"}
         subtitle={
           editingExpense
             ? "Update properties operating costs."
@@ -328,6 +341,7 @@ export default function ExpensesScreen() {
         formError={formError}
       >
         <DropdownField
+          required
           label="Linked Asset"
           placeholder="Select a property"
           value={form.propertyId}
@@ -369,9 +383,7 @@ export default function ExpensesScreen() {
             <View className="flex-1 justify-center bg-black/40 px-5">
               <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
                 <View className="mb-2 flex-row items-center justify-between">
-                  <Text className="text-sm font-bold text-[#1d1d1f]">
-                    Transaction Date
-                  </Text>
+                  <Text className="text-sm font-bold text-[#1d1d1f]"></Text>
                   <TouchableOpacity
                     activeOpacity={0.8}
                     className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
@@ -395,6 +407,7 @@ export default function ExpensesScreen() {
 
         <BaseField
           label="Reference No."
+          required
           placeholder="Invoice, receipt, or check sequence"
           value={form.referenceNumber}
           onChangeText={(value) => updateForm("referenceNumber", value)}
