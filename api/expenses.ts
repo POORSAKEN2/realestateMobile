@@ -72,6 +72,9 @@ function toExpenseApiPayload(payload: CreateExpensePayload) {
 }
 
 function normalizeExpense(expense: Record<string, any>): Expense {
+  const rawDate = expense?.date ?? new Date().toISOString();
+
+  const formattedDate = String(rawDate).trim().split("T")[0];
   return {
     ...expense,
     id: String(expense?.id ?? ""),
@@ -83,7 +86,7 @@ function normalizeExpense(expense: Record<string, any>): Expense {
     property: expense?.property ?? null,
     category: expense?.category ?? "OTHER",
     amount: Number(expense?.amount ?? 0),
-    date: expense?.date ?? new Date().toISOString().split("T")[0],
+    date: formattedDate,
     status: normalizeExpenseStatus(expense?.status),
     reference_no: expense?.reference_no ?? expense?.referenceNumber ?? null,
     description: expense?.description ?? null,
