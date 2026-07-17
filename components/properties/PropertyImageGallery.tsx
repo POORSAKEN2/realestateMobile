@@ -31,6 +31,12 @@ function ZoomableImage({
   const isZoomedRef = useRef(false);
   const viewport = useRef({ width: 0, height: 0 });
   const [isZoomed, setIsZoomed] = useState(false);
+  const handlePanMove = useRef(
+    Animated.event([null, { dx: translation.x, dy: translation.y }], {
+      // PanResponder gestures are JavaScript events, not direct native events.
+      useNativeDriver: false,
+    }),
+  ).current;
 
   const getBounds = () => ({
     x: (viewport.current.width * (ZOOM_SCALE - 1)) / 2,
@@ -40,26 +46,37 @@ function ZoomableImage({
     const limit = getBounds()[axis];
     return Math.max(-limit, Math.min(limit, value));
   };
+  const settlePan = () => {
+    translation.flattenOffset();
+    translation.stopAnimation((position) => {
+      const target = {
+        x: clampTranslation(position.x, "x"),
+        y: clampTranslation(position.y, "y"),
+      };
+
+      panOffset.current = target;
+      Animated.spring(translation, {
+        toValue: target,
+        damping: 18,
+        mass: 0.7,
+        stiffness: 180,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gesture) =>
         isZoomedRef.current &&
         (Math.abs(gesture.dx) > 2 || Math.abs(gesture.dy) > 2),
-      onPanResponderMove: (_, gesture) => {
-        translation.setValue({
-          x: clampTranslation(panOffset.current.x + gesture.dx, "x"),
-          y: clampTranslation(panOffset.current.y + gesture.dy, "y"),
-        });
+      onPanResponderGrant: () => {
+        translation.stopAnimation();
+        translation.setOffset(panOffset.current);
+        translation.setValue({ x: 0, y: 0 });
       },
-      onPanResponderRelease: (_, gesture) => {
-        panOffset.current = {
-          x: clampTranslation(panOffset.current.x + gesture.dx, "x"),
-          y: clampTranslation(panOffset.current.y + gesture.dy, "y"),
-        };
-      },
-      onPanResponderTerminate: () => {
-        translation.setValue(panOffset.current);
-      },
+      onPanResponderMove: (event, gesture) => handlePanMove(event, gesture),
+      onPanResponderRelease: settlePan,
+      onPanResponderTerminate: settlePan,
     }),
   ).current;
 
@@ -73,12 +90,18 @@ function ZoomableImage({
       panOffset.current = { x: 0, y: 0 };
       Animated.spring(translation, {
         toValue: panOffset.current,
+        damping: 18,
+        mass: 0.7,
+        stiffness: 180,
         useNativeDriver: true,
       }).start();
     }
 
     Animated.spring(scale, {
       toValue: nextZoomed ? ZOOM_SCALE : 1,
+      damping: 18,
+      mass: 0.7,
+      stiffness: 180,
       useNativeDriver: true,
     }).start();
   }
@@ -194,6 +217,8 @@ export default function PropertyImageGallery({
               );
             }}
             pagingEnabled
+            decelerationRate="fast"
+            disableIntervalMomentum
             scrollEventThrottle={16}
             scrollEnabled={zoomedImageIndex === null}
             showsHorizontalScrollIndicator={false}
