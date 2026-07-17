@@ -118,7 +118,9 @@ function normalizeProperty(property: Record<string, any>): Property {
     .map((image: string) => getImageUrl(image))
     .filter(Boolean);
   const normalizedMediaImages = mediaItems
-    .map((image: any) => image?.original_url ?? image?.url ?? image?.preview_url)
+    .map(
+      (image: any) => image?.original_url ?? image?.url ?? image?.preview_url,
+    )
     .map((image: string) => getImageUrl(image))
     .filter(Boolean);
   const rawImage =
@@ -173,7 +175,9 @@ function normalizeProperty(property: Record<string, any>): Property {
     lng: lng !== undefined && lng !== null ? Number(lng) : undefined,
     image,
     images: Array.from(
-      new Set([image, ...normalizedImages, ...normalizedMediaImages].filter(Boolean)),
+      new Set(
+        [image, ...normalizedImages, ...normalizedMediaImages].filter(Boolean),
+      ),
     ),
     parentId: property?.parentId ?? property?.parent_id,
     isTransientBookable: normalizeBoolean(
@@ -255,7 +259,15 @@ function toPropertyFormData(
   });
 
   images.slice(0, MAX_PROPERTY_IMAGES).forEach((image) => {
-    formData.append("images[]", (image.file ?? image) as unknown as Blob);
+    const file =
+      image.file ??
+      ({
+        uri: image.uri,
+        name: image.name,
+        type: image.type,
+      } as unknown as Blob);
+
+    formData.append("images[]", file);
   });
   if (method) formData.append("_method", method);
 

@@ -38,6 +38,7 @@ export type SelectedImage = {
   uri: string;
   name: string;
   type: string;
+  size?: number | null;
   file?: Blob;
 };
 
@@ -246,7 +247,13 @@ export function toSelectedImage(
       : asset.uri.toLowerCase().endsWith(".webp")
         ? "image/webp"
         : "image/jpeg");
-  return { uri: asset.uri, name, type, file: asset.file };
+  return {
+    uri: asset.uri,
+    name,
+    type,
+    size: asset.fileSize,
+    file: asset.file,
+  };
 }
 export function getDocumentType(asset: DocumentPicker.DocumentPickerAsset) {
   if (asset.mimeType) return asset.mimeType;

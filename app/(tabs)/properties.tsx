@@ -69,6 +69,13 @@ type PropertyListItem =
 
 type PropertyFormPayload = CreatePropertyPayload | UpdatePropertyPayload;
 
+const MAX_PROPERTY_IMAGE_SIZE = 5 * 1024 * 1024;
+const SUPPORTED_PROPERTY_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
 function LoadingState({ label }: { label: string }) {
   return (
     <View className="flex-1 justify-center rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-6 shadow-sm">
@@ -271,14 +278,35 @@ export default function PropertiesScreen() {
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsMultipleSelection: true,
-      mediaTypes: ["images"],
-      quality: 0.85,
-      selectionLimit: MAX_PROPERTY_IMAGES - selectedImages.length,
+    let result: ImagePicker.ImagePickerResult;
+
+    try {
+      result = await ImagePicker.launchImageLibraryAsync({
+        allowsMultipleSelection: true,
+        mediaTypes: ["images"],
+        preferredAssetRepresentationMode:
+          ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible,
+        quality: 0.85,
+        selectionLimit: MAX_PROPERTY_IMAGES - selectedImages.length,
+      });
+    } catch {
+      setFormError("Photo library could not open. Please try again.");
+      return;
+    }
+
+    if (result.canceled || !result.assets?.length) return;
+
+    const invalidImage = result.assets.find((asset) => {
+      const type = asset.mimeType?.toLowerCase();
+      return (
+        !type ||
+        !SUPPORTED_PROPERTY_IMAGE_TYPES.has(type) ||
+        (asset.fileSize ?? 0) > MAX_PROPERTY_IMAGE_SIZE
+      );
     });
 
-    if (result.canceled || !result.assets?.length) {
+    if (invalidImage) {
+      setFormError("Choose JPG, PNG, or WEBP images smaller than 5 MB.");
       return;
     }
 
