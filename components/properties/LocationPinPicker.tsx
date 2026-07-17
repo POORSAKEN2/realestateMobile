@@ -1,12 +1,13 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import MapView, {
   Marker,
   type MapPressEvent,
   type Region,
 } from "react-native-maps";
 
+import { MapKitJsWebView } from "./MapKitJsWebView";
 import {
   formatCoordinate,
   parseNumber,
@@ -19,6 +20,8 @@ const PHILIPPINES_REGION: Region = {
   longitudeDelta: 12,
 };
 const PINNED_LOCATION_DELTA = { latitudeDelta: 0.02, longitudeDelta: 0.02 };
+const MAPKIT_JS_TOKEN = process.env.EXPO_PUBLIC_MAPKIT_JS_TOKEN ?? "";
+const MAPKIT_JS_BASE_URL = process.env.EXPO_PUBLIC_MAPKIT_JS_BASE_URL;
 
 export function LocationPinPicker({
   lat,
@@ -91,23 +94,35 @@ export function LocationPinPicker({
         visible={isMapVisible}
       >
         <View className="flex-1 bg-[#FFFFFF]">
-          <MapView
-            initialRegion={mapRegion}
-            onPress={handleMapPress}
-            style={{ flex: 1 }}
-          >
-            {markerCoordinate ? (
-              <Marker
-                coordinate={markerCoordinate}
-                draggable
-                onDragEnd={(event) => {
-                  const { latitude: nextLatitude, longitude: nextLongitude } =
-                    event.nativeEvent.coordinate;
-                  setPinnedLocation(nextLatitude, nextLongitude);
-                }}
-              />
-            ) : null}
-          </MapView>
+          {Platform.OS === "android" ? (
+            <MapKitJsWebView
+              baseUrl={MAPKIT_JS_BASE_URL}
+              coordinate={markerCoordinate}
+              mapsToken={MAPKIT_JS_TOKEN}
+              onPinSelected={({
+                latitude: nextLatitude,
+                longitude: nextLongitude,
+              }) => setPinnedLocation(nextLatitude, nextLongitude)}
+            />
+          ) : (
+            <MapView
+              initialRegion={mapRegion}
+              onPress={handleMapPress}
+              style={{ flex: 1 }}
+            >
+              {markerCoordinate ? (
+                <Marker
+                  coordinate={markerCoordinate}
+                  draggable
+                  onDragEnd={(event) => {
+                    const { latitude: nextLatitude, longitude: nextLongitude } =
+                      event.nativeEvent.coordinate;
+                    setPinnedLocation(nextLatitude, nextLongitude);
+                  }}
+                />
+              ) : null}
+            </MapView>
+          )}
           <View className="absolute left-5 right-5 top-14 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
             <View className="flex-row items-center justify-between gap-3">
               <View className="min-w-0 flex-1">
