@@ -64,10 +64,34 @@ const allowedDocumentTypes = [
   "image/png",
 ];
 
-function getDocumentType(asset: DocumentPicker.DocumentPickerAsset) {
-  if (asset.mimeType) return asset.mimeType;
+const allowedDocumentExtensions = new Set([
+  "pdf",
+  "doc",
+  "docx",
+  "jpg",
+  "jpeg",
+  "png",
+]);
+const maximumDocumentSize = 10 * 1024 * 1024;
 
-  const extension = asset.name.split(".").pop()?.toLowerCase();
+function getDocumentExtension(asset: DocumentPicker.DocumentPickerAsset) {
+  return asset.name.split(".").pop()?.toLowerCase();
+}
+
+function isSupportedDocument(asset: DocumentPicker.DocumentPickerAsset) {
+  const mimeType = asset.mimeType?.toLowerCase();
+
+  return Boolean(
+    (mimeType && allowedDocumentTypes.includes(mimeType)) ||
+    allowedDocumentExtensions.has(getDocumentExtension(asset) ?? ""),
+  );
+}
+
+function getDocumentType(asset: DocumentPicker.DocumentPickerAsset) {
+  const mimeType = asset.mimeType?.toLowerCase();
+  if (mimeType && allowedDocumentTypes.includes(mimeType)) return mimeType;
+
+  const extension = getDocumentExtension(asset);
 
   if (extension === "pdf") return "application/pdf";
   if (extension === "doc") return "application/msword";
@@ -311,22 +335,41 @@ export default function DocumentsScreen() {
   async function pickFile() {
     setFormError("");
 
-    const result = await DocumentPicker.getDocumentAsync({
-      copyToCacheDirectory: true,
-      multiple: false,
-      type: allowedDocumentTypes,
-    });
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        copyToCacheDirectory: true,
+        multiple: false,
+        // Some Android document providers mark files as unselectable when
+        // given a MIME-type filter. Validate selected file below instead.
+        type: "*/*",
+      });
 
-    if (result.canceled || !result.assets?.length) return;
+      if (result.canceled || !result.assets?.length) return;
 
-    const file = toUpload(result.assets[0]);
-    setSelectedFile(file);
+      const asset = result.assets[0];
+      if (!isSupportedDocument(asset)) {
+        setSelectedFile(null);
+        setFormError("Choose a PDF, DOC, DOCX, JPG, or PNG file.");
+        return;
+      }
 
-    if (!form.name.trim()) {
-      setForm((current) => ({
-        ...current,
-        name: file.name.replace(/\.[^/.]+$/, ""),
-      }));
+      if ((asset.size ?? 0) > maximumDocumentSize) {
+        setSelectedFile(null);
+        setFormError("Choose a file smaller than 10 MB.");
+        return;
+      }
+
+      const file = toUpload(asset);
+      setSelectedFile(file);
+
+      if (!form.name.trim()) {
+        setForm((current) => ({
+          ...current,
+          name: file.name.replace(/\.[^/.]+$/, ""),
+        }));
+      }
+    } catch {
+      setFormError("File picker could not open. Please try again.");
     }
   }
 
