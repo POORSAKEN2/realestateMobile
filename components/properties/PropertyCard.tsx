@@ -15,86 +15,13 @@ import {
   formatStatus,
   MAX_PROPERTY_IMAGES,
 } from "../../utils/properties/propertyForm";
+import PropertyImageGallery from "./PropertyImageGallery";
 
 function getPropertyImages(property: Property) {
   const images = property.images?.length ? property.images : [property.image];
   return Array.from(new Set(images.filter(Boolean))).slice(
     0,
     MAX_PROPERTY_IMAGES,
-  );
-}
-
-function PropertyImageGallery({
-  images,
-  title,
-  visible,
-  onClose,
-}: {
-  images: string[];
-  title: string;
-  visible: boolean;
-  onClose: () => void;
-}) {
-  const [galleryWidth, setGalleryWidth] = useState(0);
-  return (
-    <Modal
-      animationType="fade"
-      onRequestClose={onClose}
-      transparent
-      visible={visible}
-    >
-      <View className="flex-1 bg-black/95">
-        <View className="absolute left-5 right-5 top-14 z-10 flex-row items-center justify-between gap-4">
-          <Text
-            className="min-w-0 flex-1 text-base font-bold text-white"
-            numberOfLines={1}
-          >
-            {title}
-          </Text>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            className="h-10 w-10 items-center justify-center rounded-full bg-white/15"
-            onPress={onClose}
-          >
-            <MaterialCommunityIcons name="close" color="#FFFFFF" size={22} />
-          </TouchableOpacity>
-        </View>
-        <View
-          className="flex-1 justify-center"
-          onLayout={(event) => setGalleryWidth(event.nativeEvent.layout.width)}
-        >
-          <ScrollView
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-          >
-            {images.map((image, index) => (
-              <View
-                className="justify-center"
-                key={`${image}:gallery:${index}`}
-                style={{ width: galleryWidth || 1 }}
-              >
-                <Image
-                  className="h-[72%] w-full"
-                  resizeMode="contain"
-                  source={{ uri: image }}
-                />
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-        {images.length > 1 ? (
-          <View className="absolute bottom-12 left-0 right-0 flex-row justify-center gap-2">
-            {images.map((image, index) => (
-              <View
-                className="h-2 w-2 rounded-full bg-white/80"
-                key={`${image}:gallery-dot:${index}`}
-              />
-            ))}
-          </View>
-        ) : null}
-      </View>
-    </Modal>
   );
 }
 
@@ -128,7 +55,7 @@ export function PropertyCard({
         <ScrollView
           horizontal
           pagingEnabled
-          showsHorizontalScrollIndicator={false}
+          showsHorizontalScrollIndicator={true}
         >
           {propertyImages.map((image, index) => (
             <Image

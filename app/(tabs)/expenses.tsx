@@ -395,7 +395,7 @@ export default function ExpensesScreen() {
                   </TouchableOpacity>
                 </View>
                 <DateTimePicker
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  display={Platform.OS === "ios" ? "inline" : "default"}
                   mode="date"
                   onChange={handleDateChange}
                   value={parseDateValue(form.date)}

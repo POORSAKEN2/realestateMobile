@@ -855,7 +855,14 @@ export default function BookingsScreen() {
                   </TouchableOpacity>
                 </View>
                 <DateTimePicker
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  display={
+                    Platform.OS === "ios"
+                      ? activePickerField === "startDate" ||
+                        activePickerField === "endDate"
+                        ? "inline"
+                        : "spinner"
+                      : "default"
+                  }
                   minimumDate={
                     activePickerField === "endDate" && formData.startDate
                       ? new Date(`${formData.startDate}T12:00:00`)
