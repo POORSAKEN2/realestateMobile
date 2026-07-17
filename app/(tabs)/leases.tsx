@@ -4,7 +4,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import Feather from "@expo/vector-icons/Feather";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -124,37 +124,37 @@ function toLeaseForm(lease: Lease): LeaseFormState {
   };
 }
 
-function DateField({
-  label,
-  value,
-  placeholder,
-  onPress,
-}: {
-  label: string;
-  value: string;
-  placeholder: string;
-  onPress: () => void;
-}) {
-  return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-        {label}
-      </Text>
-      <TouchableOpacity
-        activeOpacity={0.85}
-        className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
-        onPress={onPress}
-      >
-        <Text
-          className={`text-base ${value ? "text-[#1d1d1f]" : "text-[#6F6D6D]"}`}
-        >
-          {getDateLabel(value) || placeholder}
-        </Text>
-        <Ionicons name="calendar-outline" color="#2563EB" size={20} />
-      </TouchableOpacity>
-    </View>
-  );
-}
+// function DateField({
+//   label,
+//   value,
+//   placeholder,
+//   onPress,
+// }: {
+//   label: string;
+//   value: string;
+//   placeholder: string;
+//   onPress: () => void;
+// }) {
+//   return (
+//     <View className="gap-2">
+//       <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+//         {label}
+//       </Text>
+//       <TouchableOpacity
+//         activeOpacity={0.85}
+//         className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+//         onPress={onPress}
+//       >
+//         <Text
+//           className={`text-base ${value ? "text-[#1d1d1f]" : "text-[#6F6D6D]"}`}
+//         >
+//           {getDateLabel(value) || placeholder}
+//         </Text>
+//         <Ionicons name="calendar-outline" color="#2563EB" size={20} />
+//       </TouchableOpacity>
+//     </View>
+//   );
+// }
 
 function MetricCard({
   icon,
@@ -354,6 +354,8 @@ export default function LeasesScreen() {
   const [activeDateField, setActiveDateField] = useState<DateFieldKey | null>(
     null,
   );
+  const [datePickerValue, setDatePickerValue] = useState(new Date());
+  const datePickerValueRef = useRef(datePickerValue);
 
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
@@ -472,15 +474,33 @@ export default function LeasesScreen() {
   }
 
   function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (Platform.OS === "android") {
-      setActiveDateField(null);
-    }
-
     if (event.type === "dismissed" || !activeDateField || !selectedDate) {
+      if (Platform.OS === "android") setActiveDateField(null);
       return;
     }
 
-    updateForm(activeDateField, formatDateValue(selectedDate));
+    // Keep latest calendar selection synchronously for a quick Done tap.
+    datePickerValueRef.current = selectedDate;
+    setDatePickerValue(selectedDate);
+
+    if (Platform.OS === "android") {
+      updateForm(activeDateField, formatDateValue(selectedDate));
+      setActiveDateField(null);
+    }
+  }
+
+  function openDatePicker(field: DateFieldKey) {
+    const initialDate = getDateValue(form[field]);
+    datePickerValueRef.current = initialDate;
+    setDatePickerValue(initialDate);
+    setActiveDateField(field);
+  }
+
+  function confirmDatePicker() {
+    if (!activeDateField) return;
+
+    updateForm(activeDateField, formatDateValue(datePickerValueRef.current));
+    setActiveDateField(null);
   }
 
   function handleSubmit() {
@@ -728,10 +748,10 @@ export default function LeasesScreen() {
         <View className="flex-row gap-3">
           <View className="flex-1">
             <PickerField
-              label="Check-In Date"
+              label="Start Date"
               value={form.startDate}
               placeholder="Select date"
-              onPress={() => setActiveDateField("startDate")}
+              onPress={() => openDatePicker("startDate")}
               // Automatically uses calendar icon & blue styling by default
             />
           </View>
@@ -740,43 +760,11 @@ export default function LeasesScreen() {
               label="End Date"
               value={form.endDate}
               placeholder="Select date"
-              onPress={() => setActiveDateField("endDate")}
+              onPress={() => openDatePicker("endDate")}
               // Automatically uses calendar icon & blue styling by default
             />
           </View>
         </View>
-
-        {activeDateField ? (
-          <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-            <View className="mb-2 flex-row items-center justify-between">
-              <Text className="text-sm font-bold text-[#1d1d1f]">
-                {activeDateField === "startDate"
-                  ? "Select Start Date"
-                  : "Select End Date"}
-              </Text>
-              {Platform.OS === "ios" ? (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
-                  onPress={() => setActiveDateField(null)}
-                >
-                  <Text className="text-xs font-bold text-[#2563EB]">Done</Text>
-                </TouchableOpacity>
-              ) : null}
-            </View>
-            <DateTimePicker
-              display={Platform.OS === "ios" ? "spinner" : "default"}
-              minimumDate={
-                activeDateField === "endDate" && form.startDate
-                  ? getDateValue(form.startDate)
-                  : undefined
-              }
-              mode="date"
-              onChange={handleDateChange}
-              value={getDateValue(form[activeDateField])}
-            />
-          </View>
-        ) : null}
 
         <BaseField
           keyboardType="decimal-pad"
@@ -799,6 +787,47 @@ export default function LeasesScreen() {
           options={statusOptions}
           value={form.status}
         />
+
+        {activeDateField ? (
+          <Modal
+            animationType="fade"
+            onRequestClose={() => setActiveDateField(null)}
+            transparent
+            visible
+          >
+            <View className="flex-1 justify-center bg-black/40 px-5">
+              <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
+                <View className="mb-2 flex-row items-center justify-between">
+                  <Text className="text-sm font-bold text-[#1d1d1f]">
+                    {activeDateField === "startDate"
+                      ? "Select Start Date"
+                      : "Select End Date"}
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
+                    onPress={confirmDatePicker}
+                  >
+                    <Text className="text-xs font-bold text-[#2563EB]">
+                      Done
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <DateTimePicker
+                  display={Platform.OS === "ios" ? "inline" : "default"}
+                  minimumDate={
+                    activeDateField === "endDate" && form.startDate
+                      ? getDateValue(form.startDate)
+                      : undefined
+                  }
+                  mode="date"
+                  onChange={handleDateChange}
+                  value={datePickerValue}
+                />
+              </View>
+            </View>
+          </Modal>
+        ) : null}
       </AddEditModal>
 
       <Modal
