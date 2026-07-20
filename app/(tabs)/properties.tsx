@@ -3,7 +3,7 @@ import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -119,6 +119,8 @@ export default function PropertiesScreen() {
       fetchDocuments(accessToken, { propertyId: editingProperty?.id }),
     enabled: Boolean(accessToken && editingProperty?.id && isFormVisible),
   });
+
+  const submitLockRef = useRef(false);
 
   const saveMutation = useMutation({
     mutationFn: async (payload: PropertyFormPayload) => {
@@ -262,6 +264,7 @@ export default function PropertiesScreen() {
   }
 
   async function pickImage() {
+    if (saveMutation.isPending) return;
     setFormError("");
 
     if (selectedImages.length >= MAX_PROPERTY_IMAGES) {
@@ -333,12 +336,14 @@ export default function PropertiesScreen() {
   }
 
   function removeImage(index: number) {
+    if (saveMutation.isPending) return;
     setSelectedImages((current) =>
       current.filter((_, imageIndex) => imageIndex !== index),
     );
   }
 
   async function pickDocuments() {
+    if (saveMutation.isPending) return;
     setFormError("");
 
     const result = await DocumentPicker.getDocumentAsync({
@@ -379,6 +384,7 @@ export default function PropertiesScreen() {
   }
 
   function removeDocument(index: number) {
+    if (saveMutation.isPending) return;
     setSelectedDocuments((current) =>
       current.filter((_, documentIndex) => documentIndex !== index),
     );
@@ -387,7 +393,9 @@ export default function PropertiesScreen() {
   function handleSubmit() {
     setFormError("");
 
-    if (saveMutation.isPending) return;
+    // isPending only updates on re-render, so a rapid double-tap can pass it
+    // twice; the ref closes that window (double create + racing uploads).
+    if (saveMutation.isPending || submitLockRef.current) return;
 
     if (!accessToken) {
       setFormError("Please log in before creating a property.");
@@ -479,7 +487,12 @@ export default function PropertiesScreen() {
       payload.bathrooms = bathrooms;
     }
 
-    saveMutation.mutate(payload);
+    submitLockRef.current = true;
+    saveMutation.mutate(payload, {
+      onSettled: () => {
+        submitLockRef.current = false;
+      },
+    });
   }
 
   return (

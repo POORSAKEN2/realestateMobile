@@ -34,10 +34,16 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
   formError,
   children,
 }) => {
+  // Dismissing mid-save would abandon an in-flight upload and desync the form.
+  const handleClose = () => {
+    if (isPending) return;
+    onClose();
+  };
+
   return (
     <Modal
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       presentationStyle="formSheet"
       visible={isVisible}
     >
@@ -64,7 +70,8 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
             <TouchableOpacity
               activeOpacity={0.8}
               className="h-10 w-10 items-center justify-center rounded-full bg-black/10"
-              onPress={onClose}
+              disabled={isPending}
+              onPress={handleClose}
             >
               <Ionicons name="close" color="#3d3d3d" size={22} />
             </TouchableOpacity>

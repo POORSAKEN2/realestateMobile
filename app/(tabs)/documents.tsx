@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -235,6 +235,8 @@ export default function DocumentsScreen() {
     [documents],
   );
 
+  const submitLockRef = useRef(false);
+
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (!accessToken)
@@ -333,6 +335,7 @@ export default function DocumentsScreen() {
   }
 
   async function pickFile() {
+    if (saveMutation.isPending) return;
     setFormError("");
 
     try {
@@ -646,7 +649,17 @@ export default function DocumentsScreen() {
         onChangeForm={setForm}
         onClose={closeForm}
         onPickFile={pickFile}
-        onSubmit={() => saveMutation.mutate()}
+        onSubmit={() => {
+          // isPending is render-state; the ref blocks a same-frame double-tap
+          // from firing two uploads.
+          if (saveMutation.isPending || submitLockRef.current) return;
+          submitLockRef.current = true;
+          saveMutation.mutate(undefined, {
+            onSettled: () => {
+              submitLockRef.current = false;
+            },
+          });
+        }}
         properties={properties}
         selectedFile={selectedFile}
         visible={isFormVisible}
@@ -730,12 +743,18 @@ function DocumentFormModal({
 }) {
   const title = editingDocument ? "Update document" : "Upload document";
 
+  // Dismissing mid-save would abandon the in-flight file upload.
+  const handleClose = () => {
+    if (isSaving) return;
+    onClose();
+  };
+
   return (
     <Modal
       animationType="slide"
       transparent
       visible={visible}
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View className="flex-1 justify-end bg-slate-950/40">
         <View className="max-h-[92%] rounded-t-[32px] bg-white">
@@ -745,7 +764,8 @@ function DocumentFormModal({
               <TouchableOpacity
                 activeOpacity={0.85}
                 className="h-10 w-10 items-center justify-center rounded-full bg-slate-100"
-                onPress={onClose}
+                disabled={isSaving}
+                onPress={handleClose}
               >
                 <MaterialCommunityIcons
                   name="close"

@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   Alert,
   Image,
@@ -87,6 +87,7 @@ export default function ProfileScreen() {
     null,
   );
   const [isSaving, setIsSaving] = useState(false);
+  const savingRef = useRef(false);
   const accessToken = session?.accessToken;
 
   const profileCompleteCount = [
@@ -105,6 +106,7 @@ export default function ProfileScreen() {
   }
 
   async function pickProfileImage() {
+    if (savingRef.current) return;
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permission.granted) {
@@ -136,6 +138,10 @@ export default function ProfileScreen() {
   }
 
   async function handleSave() {
+    // Ref guard: a double-tap can re-enter before the disabled state renders,
+    // firing two overlapping profile uploads.
+    if (savingRef.current) return;
+
     if (!form.fullName.trim()) {
       Alert.alert("Full name required", "Enter your full name before saving.");
       return;
@@ -149,6 +155,7 @@ export default function ProfileScreen() {
       return;
     }
 
+    savingRef.current = true;
     setIsSaving(true);
 
     try {
@@ -191,6 +198,7 @@ export default function ProfileScreen() {
 
       Alert.alert("Profile update failed", message);
     } finally {
+      savingRef.current = false;
       setIsSaving(false);
     }
   }
