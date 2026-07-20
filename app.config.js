@@ -23,6 +23,13 @@ module.exports = ({ config }) => {
     plugins: [
       ...(config.plugins ?? []),
       "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          locationWhenInUsePermission:
+            "Allow Real Estate Mobile to use your location to set the default property pin.",
+        },
+      ],
       "expo-notifications",
       "expo-secure-store",
     ],

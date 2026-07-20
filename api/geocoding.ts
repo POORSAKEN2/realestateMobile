@@ -16,6 +16,29 @@ type NominatimSearchResult = {
   lon?: string;
 };
 
+type NominatimReverseResult = {
+  address?: Partial<
+    Record<
+      | "city"
+      | "municipality"
+      | "town"
+      | "village"
+      | "city_district"
+      | "county"
+      | "state_district"
+      | "state"
+      | "country",
+      string
+    >
+  >;
+};
+
+const REQUEST_HEADERS = {
+  Accept: "application/json",
+  "Accept-Language": "en",
+  "User-Agent": "realestateMobile/1.0 (com.angelod2.realestateMobile)",
+};
+
 export async function searchLocations(
   query: string,
 ): Promise<LocationSearchResult[]> {
@@ -29,11 +52,7 @@ export async function searchLocations(
   url.searchParams.set("limit", "5");
 
   const response = await fetch(url.toString(), {
-    headers: {
-      Accept: "application/json",
-      "Accept-Language": "en",
-      "User-Agent": "realestateMobile/1.0 (com.angelod2.realestateMobile)",
-    },
+    headers: REQUEST_HEADERS,
   });
 
   if (!response.ok) {
@@ -64,4 +83,49 @@ export async function searchLocations(
       },
     ];
   });
+}
+
+export type ReverseGeocodeResult = {
+  city?: string;
+  country?: string;
+};
+
+export async function reverseGeocodeLocation(
+  latitude: number,
+  longitude: number,
+): Promise<ReverseGeocodeResult> {
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return {};
+  }
+
+  const url = new URL("/reverse", GEOCODING_BASE_URL);
+  url.searchParams.set("lat", String(latitude));
+  url.searchParams.set("lon", String(longitude));
+  url.searchParams.set("format", "jsonv2");
+  url.searchParams.set("addressdetails", "1");
+  url.searchParams.set("layer", "address");
+
+  const response = await fetch(url.toString(), {
+    headers: REQUEST_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Reverse geocoding failed with status ${response.status}.`);
+  }
+
+  const data = (await response.json()) as NominatimReverseResult;
+  const address = data.address;
+
+  return {
+    city:
+      address?.city ??
+      address?.municipality ??
+      address?.town ??
+      address?.village ??
+      address?.city_district ??
+      address?.county ??
+      address?.state_district ??
+      address?.state,
+    country: address?.country,
+  };
 }

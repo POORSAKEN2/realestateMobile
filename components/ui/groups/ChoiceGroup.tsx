@@ -27,7 +27,9 @@ export function ChoiceGroup<T extends string>({
           <TouchableOpacity
             key={choice.value}
             activeOpacity={0.8}
-            className={`rounded-full border px-3.5 py-2.5 ${
+            accessibilityRole="button"
+            accessibilityState={{ selected }}
+            className={`min-h-11 items-center justify-center rounded-full border px-3.5 py-2.5 ${
               selected
                 ? "border-[#2563EB] bg-[#2563EB]"
                 : "border-[#1d1d1f]/10 bg-[#2563EB]/5"

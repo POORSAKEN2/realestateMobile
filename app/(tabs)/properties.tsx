@@ -1,9 +1,16 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -38,6 +45,7 @@ import {
   cleanDecimal,
   cleanInteger,
   emptyForm,
+  formatCoordinate,
   formatPeso,
   formatSelectedDocumentSize,
   getDocumentType,
@@ -92,12 +100,42 @@ function LoadingState({ label }: { label: string }) {
   );
 }
 
+function PropertyFormSection({
+  children,
+  description,
+  icon,
+  title,
+}: {
+  children: ReactNode;
+  description: string;
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  title: string;
+}) {
+  return (
+    <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-white p-4 shadow-sm">
+      <View className="flex-row items-start gap-3">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">
+          <MaterialCommunityIcons name={icon} color="#2563EB" size={21} />
+        </View>
+        <View className="min-w-0 flex-1">
+          <Text className="text-base font-bold text-[#1d1d1f]">{title}</Text>
+          <Text className="mt-1 text-xs leading-5 text-[#6F6D6D]">
+            {description}
+          </Text>
+        </View>
+      </View>
+      {children}
+    </View>
+  );
+}
+
 export default function PropertiesScreen() {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
   const router = useRouter();
   const [form, setForm] = useState<FormState>(emptyForm);
+  const formRef = useRef(form);
   const [formError, setFormError] = useState("");
   const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
   const [selectedDocuments, setSelectedDocuments] = useState<
@@ -107,6 +145,11 @@ export default function PropertiesScreen() {
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const formSessionRef = useRef(0);
+
+  useEffect(() => {
+    formRef.current = form;
+  }, [form]);
 
   const { useList, useCreate, useUpdate } = useProperties();
   const { data: properties = [], isLoading } = useList();
@@ -219,20 +262,52 @@ export default function PropertiesScreen() {
       : (revenueGeneratingCount / properties.length) * 100;
 
   function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
+    formRef.current = { ...formRef.current, [key]: value };
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  async function setDefaultPinFromCurrentLocation(formSession: number) {
+    try {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== "granted") return;
+
+      const currentLocation = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      if (formSessionRef.current !== formSession) return;
+
+      const coordinates = {
+        lat: formatCoordinate(currentLocation.coords.latitude),
+        lng: formatCoordinate(currentLocation.coords.longitude),
+      };
+
+      if (formRef.current.lat.trim() || formRef.current.lng.trim()) return;
+      formRef.current = { ...formRef.current, ...coordinates };
+      setForm((current) => ({ ...current, ...coordinates }));
+    } catch {
+      // Location is an optional default; users can still search or place a pin.
+    }
+  }
+
   function openForm() {
+    const formSession = formSessionRef.current + 1;
+    formSessionRef.current = formSession;
+    formRef.current = emptyForm;
     setForm(emptyForm);
     setSelectedImages([]);
     setSelectedDocuments([]);
     setFormError("");
     setEditingProperty(null);
     setIsFormVisible(true);
+    void setDefaultPinFromCurrentLocation(formSession);
   }
 
   function openEditForm(property: Property) {
-    setForm(toFormState(property));
+    formSessionRef.current += 1;
+    const editForm = toFormState(property);
+    formRef.current = editForm;
+    setForm(editForm);
     setSelectedImages([]);
     setSelectedDocuments([]);
     setFormError("");
@@ -241,6 +316,8 @@ export default function PropertiesScreen() {
   }
 
   function closeForm() {
+    formSessionRef.current += 1;
+    formRef.current = emptyForm;
     setForm(emptyForm);
     setSelectedImages([]);
     setSelectedDocuments([]);
@@ -252,13 +329,14 @@ export default function PropertiesScreen() {
   function selectLocation(location: string) {
     const coordinates = locationCoordinates[location];
 
-    setForm((current) => ({
-      ...current,
+    formRef.current = {
+      ...formRef.current,
       location,
       country: "Philippines",
-      lat: coordinates ? String(coordinates.lat) : current.lat,
-      lng: coordinates ? String(coordinates.lng) : current.lng,
-    }));
+      lat: coordinates ? String(coordinates.lat) : formRef.current.lat,
+      lng: coordinates ? String(coordinates.lng) : formRef.current.lng,
+    };
+    setForm(formRef.current);
   }
 
   async function pickImage() {
@@ -422,7 +500,7 @@ export default function PropertiesScreen() {
 
     if (lat === undefined || lng === undefined) {
       setFormError(
-        "Latitude and longitude are required. Select a suggested location or enter valid coordinates.",
+        "A property pin is required. Open the map and place the pin at the property's location.",
       );
       return;
     }
@@ -682,71 +760,100 @@ export default function PropertiesScreen() {
         onSubmit={handleSubmit}
         formError={formError}
       >
-        <BaseField
-          label="Property Title"
-          onChangeText={(value) => updateForm("title", value)}
-          placeholder="e.g. The Shard"
-          value={form.title}
-          required
-        />
-
-        <BaseField
-          label="Location"
-          onChangeText={(value) => updateForm("location", value)}
-          placeholder="City, area, or address"
-          value={form.location}
-          required
-        />
-
-        <View className="flex-row flex-wrap gap-2">
-          {filteredLocationSuggestions.map((location) => (
-            <TouchableOpacity
-              key={location}
-              activeOpacity={0.8}
-              className="rounded-full border border-[#1d1d1f]/10 bg-[#FFFFFF] px-3.5 py-2.5 shadow-sm"
-              onPress={() => selectLocation(location)}
-            >
-              <Text className="text-xs font-bold text-[#2563EB]">
-                {location}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        <View className="rounded-2xl bg-[#2563EB]/10 px-4 py-3">
+          <Text className="text-xs leading-5 text-[#1E40AF]">
+            Fields marked with * are required. You can add images and documents
+            now or later.
+          </Text>
         </View>
 
-        <DropdownField
-          label="Country"
-          subtitle="Southeast Asia"
-          placeholder="Select a country"
-          value={form.country}
-          options={seaCountryChoices}
-          onSelect={(value) => updateForm("country", value)}
-        />
-
-        <LocationPinPicker
-          lat={form.lat}
-          lng={form.lng}
-          onChange={(coordinates) =>
-            setForm((current) => ({
-              ...current,
-              lat: coordinates.lat,
-              lng: coordinates.lng,
-            }))
-          }
-        />
-
-        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+        <PropertyFormSection
+          description="Name the property and choose its current portfolio status."
+          icon="home-outline"
+          title="Basics"
+        >
+          <BaseField
+            autoCorrect={false}
+            label="Property name"
+            onChangeText={(value) => updateForm("title", value)}
+            placeholder="e.g. Greenfield Residences"
+            value={form.title}
+            required
+          />
           <ChoiceGroup
             choices={propertyStatusChoices}
-            label="Property Status"
+            label="Current status"
             onSelect={(value) => updateForm("status", value)}
             value={form.status}
           />
-        </View>
+        </PropertyFormSection>
 
-        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+        <PropertyFormSection
+          description="Enter the city, then confirm the exact position on the map."
+          icon="map-marker-outline"
+          title="Location"
+        >
+          <BaseField
+            label="City or area"
+            onChangeText={(value) => updateForm("location", value)}
+            placeholder="e.g. Makati City"
+            value={form.location}
+            required
+          />
+
+          {filteredLocationSuggestions.length > 0 ? (
+            <View className="gap-2">
+              <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                Quick choices
+              </Text>
+              <View className="flex-row flex-wrap gap-2">
+                {filteredLocationSuggestions.map((location) => (
+                  <TouchableOpacity
+                    key={location}
+                    activeOpacity={0.8}
+                    accessibilityRole="button"
+                    className="min-h-11 justify-center rounded-full border border-[#1d1d1f]/10 bg-[#2563EB]/5 px-3.5 py-2.5"
+                    onPress={() => selectLocation(location)}
+                  >
+                    <Text className="text-xs font-semibold text-[#2563EB]">
+                      {location}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ) : null}
+
+          <DropdownField
+            label="Country"
+            subtitle="Southeast Asia"
+            placeholder="Select a country"
+            value={form.country}
+            options={seaCountryChoices}
+            onSelect={(value) => updateForm("country", value)}
+            required
+          />
+
+          <LocationPinPicker
+            lat={form.lat}
+            lng={form.lng}
+            onChange={(coordinates) => {
+              formRef.current = { ...formRef.current, ...coordinates };
+              setForm((current) => ({ ...current, ...coordinates }));
+            }}
+            onCountryChange={(country) => updateForm("country", country)}
+            onLocationChange={(location) => updateForm("location", location)}
+          />
+        </PropertyFormSection>
+
+        <PropertyFormSection
+          description="Classify the asset and add the physical details buyers or operators need."
+          icon="office-building-outline"
+          title="Property details"
+        >
           <ChoiceGroup
             choices={propertyClassificationChoices}
-            label="Property Classification"
+            label="Classification"
             onSelect={(classification) => {
               const [type] = getPropertyTypeChoices(classification);
               setForm((current) => ({
@@ -757,142 +864,130 @@ export default function PropertiesScreen() {
             }}
             value={form.classification}
           />
-        </View>
-
-        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
           <ChoiceGroup
             choices={propertyTypeChoices}
-            label="Property Type"
+            label="Property type"
             onSelect={(value) => updateForm("type", value)}
             value={form.type}
           />
-        </View>
 
-        <View className="flex-row gap-3">
-          <View className="flex-1">
-            <BaseField
-              keyboardType="decimal-pad"
-              label="Market Value"
-              onChangeText={(value) => updateForm("value", cleanDecimal(value))}
-              placeholder="0"
-              value={form.value}
-            />
-          </View>
-          <View className="w-28">
-            <BaseField
-              keyboardType="decimal-pad"
-              label="ROI %"
-              onChangeText={(value) => updateForm("roi", cleanDecimal(value))}
-              placeholder="0"
-              value={form.roi}
-            />
-          </View>
-        </View>
-
-        <View className="flex-row gap-3">
-          <View className="flex-1">
-            <BaseField
-              keyboardType="numbers-and-punctuation"
-              label="Latitude"
-              onChangeText={(value) =>
-                updateForm("lat", cleanDecimal(value, true))
-              }
-              placeholder="0"
-              value={form.lat}
-              required
-            />
-          </View>
-          <View className="flex-1">
-            <BaseField
-              keyboardType="numbers-and-punctuation"
-              label="Longitude"
-              onChangeText={(value) =>
-                updateForm("lng", cleanDecimal(value, true))
-              }
-              placeholder="0"
-              value={form.lng}
-              required
-            />
-          </View>
-        </View>
-
-        {requiresBedroomAndBathroomCounts(form.classification, form.type) ? (
-          <View className="flex-row gap-3">
-            <View className="flex-1">
-              <BaseField
-                keyboardType="numeric"
-                label="Bedrooms"
-                onChangeText={(value) =>
-                  updateForm("bedrooms", cleanInteger(value))
-                }
+          {requiresBedroomAndBathroomCounts(form.classification, form.type) ? (
+            <View className="flex-row gap-3">
+              <View className="flex-1">
+                <BaseField
+                  keyboardType="number-pad"
+                  label="Bedrooms"
+                  onChangeText={(value) =>
+                    updateForm("bedrooms", cleanInteger(value))
+                  }
+                placeholder="0"
                 value={form.bedrooms}
-              />
-            </View>
-            <View className="flex-1">
-              <BaseField
-                keyboardType="numeric"
-                label="Bathrooms"
-                onChangeText={(value) =>
-                  updateForm("bathrooms", cleanInteger(value))
-                }
-                value={form.bathrooms}
-              />
-            </View>
-          </View>
-        ) : null}
-
-        <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-          <View className="flex-row items-center justify-between gap-4">
-            <View className="flex-1 flex-row items-center gap-3">
-              <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
-                <MaterialCommunityIcons
-                  name="calendar-clock"
-                  color="#2563EB"
-                  size={22}
+                required
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-sm font-bold text-[#1d1d1f]">
-                  Transient Booking Enabled
-                </Text>
-                <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
-                  Allow short-term reservations for this property.
-                </Text>
+                <BaseField
+                  keyboardType="number-pad"
+                  label="Bathrooms"
+                  onChangeText={(value) =>
+                    updateForm("bathrooms", cleanInteger(value))
+                  }
+                placeholder="0"
+                value={form.bathrooms}
+                required
+                />
               </View>
             </View>
-            <Switch
-              onValueChange={(value) =>
-                updateForm("isTransientBookable", value)
-              }
-              thumbColor="#FFFFFF"
-              trackColor={{ false: "#6F6D6D", true: "#2563EB" }}
-              value={form.isTransientBookable}
-            />
+          ) : null}
+
+          <BaseField
+            label="Floor area"
+            onChangeText={(value) => updateForm("area", value)}
+            placeholder="e.g. 120 sqm"
+            value={form.area}
+          />
+          <BaseField
+            label="Description"
+            multiline
+            numberOfLines={4}
+            onChangeText={(value) => updateForm("description", value)}
+            placeholder="Add useful notes about the property (optional)"
+            value={form.description}
+          />
+        </PropertyFormSection>
+
+        <PropertyFormSection
+          description="Add valuation and operating information for portfolio reporting."
+          icon="chart-line"
+          title="Financials & use"
+        >
+          <View className="flex-row gap-3">
+            <View className="flex-1">
+              <BaseField
+                keyboardType="decimal-pad"
+                label="Market value (PHP)"
+                onChangeText={(value) =>
+                  updateForm("value", cleanDecimal(value))
+                }
+                placeholder="0"
+                value={form.value}
+                required
+              />
+            </View>
+            <View className="w-28">
+              <BaseField
+                keyboardType="decimal-pad"
+                label="ROI (%)"
+                onChangeText={(value) => updateForm("roi", cleanDecimal(value))}
+                placeholder="0"
+                value={form.roi}
+                required
+              />
+            </View>
           </View>
-        </View>
 
-        <BaseField
-          keyboardType="decimal-pad"
-          label="Occupancy %"
-          onChangeText={(value) => updateForm("occupancy", cleanDecimal(value))}
-          placeholder="Optional"
-          value={form.occupancy}
-        />
+          <BaseField
+            keyboardType="decimal-pad"
+            label="Occupancy (%)"
+            maxLength={6}
+            onChangeText={(value) =>
+              updateForm("occupancy", cleanDecimal(value))
+            }
+            placeholder="e.g. 85"
+            value={form.occupancy}
+          />
 
-        <BaseField
-          label="Area"
-          onChangeText={(value) => updateForm("area", value)}
-          placeholder="Optional"
-          value={form.area}
-        />
-
-        <BaseField
-          label="Description"
-          multiline
-          onChangeText={(value) => updateForm("description", value)}
-          placeholder="Optional notes"
-          value={form.description}
-        />
+          <View className="rounded-2xl bg-[#F7F8FA] p-4">
+            <View className="flex-row items-center justify-between gap-4">
+              <View className="min-w-0 flex-1 flex-row items-center gap-3">
+                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">
+                  <MaterialCommunityIcons
+                    name="calendar-clock"
+                    color="#2563EB"
+                    size={21}
+                  />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-bold text-[#1d1d1f]">
+                    Allow short-term bookings
+                  </Text>
+                  <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+                    Guests can reserve this property for short stays.
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                accessibilityLabel="Allow short-term bookings"
+                onValueChange={(value) =>
+                  updateForm("isTransientBookable", value)
+                }
+                thumbColor="#FFFFFF"
+                trackColor={{ false: "#8E8E93", true: "#2563EB" }}
+                value={form.isTransientBookable}
+              />
+            </View>
+          </View>
+        </PropertyFormSection>
 
         {/* Property Images Section */}
         <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">

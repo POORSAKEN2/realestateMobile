@@ -16,7 +16,9 @@ import MapView, {
 } from "react-native-maps";
 
 import {
+  reverseGeocodeLocation,
   searchLocations,
+  type ReverseGeocodeResult,
   type LocationSearchResult,
 } from "../../api/geocoding";
 import {
@@ -36,10 +38,14 @@ export function LocationPinPicker({
   lat,
   lng,
   onChange,
+  onCountryChange,
+  onLocationChange,
 }: {
   lat: string;
   lng: string;
   onChange: (coordinates: { lat: string; lng: string }) => void;
+  onCountryChange: (country: string) => void;
+  onLocationChange: (location: string) => void;
 }) {
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,13 +54,57 @@ export function LocationPinPicker({
   );
   const [searchError, setSearchError] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [isResolvingPinLocation, setIsResolvingPinLocation] = useState(false);
+  const [pinLocationError, setPinLocationError] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const mapRef = useRef<MapView | null>(null);
   const searchInputRef = useRef<TextInput | null>(null);
+  const pinCityRequestRef = useRef(0);
+  const pinCountryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resolvedPinRef = useRef<
+    { coordinateKey: string; location: ReverseGeocodeResult } | undefined
+  >(undefined);
 
   useEffect(() => {
     if (isSearchFocused) searchInputRef.current?.focus();
   }, [isSearchFocused]);
+  useEffect(() => {
+    pinCityRequestRef.current += 1;
+    const request = pinCityRequestRef.current;
+    const latitude = parseNumber(lat);
+    const longitude = parseNumber(lng);
+    const coordinateKey = `${lat}:${lng}`;
+
+    if (pinCountryTimerRef.current) {
+      clearTimeout(pinCountryTimerRef.current);
+      pinCountryTimerRef.current = null;
+    }
+    resolvedPinRef.current = undefined;
+    setPinLocationError("");
+    setIsResolvingPinLocation(false);
+
+    if (latitude === undefined || longitude === undefined) return;
+
+    pinCountryTimerRef.current = setTimeout(async () => {
+      try {
+        const location = await reverseGeocodeLocation(latitude, longitude);
+        if (pinCityRequestRef.current !== request) return;
+
+        resolvedPinRef.current = { coordinateKey, location };
+        if (location.country) onCountryChange(location.country);
+        if (location.city) onLocationChange(location.city);
+      } catch {
+        // Location synchronization is best-effort and does not block pinning.
+      }
+    }, 1000);
+
+    return () => {
+      if (pinCountryTimerRef.current) {
+        clearTimeout(pinCountryTimerRef.current);
+        pinCountryTimerRef.current = null;
+      }
+    };
+  }, [lat, lng]);
   const latitude = parseNumber(lat);
   const longitude = parseNumber(lng);
   const markerCoordinate =
@@ -110,6 +160,56 @@ export function LocationPinPicker({
       450,
     );
   };
+  const handleUsePinLocation = async () => {
+    if (!markerCoordinate || isResolvingPinLocation) return;
+
+    const coordinateKey = `${lat}:${lng}`;
+    const cachedLocation =
+      resolvedPinRef.current?.coordinateKey === coordinateKey
+        ? resolvedPinRef.current.location
+        : undefined;
+
+    if (cachedLocation?.city) {
+      if (cachedLocation.country) onCountryChange(cachedLocation.country);
+      onLocationChange(cachedLocation.city);
+      return;
+    }
+
+    const request = pinCityRequestRef.current + 1;
+    pinCityRequestRef.current = request;
+    if (pinCountryTimerRef.current) {
+      clearTimeout(pinCountryTimerRef.current);
+      pinCountryTimerRef.current = null;
+    }
+    setIsResolvingPinLocation(true);
+    setPinLocationError("");
+
+    try {
+      const location = await reverseGeocodeLocation(
+        markerCoordinate.latitude,
+        markerCoordinate.longitude,
+      );
+      if (pinCityRequestRef.current !== request) return;
+
+      resolvedPinRef.current = { coordinateKey, location };
+      if (location.country) onCountryChange(location.country);
+
+      if (!location.city) {
+        setPinLocationError("No city was found for this pin.");
+        return;
+      }
+
+      onLocationChange(location.city);
+    } catch {
+      if (pinCityRequestRef.current === request) {
+        setPinLocationError("Could not find the pin's city. Please try again.");
+      }
+    } finally {
+      if (pinCityRequestRef.current === request) {
+        setIsResolvingPinLocation(false);
+      }
+    }
+  };
   const coordinateLabel = markerCoordinate
     ? `${formatCoordinate(markerCoordinate.latitude)}, ${formatCoordinate(markerCoordinate.longitude)}`
     : "No pin selected";
@@ -146,6 +246,38 @@ export function LocationPinPicker({
           {markerCoordinate ? "Update Pin on Map" : "Pin Property on Map"}
         </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        className={`h-12 flex-row items-center justify-center gap-2 rounded-2xl ${
+          markerCoordinate ? "bg-[#2563EB]" : "bg-[#1d1d1f]/10"
+        }`}
+        disabled={!markerCoordinate || isResolvingPinLocation}
+        onPress={handleUsePinLocation}
+      >
+        {isResolvingPinLocation ? (
+          <ActivityIndicator color="#FFFFFF" size="small" />
+        ) : (
+          <MaterialCommunityIcons
+            name="map-marker-check-outline"
+            color={markerCoordinate ? "#FFFFFF" : "#8E8E93"}
+            size={19}
+          />
+        )}
+        <Text
+          className={`text-sm font-bold ${
+            markerCoordinate ? "text-[#FFFFFF]" : "text-[#8E8E93]"
+          }`}
+        >
+          {isResolvingPinLocation
+            ? "Finding City..."
+            : "Set Location from Pin"}
+        </Text>
+      </TouchableOpacity>
+      {pinLocationError ? (
+        <Text className="text-center text-xs font-semibold text-[#B42318]">
+          {pinLocationError}
+        </Text>
+      ) : null}
       <Modal
         animationType="slide"
         onRequestClose={() => setIsMapVisible(false)}
