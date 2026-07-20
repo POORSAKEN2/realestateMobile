@@ -45,3 +45,15 @@ export type {
   PushTokenPlatform,
   RegisterPushTokenPayload,
 } from "./domain/notifications";
+export type {
+  EditableProfileField,
+  ProfileCompletion,
+  ProfileForm,
+  ProfileImageGateway,
+  ProfileImageSelection,
+  ProfileImageUpload,
+  ProfileSaveResult,
+  ProfileUpdateGateway,
+  ProfileValidationErrors,
+  UpdateUserProfilePayload,
+} from "./domain/profile";

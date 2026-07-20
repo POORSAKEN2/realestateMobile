@@ -23,7 +23,10 @@ export function BuildingChoices({
           <TouchableOpacity
             key={building.id}
             activeOpacity={0.8}
-            className={`rounded-full border px-3.5 py-2.5 ${selected ? "border-[#2563EB] bg-[#2563EB]" : "border-[#1d1d1f]/10 bg-[#FFFFFF]"}`}
+            accessibilityLabel={`Show calendar for ${building.title}`}
+            accessibilityRole="button"
+            accessibilityState={{ selected }}
+            className={`min-h-11 justify-center rounded-full border px-4 ${selected ? "border-[#2563EB] bg-[#2563EB]" : "border-slate-200 bg-[#FFFFFF]"}`}
             onPress={() => onSelect(building.id)}
           >
             <Text

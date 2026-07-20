@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Modal,
   KeyboardAvoidingView,
@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface AddEditModalProps {
   isVisible: boolean;
@@ -34,6 +35,12 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
   formError,
   children,
 }) => {
+  const scrollRef = useRef<ScrollView | null>(null);
+
+  useEffect(() => {
+    if (formError) scrollRef.current?.scrollTo({ animated: true, y: 0 });
+  }, [formError]);
+
   return (
     <Modal
       animationType="slide"
@@ -44,22 +51,22 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
       {/* Explicit style layout string replaces 'modal-container' */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        // className="flex-1 bg-[#2563EB]/5"
-        className="flex-1 bg-white"
+        className="flex-1 bg-[#F7F8FA]"
       >
-        {/* Explicit header background replaces 'modal-header' */}
-        <View className="p-6">
+        <View className="border-b border-[#1d1d1f]/10 bg-white px-5 py-5">
           <View className="flex-row items-center">
             <View className="flex-1 pr-4">
-              <Text className=" font-soraSemiBold text-2xl " numberOfLines={1}>
+              <Text className="font-soraSemiBold text-2xl text-[#1d1d1f]" numberOfLines={1}>
                 {title}
               </Text>
-              {/* {subtitle ? (
+              {subtitle ? (
                 <Text
-                  className="mt-1 font-sora text-sm text-white/70"
-                  numberOfLines={1}
-                ></Text>
-              ) : null} */}
+                  className="mt-1 font-sora text-sm text-[#6F6D6D]"
+                  numberOfLines={2}
+                >
+                  {subtitle}
+                </Text>
+              ) : null}
             </View>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -71,36 +78,42 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
           </View>
         </View>
 
-        {/* Scrollable Form Body */}
         <ScrollView
+          automaticallyAdjustKeyboardInsets
           className="flex-1"
-          contentContainerClassName="gap-5 px-6 py-6"
+          contentContainerClassName="gap-6 px-5 pb-10 pt-5"
+          keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
+          ref={scrollRef}
         >
-          {children}
-
           {formError ? (
-            <View className="rounded-2xl border border-[#1d1d1f]/10 bg-[#1d1d1f]/5 p-4">
-              <Text className="text-sm font-medium text-[#1d1d1f]">
-                {formError}
-              </Text>
+            <View className="flex-row items-start gap-3 rounded-2xl border border-[#B42318]/20 bg-[#FEF3F2] p-4">
+              <Ionicons name="alert-circle-outline" color="#B42318" size={20} />
+              <View className="min-w-0 flex-1">
+                <Text className="text-sm font-semibold text-[#B42318]">
+                  Please review the form
+                </Text>
+                <Text className="mt-1 text-xs leading-5 text-[#7A271A]">
+                  {formError}
+                </Text>
+              </View>
             </View>
           ) : null}
+
+          {children}
         </ScrollView>
 
-        {/* Explicit footer layout replaces 'modal-footer' */}
-        <View className="border-t border-[#1d1d1f]/10 bg-white py-6">
-          <View className="flex-row gap-3">
-            {/* <TouchableOpacity
-              activeOpacity={0.85}
-              className="h-14 flex-1 items-center justify-center rounded-2xl border border-[#1d1d1f]/10 bg-white"
-              onPress={onClose}
-            >
-              <Text className="text-base font-bold text-[#1d1d1f]">Cancel</Text>
-            </TouchableOpacity> */}
+        <SafeAreaView
+          className="border-t border-[#1d1d1f]/10 bg-white px-5 pb-4 pt-4"
+          edges={["bottom"]}
+        >
+          <View className="flex-row">
             <TouchableOpacity
               activeOpacity={0.85}
-              className="mx-6 mb-8 h-16 flex-1 items-center justify-center rounded-2xl bg-[#2563EB]"
+              accessibilityRole="button"
+              className={`h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB] ${
+                isPending ? "opacity-60" : ""
+              }`}
               disabled={isPending}
               onPress={onSubmit}
             >
@@ -113,7 +126,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               )}
             </TouchableOpacity>
           </View>
-        </View>
+        </SafeAreaView>
       </KeyboardAvoidingView>
     </Modal>
   );

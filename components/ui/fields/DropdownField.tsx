@@ -40,15 +40,17 @@ export function DropdownField({
     <View className="gap-2">
       <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
         {label}
-        <Text className="text-red-600">{required ? "*" : ""}</Text>
+        <Text className="text-red-600">{required ? " *" : ""}</Text>
       </Text>
 
       <TouchableOpacity
         activeOpacity={0.85}
+        accessibilityLabel={`${label}${required ? ", required" : ""}`}
+        accessibilityRole="button"
         className="h-14 flex-row items-center justify-between rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
         onPress={() => setIsOpen(true)}
       >
-        <Text className="text-base font-semibold text-[#1d1d1f]">
+        <Text className="min-w-0 flex-1 text-base font-semibold text-[#1d1d1f]" numberOfLines={1}>
           {selectedLabel || placeholder}
         </Text>
         <MaterialCommunityIcons name="chevron-down" color="#6F6D6D" size={22} />

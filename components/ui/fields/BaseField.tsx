@@ -53,13 +53,14 @@ export function BaseField({
     <View className="gap-1">
       <Text className={labelClassName}>
         {label}
-        <Text className="text-red-600">{required ? "*" : ""}</Text>
+        <Text className="text-red-600">{required ? " *" : ""}</Text>
       </Text>
 
       <View className={containerClassName}>
         {icon && <Ionicons name={icon} color="#64748B" size={19} />}
 
         <TextInput
+          accessibilityLabel={`${label}${required ? ", required" : ""}`}
           className={inputClassName}
           value={value}
           onChangeText={onChangeText}

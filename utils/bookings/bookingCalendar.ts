@@ -21,6 +21,11 @@ export type BookingFormState = {
   notes: string;
 };
 
+export type BookingFormUpdater = <K extends keyof BookingFormState>(
+  key: K,
+  value: BookingFormState[K],
+) => void;
+
 export type Availability = { label: string; bg: string; text: string };
 export type BookingPickerField =
   | "startDate"
@@ -55,7 +60,19 @@ export function getMonthDays(monthDate: Date) {
     1,
   );
   const start = addDays(firstOfMonth, -firstOfMonth.getDay());
-  return Array.from({ length: 42 }, (_, index) => addDays(start, index));
+  const daysInMonth = new Date(
+    monthDate.getFullYear(),
+    monthDate.getMonth() + 1,
+    0,
+  ).getDate();
+  const visibleDayCount = Math.max(
+    35,
+    Math.ceil((firstOfMonth.getDay() + daysInMonth) / 7) * 7,
+  );
+
+  return Array.from({ length: visibleDayCount }, (_, index) =>
+    addDays(start, index),
+  );
 }
 
 export function formatDisplayDate(value: string) {
@@ -86,8 +103,11 @@ export function getDayWindow(day: Date) {
 export function getBookingStatusLabel(booking: TransientBooking) {
   const today = dateKey(new Date());
   if (booking.status === "Cancelled") return "Cancelled";
+  if (booking.startDate > today) return "Upcoming";
+  if (booking.startDate === today) return "Checking in today";
   if (booking.endDate === today) return "Checking out today";
-  return "Occupied";
+  if (booking.endDate < today) return "Completed";
+  return "In house";
 }
 
 export function getParamValue(value?: string | string[]) {
