@@ -21,6 +21,11 @@ export type BookingFormState = {
   notes: string;
 };
 
+export type BookingFormUpdater = <K extends keyof BookingFormState>(
+  key: K,
+  value: BookingFormState[K],
+) => void;
+
 export type Availability = { label: string; bg: string; text: string };
 export type BookingPickerField =
   | "startDate"
