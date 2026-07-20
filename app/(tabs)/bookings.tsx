@@ -35,7 +35,6 @@ import type {
 } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
-import ChoiceChips from "../../components/ui/chips/ChoiceChips";
 import { BuildingChoices } from "../../components/bookings/BuildingChoices";
 import {
   getAvailabilityForDay,
@@ -53,6 +52,7 @@ import {
   getDateRangeLabel,
   getMonthDays,
   getParamValue,
+  parseDate,
   parseMoney,
   weekdayLabels,
   type BookingFormMode,
@@ -71,6 +71,7 @@ export default function BookingsScreen() {
   const requestedPropertyId = getParamValue(params.propertyId);
   const queryClient = useQueryClient();
   const [currentMonth, setCurrentMonth] = useState(() => new Date());
+  const [selectedDate, setSelectedDate] = useState(() => dateKey(new Date()));
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("Booked");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -163,7 +164,55 @@ export default function BookingsScreen() {
     month: "long",
     year: "numeric",
   }).format(currentMonth);
+  const selectedDay = useMemo(() => parseDate(selectedDate), [selectedDate]);
+  const selectedDayLabel = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(selectedDay);
+  const selectedDayBookings = useMemo(
+    () => getBookingsForDay(visibleBookings, selectedDay),
+    [selectedDay, visibleBookings],
+  );
+  const selectedDayAvailability = getAvailabilityForDay(
+    selectedBuildingBookings,
+    selectedDay,
+  );
+  const canCreateOnSelectedDay =
+    selectedDayAvailability.label === "Available" ||
+    selectedDayAvailability.label === "After 2 PM";
+  const today = new Date();
+  const todayKey = dateKey(today);
+  const isViewingCurrentMonth =
+    currentMonth.getFullYear() === today.getFullYear() &&
+    currentMonth.getMonth() === today.getMonth();
   const isLoading = isLoadingProperties || isLoadingBookings;
+
+  function changeMonth(offset: number) {
+    const nextMonth = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth() + offset,
+      1,
+    );
+    setCurrentMonth(nextMonth);
+    setSelectedDate(dateKey(nextMonth));
+  }
+
+  function selectCalendarDay(day: Date) {
+    setSelectedDate(dateKey(day));
+    if (
+      day.getFullYear() !== currentMonth.getFullYear() ||
+      day.getMonth() !== currentMonth.getMonth()
+    ) {
+      setCurrentMonth(new Date(day.getFullYear(), day.getMonth(), 1));
+    }
+  }
+
+  function goToToday() {
+    const nextToday = new Date();
+    setCurrentMonth(nextToday);
+    setSelectedDate(dateKey(nextToday));
+  }
 
   async function refreshBookings() {
     setIsRefreshing(true);
@@ -391,20 +440,20 @@ export default function BookingsScreen() {
   }
 
   return (
-    <Screen className="bg-[#2563EB]/5">
+    <Screen className="bg-slate-50">
       <View className="flex-1 gap-5">
         <View className="flex-row items-center justify-between px-1">
           <View>
             <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
               Short Stay
             </Text>
-            <Text className="font-soraSemiBold text-3xl tracking-tight text-[#1d1d1f]">
+            <Text className="font-soraSemiBold text-3xl tracking-tight text-slate-950">
               Bookings
             </Text>
           </View>
           <AddButton
             disabled={!selectedBuilding}
-            onPress={() => openCreate()}
+            onPress={() => openCreate(selectedDate)}
           />
         </View>
 
@@ -419,58 +468,53 @@ export default function BookingsScreen() {
           }
           showsVerticalScrollIndicator={false}
         >
-          <View className="gap-5 pb-8">
-            <View className="gap-4 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-              <View className="flex-row items-center justify-between gap-3">
-                <View className="flex-1">
-                  <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-                    Building
+          <View className="gap-4 pb-8">
+            <View className="gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+              <View className="flex-row items-start justify-between gap-3">
+                <View className="min-w-0 flex-1">
+                  <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Property calendar
                   </Text>
-                  <Text className="mt-1 text-base font-bold text-[#1d1d1f]">
+                  <Text
+                    className="mt-1 font-soraSemiBold text-lg text-slate-950"
+                    numberOfLines={1}
+                  >
                     {selectedBuilding?.title ?? "No building selected"}
                   </Text>
                 </View>
-                <View className="flex-row items-center gap-2">
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className="h-10 w-10 items-center justify-center rounded-full bg-[#2563EB]/10"
-                    onPress={() =>
-                      setCurrentMonth(
-                        new Date(
-                          currentMonth.getFullYear(),
-                          currentMonth.getMonth() - 1,
-                          1,
-                        ),
-                      )
-                    }
-                  >
-                    <Ionicons name="chevron-back" color="#2563EB" size={20} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className="h-10 w-10 items-center justify-center rounded-full bg-[#2563EB]/10"
-                    onPress={() =>
-                      setCurrentMonth(
-                        new Date(
-                          currentMonth.getFullYear(),
-                          currentMonth.getMonth() + 1,
-                          1,
-                        ),
-                      )
-                    }
-                  >
-                    <Ionicons
-                      name="chevron-forward"
-                      color="#2563EB"
-                      size={20}
-                    />
-                  </TouchableOpacity>
+                <View className="flex-row rounded-full bg-slate-100 p-1">
+                  {(
+                    [
+                      { label: "Confirmed", value: "Booked" },
+                      { label: "All", value: "All" },
+                    ] as const
+                  ).map((option) => {
+                    const selected = statusFilter === option.value;
+
+                    return (
+                      <TouchableOpacity
+                        key={option.value}
+                        activeOpacity={0.78}
+                        accessibilityLabel={`Show ${option.label.toLowerCase()} reservations`}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected }}
+                        className={`h-11 justify-center rounded-full px-3 ${
+                          selected ? "bg-blue-600" : "bg-transparent"
+                        }`}
+                        onPress={() => setStatusFilter(option.value)}
+                      >
+                        <Text
+                          className={`text-xs font-bold ${
+                            selected ? "text-white" : "text-slate-600"
+                          }`}
+                        >
+                          {option.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
-
-              <Text className="text-center font-soraSemiBold text-lg text-[#1d1d1f]">
-                {monthLabel}
-              </Text>
 
               {buildingOptions.length > 0 ? (
                 <BuildingChoices
@@ -479,201 +523,395 @@ export default function BookingsScreen() {
                   selectedId={selectedPropertyId}
                 />
               ) : null}
-
-              <ChoiceChips<StatusFilter>
-                options={[
-                  { label: "Booked", value: "Booked" },
-                  { label: "All", value: "All" },
-                ]}
-                onSelect={setStatusFilter}
-                value={statusFilter}
-              />
             </View>
 
             {isLoading ? (
-              <View className="items-center rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-8 shadow-sm">
+              <View className="items-center rounded-[24px] border border-slate-200 bg-white p-8 shadow-sm shadow-slate-900/5">
                 <ActivityIndicator color="#2563EB" />
-                <Text className="mt-3 text-sm font-semibold text-[#1d1d1f]">
-                  Loading bookings
+                <Text className="mt-3 text-sm font-semibold text-slate-700">
+                  Loading calendar
                 </Text>
               </View>
             ) : buildingOptions.length === 0 ? (
-              <View className="items-center rounded-[28px] border border-dashed border-[#1d1d1f]/20 bg-[#FFFFFF]/95 p-8 shadow-sm">
-                <Ionicons name="calendar-outline" color="#2563EB" size={38} />
-                <Text className="mt-3 text-base font-bold text-[#1d1d1f]">
-                  No transient-bookable buildings yet
+              <View className="items-center rounded-[24px] border border-dashed border-slate-300 bg-white p-8">
+                <View className="h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+                  <Ionicons name="calendar-outline" color="#2563EB" size={28} />
+                </View>
+                <Text className="mt-4 text-center font-soraSemiBold text-base text-slate-950">
+                  No bookable buildings yet
                 </Text>
-                <Text className="mt-1 text-center text-sm leading-5 text-[#6F6D6D]">
-                  Mark a property as available for transient bookings in the
-                  property form.
+                <Text className="mt-1 text-center text-sm leading-5 text-slate-500">
+                  Enable transient bookings in a property form to start using
+                  this calendar.
                 </Text>
               </View>
             ) : (
-              <View className="overflow-hidden rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] shadow-sm">
-                <View className="flex-row border-b border-[#1d1d1f]/10 p-2">
-                  {weekdayLabels.map((day) => (
-                    <Text
-                      key={day}
-                      className="flex-1 text-center text-[10px] font-bold uppercase text-[#6F6D6D]"
-                    >
-                      {day}
-                    </Text>
-                  ))}
-                </View>
-
-                <View className="flex-row flex-wrap p-1">
-                  {monthDays.map((day) => {
-                    const key = dateKey(day);
-                    const dayBookings = getBookingsForDay(visibleBookings, day);
-                    const availability = getAvailabilityForDay(
-                      selectedBuildingBookings,
-                      day,
-                    );
-                    const isCurrentMonth =
-                      day.getMonth() === currentMonth.getMonth();
-                    const canCreateFromDay =
-                      availability.label === "Available" ||
-                      availability.label === "After 2 PM";
-
-                    return (
+              <>
+                <View className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm shadow-slate-900/5">
+                  <View className="flex-row items-center gap-2 px-4 pb-3 pt-4">
+                    <View className="min-w-0 flex-1">
+                      <Text className="font-soraSemiBold text-lg text-slate-950">
+                        {monthLabel}
+                      </Text>
+                      <Text className="mt-0.5 text-xs font-medium text-slate-500">
+                        Select a day to see its schedule
+                      </Text>
+                    </View>
+                    {!isViewingCurrentMonth ? (
                       <TouchableOpacity
-                        key={key}
                         activeOpacity={0.78}
-                        className={`m-0.5 min-h-[86px] rounded-2xl border border-[#1d1d1f]/5 p-2 ${
-                          isCurrentMonth ? "bg-[#FFFFFF]" : "bg-[#1d1d1f]/5"
-                        }`}
-                        onPress={() =>
-                          canCreateFromDay
-                            ? openCreate(key)
-                            : dayBookings[0] && openEdit(dayBookings[0])
-                        }
-                        style={{ width: "13.25%" }}
+                        accessibilityLabel="Return to today"
+                        accessibilityRole="button"
+                        className="h-11 justify-center rounded-full bg-blue-50 px-3"
+                        onPress={goToToday}
                       >
-                        <Text
-                          className={`text-xs font-bold ${
-                            isCurrentMonth ? "text-[#1d1d1f]" : "text-[#6F6D6D]"
-                          }`}
-                        >
-                          {day.getDate()}
+                        <Text className="text-xs font-bold text-blue-700">
+                          Today
                         </Text>
-                        <View
-                          className={`mt-1 rounded-md px-1.5 py-1 ${availability.bg}`}
+                      </TouchableOpacity>
+                    ) : null}
+                    <TouchableOpacity
+                      activeOpacity={0.78}
+                      accessibilityLabel="Previous month"
+                      accessibilityRole="button"
+                      className="h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white"
+                      onPress={() => changeMonth(-1)}
+                    >
+                      <Ionicons name="chevron-back" color="#334155" size={19} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.78}
+                      accessibilityLabel="Next month"
+                      accessibilityRole="button"
+                      className="h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white"
+                      onPress={() => changeMonth(1)}
+                    >
+                      <Ionicons
+                        name="chevron-forward"
+                        color="#334155"
+                        size={19}
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View className="flex-row border-y border-slate-100 bg-slate-50/80 py-2.5">
+                    {weekdayLabels.map((day) => (
+                      <Text
+                        key={day}
+                        className="flex-1 text-center text-[11px] font-bold uppercase tracking-wide text-slate-400"
+                      >
+                        {day.slice(0, 1)}
+                      </Text>
+                    ))}
+                  </View>
+
+                  <View className="flex-row flex-wrap px-1 py-2">
+                    {monthDays.map((day) => {
+                      const key = dateKey(day);
+                      const dayBookings = getBookingsForDay(
+                        visibleBookings,
+                        day,
+                      );
+                      const availability = getAvailabilityForDay(
+                        selectedBuildingBookings,
+                        day,
+                      );
+                      const isCurrentMonth =
+                        day.getMonth() === currentMonth.getMonth();
+                      const isSelected = key === selectedDate;
+                      const isToday = key === todayKey;
+                      const availabilityDot =
+                        availability.label === "Available"
+                          ? "bg-emerald-500"
+                          : availability.label === "After 2 PM" ||
+                              availability.label === "Checkout"
+                            ? "bg-amber-500"
+                            : "bg-rose-500";
+                      const spokenDate = new Intl.DateTimeFormat("en-US", {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                      }).format(day);
+
+                      return (
+                        <TouchableOpacity
+                          key={key}
+                          activeOpacity={0.72}
+                          accessibilityLabel={`${spokenDate}. ${availability.label}. ${dayBookings.length} ${dayBookings.length === 1 ? "booking" : "bookings"}.`}
+                          accessibilityRole="button"
+                          accessibilityState={{ selected: isSelected }}
+                          className="h-14 items-center justify-center"
+                          onPress={() => selectCalendarDay(day)}
+                          style={{ width: "14.2857%" }}
                         >
-                          <Text
-                            className={`text-[8px] font-bold uppercase leading-3 ${availability.text}`}
-                            numberOfLines={2}
-                          >
-                            {availability.label}
-                          </Text>
-                        </View>
-                        {dayBookings.slice(0, 1).map((booking) => (
                           <View
-                            key={booking.id}
-                            className="mt-1 rounded-md bg-[#2563EB]/10 px-1.5 py-1"
+                            className={`h-9 w-9 items-center justify-center rounded-full ${
+                              isSelected
+                                ? "bg-blue-600"
+                                : isToday
+                                  ? "border border-blue-500 bg-blue-50"
+                                  : "bg-transparent"
+                            }`}
                           >
                             <Text
-                              className="text-[9px] font-bold text-[#2563EB]"
+                              className={`text-[13px] font-bold ${
+                                isSelected
+                                  ? "text-white"
+                                  : isCurrentMonth
+                                    ? isToday
+                                      ? "text-blue-700"
+                                      : "text-slate-800"
+                                    : "text-slate-300"
+                              }`}
+                            >
+                              {day.getDate()}
+                            </Text>
+                          </View>
+                          <View className="mt-0.5 h-2 flex-row items-center justify-center gap-0.5">
+                            {dayBookings.length > 0 ? (
+                              dayBookings
+                                .slice(0, 3)
+                                .map((booking) => (
+                                  <View
+                                    key={booking.id}
+                                    className={`h-1.5 w-1.5 rounded-full ${
+                                      booking.status === "Cancelled"
+                                        ? "bg-slate-300"
+                                        : "bg-blue-500"
+                                    }`}
+                                  />
+                                ))
+                            ) : isCurrentMonth ? (
+                              <View
+                                className={`h-1.5 w-1.5 rounded-full ${availabilityDot}`}
+                              />
+                            ) : null}
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  <View className="flex-row flex-wrap gap-x-4 gap-y-2 border-t border-slate-100 px-4 py-3">
+                    {[
+                      { color: "bg-blue-500", label: "Reservation" },
+                      { color: "bg-emerald-500", label: "Available" },
+                      { color: "bg-amber-500", label: "Turnover" },
+                      { color: "bg-slate-300", label: "Cancelled" },
+                    ].map((item) => (
+                      <View
+                        className="flex-row items-center gap-1.5"
+                        key={item.label}
+                      >
+                        <View
+                          className={`h-2 w-2 rounded-full ${item.color}`}
+                        />
+                        <Text className="text-[11px] font-semibold text-slate-500">
+                          {item.label}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+
+                <View className="gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+                  <View className="flex-row items-start justify-between gap-3">
+                    <View className="min-w-0 flex-1">
+                      <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Day schedule
+                      </Text>
+                      <Text className="mt-1 font-soraSemiBold text-lg text-slate-950">
+                        {selectedDayLabel}
+                      </Text>
+                    </View>
+                    <View
+                      className={`rounded-full px-3 py-1.5 ${selectedDayAvailability.bg}`}
+                    >
+                      <Text
+                        className={`text-[11px] font-bold ${selectedDayAvailability.text}`}
+                      >
+                        {selectedDayAvailability.label}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {selectedDayBookings.length > 0 ? (
+                    <View className="gap-2">
+                      {selectedDayBookings.map((booking) => (
+                        <TouchableOpacity
+                          key={booking.id}
+                          activeOpacity={0.78}
+                          accessibilityLabel={`Open booking for ${booking.guestName}, room ${booking.roomNumber}`}
+                          accessibilityRole="button"
+                          className="min-h-[64px] flex-row items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3"
+                          onPress={() => openEdit(booking)}
+                        >
+                          <View className="h-10 w-10 items-center justify-center rounded-xl bg-blue-100">
+                            <Ionicons
+                              name="bed-outline"
+                              color="#2563EB"
+                              size={19}
+                            />
+                          </View>
+                          <View className="min-w-0 flex-1">
+                            <Text
+                              className="font-soraSemiBold text-sm text-slate-900"
                               numberOfLines={1}
                             >
                               {booking.guestName}
                             </Text>
-                            <Text
-                              className="text-[8px] font-medium text-[#2563EB]"
-                              numberOfLines={1}
-                            >
-                              Room {booking.roomNumber}
+                            <Text className="mt-0.5 text-xs font-medium text-slate-500">
+                              Room {booking.roomNumber} ·{" "}
+                              {formatDisplayTime(booking.checkInTime)}–
+                              {formatDisplayTime(booking.checkOutTime)}
                             </Text>
                           </View>
-                        ))}
-                        {dayBookings.length > 1 ? (
-                          <Text className="mt-1 text-[9px] font-medium text-[#6F6D6D]">
-                            +{dayBookings.length - 1} more
-                          </Text>
-                        ) : null}
-                      </TouchableOpacity>
-                    );
-                  })}
+                          <Ionicons
+                            name="chevron-forward"
+                            color="#94A3B8"
+                            size={18}
+                          />
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  ) : (
+                    <View className="flex-row items-center gap-3 rounded-2xl bg-slate-50 p-4">
+                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+                        <Ionicons
+                          name="sparkles-outline"
+                          color="#64748B"
+                          size={18}
+                        />
+                      </View>
+                      <View className="min-w-0 flex-1">
+                        <Text className="text-sm font-bold text-slate-800">
+                          No stays scheduled
+                        </Text>
+                        <Text className="mt-0.5 text-xs leading-5 text-slate-500">
+                          This day has no visible reservations.
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+
+                  {canCreateOnSelectedDay ? (
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      accessibilityLabel={`Add booking on ${selectedDayLabel}`}
+                      accessibilityRole="button"
+                      className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-blue-600"
+                      onPress={() => openCreate(selectedDate)}
+                    >
+                      <Ionicons name="add" color="#FFFFFF" size={20} />
+                      <Text className="font-soraSemiBold text-sm text-white">
+                        Add booking for this day
+                      </Text>
+                    </TouchableOpacity>
+                  ) : null}
                 </View>
-              </View>
+              </>
             )}
 
-            <View className="mb-16 gap-3 rounded-[28px] border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4 shadow-sm">
-              <View>
-                <Text className="text-lg font-bold text-[#1d1d1f]">
-                  Booking History
-                </Text>
-                <Text className="mt-1 text-xs font-medium text-[#6F6D6D]">
-                  {selectedBuilding?.title ?? "Select a building"}
+            <View className="mb-16 gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+              <View className="flex-row items-end justify-between gap-3">
+                <View>
+                  <Text className="font-soraSemiBold text-lg text-slate-950">
+                    All reservations
+                  </Text>
+                  <Text className="mt-1 text-xs font-medium text-slate-500">
+                    {selectedBuilding?.title ?? "Select a building"}
+                  </Text>
+                </View>
+                <Text className="text-xs font-bold text-slate-400">
+                  {visibleBookings.length} total
                 </Text>
               </View>
 
               {isLoading ? (
-                <Text className="text-sm font-medium text-[#6F6D6D]">
-                  Loading bookings...
+                <Text className="text-sm font-medium text-slate-500">
+                  Loading reservations...
                 </Text>
               ) : visibleBookings.length > 0 ? (
                 visibleBookings
                   .slice()
-                  .sort((a, b) => a.startDate.localeCompare(b.startDate))
-                  .map((booking) => (
-                    <TouchableOpacity
-                      key={booking.id}
-                      activeOpacity={0.82}
-                      className="rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-4"
-                      onPress={() => openEdit(booking)}
-                    >
-                      <View className="flex-row items-start justify-between gap-3">
+                  .sort((a, b) => b.startDate.localeCompare(a.startDate))
+                  .map((booking) => {
+                    const statusLabel = getBookingStatusLabel(booking);
+                    const statusBackground =
+                      statusLabel === "Cancelled" || statusLabel === "Completed"
+                        ? "bg-slate-100"
+                        : statusLabel === "Upcoming"
+                          ? "bg-blue-50"
+                          : statusLabel === "Checking out today"
+                            ? "bg-amber-50"
+                            : "bg-emerald-50";
+                    const statusText =
+                      statusLabel === "Cancelled" || statusLabel === "Completed"
+                        ? "text-slate-500"
+                        : statusLabel === "Upcoming"
+                          ? "text-blue-700"
+                          : statusLabel === "Checking out today"
+                            ? "text-amber-700"
+                            : "text-emerald-700";
+                    const startDate = parseDate(booking.startDate);
+                    const startMonth = new Intl.DateTimeFormat("en-US", {
+                      month: "short",
+                    }).format(startDate);
+
+                    return (
+                      <TouchableOpacity
+                        key={booking.id}
+                        activeOpacity={0.78}
+                        accessibilityLabel={`Open ${statusLabel} booking for ${booking.guestName}`}
+                        accessibilityRole="button"
+                        className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3"
+                        onPress={() => openEdit(booking)}
+                      >
+                        <View className="w-12 items-center rounded-xl bg-slate-50 py-2">
+                          <Text className="text-[10px] font-bold uppercase text-slate-400">
+                            {startMonth}
+                          </Text>
+                          <Text className="font-soraSemiBold text-lg text-slate-900">
+                            {startDate.getDate()}
+                          </Text>
+                        </View>
                         <View className="min-w-0 flex-1">
                           <Text
-                            className="font-soraSemiBold text-base text-[#1d1d1f]"
+                            className="font-soraSemiBold text-sm text-slate-900"
                             numberOfLines={1}
                           >
                             {booking.guestName}
                           </Text>
-                          <Text className="mt-1 text-xs font-medium text-[#6F6D6D]">
-                            {selectedBuilding?.title ?? "Building"} - Room{" "}
-                            {booking.roomNumber}
+                          <Text className="mt-1 text-xs font-medium text-slate-500">
+                            Room {booking.roomNumber} ·{" "}
+                            {formatDisplayDate(booking.startDate)}–
+                            {formatDisplayDate(booking.endDate)}
                           </Text>
-                          <Text className="mt-1 text-xs text-[#6F6D6D]">
-                            Check-in: {formatDisplayDate(booking.startDate)}{" "}
-                            {formatDisplayTime(booking.checkInTime)}
-                          </Text>
-                          <Text className="mt-1 text-xs text-[#6F6D6D]">
-                            Check-out: {formatDisplayDate(booking.endDate)}{" "}
-                            {formatDisplayTime(booking.checkOutTime)}
-                          </Text>
-                        </View>
-                        <View
-                          className={`rounded-md px-2 py-1 ${
-                            booking.status === "Cancelled"
-                              ? "bg-[#1d1d1f]/10"
-                              : booking.endDate === dateKey(new Date())
-                                ? "bg-amber-50"
-                                : "bg-rose-50"
-                          }`}
-                        >
-                          <Text
-                            className={`text-[10px] font-bold uppercase ${
-                              booking.status === "Cancelled"
-                                ? "text-[#6F6D6D]"
-                                : booking.endDate === dateKey(new Date())
-                                  ? "text-amber-600"
-                                  : "text-rose-600"
-                            }`}
+                          <View
+                            className={`mt-2 self-start rounded-full px-2 py-1 ${statusBackground}`}
                           >
-                            {getBookingStatusLabel(booking)}
-                          </Text>
+                            <Text
+                              className={`text-[10px] font-bold ${statusText}`}
+                            >
+                              {statusLabel}
+                            </Text>
+                          </View>
                         </View>
-                      </View>
-                    </TouchableOpacity>
-                  ))
+                        <Ionicons
+                          name="chevron-forward"
+                          color="#94A3B8"
+                          size={18}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })
               ) : (
-                <View className="rounded-2xl border border-dashed border-[#1d1d1f]/20 p-6">
-                  <Text className="text-center text-sm font-bold text-[#1d1d1f]">
-                    No bookings found
+                <View className="items-center rounded-2xl border border-dashed border-slate-200 p-6">
+                  <Text className="text-center text-sm font-bold text-slate-800">
+                    No reservations found
                   </Text>
-                  <Text className="mt-1 text-center text-xs text-[#6F6D6D]">
-                    Create a booking from the calendar or the button above.
+                  <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
+                    Select an available day to add your first booking.
                   </Text>
                 </View>
               )}
