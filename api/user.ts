@@ -1,22 +1,9 @@
-import * as ImagePicker from "expo-image-picker";
-
 import { API_BASE_URL, apiClient } from "./client";
-import type { ApiEnvelope, AuthUser } from "../types";
-
-export type ProfileImageUpload = {
-  uri: string;
-  name: string;
-  type: string;
-  file?: Blob;
-};
-
-export type UpdateUserProfilePayload = {
-  name: string;
-  company: string;
-  role: string;
-  phone: string;
-  profileImage?: ProfileImageUpload | null;
-};
+import type {
+  ApiEnvelope,
+  AuthUser,
+  UpdateUserProfilePayload,
+} from "../types";
 
 function authHeaders(accessToken?: string) {
   return {
@@ -82,21 +69,6 @@ export function normalizeUser(user: AuthUser): AuthUser {
     profileImage: profileImageUrl || user.profileImage,
     avatar: profileImageUrl || user.avatar,
   };
-}
-
-export function getImageName(asset: ImagePicker.ImagePickerAsset) {
-  if (asset.fileName) return asset.fileName;
-
-  const [nameFromUri] = asset.uri.split("/").slice(-1);
-  return nameFromUri || `profile-${Date.now()}.jpg`;
-}
-
-export function getImageType(asset: ImagePicker.ImagePickerAsset) {
-  if (asset.mimeType) return asset.mimeType;
-  if (asset.uri.toLowerCase().endsWith(".png")) return "image/png";
-  if (asset.uri.toLowerCase().endsWith(".webp")) return "image/webp";
-
-  return "image/jpeg";
 }
 
 export async function updateUserProfile(
