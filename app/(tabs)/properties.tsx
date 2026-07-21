@@ -168,7 +168,7 @@ export default function PropertiesScreen() {
           renderItem={({ item }) => {
             if (item.kind === "search") {
               return (
-                <View className="bg-[#F5F7FC] pb-1">
+                <View className="z-10 bg-white pb-3 shadow-[#000000] drop-shadow-md">
                   <PropertyListToolbar
                     onChangeSearch={setSearchQuery}
                     onChangeStatus={setStatusFilter}
