@@ -72,7 +72,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               ) : null}
             </View>
             <TouchableOpacity
-              accessibilityLabel="Close property form"
+              accessibilityLabel={`Close ${title}`}
               accessibilityRole="button"
               activeOpacity={0.8}
               className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"

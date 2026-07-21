@@ -21,6 +21,7 @@ import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { DropdownField } from "../../components/ui/fields/DropdownField";
 import { PickerField } from "../../components/ui/fields/PickerField";
+import { FormSection } from "../../components/ui/forms/FormSection";
 import { ChoiceGroup } from "../../components/ui/groups/ChoiceGroup";
 
 import { useAuth } from "../../hooks/useAuth";
@@ -340,95 +341,149 @@ export default function ExpensesScreen() {
         onSubmit={handleSubmit}
         formError={formError}
       >
-        <DropdownField
-          required
-          label="Linked Asset"
-          placeholder="Select a property"
-          value={form.propertyId}
-          options={propertyOptions}
-          onSelect={(value) => updateForm("propertyId", value)}
-        />
-
-        <DropdownField
-          label="Category"
-          placeholder="Select expense category"
-          value={form.category}
-          options={expenseCategoryChoices}
-          onSelect={(value) => updateForm("category", value)}
-        />
-
-        <BaseField
-          keyboardType="decimal-pad"
-          label="Amount"
-          placeholder="0.00"
-          value={form.amount}
-          onChangeText={(value) => updateForm("amount", cleanDecimal(value))}
-          required
-        />
-
-        <PickerField
-          label="Transaction Date"
-          placeholder="Select transaction date"
-          value={form.date}
-          onPress={() => setIsDatePickerVisible(true)}
-        />
-
-        {isDatePickerVisible ? (
-          <Modal
-            animationType="fade"
-            onRequestClose={() => setIsDatePickerVisible(false)}
-            transparent
-            visible
-          >
-            <View className="flex-1 justify-center bg-black/40 px-5">
-              <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
-                <View className="mb-2 flex-row items-center justify-between">
-                  <Text className="text-sm font-bold text-[#1d1d1f]"></Text>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
-                    onPress={() => setIsDatePickerVisible(false)}
-                  >
-                    <Text className="text-xs font-bold text-[#2563EB]">
-                      Done
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <DateTimePicker
-                  display={Platform.OS === "ios" ? "inline" : "default"}
-                  mode="date"
-                  onChange={handleDateChange}
-                  value={parseDateValue(form.date)}
-                />
-              </View>
-            </View>
-          </Modal>
-        ) : null}
-
-        <BaseField
-          label="Reference No."
-          required
-          placeholder="Invoice, receipt, or check sequence"
-          value={form.referenceNumber}
-          onChangeText={(value) => updateForm("referenceNumber", value)}
-        />
-
-        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
-          <ChoiceGroup
-            choices={expenseStatusChoices}
-            label="Transaction Status"
-            value={form.status}
-            onSelect={(value) => updateForm("status", value)}
+        <View className="flex-row items-start gap-2 rounded-2xl bg-[#2563EB]/10 px-4 py-3">
+          <MaterialCommunityIcons
+            name="information-outline"
+            color="#1E40AF"
+            size={18}
           />
+          <Text className="min-w-0 flex-1 text-sm leading-5 text-[#1E40AF]">
+            Fields marked with * are required. Link each expense to a property
+            so portfolio reporting stays accurate.
+          </Text>
         </View>
 
-        <BaseField
-          label="Description"
-          multiline
-          placeholder="Optional expenditure breakdown details..."
-          value={form.description}
-          onChangeText={(value) => updateForm("description", value)}
-        />
+        <FormSection
+          description="Choose where the cost belongs and how it should be reported."
+          icon="office-building-outline"
+          title="Expense details"
+        >
+          <DropdownField
+            required
+            label="Linked property"
+            placeholder="Select a property"
+            value={form.propertyId}
+            options={propertyOptions}
+            onSelect={(value) => updateForm("propertyId", value)}
+          />
+
+          {selectedProperty ? (
+            <View className="flex-row items-center gap-3 rounded-2xl bg-[#F7F8FA] p-4">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#2563EB]/10">
+                <MaterialCommunityIcons
+                  name="map-marker-outline"
+                  color="#2563EB"
+                  size={20}
+                />
+              </View>
+              <View className="min-w-0 flex-1">
+                <Text className="text-sm font-bold text-[#1d1d1f]">
+                  {selectedProperty.title}
+                </Text>
+                <Text className="mt-0.5 text-xs text-slate-600">
+                  {selectedProperty.location}
+                </Text>
+              </View>
+            </View>
+          ) : null}
+
+          <DropdownField
+            required
+            label="Category"
+            placeholder="Select expense category"
+            value={form.category}
+            options={expenseCategoryChoices}
+            onSelect={(value) => updateForm("category", value)}
+          />
+        </FormSection>
+
+        <FormSection
+          description="Enter the amount, transaction date, and supporting reference."
+          icon="cash-multiple"
+          title="Payment details"
+        >
+          <BaseField
+            keyboardType="decimal-pad"
+            label="Amount (PHP)"
+            placeholder="0.00"
+            value={form.amount}
+            onChangeText={(value) => updateForm("amount", cleanDecimal(value))}
+            required
+          />
+
+          <PickerField
+            label="Transaction date"
+            placeholder="Select transaction date"
+            required
+            value={form.date}
+            onPress={() => setIsDatePickerVisible(true)}
+          />
+
+          {isDatePickerVisible ? (
+            <Modal
+              animationType="fade"
+              onRequestClose={() => setIsDatePickerVisible(false)}
+              transparent
+              visible
+            >
+              <View className="flex-1 justify-center bg-black/40 px-5">
+                <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
+                  <View className="mb-2 flex-row items-center justify-between">
+                    <Text className="text-sm font-bold text-[#1d1d1f]">
+                      Select transaction date
+                    </Text>
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
+                      onPress={() => setIsDatePickerVisible(false)}
+                    >
+                      <Text className="text-xs font-bold text-[#2563EB]">
+                        Done
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <DateTimePicker
+                    display={Platform.OS === "ios" ? "inline" : "default"}
+                    mode="date"
+                    onChange={handleDateChange}
+                    value={parseDateValue(form.date)}
+                  />
+                </View>
+              </View>
+            </Modal>
+          ) : null}
+
+          <BaseField
+            label="Reference number"
+            placeholder="Invoice, receipt, or check number (optional)"
+            value={form.referenceNumber}
+            onChangeText={(value) => updateForm("referenceNumber", value)}
+          />
+        </FormSection>
+
+        <FormSection
+          description="Set the payment state and add any useful context."
+          icon="clipboard-text-outline"
+          title="Status & notes"
+        >
+          <View className="rounded-2xl bg-[#F7F8FA] p-4">
+            <ChoiceGroup
+              choices={expenseStatusChoices}
+              label="Transaction status"
+              value={form.status}
+              onSelect={(value) => updateForm("status", value)}
+            />
+          </View>
+
+          <BaseField
+            label="Description"
+            multiline
+            numberOfLines={4}
+            placeholder="Add an optional cost breakdown or note"
+            value={form.description}
+            onChangeText={(value) => updateForm("description", value)}
+          />
+        </FormSection>
       </AddEditModal>
     </Screen>
   );

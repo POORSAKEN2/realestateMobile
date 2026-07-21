@@ -35,18 +35,20 @@ export function BookingStayFields({
       <View className="flex-row gap-2">
         <View className="flex-1">
           <PickerField
-            label="Check-in Date"
+            label="Check-in date"
             onPress={() => setActivePickerField("startDate")}
             placeholder="Select date"
+            required
             value={form.startDate}
           />
         </View>
         <View className="w-32">
           <PickerField
             iconName="time-outline"
-            label="Check-in Time"
+            label="Time"
             onPress={() => setActivePickerField("checkInTime")}
             placeholder="Select time"
+            required
             value={form.checkInTime}
           />
         </View>
@@ -55,18 +57,20 @@ export function BookingStayFields({
       <View className="flex-row gap-2">
         <View className="flex-1">
           <PickerField
-            label="Check-out Date"
+            label="Check-out date"
             onPress={() => setActivePickerField("endDate")}
             placeholder="Select date"
+            required
             value={form.endDate}
           />
         </View>
         <View className="w-32">
           <PickerField
             iconName="time-outline"
-            label="Check-out Time"
+            label="Time"
             onPress={() => setActivePickerField("checkOutTime")}
             placeholder="Select time"
+            required
             value={form.checkOutTime}
           />
         </View>

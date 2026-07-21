@@ -7,6 +7,7 @@ interface PickerFieldProps {
   value?: string;
   placeholder: string;
   onPress: () => void;
+  required?: boolean;
   iconName?: keyof typeof Ionicons.glyphMap; // Change icons depending on use case
   iconColor?: string;
   iconSize?: number;
@@ -20,6 +21,7 @@ export function PickerField({
   value,
   placeholder,
   onPress,
+  required,
   iconName = "calendar-outline", // Default to calendar
   iconColor = "#2563EB", // Default to your vibrant blue
   iconSize = 20,
@@ -29,12 +31,15 @@ export function PickerField({
 }: PickerFieldProps) {
   return (
     <View className={className} style={style}>
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+      <Text className="text-xs font-semibold text-slate-600">
         {label}
+        <Text className="text-red-600">{required ? " *" : ""}</Text>
       </Text>
 
       <TouchableOpacity
         activeOpacity={0.85}
+        accessibilityLabel={`${label}${required ? ", required" : ""}`}
+        accessibilityRole="button"
         className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
         onPress={onPress}
       >
