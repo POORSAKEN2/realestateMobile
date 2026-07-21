@@ -53,10 +53,13 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1 bg-[#F7F8FA]"
       >
-        <View className="border-b border-[#1d1d1f]/10 bg-white px-5 py-5">
+        <View className="border-b border-slate-200 bg-white px-5 py-4">
           <View className="flex-row items-center">
             <View className="flex-1 pr-4">
-              <Text className="font-soraSemiBold text-2xl text-[#1d1d1f]" numberOfLines={1}>
+              <Text
+                className="font-soraSemiBold text-2xl text-[#1d1d1f]"
+                numberOfLines={2}
+              >
                 {title}
               </Text>
               {subtitle ? (
@@ -69,8 +72,10 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               ) : null}
             </View>
             <TouchableOpacity
+              accessibilityLabel="Close property form"
+              accessibilityRole="button"
               activeOpacity={0.8}
-              className="h-10 w-10 items-center justify-center rounded-full bg-black/10"
+              className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
               onPress={onClose}
             >
               <Ionicons name="close" color="#3d3d3d" size={22} />
@@ -109,6 +114,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
         >
           <View className="flex-row">
             <TouchableOpacity
+              accessibilityLabel={submitText}
               activeOpacity={0.85}
               accessibilityRole="button"
               className={`h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB] ${

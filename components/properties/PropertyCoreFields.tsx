@@ -14,7 +14,6 @@ import {
 } from "../../utils/properties/propertyForm";
 import { BaseField } from "../ui/fields/BaseField";
 import { DropdownField } from "../ui/fields/DropdownField";
-import { ChoiceGroup } from "../ui/groups/ChoiceGroup";
 import { LocationPinPicker } from "./LocationPinPicker";
 import { PropertyFormSection } from "./PropertyFormSection";
 
@@ -48,8 +47,13 @@ export function PropertyCoreFields({
 
   return (
     <>
-      <View className="rounded-2xl bg-[#2563EB]/10 px-4 py-3">
-        <Text className="text-xs leading-5 text-[#1E40AF]">
+      <View className="flex-row items-start gap-2 rounded-2xl bg-[#2563EB]/10 px-4 py-3">
+        <MaterialCommunityIcons
+          name="information-outline"
+          color="#1E40AF"
+          size={18}
+        />
+        <Text className="min-w-0 flex-1 text-sm leading-5 text-[#1E40AF]">
           Fields marked with * are required. You can add images and documents
           now or later.
         </Text>
@@ -68,11 +72,13 @@ export function PropertyCoreFields({
           value={form.title}
           required
         />
-        <ChoiceGroup
-          choices={propertyStatusChoices}
+        <DropdownField
           label="Current status"
+          options={propertyStatusChoices}
           onSelect={(value) => updateForm("status", value)}
+          placeholder="Select a status"
           value={form.status}
+          required
         />
       </PropertyFormSection>
 
@@ -91,7 +97,7 @@ export function PropertyCoreFields({
 
         {filteredLocationSuggestions.length > 0 ? (
           <View className="gap-2">
-            <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+            <Text className="text-xs font-semibold text-slate-600">
               Quick choices
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -136,17 +142,21 @@ export function PropertyCoreFields({
         icon="office-building-outline"
         title="Property details"
       >
-        <ChoiceGroup
-          choices={propertyClassificationChoices}
+        <DropdownField
           label="Classification"
+          options={propertyClassificationChoices}
           onSelect={updateClassification}
+          placeholder="Select a classification"
           value={form.classification}
+          required
         />
-        <ChoiceGroup
-          choices={propertyTypeChoices}
+        <DropdownField
           label="Property type"
+          options={propertyTypeChoices}
           onSelect={(value) => updateForm("type", value)}
+          placeholder="Select a property type"
           value={form.type}
+          required
         />
 
         {requiresBedroomAndBathroomCounts(form.classification, form.type) ? (

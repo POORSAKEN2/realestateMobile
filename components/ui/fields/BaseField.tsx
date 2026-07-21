@@ -27,8 +27,8 @@ export function BaseField({
 
   // 2. Resolve conflicting style classes between modules
   const labelClassName = isIconVariant
-    ? "text-[11px] font-bold uppercase tracking-wide text-slate-500"
-    : "text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]";
+    ? "text-xs font-semibold text-slate-600"
+    : "text-xs font-semibold text-slate-600";
 
   const containerClassName = isIconVariant
     ? "h-14 flex-row items-center rounded-xl border border-slate-200 bg-white px-4 shadow-sm shadow-slate-900/5"
@@ -50,7 +50,7 @@ export function BaseField({
       : "words";
 
   return (
-    <View className="gap-1">
+    <View className="gap-1.5">
       <Text className={labelClassName}>
         {label}
         <Text className="text-red-600">{required ? " *" : ""}</Text>

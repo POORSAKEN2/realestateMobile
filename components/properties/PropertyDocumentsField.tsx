@@ -24,7 +24,7 @@ export function PropertyDocumentsField({
   onRemove: (index: number) => void;
 }) {
   return (
-    <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+    <View className="gap-4 rounded-2xl border border-slate-200 bg-white p-4">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
           <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
@@ -36,7 +36,7 @@ export function PropertyDocumentsField({
           </View>
           <View className="flex-1">
             <Text className="text-sm font-bold text-[#1d1d1f]">
-              Property Documents
+              Property documents
             </Text>
             <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
               PDF, DOC, DOCX, JPG, or PNG files.
@@ -45,8 +45,13 @@ export function PropertyDocumentsField({
         </View>
         <TouchableOpacity
           activeOpacity={0.85}
+          accessibilityLabel={
+            documents.length > 0
+              ? "Add more property documents"
+              : "Choose property documents"
+          }
           accessibilityRole="button"
-          className="rounded-full bg-[#2563EB] px-4 py-2.5"
+          className="min-h-11 justify-center rounded-2xl bg-[#2563EB] px-4 py-2.5"
           onPress={onPick}
         >
           <Text className="text-xs font-bold text-[#FFFFFF]">
@@ -66,8 +71,8 @@ export function PropertyDocumentsField({
 
       {isEditing ? (
         <View className="gap-2">
-          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-            Attached Documents
+          <Text className="text-xs font-semibold text-slate-600">
+            Attached documents
           </Text>
           {isLoadingExistingDocuments ? (
             <View className="h-14 justify-center rounded-2xl bg-[#2563EB]/5 px-3">
@@ -95,7 +100,7 @@ export function PropertyDocumentsField({
                   >
                     {document.name}
                   </Text>
-                  <Text className="mt-0.5 text-[11px] text-[#6F6D6D]">
+                  <Text className="mt-0.5 text-xs text-slate-600">
                     {document.category} | {document.size}
                   </Text>
                 </View>
@@ -118,8 +123,8 @@ export function PropertyDocumentsField({
 
       {documents.length > 0 ? (
         <View className="gap-2">
-          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-            New Uploads
+          <Text className="text-xs font-semibold text-slate-600">
+            New uploads
           </Text>
           {documents.map((document, index) => (
             <View
@@ -140,7 +145,7 @@ export function PropertyDocumentsField({
                 >
                   {document.name}
                 </Text>
-                <Text className="mt-0.5 text-[11px] text-[#6F6D6D]">
+                <Text className="mt-0.5 text-xs text-slate-600">
                   {formatSelectedDocumentSize(document.size)}
                 </Text>
               </View>
@@ -148,7 +153,7 @@ export function PropertyDocumentsField({
                 activeOpacity={0.8}
                 accessibilityLabel={`Remove ${document.name}`}
                 accessibilityRole="button"
-                className="h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF]"
+                className="h-11 w-11 items-center justify-center rounded-full bg-[#FFFFFF]"
                 onPress={() => onRemove(index)}
               >
                 <MaterialCommunityIcons

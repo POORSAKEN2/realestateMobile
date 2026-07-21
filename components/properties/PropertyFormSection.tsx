@@ -14,14 +14,14 @@ export function PropertyFormSection({
   title: string;
 }) {
   return (
-    <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-white p-4 shadow-sm">
+    <View className="gap-4 border-b border-slate-200 pb-6">
       <View className="flex-row items-start gap-3">
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-          <MaterialCommunityIcons name={icon} color="#2563EB" size={21} />
+        <View className="h-9 w-9 items-center justify-center rounded-xl bg-[#2563EB]/10">
+          <MaterialCommunityIcons name={icon} color="#2563EB" size={19} />
         </View>
         <View className="min-w-0 flex-1">
-          <Text className="text-base font-bold text-[#1d1d1f]">{title}</Text>
-          <Text className="mt-1 text-xs leading-5 text-[#6F6D6D]">
+          <Text className="text-lg font-bold text-[#1d1d1f]">{title}</Text>
+          <Text className="mt-1 text-sm leading-5 text-slate-600">
             {description}
           </Text>
         </View>

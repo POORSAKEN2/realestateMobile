@@ -214,10 +214,10 @@ export function LocationPinPicker({
     ? `${formatCoordinate(markerCoordinate.latitude)}, ${formatCoordinate(markerCoordinate.longitude)}`
     : "No pin selected";
   return (
-    <View className="gap-3 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
+    <View className="gap-3 rounded-2xl border border-slate-200 bg-white p-4">
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+          <Text className="text-xs font-semibold text-slate-600">
             Pin Location
           </Text>
           <Text className="mt-1 text-sm font-bold text-[#1d1d1f]">
@@ -225,6 +225,8 @@ export function LocationPinPicker({
           </Text>
         </View>
         <TouchableOpacity
+          accessibilityLabel="Open property pin map"
+          accessibilityRole="button"
           activeOpacity={0.85}
           className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]"
           onPress={() => setIsMapVisible(true)}
@@ -237,6 +239,7 @@ export function LocationPinPicker({
         </TouchableOpacity>
       </View>
       <TouchableOpacity
+        accessibilityRole="button"
         activeOpacity={0.85}
         className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-[#2563EB]/10"
         onPress={() => setIsMapVisible(true)}
@@ -247,6 +250,10 @@ export function LocationPinPicker({
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityState={{
+          disabled: !markerCoordinate || isResolvingPinLocation,
+        }}
         activeOpacity={0.85}
         className={`h-12 flex-row items-center justify-center gap-2 rounded-2xl ${
           markerCoordinate ? "bg-[#2563EB]" : "bg-[#1d1d1f]/10"
@@ -268,9 +275,7 @@ export function LocationPinPicker({
             markerCoordinate ? "text-[#FFFFFF]" : "text-[#8E8E93]"
           }`}
         >
-          {isResolvingPinLocation
-            ? "Finding City..."
-            : "Set Location from Pin"}
+          {isResolvingPinLocation ? "Finding City..." : "Set Location from Pin"}
         </Text>
       </TouchableOpacity>
       {pinLocationError ? (
@@ -305,7 +310,7 @@ export function LocationPinPicker({
           <View className="absolute left-5 right-8 top-16 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 py-6 shadow-sm">
             <View className="flex-row items-center justify-between gap-3">
               <View className="min-w-0 flex-1">
-                <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                <Text className="text-xs font-semibold text-slate-600">
                   Property Pin
                 </Text>
                 <Text className="m-1 text-sm font-bold text-[#1d1d1f]">
@@ -315,8 +320,10 @@ export function LocationPinPicker({
                 </Text>
               </View>
               <TouchableOpacity
+                accessibilityLabel="Close property pin map"
+                accessibilityRole="button"
                 activeOpacity={0.85}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/10"
+                className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
                 onPress={() => setIsMapVisible(false)}
               >
                 <MaterialCommunityIcons
@@ -417,7 +424,7 @@ export function LocationPinPicker({
                 ))}
               </View>
             ) : null}
-            <Text className="mt-2 text-[10px] text-[#8E8E93]">
+            <Text className="mt-2 text-xs text-slate-600">
               Search data © OpenStreetMap contributors
             </Text>
           </View>
