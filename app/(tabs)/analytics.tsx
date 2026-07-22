@@ -1,6 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
 import Svg, {
@@ -12,14 +11,12 @@ import Svg, {
   Stop,
 } from "react-native-svg";
 
-import {
-  fetchPortfolioHistory,
-  fetchPortfolioStats,
-} from "../../api/analytics";
 import { useProperties } from "../../hooks/api/useProperties";
+import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
+import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
 
 type MetricCard = {
   label: string;
@@ -43,14 +40,6 @@ const distributionColors = [
   "#7C3AED",
   "#52525B",
 ];
-
-const formatPesoValue = (value: number = 0) => {
-  if (value >= 1_000_000_000) return `₱${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `₱${(value / 1_000_000).toFixed(1)}M`;
-  if (value === 0) return "₱0";
-
-  return `₱${value.toLocaleString()}`;
-};
 
 const formatAssetType = (type?: Property["type"]) => type ?? "Uncategorized";
 
@@ -305,14 +294,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
 export default function AnalyticsScreen() {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
-  const { data: stats, isLoading: isLoadingStats } = useQuery({
-    queryKey: ["analytics", "stats", accessToken],
-    queryFn: () => fetchPortfolioStats(accessToken),
-  });
-  const { data: history = [] } = useQuery({
-    queryKey: ["analytics", "history", accessToken],
-    queryFn: () => fetchPortfolioHistory(accessToken),
-  });
+  const { stats, history, isLoadingStats } = usePortfolioAnalytics(accessToken);
   const { useList } = useProperties();
   const { data: properties = [] } = useList();
 

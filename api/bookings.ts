@@ -1,10 +1,9 @@
-import { apiClient } from "./client";
+import { apiClient, authHeaders, unwrapCollection, unwrapData } from "./client";
 import { createLessee, fetchLessees } from "./propertyDetails";
 import { fetchProperties } from "./properties";
 import type {
   ApiEnvelope,
   Lessee,
-  PaginatedApiData,
   TransientBooking,
   TransientBookingPayload,
 } from "../types";
@@ -17,53 +16,6 @@ export type {
 
 export const DEFAULT_CHECK_IN_TIME = "14:00";
 export const DEFAULT_CHECK_OUT_TIME = "11:00";
-
-function authHeaders(accessToken?: string) {
-  return {
-    Accept: "application/json",
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-  };
-}
-
-function unwrapData<T>(response: ApiEnvelope<T> | T): T {
-  if (
-    response &&
-    typeof response === "object" &&
-    "data" in response &&
-    response.data !== undefined
-  ) {
-    return response.data;
-  }
-
-  return response as T;
-}
-
-function normalizeCollection<T>(
-  payload: ApiEnvelope<T[]> | ApiEnvelope<PaginatedApiData<T>> | T[],
-): T[] {
-  const data =
-    payload &&
-    typeof payload === "object" &&
-    !Array.isArray(payload) &&
-    "data" in payload
-      ? payload.data
-      : payload;
-
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (
-    data &&
-    typeof data === "object" &&
-    "data" in data &&
-    Array.isArray((data as PaginatedApiData<T>).data)
-  ) {
-    return (data as PaginatedApiData<T>).data ?? [];
-  }
-
-  return [];
-}
 
 function normalizeBooking(lease: Record<string, any>): TransientBooking {
   const lessee = lease?.lessee ?? {};
@@ -186,7 +138,7 @@ export async function fetchTransientBookings(accessToken?: string) {
     ApiEnvelope<Record<string, any>[]> | Record<string, any>[]
   >("/leases?type=Transient", { headers: authHeaders(accessToken) });
 
-  return normalizeCollection(response).map(normalizeBooking);
+  return unwrapCollection(response).map(normalizeBooking);
 }
 
 export async function fetchTransientBookablePropertyIds(accessToken?: string) {

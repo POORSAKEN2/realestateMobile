@@ -49,3 +49,29 @@ export function getPropertyStatusTone(
 ): PropertyStatusTone {
   return STATUS_TONES[status];
 }
+
+export function hasMapCoordinate(property: Property): property is Property & {
+  lat: number;
+  lng: number;
+} {
+  return (
+    typeof property.lat === "number" &&
+    Number.isFinite(property.lat) &&
+    typeof property.lng === "number" &&
+    Number.isFinite(property.lng)
+  );
+}
+
+export function getPropertyCoordinate(
+  property: Property & { lat: number; lng: number },
+) {
+  return { latitude: property.lat, longitude: property.lng };
+}
+
+export function getPropertyMarkerColor(status: Property["status"]) {
+  if (status === "UNDER_CONSTRUCTION") return "#EA580C";
+  if (status === "PRE_LEASED") return "#0891B2";
+  if (status === "REVENUE_GENERATING") return "#16A34A";
+  if (status === "PERSONAL_USE") return "#C026D3";
+  return "#2563EB";
+}

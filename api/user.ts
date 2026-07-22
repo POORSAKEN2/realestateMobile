@@ -1,29 +1,5 @@
-import { API_BASE_URL, apiClient } from "./client";
-import type {
-  ApiEnvelope,
-  AuthUser,
-  UpdateUserProfilePayload,
-} from "../types";
-
-function authHeaders(accessToken?: string) {
-  return {
-    Accept: "application/json",
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-  };
-}
-
-function unwrapData<T>(response: ApiEnvelope<T> | T): T {
-  if (
-    response &&
-    typeof response === "object" &&
-    "data" in response &&
-    response.data !== undefined
-  ) {
-    return response.data;
-  }
-
-  return response as T;
-}
+import { API_BASE_URL, apiClient, authHeaders, unwrapData } from "./client";
+import type { ApiEnvelope, AuthUser, UpdateUserProfilePayload } from "../types";
 
 function getAbsoluteStorageUrl(path?: string | null) {
   if (!path) return "";

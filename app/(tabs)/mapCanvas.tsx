@@ -1,177 +1,40 @@
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Image,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, { Marker, type LatLng, type Region } from "react-native-maps";
+import MapView, { Marker, type LatLng } from "react-native-maps";
 
+import { MapPropertyPreview } from "../../components/properties/MapPropertyPreview";
 import { useProperties } from "../../hooks/api/useProperties";
+import {
+  PHILIPPINES_REGION,
+  usePropertyMap,
+} from "../../hooks/properties/usePropertyMap";
 import { Screen } from "../../components/ui/Screen";
-import { useAuth } from "../../hooks/useAuth";
-import type { Property } from "../../types";
-
-const PHILIPPINES_REGION: Region = {
-  latitude: 12.8797,
-  longitude: 121.774,
-  latitudeDelta: 12,
-  longitudeDelta: 12,
-};
-
-const SELECTED_PROPERTY_DELTA = {
-  latitudeDelta: 0.035,
-  longitudeDelta: 0.035,
-};
-const MAX_PROPERTY_IMAGES = 5;
-
-function formatStatus(status: string) {
-  return status
-    .toLowerCase()
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
-function formatPeso(value = 0) {
-  if (value >= 1_000_000_000)
-    return `PHP ${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `PHP ${(value / 1_000_000).toFixed(1)}M`;
-  return `PHP ${value.toLocaleString()}`;
-}
-
-function hasMapCoordinate(property: Property): property is Property & {
-  lat: number;
-  lng: number;
-} {
-  return (
-    typeof property.lat === "number" &&
-    Number.isFinite(property.lat) &&
-    typeof property.lng === "number" &&
-    Number.isFinite(property.lng)
-  );
-}
-
-function getPropertyCoordinate(
-  property: Property & { lat: number; lng: number },
-) {
-  return {
-    latitude: property.lat,
-    longitude: property.lng,
-  };
-}
-
-function getMarkerColor(status: Property["status"]) {
-  if (status === "UNDER_CONSTRUCTION") return "#EA580C";
-  if (status === "PRE_LEASED") return "#0891B2";
-  if (status === "REVENUE_GENERATING") return "#16A34A";
-  if (status === "PERSONAL_USE") return "#C026D3";
-  return "#2563EB";
-}
-
-function getPropertyImages(property: Property) {
-  const images = property.images?.length ? property.images : [property.image];
-  return Array.from(new Set(images.filter(Boolean))).slice(
-    0,
-    MAX_PROPERTY_IMAGES,
-  );
-}
+import {
+  getPropertyCoordinate,
+  getPropertyMarkerColor,
+} from "../../utils/properties/propertyPresentation";
 
 export default function MapCanvasScreen() {
-  const mapRef = useRef<MapView | null>(null);
   const router = useRouter();
-  const { session } = useAuth();
-  const accessToken = session?.accessToken;
-  const [isMapReady, setIsMapReady] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
-    null,
-  );
-
   const { useList } = useProperties();
   const { data: properties = [], isError, isLoading, refetch } = useList();
-
-  const mappedProperties = useMemo(
-    () => properties.filter(hasMapCoordinate),
-    [properties],
-  );
-
-  const unmappedPropertyCount = properties.length - mappedProperties.length;
-  const selectedPropertyImages = selectedProperty
-    ? getPropertyImages(selectedProperty)
-    : [];
-
-  useEffect(() => {
-    if (!isMapReady || mappedProperties.length === 0) return;
-
-    const timer = setTimeout(() => {
-      if (mappedProperties.length === 1) {
-        const coordinate = getPropertyCoordinate(mappedProperties[0]);
-        mapRef.current?.animateToRegion(
-          { ...coordinate, ...SELECTED_PROPERTY_DELTA },
-          700,
-        );
-        return;
-      }
-
-      mapRef.current?.fitToCoordinates(
-        mappedProperties.map(getPropertyCoordinate),
-        {
-          animated: true,
-          edgePadding: { top: 110, right: 70, bottom: 220, left: 70 },
-        },
-      );
-    }, 250);
-
-    return () => clearTimeout(timer);
-  }, [isMapReady, mappedProperties]);
-
-  function handleRecenter() {
-    setSelectedProperty(null);
-
-    if (mappedProperties.length === 0) {
-      mapRef.current?.animateToRegion(PHILIPPINES_REGION, 800);
-      return;
-    }
-
-    if (mappedProperties.length === 1) {
-      mapRef.current?.animateToRegion(
-        {
-          ...getPropertyCoordinate(mappedProperties[0]),
-          ...SELECTED_PROPERTY_DELTA,
-        },
-        800,
-      );
-      return;
-    }
-
-    mapRef.current?.fitToCoordinates(
-      mappedProperties.map(getPropertyCoordinate),
-      {
-        animated: true,
-        edgePadding: { top: 110, right: 70, bottom: 220, left: 70 },
-      },
-    );
-  }
-
-  function handleMarkerPress(
-    property: Property & { lat: number; lng: number },
-  ) {
-    setSelectedProperty(property);
-    mapRef.current?.animateToRegion(
-      {
-        latitude: property.lat,
-        longitude: property.lng,
-        ...SELECTED_PROPERTY_DELTA,
-      },
-      500,
-    );
-  }
+  const {
+    mapRef,
+    mappedProperties,
+    recenter,
+    selectedProperty,
+    selectProperty,
+    setIsMapReady,
+    setSelectedProperty,
+    unmappedPropertyCount,
+  } = usePropertyMap(properties);
 
   return (
     <Screen className="bg-[#EFF6FF]">
@@ -195,9 +58,11 @@ export default function MapCanvasScreen() {
                 coordinate={coordinate}
                 description={property.location}
                 identifier={property.id}
-                onPress={() => handleMarkerPress(property)}
+                onPress={() => selectProperty(property)}
                 pinColor={
-                  isSelected ? "#0F172A" : getMarkerColor(property.status)
+                  isSelected
+                    ? "#0F172A"
+                    : getPropertyMarkerColor(property.status)
                 }
                 title={property.title}
               />
@@ -233,7 +98,7 @@ export default function MapCanvasScreen() {
 
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={handleRecenter}
+            onPress={recenter}
             style={[styles.iconButton, styles.primaryIconButton]}
           >
             <AntDesign name="aim" size={22} color="#FFFFFF" />
@@ -308,76 +173,10 @@ export default function MapCanvasScreen() {
         ) : null}
 
         {selectedProperty ? (
-          <View style={styles.propertyCard}>
-            <View style={styles.propertyImageFrame}>
-              {selectedPropertyImages.length ? (
-                <ScrollView
-                  horizontal
-                  pagingEnabled
-                  showsHorizontalScrollIndicator={false}
-                >
-                  {selectedPropertyImages.map((image, index) => (
-                    <Image
-                      key={`${image}:${index}`}
-                      source={{ uri: image }}
-                      style={styles.propertyImage}
-                    />
-                  ))}
-                </ScrollView>
-              ) : (
-                <MaterialCommunityIcons
-                  color="#64748B"
-                  name="home-city-outline"
-                  size={30}
-                />
-              )}
-              {selectedPropertyImages.length > 1 ? (
-                <View style={styles.imageCountBadge}>
-                  <Text style={styles.imageCountText}>
-                    {selectedPropertyImages.length}
-                  </Text>
-                </View>
-              ) : null}
-            </View>
-            <View style={styles.propertyDetails}>
-              <View style={styles.propertyTitleRow}>
-                <Text numberOfLines={1} style={styles.propertyTitle}>
-                  {selectedProperty.title}
-                </Text>
-                <TouchableOpacity
-                  accessibilityLabel="Close selected property"
-                  activeOpacity={0.8}
-                  onPress={() => setSelectedProperty(null)}
-                  style={styles.dismissButton}
-                >
-                  <MaterialCommunityIcons
-                    color="#64748B"
-                    name="close"
-                    size={18}
-                  />
-                </TouchableOpacity>
-              </View>
-              <Text numberOfLines={1} style={styles.propertyLocation}>
-                {selectedProperty.location}
-                {selectedProperty.country
-                  ? `, ${selectedProperty.country}`
-                  : ""}
-              </Text>
-              <View style={styles.propertyMetaRow}>
-                <View style={styles.statusPill}>
-                  <Text style={styles.statusText}>
-                    {formatStatus(selectedProperty.status)}
-                  </Text>
-                </View>
-                <Text numberOfLines={1} style={styles.propertyValue}>
-                  {formatPeso(selectedProperty.value)}
-                </Text>
-              </View>
-              <Text numberOfLines={1} style={styles.propertyType}>
-                {selectedProperty.type ?? "Property"}
-              </Text>
-            </View>
-          </View>
+          <MapPropertyPreview
+            onClose={() => setSelectedProperty(null)}
+            property={selectedProperty}
+          />
         ) : null}
       </View>
     </Screen>
@@ -521,110 +320,5 @@ const styles = StyleSheet.create({
   },
   unmappedNoticeRaised: {
     bottom: 210,
-  },
-  propertyCard: {
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    bottom: 24,
-    elevation: 8,
-    flexDirection: "row",
-    gap: 12,
-    left: 16,
-    padding: 12,
-    position: "absolute",
-    right: 16,
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.16,
-    shadowRadius: 20,
-  },
-  propertyImageFrame: {
-    alignItems: "center",
-    backgroundColor: "#E2E8F0",
-    borderRadius: 18,
-    height: 74,
-    justifyContent: "center",
-    overflow: "hidden",
-    width: 74,
-  },
-  propertyImage: {
-    height: 74,
-    width: 74,
-  },
-  imageCountBadge: {
-    backgroundColor: "rgba(15, 23, 42, 0.72)",
-    borderRadius: 999,
-    bottom: 6,
-    minWidth: 20,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    position: "absolute",
-    right: 6,
-  },
-  imageCountText: {
-    color: "#FFFFFF",
-    fontSize: 10,
-    fontWeight: "800",
-    textAlign: "center",
-  },
-  propertyDetails: {
-    flex: 1,
-    minWidth: 0,
-  },
-  propertyTitleRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-  },
-  propertyTitle: {
-    color: "#0F172A",
-    flex: 1,
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  dismissButton: {
-    alignItems: "center",
-    backgroundColor: "#F1F5F9",
-    borderRadius: 999,
-    height: 28,
-    justifyContent: "center",
-    width: 28,
-  },
-  propertyLocation: {
-    color: "#64748B",
-    fontSize: 12,
-    fontWeight: "600",
-    marginTop: 4,
-  },
-  propertyMetaRow: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: 8,
-    marginTop: 10,
-  },
-  statusPill: {
-    backgroundColor: "#DBEAFE",
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  statusText: {
-    color: "#2563EB",
-    fontSize: 10,
-    fontWeight: "800",
-    textTransform: "uppercase",
-  },
-  propertyValue: {
-    color: "#0F172A",
-    flex: 1,
-    fontSize: 12,
-    fontWeight: "800",
-  },
-  propertyType: {
-    color: "#64748B",
-    fontSize: 11,
-    fontWeight: "700",
-    marginTop: 5,
   },
 });
