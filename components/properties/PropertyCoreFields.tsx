@@ -7,6 +7,7 @@ import {
   cleanInteger,
   propertyClassificationChoices,
   propertyStatusChoices,
+  propertySupportsTransientBooking,
   requiresBedroomAndBathroomCounts,
   seaCountryChoices,
   type Choice,
@@ -231,36 +232,38 @@ export function PropertyCoreFields({
           value={form.occupancy}
         />
 
-        <View className="rounded-2xl bg-[#F7F8FA] p-4">
-          <View className="flex-row items-center justify-between gap-4">
-            <View className="min-w-0 flex-1 flex-row items-center gap-3">
-              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-                <MaterialCommunityIcons
-                  name="calendar-clock"
-                  color="#2563EB"
-                  size={21}
-                />
+        {propertySupportsTransientBooking(form.classification, form.type) ? (
+          <View className="rounded-2xl bg-[#F7F8FA] p-4">
+            <View className="flex-row items-center justify-between gap-4">
+              <View className="min-w-0 flex-1 flex-row items-center gap-3">
+                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">
+                  <MaterialCommunityIcons
+                    name="calendar-clock"
+                    color="#2563EB"
+                    size={21}
+                  />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-bold text-[#1d1d1f]">
+                    Allow short-term bookings
+                  </Text>
+                  <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+                    Guests can reserve this property for short stays.
+                  </Text>
+                </View>
               </View>
-              <View className="min-w-0 flex-1">
-                <Text className="text-sm font-bold text-[#1d1d1f]">
-                  Allow short-term bookings
-                </Text>
-                <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
-                  Guests can reserve this property for short stays.
-                </Text>
-              </View>
+              <Switch
+                accessibilityLabel="Allow short-term bookings"
+                onValueChange={(value) =>
+                  updateForm("isTransientBookable", value)
+                }
+                thumbColor="#FFFFFF"
+                trackColor={{ false: "#8E8E93", true: "#2563EB" }}
+                value={form.isTransientBookable}
+              />
             </View>
-            <Switch
-              accessibilityLabel="Allow short-term bookings"
-              onValueChange={(value) =>
-                updateForm("isTransientBookable", value)
-              }
-              thumbColor="#FFFFFF"
-              trackColor={{ false: "#8E8E93", true: "#2563EB" }}
-              value={form.isTransientBookable}
-            />
           </View>
-        </View>
+        ) : null}
       </PropertyFormSection>
     </>
   );

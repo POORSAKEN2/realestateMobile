@@ -182,6 +182,18 @@ export function propertySupportsRooms(
 
   return false;
 }
+export function propertySupportsTransientBooking(
+  classification?: string | null,
+  type?: string | null,
+) {
+  if (classification === "Residential") {
+    return true;
+  }
+  if (classification === "Commercial") {
+    return type === "Coworking Space" || type === "Mixed Use Building";
+  }
+  return false;
+}
 export function parseNumber(value: string) {
   const parsed = Number(value.trim().replace(/,/g, ""));
   return Number.isFinite(parsed) ? parsed : undefined;

@@ -2,6 +2,7 @@ import type { CreatePropertyPayload, UpdatePropertyPayload } from "../../types";
 import {
   parseInteger,
   parseNumber,
+  propertySupportsTransientBooking,
   requiresBedroomAndBathroomCounts,
   type FormState,
   type SelectedImage,
@@ -71,7 +72,9 @@ export function buildPropertyPayload(
     roi,
     lat,
     lng,
-    is_transient_bookable: form.isTransientBookable,
+    is_transient_bookable: propertySupportsTransientBooking(form.classification, form.type)
+      ? form.isTransientBookable
+      : false,
   };
 
   if (selectedImages.length > 0) payload.images = selectedImages;
