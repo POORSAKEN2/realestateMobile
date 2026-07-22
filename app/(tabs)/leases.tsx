@@ -41,14 +41,13 @@ type LeaseFormState = {
   propertyId: string;
   lesseeId: string;
   startDate: string;
-  endDate: string;
   durationMonths: string;
   monthlyRent: string;
   roomNumber: string;
   status: string;
 };
 
-type DateFieldKey = "startDate" | "endDate";
+type DateFieldKey = "startDate";
 
 type Option = {
   label: string;
@@ -59,7 +58,6 @@ const emptyLeaseForm: LeaseFormState = {
   propertyId: "",
   lesseeId: "",
   startDate: formatDateValue(new Date()),
-  endDate: "",
   durationMonths: "12",
   monthlyRent: "",
   roomNumber: "",
@@ -119,12 +117,12 @@ function calculateEndDate(startDateStr: string, months: number): string {
   if (!startDateStr || months < 1) return "";
   const [year, month, day] = startDateStr.split("-").map(Number);
   if (!year || !month || !day) return "";
-  const date = new Date(year, month - 1, day);
-  date.setMonth(date.getMonth() + Number(months));
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+
+  const targetMonth = month - 1 + Number(months);
+  const lastDayOfTargetMonth = new Date(year, targetMonth + 1, 0).getDate();
+  return formatDateValue(
+    new Date(year, targetMonth, Math.min(day, lastDayOfTargetMonth)),
+  );
 }
 
 function calculateDurationMonths(
@@ -146,7 +144,6 @@ function toLeaseForm(lease: Lease): LeaseFormState {
     propertyId: lease.propertyId,
     lesseeId: lease.lesseeId,
     startDate: lease.startDate,
-    endDate: lease.endDate ?? "",
     durationMonths: String(duration),
     monthlyRent: String(lease.monthlyRent || ""),
     roomNumber: lease.roomNumber ?? "",
@@ -805,15 +802,31 @@ export default function LeasesScreen() {
               onPress={() => openDatePicker("startDate")}
               variant="filled"
             />
-            <PickerField
+            <BaseField
               className="min-w-0 flex-1 gap-2"
-              label="End Date"
-              value={getDateLabel(form.endDate)}
-              placeholder="Select date"
-              onPress={() => openDatePicker("endDate")}
+              keyboardType="number-pad"
+              label="Duration (Months)"
+              onChangeText={(value) =>
+                updateForm("durationMonths", value.replace(/\D/g, ""))
+              }
+              placeholder="12"
+              value={form.durationMonths}
               variant="filled"
             />
           </View>
+
+          {form.startDate && Number(form.durationMonths) >= 1 ? (
+            <View className="flex-row items-center justify-between rounded-2xl border border-[#2563EB]/15 bg-[#2563EB]/5 px-4 py-3.5">
+              <Text className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+                Calculated End Date
+              </Text>
+              <Text className="font-soraSemiBold text-sm text-[#1d1d1f]">
+                {getDateLabel(
+                  calculateEndDate(form.startDate, Number(form.durationMonths)),
+                )}
+              </Text>
+            </View>
+          ) : null}
 
           <BaseField
             keyboardType="decimal-pad"
@@ -852,9 +865,7 @@ export default function LeasesScreen() {
               <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
                 <View className="mb-2 flex-row items-center justify-between">
                   <Text className="text-sm font-bold text-[#1d1d1f]">
-                    {activeDateField === "startDate"
-                      ? "Select Start Date"
-                      : "Select End Date"}
+                    Select Start Date
                   </Text>
                   <TouchableOpacity
                     activeOpacity={0.8}
@@ -868,11 +879,6 @@ export default function LeasesScreen() {
                 </View>
                 <DateTimePicker
                   display={Platform.OS === "ios" ? "inline" : "default"}
-                  minimumDate={
-                    activeDateField === "endDate" && form.startDate
-                      ? getDateValue(form.startDate)
-                      : undefined
-                  }
                   mode="date"
                   onChange={handleDateChange}
                   value={datePickerValue}
