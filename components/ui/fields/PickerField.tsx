@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ViewProps } from "react-native";
+import { Modal, View, Text, TouchableOpacity, ViewProps } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface PickerFieldProps {
@@ -15,6 +15,12 @@ interface PickerFieldProps {
   className?: string; // Overrides for container
   style?: ViewProps["style"];
   variant?: "default" | "filled";
+}
+
+interface PickerModalShellProps {
+  children: React.ReactNode;
+  onClose: () => void;
+  title: string;
 }
 
 export function PickerField({
@@ -74,5 +80,33 @@ export function PickerField({
             )}
       </TouchableOpacity>
     </View>
+  );
+}
+
+export function PickerModalShell({
+  children,
+  onClose,
+  title,
+}: PickerModalShellProps) {
+  return (
+    <Modal animationType="fade" onRequestClose={onClose} transparent visible>
+      <View className="flex-1 justify-center bg-black/40 px-5">
+        <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
+          <View className="mb-2 flex-row items-center justify-between">
+            <Text className="text-sm font-bold text-[#1d1d1f]">{title}</Text>
+            <TouchableOpacity
+              accessibilityLabel={`Close ${title}`}
+              accessibilityRole="button"
+              activeOpacity={0.8}
+              className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
+              onPress={onClose}
+            >
+              <Text className="text-xs font-bold text-[#2563EB]">Done</Text>
+            </TouchableOpacity>
+          </View>
+          {children}
+        </View>
+      </View>
+    </Modal>
   );
 }

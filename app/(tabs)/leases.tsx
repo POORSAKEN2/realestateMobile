@@ -33,35 +33,26 @@ import type { Lease, LeasePayload, Lessee, Property } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { ChoiceField } from "../../components/ui/fields/ChoiceField";
-import { PickerField } from "../../components/ui/fields/PickerField";
+import {
+  PickerField,
+  PickerModalShell,
+} from "../../components/ui/fields/PickerField";
 import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
-
-type LeaseFormState = {
-  propertyId: string;
-  lesseeId: string;
-  startDate: string;
-  durationMonths: string;
-  monthlyRent: string;
-  roomNumber: string;
-  status: string;
-};
-
-type DateFieldKey = "startDate";
+import {
+  calculateLeaseEndDate,
+  createEmptyLeaseForm,
+  createLeaseForm,
+  formatLeaseDateLabel,
+  formatLeaseDateValue,
+  getLeaseFormResult,
+  parseLeaseDateValue,
+  type LeaseFormState,
+} from "../../utils/leases/leaseForm";
 
 type Option = {
   label: string;
   value: string;
-};
-
-const emptyLeaseForm: LeaseFormState = {
-  propertyId: "",
-  lesseeId: "",
-  startDate: formatDateValue(new Date()),
-  durationMonths: "12",
-  monthlyRent: "",
-  roomNumber: "",
-  status: "Active",
 };
 
 const statusOptions: Option[] = [
@@ -81,107 +72,6 @@ function formatCurrency(value: number) {
 function cleanNumber(value: string) {
   return value.replace(/[^\d.]/g, "");
 }
-
-function formatDateValue(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-function getDateValue(value: string) {
-  if (!value) return new Date();
-
-  const [year, month, day] = value.split("-").map(Number);
-
-  if (!year || !month || !day) {
-    return new Date();
-  }
-
-  const date = new Date(year, month - 1, day);
-  return Number.isNaN(date.getTime()) ? new Date() : date;
-}
-
-function getDateLabel(value: string) {
-  if (!value) return "";
-
-  return getDateValue(value).toLocaleDateString("en-PH", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function calculateEndDate(startDateStr: string, months: number): string {
-  if (!startDateStr || months < 1) return "";
-  const [year, month, day] = startDateStr.split("-").map(Number);
-  if (!year || !month || !day) return "";
-
-  const targetMonth = month - 1 + Number(months);
-  const lastDayOfTargetMonth = new Date(year, targetMonth + 1, 0).getDate();
-  return formatDateValue(
-    new Date(year, targetMonth, Math.min(day, lastDayOfTargetMonth)),
-  );
-}
-
-function calculateDurationMonths(
-  startDateStr: string,
-  endDateStr: string,
-): number {
-  if (!startDateStr || !endDateStr) return 12;
-  const start = new Date(startDateStr);
-  const end = new Date(endDateStr);
-  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 12;
-  const years = end.getFullYear() - start.getFullYear();
-  const months = end.getMonth() - start.getMonth() + years * 12;
-  return months >= 1 ? months : 1;
-}
-
-function toLeaseForm(lease: Lease): LeaseFormState {
-  const duration = calculateDurationMonths(lease.startDate, lease.endDate);
-  return {
-    propertyId: lease.propertyId,
-    lesseeId: lease.lesseeId,
-    startDate: lease.startDate,
-    durationMonths: String(duration),
-    monthlyRent: String(lease.monthlyRent || ""),
-    roomNumber: lease.roomNumber ?? "",
-    status: lease.status || "Active",
-  };
-}
-
-// function DateField({
-//   label,
-//   value,
-//   placeholder,
-//   onPress,
-// }: {
-//   label: string;
-//   value: string;
-//   placeholder: string;
-//   onPress: () => void;
-// }) {
-//   return (
-//     <View className="gap-2">
-//       <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
-//         {label}
-//       </Text>
-//       <TouchableOpacity
-//         activeOpacity={0.85}
-//         className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
-//         onPress={onPress}
-//       >
-//         <Text
-//           className={`text-base ${value ? "text-[#1d1d1f]" : "text-[#6F6D6D]"}`}
-//         >
-//           {getDateLabel(value) || placeholder}
-//         </Text>
-//         <Ionicons name="calendar-outline" color="#2563EB" size={20} />
-//       </TouchableOpacity>
-//     </View>
-//   );
-// }
 
 function MetricCard({
   icon,
@@ -372,15 +262,13 @@ export default function LeasesScreen() {
   const params = useLocalSearchParams<{ action?: string }>();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [form, setForm] = useState<LeaseFormState>(emptyLeaseForm);
+  const [form, setForm] = useState<LeaseFormState>(createEmptyLeaseForm);
   const [formError, setFormError] = useState("");
   const [editingLease, setEditingLease] = useState<Lease | null>(null);
   const [selectedTenant, setSelectedTenant] = useState<Lessee | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Lease | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [activeDateField, setActiveDateField] = useState<DateFieldKey | null>(
-    null,
-  );
+  const [isStartDatePickerOpen, setIsStartDatePickerOpen] = useState(false);
   const [datePickerValue, setDatePickerValue] = useState(new Date());
   const datePickerValueRef = useRef(datePickerValue);
 
@@ -406,9 +294,9 @@ export default function LeasesScreen() {
       await queryClient.invalidateQueries({ queryKey: ["leases"] });
       setIsFormOpen(false);
       setEditingLease(null);
-      setForm(emptyLeaseForm);
+      setForm(createEmptyLeaseForm());
       setFormError("");
-      setActiveDateField(null);
+      setIsStartDatePickerOpen(false);
     },
     onError: (error) => {
       setFormError(
@@ -475,34 +363,34 @@ export default function LeasesScreen() {
   function openCreateForm() {
     setEditingLease(null);
     setForm({
-      ...emptyLeaseForm,
+      ...createEmptyLeaseForm(),
       propertyId: properties[0]?.id ?? "",
       lesseeId: lessees[0]?.id ?? "",
     });
     setFormError("");
-    setActiveDateField(null);
+    setIsStartDatePickerOpen(false);
     setIsFormOpen(true);
   }
 
   function openEditForm(lease: Lease) {
     setEditingLease(lease);
-    setForm(toLeaseForm(lease));
+    setForm(createLeaseForm(lease));
     setFormError("");
-    setActiveDateField(null);
+    setIsStartDatePickerOpen(false);
     setIsFormOpen(true);
   }
 
   function closeForm() {
     setIsFormOpen(false);
     setEditingLease(null);
-    setForm(emptyLeaseForm);
+    setForm(createEmptyLeaseForm());
     setFormError("");
-    setActiveDateField(null);
+    setIsStartDatePickerOpen(false);
   }
 
   function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (event.type === "dismissed" || !activeDateField || !selectedDate) {
-      if (Platform.OS === "android") setActiveDateField(null);
+    if (event.type === "dismissed" || !selectedDate) {
+      if (Platform.OS === "android") setIsStartDatePickerOpen(false);
       return;
     }
 
@@ -511,67 +399,33 @@ export default function LeasesScreen() {
     setDatePickerValue(selectedDate);
 
     if (Platform.OS === "android") {
-      updateForm(activeDateField, formatDateValue(selectedDate));
-      setActiveDateField(null);
+      updateForm("startDate", formatLeaseDateValue(selectedDate));
+      setIsStartDatePickerOpen(false);
     }
   }
 
-  function openDatePicker(field: DateFieldKey) {
-    const initialDate = getDateValue(form[field]);
+  function openStartDatePicker() {
+    const initialDate = parseLeaseDateValue(form.startDate);
     datePickerValueRef.current = initialDate;
     setDatePickerValue(initialDate);
-    setActiveDateField(field);
+    setIsStartDatePickerOpen(true);
   }
 
   function confirmDatePicker() {
-    if (!activeDateField) return;
-
-    updateForm(activeDateField, formatDateValue(datePickerValueRef.current));
-    setActiveDateField(null);
+    updateForm("startDate", formatLeaseDateValue(datePickerValueRef.current));
+    setIsStartDatePickerOpen(false);
   }
 
   function handleSubmit() {
     setFormError("");
+    const result = getLeaseFormResult(form);
 
-    const monthlyRent = Number(form.monthlyRent || 0);
-    const durationMonths = parseInt(form.durationMonths, 10);
-
-    if (!form.propertyId) {
-      setFormError("Please select a property.");
+    if (!result.isValid) {
+      setFormError(result.error);
       return;
     }
 
-    if (!form.lesseeId) {
-      setFormError("Please select a tenant.");
-      return;
-    }
-
-    if (!form.startDate) {
-      setFormError("Start date is required.");
-      return;
-    }
-
-    if (Number.isNaN(durationMonths) || durationMonths < 1) {
-      setFormError("Lease duration must be at least 1 month.");
-      return;
-    }
-
-    if (Number.isNaN(monthlyRent) || monthlyRent <= 0) {
-      setFormError("Monthly rent must be a valid amount greater than 0.");
-      return;
-    }
-
-    const calculatedEndDate = calculateEndDate(form.startDate, durationMonths);
-
-    saveMutation.mutate({
-      propertyId: form.propertyId,
-      lesseeId: form.lesseeId,
-      startDate: form.startDate,
-      endDate: calculatedEndDate,
-      monthlyRent,
-      roomNumber: form.roomNumber.trim(),
-      status: form.status,
-    });
+    saveMutation.mutate(result.payload);
   }
 
   const isLoading = isLoadingLeases || isLoadingLessees || isLoadingProperties;
@@ -797,9 +651,9 @@ export default function LeasesScreen() {
             <PickerField
               className="min-w-0 flex-1 gap-2"
               label="Start Date"
-              value={getDateLabel(form.startDate)}
+              value={formatLeaseDateLabel(form.startDate)}
               placeholder="Select date"
-              onPress={() => openDatePicker("startDate")}
+              onPress={openStartDatePicker}
               variant="filled"
             />
             <BaseField
@@ -821,8 +675,11 @@ export default function LeasesScreen() {
                 Calculated End Date
               </Text>
               <Text className="font-soraSemiBold text-sm text-[#1d1d1f]">
-                {getDateLabel(
-                  calculateEndDate(form.startDate, Number(form.durationMonths)),
+                {formatLeaseDateLabel(
+                  calculateLeaseEndDate(
+                    form.startDate,
+                    Number(form.durationMonths),
+                  ),
                 )}
               </Text>
             </View>
@@ -854,38 +711,18 @@ export default function LeasesScreen() {
           />
         </FormSection>
 
-        {activeDateField ? (
-          <Modal
-            animationType="fade"
-            onRequestClose={() => setActiveDateField(null)}
-            transparent
-            visible
+        {isStartDatePickerOpen ? (
+          <PickerModalShell
+            onClose={confirmDatePicker}
+            title="Select Start Date"
           >
-            <View className="flex-1 justify-center bg-black/40 px-5">
-              <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
-                <View className="mb-2 flex-row items-center justify-between">
-                  <Text className="text-sm font-bold text-[#1d1d1f]">
-                    Select Start Date
-                  </Text>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
-                    onPress={confirmDatePicker}
-                  >
-                    <Text className="text-xs font-bold text-[#2563EB]">
-                      Done
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <DateTimePicker
-                  display={Platform.OS === "ios" ? "inline" : "default"}
-                  mode="date"
-                  onChange={handleDateChange}
-                  value={datePickerValue}
-                />
-              </View>
-            </View>
-          </Modal>
+            <DateTimePicker
+              display={Platform.OS === "ios" ? "inline" : "default"}
+              mode="date"
+              onChange={handleDateChange}
+              value={datePickerValue}
+            />
+          </PickerModalShell>
         ) : null}
       </AddEditModal>
 
