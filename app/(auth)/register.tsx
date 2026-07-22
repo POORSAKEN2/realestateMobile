@@ -168,7 +168,7 @@ export default function RegisterScreen() {
                     onPress={() => setShowPassword((current) => !current)}
                   >
                     <Feather
-                      name={showPassword ? "eye-off" : "eye"}
+                      name={showPassword ? "eye" : "eye-off"}
                       size={20}
                       color="#5f6b6b"
                     />
@@ -221,7 +221,7 @@ export default function RegisterScreen() {
                     }
                   >
                     <Feather
-                      name={showConfirmPassword ? "eye-off" : "eye"}
+                      name={showConfirmPassword ? "eye" : "eye-off"}
                       size={20}
                       color="#5f6b6b"
                     />
