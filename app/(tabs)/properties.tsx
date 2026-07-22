@@ -126,7 +126,7 @@ export default function PropertiesScreen() {
     mutationFn: async (payload: PropertyFormPayload) => {
       const property = editingProperty
         ? await propertyFetchers.update({ id: editingProperty.id, payload })
-        : await propertyFetchers.create(payload);
+        : await propertyFetchers.create(payload as CreatePropertyPayload);
 
       if (selectedDocuments.length > 0) {
         await uploadPropertyDocuments(

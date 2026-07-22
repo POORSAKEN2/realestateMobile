@@ -41,6 +41,7 @@ type LeaseFormState = {
   lesseeId: string;
   startDate: string;
   endDate: string;
+  durationMonths: string;
   monthlyRent: string;
   roomNumber: string;
   status: string;
@@ -56,8 +57,9 @@ type Option = {
 const emptyLeaseForm: LeaseFormState = {
   propertyId: "",
   lesseeId: "",
-  startDate: "",
+  startDate: formatDateValue(new Date()),
   endDate: "",
+  durationMonths: "12",
   monthlyRent: "",
   roomNumber: "",
   status: "Active",
@@ -112,12 +114,36 @@ function getDateLabel(value: string) {
   });
 }
 
+function calculateEndDate(startDateStr: string, months: number): string {
+  if (!startDateStr || months < 1) return "";
+  const [year, month, day] = startDateStr.split("-").map(Number);
+  if (!year || !month || !day) return "";
+  const date = new Date(year, month - 1, day);
+  date.setMonth(date.getMonth() + Number(months));
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function calculateDurationMonths(startDateStr: string, endDateStr: string): number {
+  if (!startDateStr || !endDateStr) return 12;
+  const start = new Date(startDateStr);
+  const end = new Date(endDateStr);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 12;
+  const years = end.getFullYear() - start.getFullYear();
+  const months = end.getMonth() - start.getMonth() + years * 12;
+  return months >= 1 ? months : 1;
+}
+
 function toLeaseForm(lease: Lease): LeaseFormState {
+  const duration = calculateDurationMonths(lease.startDate, lease.endDate);
   return {
     propertyId: lease.propertyId,
     lesseeId: lease.lesseeId,
     startDate: lease.startDate,
-    endDate: lease.endDate,
+    endDate: lease.endDate ?? "",
+    durationMonths: String(duration),
     monthlyRent: String(lease.monthlyRent || ""),
     roomNumber: lease.roomNumber ?? "",
     status: lease.status || "Active",
@@ -507,6 +533,7 @@ export default function LeasesScreen() {
     setFormError("");
 
     const monthlyRent = Number(form.monthlyRent || 0);
+    const durationMonths = parseInt(form.durationMonths, 10);
 
     if (!form.propertyId) {
       setFormError("Please select a property.");
@@ -518,26 +545,28 @@ export default function LeasesScreen() {
       return;
     }
 
-    if (!form.startDate || !form.endDate) {
-      setFormError("Start date and end date are required.");
+    if (!form.startDate) {
+      setFormError("Start date is required.");
       return;
     }
 
-    if (getDateValue(form.endDate) <= getDateValue(form.startDate)) {
-      setFormError("End date must be after the start date.");
+    if (Number.isNaN(durationMonths) || durationMonths < 1) {
+      setFormError("Lease duration must be at least 1 month.");
       return;
     }
 
-    if (Number.isNaN(monthlyRent) || monthlyRent < 0) {
-      setFormError("Monthly rent must be a valid amount.");
+    if (Number.isNaN(monthlyRent) || monthlyRent <= 0) {
+      setFormError("Monthly rent must be a valid amount greater than 0.");
       return;
     }
+
+    const calculatedEndDate = calculateEndDate(form.startDate, durationMonths);
 
     saveMutation.mutate({
       propertyId: form.propertyId,
       lesseeId: form.lesseeId,
       startDate: form.startDate,
-      endDate: form.endDate,
+      endDate: calculatedEndDate,
       monthlyRent,
       roomNumber: form.roomNumber.trim(),
       status: form.status,
@@ -752,19 +781,45 @@ export default function LeasesScreen() {
               value={form.startDate}
               placeholder="Select date"
               onPress={() => openDatePicker("startDate")}
-              // Automatically uses calendar icon & blue styling by default
             />
           </View>
           <View className="flex-1">
-            <PickerField
-              label="End Date"
-              value={form.endDate}
-              placeholder="Select date"
-              onPress={() => openDatePicker("endDate")}
-              // Automatically uses calendar icon & blue styling by default
+            <BaseField
+              keyboardType="number-pad"
+              label="Duration (Months)"
+              onChangeText={(value) =>
+                updateForm("durationMonths", cleanNumber(value))
+              }
+              placeholder="12"
+              value={form.durationMonths}
             />
           </View>
         </View>
+
+        {form.startDate && Number(form.durationMonths) >= 1 ? (
+          <View className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 flex-row items-center justify-between">
+            <Text className="text-xs font-semibold text-slate-500">Inferred End Date</Text>
+            <Text className="text-xs font-bold text-slate-900">
+              {getDateLabel(calculateEndDate(form.startDate, Number(form.durationMonths)))}
+            </Text>
+          </View>
+        ) : null}
+
+        {Number(form.durationMonths) >= 1 && Number(form.monthlyRent) > 0 ? (
+          <View className="rounded-2xl border border-blue-100 bg-blue-50/60 p-4 flex-row items-center justify-between">
+            <View>
+              <Text className="text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                Estimated Total Cost
+              </Text>
+              <Text className="mt-0.5 text-xs text-slate-500">
+                {formatCurrency(Number(form.monthlyRent))} × {form.durationMonths} month{Number(form.durationMonths) > 1 ? "s" : ""}
+              </Text>
+            </View>
+            <Text className="font-soraSemiBold text-lg text-blue-600">
+              {formatCurrency(Number(form.monthlyRent) * Number(form.durationMonths))}
+            </Text>
+          </View>
+        ) : null}
 
         <BaseField
           keyboardType="decimal-pad"
