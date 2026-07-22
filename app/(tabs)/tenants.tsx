@@ -28,6 +28,7 @@ import { useAuth } from "../../hooks/useAuth";
 import type { Lessee, LesseePayload, Property } from "../../types";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
+import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
 
 type TenantFormState = {
@@ -542,6 +543,7 @@ export default function TenantsScreen() {
       </View>
 
       <AddEditModal
+        appearance="card"
         isVisible={isFormOpen}
         onClose={closeForm}
         title={editingTenant ? "Edit Tenant" : "Add Tenant"}
@@ -550,27 +552,38 @@ export default function TenantsScreen() {
         submitText={editingTenant ? "Save Tenant" : "Create Tenant"}
         onSubmit={handleSubmit}
         formError={formError}
+        showCancelAction
       >
-        <BaseField
-          label="Full Name"
-          onChangeText={(value) => updateForm("name", value)}
-          placeholder="e.g. Juan Dela Cruz"
-          value={form.name}
-        />
-        <BaseField
-          keyboardType="email-address"
-          label="Email"
-          onChangeText={(value) => updateForm("contactEmail", value)}
-          placeholder="tenant@example.com"
-          value={form.contactEmail}
-        />
-        <BaseField
-          keyboardType="phone-pad"
-          label="Phone"
-          onChangeText={(value) => updateForm("phone", value)}
-          placeholder="+63..."
-          value={form.phone}
-        />
+        <FormSection
+          description="Add the contact information used across leases and property records."
+          icon="account-details-outline"
+          title="Contact details"
+          variant="card"
+        >
+          <BaseField
+            label="Full Name"
+            onChangeText={(value) => updateForm("name", value)}
+            placeholder="e.g. Juan Dela Cruz"
+            value={form.name}
+            variant="filled"
+          />
+          <BaseField
+            keyboardType="email-address"
+            label="Email"
+            onChangeText={(value) => updateForm("contactEmail", value)}
+            placeholder="tenant@example.com"
+            value={form.contactEmail}
+            variant="filled"
+          />
+          <BaseField
+            keyboardType="phone-pad"
+            label="Phone"
+            onChangeText={(value) => updateForm("phone", value)}
+            placeholder="+63..."
+            value={form.phone}
+            variant="filled"
+          />
+        </FormSection>
       </AddEditModal>
 
       <Modal

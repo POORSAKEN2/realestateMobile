@@ -60,6 +60,12 @@ const expenseStatusChoices: Choice<Expense["status"]>[] = [
   { label: "Paid", value: "Paid" },
 ];
 
+const expenseDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
 const summary = [
   { label: "Monthly Spend", value: "₱128.4k", icon: "receipt-outline" },
   { label: "Maintenance", value: "₱42.8k", icon: "construct-outline" },
@@ -328,6 +334,7 @@ export default function ExpensesScreen() {
 
       {/* --- ADD / EDIT FORM MODAL --- */}
       <AddEditModal
+        appearance="card"
         isVisible={isFormVisible}
         onClose={closeForm}
         title={editingExpense ? "Expense Details" : "Record an expense"}
@@ -340,23 +347,23 @@ export default function ExpensesScreen() {
         submitText={editingExpense ? "Save Expense" : "Add Expense"}
         onSubmit={handleSubmit}
         formError={formError}
+        showCancelAction
       >
-        <View className="flex-row items-start gap-2 rounded-2xl bg-[#2563EB]/10 px-4 py-3">
+        <View className="flex-row items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3.5">
           <MaterialCommunityIcons
             name="information-outline"
-            color="#1E40AF"
-            size={18}
+            color="#2563EB"
+            size={20}
           />
-          <Text className="min-w-0 flex-1 text-sm leading-5 text-[#1E40AF]">
-            Fields marked with * are required. Link each expense to a property
-            so portfolio reporting stays accurate.
+          <Text className="min-w-0 flex-1 font-sora text-sm leading-5 text-[#1E40AF]">
+            Link each expense to a property for accurate reporting.
           </Text>
         </View>
 
         <FormSection
-          description="Choose where the cost belongs and how it should be reported."
           icon="office-building-outline"
           title="Expense details"
+          variant="card"
         >
           <DropdownField
             required
@@ -365,27 +372,8 @@ export default function ExpensesScreen() {
             value={form.propertyId}
             options={propertyOptions}
             onSelect={(value) => updateForm("propertyId", value)}
+            variant="filled"
           />
-
-          {selectedProperty ? (
-            <View className="flex-row items-center gap-3 rounded-2xl bg-[#F7F8FA] p-4">
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#2563EB]/10">
-                <MaterialCommunityIcons
-                  name="map-marker-outline"
-                  color="#2563EB"
-                  size={20}
-                />
-              </View>
-              <View className="min-w-0 flex-1">
-                <Text className="text-sm font-bold text-[#1d1d1f]">
-                  {selectedProperty.title}
-                </Text>
-                <Text className="mt-0.5 text-xs text-slate-600">
-                  {selectedProperty.location}
-                </Text>
-              </View>
-            </View>
-          ) : null}
 
           <DropdownField
             required
@@ -394,13 +382,14 @@ export default function ExpensesScreen() {
             value={form.category}
             options={expenseCategoryChoices}
             onSelect={(value) => updateForm("category", value)}
+            variant="filled"
           />
         </FormSection>
 
         <FormSection
-          description="Enter the amount, transaction date, and supporting reference."
           icon="cash-multiple"
           title="Payment details"
+          variant="card"
         >
           <BaseField
             keyboardType="decimal-pad"
@@ -409,15 +398,33 @@ export default function ExpensesScreen() {
             value={form.amount}
             onChangeText={(value) => updateForm("amount", cleanDecimal(value))}
             required
+            variant="filled"
           />
 
-          <PickerField
-            label="Transaction date"
-            placeholder="Select transaction date"
-            required
-            value={form.date}
-            onPress={() => setIsDatePickerVisible(true)}
-          />
+          <View className="flex-row gap-3">
+            <PickerField
+              className="min-w-0 flex-1 gap-2"
+              label="Transaction date"
+              placeholder="Select transaction date"
+              required
+              value={
+                form.date
+                  ? expenseDateFormatter.format(parseDateValue(form.date))
+                  : ""
+              }
+              onPress={() => setIsDatePickerVisible(true)}
+              variant="filled"
+            />
+
+            <BaseField
+              label="Reference number"
+              placeholder="Optional"
+              value={form.referenceNumber}
+              onChangeText={(value) => updateForm("referenceNumber", value)}
+              variant="filled"
+              wrapperClassName="min-w-0 flex-1"
+            />
+          </View>
 
           {isDatePickerVisible ? (
             <Modal
@@ -452,28 +459,20 @@ export default function ExpensesScreen() {
               </View>
             </Modal>
           ) : null}
-
-          <BaseField
-            label="Reference number"
-            placeholder="Invoice, receipt, or check number (optional)"
-            value={form.referenceNumber}
-            onChangeText={(value) => updateForm("referenceNumber", value)}
-          />
         </FormSection>
 
         <FormSection
-          description="Set the payment state and add any useful context."
           icon="clipboard-text-outline"
           title="Status & notes"
+          variant="card"
         >
-          <View className="rounded-2xl bg-[#F7F8FA] p-4">
-            <ChoiceGroup
-              choices={expenseStatusChoices}
-              label="Transaction status"
-              value={form.status}
-              onSelect={(value) => updateForm("status", value)}
-            />
-          </View>
+          <ChoiceGroup
+            choices={expenseStatusChoices}
+            label="Transaction status"
+            value={form.status}
+            onSelect={(value) => updateForm("status", value)}
+            variant="segmented"
+          />
 
           <BaseField
             label="Description"
@@ -482,6 +481,7 @@ export default function ExpensesScreen() {
             placeholder="Add an optional cost breakdown or note"
             value={form.description}
             onChangeText={(value) => updateForm("description", value)}
+            variant="filled"
           />
         </FormSection>
       </AddEditModal>

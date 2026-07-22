@@ -27,6 +27,7 @@ import {
   SearchableOptionSelector,
   SelectionField,
 } from "./SearchableOptionSelector";
+import { FormSection } from "../ui/forms/FormSection";
 
 type SelectorMode = "property" | "tenant" | null;
 
@@ -117,7 +118,7 @@ export function DocumentFormModal({
       >
         <View
           accessibilityViewIsModal
-          className="max-h-[94%] min-h-[620px] rounded-t-[30px] bg-white"
+          className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-[#F5F7FC]"
         >
           <View className="pt-3">
             <View className="mb-3 h-1 w-10 self-center rounded-full bg-slate-300" />
@@ -151,26 +152,25 @@ export function DocumentFormModal({
             />
           ) : (
             <>
-              <View className="flex-row items-center justify-between border-b border-slate-100 px-5 pb-4">
+              <View className="flex-row items-center justify-between bg-white px-6 pb-5 pt-2">
                 <View className="min-w-0 flex-1 pr-3">
                   <Text
                     accessibilityRole="header"
-                    className="font-soraBold text-xl text-slate-950"
+                    className="font-soraSemiBold text-[28px] leading-9 tracking-tight text-slate-950"
                   >
                     {editingDocument ? "Edit document" : "Upload document"}
                   </Text>
-                  {editingDocument ? (
-                    <Text className="mt-1 font-sora text-xs leading-5 text-slate-500">
-                      Update its details or choose a file to create a new
-                      version.
-                    </Text>
-                  ) : null}
+                  <Text className="mt-2 font-sora text-sm leading-5 text-slate-500">
+                    {editingDocument
+                      ? "Update its details or choose a replacement file."
+                      : "Organize a file by category, property, and tenant."}
+                  </Text>
                 </View>
                 <TouchableOpacity
                   accessibilityLabel="Close document form"
                   accessibilityRole="button"
                   activeOpacity={0.75}
-                  className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+                  className="h-11 w-11 items-center justify-center rounded-full bg-transparent"
                   onPress={onClose}
                 >
                   <MaterialCommunityIcons
@@ -182,7 +182,7 @@ export function DocumentFormModal({
               </View>
 
               <ScrollView
-                contentContainerClassName="gap-5 p-5"
+                contentContainerClassName="gap-4 p-5"
                 keyboardShouldPersistTaps="handled"
               >
                 {formError ? (
@@ -197,103 +197,129 @@ export function DocumentFormModal({
                   </View>
                 ) : null}
 
-                <FileField
-                  editingDocument={editingDocument}
-                  error={errors.file}
-                  onClear={onClearFile}
-                  onPick={onPickFile}
-                  selectedFile={selectedFile}
-                />
-
-                <View className="gap-2">
-                  <FieldLabel label="Name" required />
-                  <TextInput
-                    accessibilityLabel="Document name, required"
-                    className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-soraMedium text-sm text-slate-950 ${
-                      errors.name ? "border-red-400" : "border-slate-200"
-                    }`}
-                    onChangeText={(name) => onChangeForm({ ...form, name })}
-                    placeholder="Document name"
-                    placeholderTextColor="#94A3B8"
-                    value={form.name}
+                <FormSection
+                  icon="file-upload-outline"
+                  title="Document file"
+                  variant="card"
+                >
+                  <FileField
+                    editingDocument={editingDocument}
+                    error={errors.file}
+                    onClear={onClearFile}
+                    onPick={onPickFile}
+                    selectedFile={selectedFile}
                   />
-                  {errors.name ? (
-                    <Text
-                      accessibilityLiveRegion="assertive"
-                      className="font-soraMedium text-xs text-red-600"
-                    >
-                      {errors.name}
-                    </Text>
-                  ) : null}
-                </View>
+                </FormSection>
 
-                <View className="gap-2">
-                  <FieldLabel label="Category" />
-                  <View className="flex-row flex-wrap gap-2">
-                    {DOCUMENT_CATEGORIES.map((category) => {
-                      const isSelected = form.category === category;
-                      return (
-                        <TouchableOpacity
-                          key={category}
-                          accessibilityRole="radio"
-                          accessibilityState={{ checked: isSelected }}
-                          activeOpacity={0.8}
-                          className={`min-h-11 justify-center rounded-2xl border px-4 ${
-                            isSelected
-                              ? "border-slate-950 bg-slate-950"
-                              : "border-slate-200 bg-white"
-                          }`}
-                          onPress={() => onChangeForm({ ...form, category })}
-                        >
-                          <Text
-                            className={`font-soraSemiBold text-xs ${
-                              isSelected ? "text-white" : "text-slate-600"
-                            }`}
-                          >
-                            {category}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-
-                <SelectionField
-                  label="Property"
-                  onPress={() => setSelectorMode("property")}
-                  value={selectedProperty?.label ?? "No property link"}
-                />
-                <SelectionField
-                  label="Tenant"
-                  onPress={() => setSelectorMode("tenant")}
-                  value={selectedTenant?.label ?? "No tenant link"}
-                />
-
-                {editingDocument && selectedFile ? (
+                <FormSection
+                  icon="file-document-edit-outline"
+                  title="Document details"
+                  variant="card"
+                >
                   <View className="gap-2">
-                    <FieldLabel label="Version note" />
+                    <FieldLabel label="Name" required />
                     <TextInput
-                      accessibilityLabel="Version note"
-                      className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-soraMedium text-sm text-slate-950"
-                      multiline
-                      onChangeText={(revisionComment) =>
-                        onChangeForm({ ...form, revisionComment })
-                      }
-                      placeholder="For example: Signed copy uploaded"
+                      accessibilityLabel="Document name, required"
+                      className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-sora text-base text-slate-950 ${
+                        errors.name ? "border-red-400" : "border-slate-200"
+                      }`}
+                      onChangeText={(name) => onChangeForm({ ...form, name })}
+                      placeholder="Document name"
                       placeholderTextColor="#94A3B8"
-                      textAlignVertical="top"
-                      value={form.revisionComment}
+                      value={form.name}
                     />
+                    {errors.name ? (
+                      <Text
+                        accessibilityLiveRegion="assertive"
+                        className="font-soraMedium text-xs text-red-600"
+                      >
+                        {errors.name}
+                      </Text>
+                    ) : null}
                   </View>
-                ) : null}
+
+                  <View className="gap-2">
+                    <FieldLabel label="Category" />
+                    <View className="flex-row flex-wrap gap-2">
+                      {DOCUMENT_CATEGORIES.map((category) => {
+                        const isSelected = form.category === category;
+                        return (
+                          <TouchableOpacity
+                            key={category}
+                            accessibilityRole="radio"
+                            accessibilityState={{ checked: isSelected }}
+                            activeOpacity={0.8}
+                            className={`min-h-11 justify-center rounded-2xl border px-4 ${
+                              isSelected
+                                ? "border-[#2563EB] bg-[#2563EB]"
+                                : "border-slate-200 bg-slate-50"
+                            }`}
+                            onPress={() => onChangeForm({ ...form, category })}
+                          >
+                            <Text
+                              className={`font-soraSemiBold text-xs ${
+                                isSelected ? "text-white" : "text-slate-600"
+                              }`}
+                            >
+                              {category}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+
+                  <SelectionField
+                    label="Property"
+                    onPress={() => setSelectorMode("property")}
+                    value={selectedProperty?.label ?? "No property link"}
+                  />
+                  <SelectionField
+                    label="Tenant"
+                    onPress={() => setSelectorMode("tenant")}
+                    value={selectedTenant?.label ?? "No tenant link"}
+                  />
+
+                  {editingDocument && selectedFile ? (
+                    <View className="gap-2">
+                      <FieldLabel label="Version note" />
+                      <TextInput
+                        accessibilityLabel="Version note"
+                        className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-sora text-base text-slate-950"
+                        multiline
+                        onChangeText={(revisionComment) =>
+                          onChangeForm({ ...form, revisionComment })
+                        }
+                        placeholder="For example: Signed copy uploaded"
+                        placeholderTextColor="#94A3B8"
+                        textAlignVertical="top"
+                        value={form.revisionComment}
+                      />
+                    </View>
+                  ) : null}
+                </FormSection>
               </ScrollView>
 
-              <View className="border-t border-slate-100 p-5 pb-8">
+              <View className="flex-row gap-3 border-t border-slate-200 bg-white p-5 pb-8">
+                <TouchableOpacity
+                  accessibilityLabel="Cancel document form"
+                  accessibilityRole="button"
+                  activeOpacity={0.85}
+                  className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-[#2563EB] bg-white ${
+                    isSaving ? "opacity-60" : ""
+                  }`}
+                  disabled={isSaving}
+                  onPress={onClose}
+                >
+                  <Text className="font-soraSemiBold text-base text-[#2563EB]">
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   accessibilityRole="button"
                   accessibilityState={{ disabled: !canSubmit }}
                   activeOpacity={0.85}
-                  className={`min-h-14 items-center justify-center rounded-2xl bg-blue-600 ${
+                  className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-blue-600 ${
                     canSubmit ? "" : "opacity-40"
                   }`}
                   disabled={!canSubmit}
@@ -302,7 +328,7 @@ export function DocumentFormModal({
                   {isSaving ? (
                     <ActivityIndicator color="#FFFFFF" />
                   ) : (
-                    <Text className="font-soraBold text-sm text-white">
+                    <Text className="font-soraSemiBold text-base text-white">
                       {editingDocument ? "Save changes" : "Upload document"}
                     </Text>
                   )}
@@ -409,7 +435,7 @@ function FieldLabel({
   required?: boolean;
 }) {
   return (
-    <Text className="font-soraSemiBold text-xs uppercase tracking-wide text-slate-500">
+    <Text className="font-soraMedium text-sm text-slate-600">
       {label}
       {required ? <Text className="text-red-600"> *</Text> : null}
     </Text>

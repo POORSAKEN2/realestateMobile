@@ -13,6 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface AddEditModalProps {
+  appearance?: "default" | "card";
+  cancelText?: string;
   isVisible: boolean;
   onClose: () => void;
   title: string;
@@ -21,10 +23,13 @@ interface AddEditModalProps {
   submitText: string;
   onSubmit: () => void;
   formError?: string | null;
+  showCancelAction?: boolean;
   children: React.ReactNode;
 }
 
 export const AddEditModal: React.FC<AddEditModalProps> = ({
+  appearance = "default",
+  cancelText = "Cancel",
   isVisible,
   onClose,
   title,
@@ -33,9 +38,11 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
   submitText,
   onSubmit,
   formError,
+  showCancelAction = false,
   children,
 }) => {
   const scrollRef = useRef<ScrollView | null>(null);
+  const isCardAppearance = appearance === "card";
 
   useEffect(() => {
     if (formError) scrollRef.current?.scrollTo({ animated: true, y: 0 });
@@ -51,20 +58,34 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
       {/* Explicit style layout string replaces 'modal-container' */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        className="flex-1 bg-[#F7F8FA]"
+        className={`flex-1 ${isCardAppearance ? "bg-[#F5F7FC]" : "bg-[#F7F8FA]"}`}
       >
-        <View className="border-b border-slate-200 bg-white px-5 py-4">
+        <View
+          className={
+            isCardAppearance
+              ? "bg-white px-6 pb-5 pt-6"
+              : "border-b border-slate-200 bg-white px-5 py-4"
+          }
+        >
           <View className="flex-row items-center">
             <View className="flex-1 pr-4">
               <Text
-                className="font-soraSemiBold text-2xl text-[#1d1d1f]"
+                className={
+                  isCardAppearance
+                    ? "font-soraSemiBold text-[28px] leading-9 tracking-tight text-[#1d1d1f]"
+                    : "font-soraSemiBold text-2xl text-[#1d1d1f]"
+                }
                 numberOfLines={2}
               >
                 {title}
               </Text>
               {subtitle ? (
                 <Text
-                  className="mt-1 font-sora text-sm text-[#6F6D6D]"
+                  className={
+                    isCardAppearance
+                      ? "mt-2 font-sora text-base leading-6 text-slate-500"
+                      : "mt-1 font-sora text-sm text-[#6F6D6D]"
+                  }
                   numberOfLines={2}
                 >
                   {subtitle}
@@ -75,7 +96,9 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               accessibilityLabel={`Close ${title}`}
               accessibilityRole="button"
               activeOpacity={0.8}
-              className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+              className={`h-11 w-11 items-center justify-center rounded-full ${
+                isCardAppearance ? "bg-transparent" : "bg-slate-100"
+              }`}
               onPress={onClose}
             >
               <Ionicons name="close" color="#3d3d3d" size={22} />
@@ -86,7 +109,9 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
         <ScrollView
           automaticallyAdjustKeyboardInsets
           className="flex-1"
-          contentContainerClassName="gap-6 px-5 pb-10 pt-5"
+          contentContainerClassName={
+            isCardAppearance ? "gap-4 px-5 pb-8 pt-4" : "gap-6 px-5 pb-10 pt-5"
+          }
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
           ref={scrollRef}
@@ -112,7 +137,23 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
           className="border-t border-[#1d1d1f]/10 bg-white px-5 pb-4 pt-4"
           edges={["bottom"]}
         >
-          <View className="flex-row">
+          <View className={`flex-row ${showCancelAction ? "gap-3" : ""}`}>
+            {showCancelAction ? (
+              <TouchableOpacity
+                accessibilityLabel={cancelText}
+                accessibilityRole="button"
+                activeOpacity={0.85}
+                className={`h-14 flex-1 items-center justify-center rounded-2xl border border-[#2563EB] bg-white ${
+                  isPending ? "opacity-60" : ""
+                }`}
+                disabled={isPending}
+                onPress={onClose}
+              >
+                <Text className="font-soraSemiBold text-base text-[#2563EB]">
+                  {cancelText}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
             <TouchableOpacity
               accessibilityLabel={submitText}
               activeOpacity={0.85}
@@ -126,7 +167,13 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               {isPending ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text className="text-lg font-semibold text-white">
+                <Text
+                  className={
+                    isCardAppearance
+                      ? "font-soraSemiBold text-base text-white"
+                      : "text-lg font-semibold text-white"
+                  }
+                >
                   {submitText}
                 </Text>
               )}

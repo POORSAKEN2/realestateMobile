@@ -40,6 +40,7 @@ export function BookingStayFields({
             placeholder="Select date"
             required
             value={form.startDate}
+            variant="filled"
           />
         </View>
         <View className="w-32">
@@ -50,6 +51,7 @@ export function BookingStayFields({
             placeholder="Select time"
             required
             value={form.checkInTime}
+            variant="filled"
           />
         </View>
       </View>
@@ -62,6 +64,7 @@ export function BookingStayFields({
             placeholder="Select date"
             required
             value={form.endDate}
+            variant="filled"
           />
         </View>
         <View className="w-32">
@@ -72,6 +75,7 @@ export function BookingStayFields({
             placeholder="Select time"
             required
             value={form.checkOutTime}
+            variant="filled"
           />
         </View>
       </View>

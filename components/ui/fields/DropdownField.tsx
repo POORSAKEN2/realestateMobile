@@ -15,6 +15,8 @@ interface DropdownProps<T extends string> {
   options: readonly DropdownOption<T>[];
   required?: boolean;
   onSelect: (value: T) => void;
+  variant?: "default" | "filled";
+  wrapperClassName?: string;
 }
 
 export function DropdownField<T extends string>({
@@ -25,8 +27,11 @@ export function DropdownField<T extends string>({
   required,
   options,
   onSelect,
+  variant = "default",
+  wrapperClassName = "",
 }: DropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
+  const isFilledVariant = variant === "filled";
 
   const selectedLabel =
     options.find((option) => option.value === value)?.label || value;
@@ -37,8 +42,14 @@ export function DropdownField<T extends string>({
   }
 
   return (
-    <View className="gap-2">
-      <Text className="text-xs font-semibold text-slate-600">
+    <View className={`gap-2 ${wrapperClassName}`}>
+      <Text
+        className={
+          isFilledVariant
+            ? "font-soraMedium text-sm text-slate-600"
+            : "text-xs font-semibold text-slate-600"
+        }
+      >
         {label}
         <Text className="text-red-600">{required ? " *" : ""}</Text>
       </Text>
@@ -47,16 +58,26 @@ export function DropdownField<T extends string>({
         activeOpacity={0.85}
         accessibilityLabel={`${label}${required ? ", required" : ""}`}
         accessibilityRole="button"
-        className="h-14 flex-row items-center justify-between rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+        className={
+          isFilledVariant
+            ? "h-14 flex-row items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4"
+            : "h-14 flex-row items-center justify-between rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+        }
         onPress={() => setIsOpen(true)}
       >
         <Text
-          className="min-w-0 flex-1 text-base font-semibold text-[#1d1d1f]"
+          className={`min-w-0 flex-1 text-base text-[#1d1d1f] ${
+            isFilledVariant ? "font-soraMedium" : "font-semibold"
+          }`}
           numberOfLines={1}
         >
           {selectedLabel || placeholder}
         </Text>
-        <MaterialCommunityIcons name="chevron-down" color="#6F6D6D" size={22} />
+        <MaterialCommunityIcons
+          name={isFilledVariant ? "chevron-right" : "chevron-down"}
+          color="#6F6D6D"
+          size={22}
+        />
       </TouchableOpacity>
 
       <Modal

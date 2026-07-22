@@ -20,9 +20,7 @@ export function SelectionField({
 }) {
   return (
     <View className="gap-2">
-      <Text className="font-soraSemiBold text-xs uppercase tracking-wide text-slate-500">
-        {label}
-      </Text>
+      <Text className="font-soraMedium text-sm text-slate-600">{label}</Text>
       <TouchableOpacity
         accessibilityLabel={`${label}, ${value}`}
         accessibilityRole="button"
@@ -72,8 +70,8 @@ export function SearchableOptionSelector({
   );
 
   return (
-    <View className="min-h-[500px]">
-      <View className="flex-row items-center gap-3 border-b border-slate-100 px-5 pb-4">
+    <View className="min-h-[500px] bg-[#F5F7FC]">
+      <View className="flex-row items-center gap-3 bg-white px-5 pb-5 pt-2">
         <TouchableOpacity
           accessibilityLabel={backAccessibilityLabel}
           accessibilityRole="button"
@@ -85,7 +83,7 @@ export function SearchableOptionSelector({
         </TouchableOpacity>
         <Text
           accessibilityRole="header"
-          className="font-soraBold text-xl text-slate-950"
+          className="font-soraSemiBold text-2xl tracking-tight text-slate-950"
         >
           {title}
         </Text>
@@ -146,8 +144,8 @@ function OptionRow({
       accessibilityRole="radio"
       accessibilityState={{ checked: isSelected }}
       activeOpacity={0.8}
-      className={`min-h-14 flex-row items-center rounded-2xl px-4 ${
-        isSelected ? "bg-blue-50" : "bg-slate-50"
+      className={`min-h-14 flex-row items-center rounded-2xl border px-4 ${
+        isSelected ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white"
       }`}
       onPress={onPress}
     >

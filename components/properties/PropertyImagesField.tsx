@@ -15,10 +15,10 @@ export function PropertyImagesField({
   onRemove: (index: number) => void;
 }) {
   return (
-    <View className="gap-4 rounded-2xl border border-slate-200 bg-white p-4">
+    <View className="gap-4 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/5">
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
             <MaterialCommunityIcons
               name="image-outline"
               color="#2563EB"

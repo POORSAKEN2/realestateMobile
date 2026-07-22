@@ -46,6 +46,7 @@ export function BookingGuestFields({
           subtitle="Select a saved guest or add a new one."
           value={selectedGuestId}
           required
+          variant="filled"
         />
       ) : null}
 
@@ -55,7 +56,7 @@ export function BookingGuestFields({
         className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 py-3 ${
           isAddingGuest
             ? "border-[#2563EB]/30 bg-[#2563EB]/10"
-            : "border-slate-200 bg-white"
+            : "border-slate-200 bg-slate-50"
         }`}
         onPress={onToggleAddingGuest}
       >
@@ -86,13 +87,14 @@ export function BookingGuestFields({
       </TouchableOpacity>
 
       {isAddingGuest ? (
-        <View className="gap-4 rounded-2xl bg-[#F7F8FA] p-4">
+        <View className="gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <BaseField
             label="Guest name"
             onChangeText={(value) => onUpdateForm("guestName", value)}
             placeholder="e.g. Alex Santos"
             required
             value={form.guestName}
+            variant="filled"
           />
           <BaseField
             keyboardType="phone-pad"
@@ -100,6 +102,7 @@ export function BookingGuestFields({
             onChangeText={(value) => onUpdateForm("guestPhone", value)}
             placeholder="e.g. 0917 123 4567"
             value={form.guestPhone}
+            variant="filled"
           />
           <BaseField
             autoCapitalize="none"
@@ -109,6 +112,7 @@ export function BookingGuestFields({
             placeholder="e.g. alex@example.com"
             required
             value={form.guestEmail}
+            variant="filled"
           />
         </View>
       ) : null}

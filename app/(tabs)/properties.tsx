@@ -263,6 +263,7 @@ export default function PropertiesScreen() {
       </View>
 
       <AddEditModal
+        appearance="card"
         isVisible={isFormVisible}
         onClose={closeForm}
         title={editingProperty ? "Edit property" : "Add a property"}
@@ -275,6 +276,7 @@ export default function PropertiesScreen() {
         submitText={editingProperty ? "Save Property" : "Create Property"}
         onSubmit={handleSubmit}
         formError={formError}
+        showCancelAction
       >
         <PropertyCoreFields
           form={form}

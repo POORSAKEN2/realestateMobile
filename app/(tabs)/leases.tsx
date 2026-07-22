@@ -34,6 +34,7 @@ import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { ChoiceField } from "../../components/ui/fields/ChoiceField";
 import { PickerField } from "../../components/ui/fields/PickerField";
+import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
 
 type LeaseFormState = {
@@ -722,6 +723,7 @@ export default function LeasesScreen() {
       </View>
 
       <AddEditModal
+        appearance="card"
         isVisible={isFormOpen}
         onClose={closeForm}
         title={editingLease ? "Edit Lease" : "Add Lease"}
@@ -730,63 +732,82 @@ export default function LeasesScreen() {
         submitText={editingLease ? "Save Lease" : "Create Lease"}
         onSubmit={handleSubmit}
         formError={formError}
+        showCancelAction
       >
-        <ChoiceField
-          emptyText="Create a property first before adding leases."
-          label="Property"
-          onChange={(value) => updateForm("propertyId", value as string)}
-          options={propertyOptions}
-          value={form.propertyId}
-        />
-        <ChoiceField
-          emptyText="Create a tenant first before adding leases."
-          label="Tenant"
-          onChange={(value) => updateForm("lesseeId", value as string)}
-          options={lesseeOptions}
-          value={form.lesseeId}
-        />
-        <View className="flex-row gap-3">
-          <View className="flex-1">
+        <FormSection
+          description="Choose the property and tenant connected by this lease."
+          icon="account-switch-outline"
+          title="Lease parties"
+          variant="card"
+        >
+          <ChoiceField
+            emptyText="Create a property first before adding leases."
+            label="Property"
+            onChange={(value) => updateForm("propertyId", value as string)}
+            options={propertyOptions}
+            value={form.propertyId}
+            variant="filled"
+          />
+          <ChoiceField
+            emptyText="Create a tenant first before adding leases."
+            label="Tenant"
+            onChange={(value) => updateForm("lesseeId", value as string)}
+            options={lesseeOptions}
+            value={form.lesseeId}
+            variant="filled"
+          />
+        </FormSection>
+
+        <FormSection
+          description="Set the lease period, rent, unit, and current status."
+          icon="calendar-range"
+          title="Terms & status"
+          variant="card"
+        >
+          <View className="flex-row gap-3">
             <PickerField
+              className="min-w-0 flex-1 gap-2"
               label="Start Date"
-              value={form.startDate}
+              value={getDateLabel(form.startDate)}
               placeholder="Select date"
               onPress={() => openDatePicker("startDate")}
-              // Automatically uses calendar icon & blue styling by default
+              variant="filled"
             />
-          </View>
-          <View className="flex-1">
             <PickerField
+              className="min-w-0 flex-1 gap-2"
               label="End Date"
-              value={form.endDate}
+              value={getDateLabel(form.endDate)}
               placeholder="Select date"
               onPress={() => openDatePicker("endDate")}
-              // Automatically uses calendar icon & blue styling by default
+              variant="filled"
             />
           </View>
-        </View>
 
-        <BaseField
-          keyboardType="decimal-pad"
-          label="Monthly Rent"
-          onChangeText={(value) =>
-            updateForm("monthlyRent", cleanNumber(value))
-          }
-          placeholder="0"
-          value={form.monthlyRent}
-        />
-        <BaseField
-          label="Room Number"
-          onChangeText={(value) => updateForm("roomNumber", value)}
-          placeholder="Optional"
-          value={form.roomNumber}
-        />
-        <ChoiceField
-          label="Status"
-          onChange={(value) => updateForm("status", value as string)}
-          options={statusOptions}
-          value={form.status}
-        />
+          <BaseField
+            keyboardType="decimal-pad"
+            label="Monthly Rent"
+            onChangeText={(value) =>
+              updateForm("monthlyRent", cleanNumber(value))
+            }
+            placeholder="0"
+            value={form.monthlyRent}
+            variant="filled"
+          />
+          <BaseField
+            label="Room Number"
+            onChangeText={(value) => updateForm("roomNumber", value)}
+            placeholder="Optional"
+            value={form.roomNumber}
+            variant="filled"
+          />
+          <ChoiceField
+            label="Status"
+            onChange={(value) => updateForm("status", value as string)}
+            options={statusOptions}
+            value={form.status}
+            variant="segmented"
+          />
+        </FormSection>
 
         {activeDateField ? (
           <Modal

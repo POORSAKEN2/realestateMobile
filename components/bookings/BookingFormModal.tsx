@@ -62,6 +62,7 @@ export function BookingFormModal({
 }: BookingFormModalProps) {
   return (
     <AddEditModal
+      appearance="card"
       formError={formError}
       isPending={isSaving}
       isVisible={isVisible}
@@ -74,14 +75,15 @@ export function BookingFormModal({
           : "Review and update this reservation."
       }
       title={mode === "create" ? "Create a booking" : "Edit booking"}
+      showCancelAction
     >
-      <View className="flex-row items-start gap-2 rounded-2xl bg-[#2563EB]/10 px-4 py-3">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
-          color="#1E40AF"
-          size={18}
+          color="#2563EB"
+          size={20}
         />
-        <Text className="min-w-0 flex-1 text-sm leading-5 text-[#1E40AF]">
+        <Text className="min-w-0 flex-1 font-sora text-sm leading-5 text-[#1E40AF]">
           Fields marked with * are required. Availability updates as you enter
           the room and stay dates.
         </Text>
@@ -91,6 +93,7 @@ export function BookingFormModal({
         description="Choose the property and identify the room being reserved."
         icon="office-building-outline"
         title="Reservation details"
+        variant="card"
       >
         <DropdownField
           label="Building"
@@ -102,6 +105,7 @@ export function BookingFormModal({
           placeholder="Select a building"
           required
           value={form.propertyId}
+          variant="filled"
         />
 
         <View className="flex-row gap-3">
@@ -112,6 +116,7 @@ export function BookingFormModal({
               placeholder="e.g. 101"
               required
               value={form.roomNumber}
+              variant="filled"
             />
           </View>
           <View className="flex-1">
@@ -122,12 +127,13 @@ export function BookingFormModal({
               placeholder="e.g. 2500"
               required
               value={form.dailyRate}
+              variant="filled"
             />
           </View>
         </View>
 
         {selectedBuilding ? (
-          <View className="flex-row items-center gap-3 rounded-2xl bg-[#F7F8FA] p-4">
+          <View className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#2563EB]/10">
               <MaterialCommunityIcons
                 name="door-open"
@@ -152,6 +158,7 @@ export function BookingFormModal({
         description="Select a saved guest or add their contact details now."
         icon="account-outline"
         title="Guest"
+        variant="card"
       >
         <BookingGuestFields
           form={form}
@@ -168,6 +175,7 @@ export function BookingFormModal({
         description="Set the arrival and departure window for this stay."
         icon="calendar-range"
         title="Stay schedule"
+        variant="card"
       >
         <BookingStayFields
           form={form}
@@ -193,6 +201,7 @@ export function BookingFormModal({
         description="Add requests or context the operations team should know."
         icon="note-text-outline"
         title="Additional notes"
+        variant="card"
       >
         <BaseField
           label="Notes"
@@ -201,11 +210,12 @@ export function BookingFormModal({
           onChangeText={(value) => onUpdateForm("notes", value)}
           placeholder="Add optional booking notes"
           value={form.notes}
+          variant="filled"
         />
       </FormSection>
 
       {mode === "edit" && editingBooking?.status === "Booked" ? (
-        <View className="gap-3 rounded-2xl border border-rose-500/20 bg-rose-50 p-4">
+        <View className="gap-3 rounded-[24px] border border-rose-500/20 bg-rose-50 p-4">
           <View>
             <Text className="text-sm font-bold text-rose-700">
               Cancel this booking

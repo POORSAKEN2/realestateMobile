@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React from "react";
+import { View, Text, TouchableOpacity } from "react-native";
 
 export interface Option<T = string | number> {
   label: string;
@@ -14,6 +14,7 @@ interface ChoiceFieldProps<T> {
   emptyText?: string;
   isMultiSelect?: boolean;
   activeColorClass?: string; // Optional: Override default active blue color (e.g., 'bg-emerald-600 border-emerald-600')
+  variant?: "pill" | "filled" | "segmented";
 }
 
 export function ChoiceField<T extends string | number | boolean>({
@@ -24,8 +25,11 @@ export function ChoiceField<T extends string | number | boolean>({
   emptyText,
   isMultiSelect = false,
   activeColorClass = "border-[#2563EB] bg-[#2563EB]",
+  variant = "pill",
 }: ChoiceFieldProps<T>) {
-  
+  const isSegmented = variant === "segmented";
+  const hasFilledSurface = variant !== "pill";
+
   // Helper to determine if an option chip is selected
   const isSelected = (optionValue: T) => {
     if (isMultiSelect && Array.isArray(value)) {
@@ -48,18 +52,36 @@ export function ChoiceField<T extends string | number | boolean>({
 
   return (
     <View className="gap-3">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+      <Text
+        className={
+          hasFilledSurface
+            ? "font-soraMedium text-sm text-slate-600"
+            : "text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]"
+        }
+      >
         {label}
       </Text>
-      
+
       {options.length === 0 ? (
-        <View className="rounded-2xl border border-dashed border-[#1d1d1f]/20 bg-[#FFFFFF]/90 p-4">
+        <View
+          className={`rounded-2xl border border-dashed p-4 ${
+            hasFilledSurface
+              ? "border-slate-300 bg-slate-50"
+              : "border-[#1d1d1f]/20 bg-[#FFFFFF]/90"
+          }`}
+        >
           <Text className="text-sm font-medium text-[#6F6D6D]">
             {emptyText ?? "No options available."}
           </Text>
         </View>
       ) : (
-        <View className="flex-row flex-wrap gap-2">
+        <View
+          className={
+            isSegmented
+              ? "flex-row overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-0.5"
+              : "flex-row flex-wrap gap-2"
+          }
+        >
           {options.map((option) => {
             const selected = isSelected(option.value);
 
@@ -67,16 +89,30 @@ export function ChoiceField<T extends string | number | boolean>({
               <TouchableOpacity
                 key={String(option.value)}
                 activeOpacity={0.8}
-                className={`rounded-full border px-3.5 py-2.5 ${
-                  selected
-                    ? activeColorClass
-                    : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
-                }`}
+                className={
+                  isSegmented
+                    ? `h-14 flex-1 items-center justify-center rounded-[14px] ${
+                        selected ? "bg-[#2563EB]" : "bg-transparent"
+                      }`
+                    : `min-h-11 justify-center border px-3.5 py-2.5 ${
+                        hasFilledSurface ? "rounded-2xl" : "rounded-full"
+                      } ${
+                        selected
+                          ? activeColorClass
+                          : hasFilledSurface
+                            ? "border-slate-200 bg-slate-50"
+                            : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
+                      }`
+                }
                 onPress={() => handlePress(option.value)}
               >
                 <Text
-                  className={`text-xs font-semibold ${
-                    selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"
+                  className={`${isSegmented ? "font-soraMedium text-sm" : "text-xs font-semibold"} ${
+                    selected
+                      ? "text-[#FFFFFF]"
+                      : hasFilledSurface
+                        ? "text-slate-600"
+                        : "text-[#1d1d1f]"
                   }`}
                 >
                   {option.label}

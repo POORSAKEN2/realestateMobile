@@ -14,6 +14,7 @@ interface PickerFieldProps {
   rightElement?: React.ReactNode; // For passing custom components on the right side
   className?: string; // Overrides for container
   style?: ViewProps["style"];
+  variant?: "default" | "filled";
 }
 
 export function PickerField({
@@ -28,10 +29,19 @@ export function PickerField({
   rightElement,
   className = "gap-2",
   style,
+  variant = "default",
 }: PickerFieldProps) {
+  const isFilledVariant = variant === "filled";
+
   return (
     <View className={className} style={style}>
-      <Text className="text-xs font-semibold text-slate-600">
+      <Text
+        className={
+          isFilledVariant
+            ? "font-soraMedium text-sm text-slate-600"
+            : "text-xs font-semibold text-slate-600"
+        }
+      >
         {label}
         <Text className="text-red-600">{required ? " *" : ""}</Text>
       </Text>
@@ -40,11 +50,18 @@ export function PickerField({
         activeOpacity={0.85}
         accessibilityLabel={`${label}${required ? ", required" : ""}`}
         accessibilityRole="button"
-        className="h-14 flex-row items-center justify-between rounded-2xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+        className={`h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
+          isFilledVariant
+            ? "border-slate-200 bg-slate-50"
+            : "border-[#1d1d1f]/10 bg-[#FFFFFF] shadow-sm"
+        }`}
         onPress={onPress}
       >
         <Text
-          className={`text-base ${value ? "text-[#1d1d1f]" : "text-[#6F6D6D]"}`}
+          className={`text-base ${
+            isFilledVariant ? "min-w-0 flex-1 font-sora" : ""
+          } ${value ? "text-[#1d1d1f]" : "text-[#6F6D6D]"}`}
+          numberOfLines={isFilledVariant ? 1 : undefined}
         >
           {value || placeholder}
         </Text>
