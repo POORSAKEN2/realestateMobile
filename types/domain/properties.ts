@@ -73,4 +73,8 @@ export type CreatePropertyPayload = {
   images?: PropertyImageUpload[];
 };
 
-export type UpdatePropertyPayload = CreatePropertyPayload;
+export type UpdatePropertyPayload = Omit<CreatePropertyPayload, "image" | "images"> & {
+  image?: PropertyImageUpload | string;
+  images?: Array<PropertyImageUpload | string>;
+  retained_images?: string[];
+};

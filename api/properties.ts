@@ -4,6 +4,7 @@ import type {
   CreatePropertyPayload,
   PaginatedApiData,
   Property,
+  PropertyImageUpload,
   UpdatePropertyPayload,
 } from "../types";
 
@@ -225,9 +226,19 @@ export async function updateProperty(
 ) {
   const { image, images, ...propertyFields } = payload;
   const imageUploads = normalizeImageUploads(images ?? image);
+  
+  const stringImages = Array.isArray(images) 
+    ? images.filter((img): img is string => typeof img === "string")
+    : typeof image === "string" ? [image] : [];
+  
+  const payloadToSubmit = {
+    ...propertyFields,
+    ...(stringImages.length && !payload.retained_images ? { retained_images: stringImages } : {}),
+  };
+
   const body = imageUploads.length
-    ? toPropertyFormData(propertyFields, imageUploads, "PUT")
-    : payload;
+    ? toPropertyFormData(payloadToSubmit, imageUploads, "PUT")
+    : payloadToSubmit;
   const response = imageUploads.length
     ? await apiClient.post<ApiEnvelope<Property> | Property>(
         `/properties/${id}`,
@@ -236,7 +247,7 @@ export async function updateProperty(
       )
     : await apiClient.post<ApiEnvelope<Property> | Property>(
         `/properties/${id}?_method=PUT`,
-        { ...payload, _method: "PUT" },
+        { ...payloadToSubmit, _method: "PUT" },
         { headers: authHeaders(accessToken) },
       );
 
@@ -275,8 +286,10 @@ function toPropertyFormData(
 }
 
 function normalizeImageUploads(
-  images?: CreatePropertyPayload["images"] | CreatePropertyPayload["image"],
-) {
+  images?: any,
+): PropertyImageUpload[] {
   const imageList = Array.isArray(images) ? images : images ? [images] : [];
-  return imageList.slice(0, MAX_PROPERTY_IMAGES);
+  return imageList
+    .filter((img): img is PropertyImageUpload => typeof img === "object" && img !== null && "uri" in img)
+    .slice(0, MAX_PROPERTY_IMAGES);
 }

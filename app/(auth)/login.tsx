@@ -155,7 +155,7 @@ export default function LoginScreen() {
                     onPress={() => setShowPassword((current) => !current)}
                   >
                     <Feather
-                      name={showPassword ? "eye-off" : "eye"}
+                      name={showPassword ? "eye" : "eye-off"}
                       size={20}
                       color="#5f6b6b"
                     />

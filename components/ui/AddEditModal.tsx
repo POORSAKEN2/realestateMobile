@@ -48,10 +48,16 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
     if (formError) scrollRef.current?.scrollTo({ animated: true, y: 0 });
   }, [formError]);
 
+  // Dismissing mid-save would abandon an in-flight upload and desync the form.
+  const handleClose = () => {
+    if (isPending) return;
+    onClose();
+  };
+
   return (
     <Modal
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       presentationStyle="formSheet"
       visible={isVisible}
     >
@@ -99,7 +105,8 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               className={`h-11 w-11 items-center justify-center rounded-full ${
                 isCardAppearance ? "bg-transparent" : "bg-slate-100"
               }`}
-              onPress={onClose}
+              disabled={isPending}
+              onPress={handleClose}
             >
               <Ionicons name="close" color="#3d3d3d" size={22} />
             </TouchableOpacity>

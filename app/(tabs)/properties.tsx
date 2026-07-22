@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 
 import { PropertyCard } from "../../components/properties/PropertyCard";

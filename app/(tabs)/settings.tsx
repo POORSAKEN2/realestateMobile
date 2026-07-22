@@ -53,7 +53,7 @@ function PasswordField({
           onPress={() => setIsVisible((current) => !current)}
         >
           <Ionicons
-            name={isVisible ? "eye-off-outline" : "eye-outline"}
+            name={isVisible ? "eye-outline" : "eye-off-outline"}
             color="#64748B"
             size={20}
           />

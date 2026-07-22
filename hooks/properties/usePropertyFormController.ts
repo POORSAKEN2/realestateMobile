@@ -59,7 +59,7 @@ export function usePropertyFormController(accessToken?: string) {
     mutationFn: async (payload: PropertyFormPayload) => {
       const property = editingProperty
         ? await propertyFetchers.update({ id: editingProperty.id, payload })
-        : await propertyFetchers.create(payload);
+        : await propertyFetchers.create(payload as any);
 
       if (selectedDocuments.length > 0) {
         await uploadPropertyDocuments(
