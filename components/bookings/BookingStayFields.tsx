@@ -82,6 +82,7 @@ export function BookingStayFields({
 
       {activePickerField ? (
         <BookingDateTimePicker
+          key={activePickerField}
           field={activePickerField}
           form={form}
           onClose={() => setActivePickerField(null)}
@@ -103,6 +104,23 @@ function BookingDateTimePicker({
   onClose: () => void;
   onUpdateForm: BookingFormUpdater;
 }) {
+  const isDateField = field === "startDate" || field === "endDate";
+  const minimumDate =
+    field === "endDate" && form.startDate
+      ? new Date(`${form.startDate}T12:00:00`)
+      : undefined;
+  const pickerValue = getBookingPickerValue(form, field);
+  const safePickerValue =
+    minimumDate && pickerValue.getTime() < minimumDate.getTime()
+      ? minimumDate
+      : pickerValue;
+
+  function handleChange(eventType: string, selectedValue?: Date) {
+    if (Platform.OS === "android") onClose();
+    const selection = getBookingPickerChange(eventType, field, selectedValue);
+    if (selection) onUpdateForm(selection.field, selection.value);
+  }
+
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent visible>
       <View className="flex-1 justify-center bg-black/40 px-5">
@@ -119,33 +137,28 @@ function BookingDateTimePicker({
               <Text className="text-xs font-bold text-[#2563EB]">Done</Text>
             </TouchableOpacity>
           </View>
-          <DateTimePicker
-            display={
-              Platform.OS === "ios"
-                ? field === "startDate" || field === "endDate"
-                  ? "inline"
-                  : "spinner"
-                : "default"
-            }
-            minimumDate={
-              field === "endDate" && form.startDate
-                ? new Date(`${form.startDate}T12:00:00`)
-                : undefined
-            }
-            mode={
-              field === "startDate" || field === "endDate" ? "date" : "time"
-            }
-            onChange={(event, selectedValue) => {
-              if (Platform.OS === "android") onClose();
-              const selection = getBookingPickerChange(
-                event.type,
-                field,
-                selectedValue,
-              );
-              if (selection) onUpdateForm(selection.field, selection.value);
-            }}
-            value={getBookingPickerValue(form, field)}
-          />
+          {isDateField ? (
+            <DateTimePicker
+              key={`booking-date-${field}`}
+              display={Platform.OS === "ios" ? "inline" : "default"}
+              {...(minimumDate ? { minimumDate } : {})}
+              mode="date"
+              onChange={(event, selectedValue) =>
+                handleChange(event.type, selectedValue)
+              }
+              value={safePickerValue}
+            />
+          ) : (
+            <DateTimePicker
+              key={`booking-time-${field}`}
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              mode="time"
+              onChange={(event, selectedValue) =>
+                handleChange(event.type, selectedValue)
+              }
+              value={pickerValue}
+            />
+          )}
         </View>
       </View>
     </Modal>
