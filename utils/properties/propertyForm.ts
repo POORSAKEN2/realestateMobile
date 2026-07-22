@@ -164,6 +164,24 @@ export function requiresBedroomAndBathroomCounts(
 ) {
   return classification === "Residential" && !type.includes("Building");
 }
+export function propertySupportsRooms(
+  property?: Partial<Property> | null,
+  roomsCount = 0,
+) {
+  if (!property) return true;
+
+  const totalUnits = property.totalUnits ?? property.total_units ?? 0;
+  if (totalUnits > 1 || roomsCount > 0) {
+    return true;
+  }
+
+  const multiUnitKeywords = ["Building", "Mall", "Coworking", "Complex"];
+  if (property.type && multiUnitKeywords.some((kw) => property.type?.includes(kw))) {
+    return true;
+  }
+
+  return false;
+}
 export function parseNumber(value: string) {
   const parsed = Number(value.trim().replace(/,/g, ""));
   return Number.isFinite(parsed) ? parsed : undefined;

@@ -35,6 +35,7 @@ import { BaseField } from "../../components/ui/fields/BaseField";
 import { ChoiceField } from "../../components/ui/fields/ChoiceField";
 import { PickerField } from "../../components/ui/fields/PickerField";
 import AddButton from "../../components/ui/buttons/AddButton";
+import { propertySupportsRooms } from "../../utils/properties/propertyForm";
 
 type LeaseFormState = {
   propertyId: string;
@@ -437,6 +438,12 @@ export default function LeasesScreen() {
     [lessees],
   );
 
+  const selectedFormProperty = useMemo(
+    () => properties.find((item) => item.id === form.propertyId),
+    [properties, form.propertyId],
+  );
+  const showRoomInput = propertySupportsRooms(selectedFormProperty);
+
   const filteredLeases = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
@@ -568,7 +575,7 @@ export default function LeasesScreen() {
       startDate: form.startDate,
       endDate: calculatedEndDate,
       monthlyRent,
-      roomNumber: form.roomNumber.trim(),
+      roomNumber: showRoomInput ? form.roomNumber.trim() : "",
       status: form.status,
     });
   }
@@ -763,7 +770,14 @@ export default function LeasesScreen() {
         <ChoiceField
           emptyText="Create a property first before adding leases."
           label="Property"
-          onChange={(value) => updateForm("propertyId", value as string)}
+          onChange={(value) => {
+            const nextPropId = value as string;
+            const nextProp = properties.find((p) => p.id === nextPropId);
+            updateForm("propertyId", nextPropId);
+            if (!propertySupportsRooms(nextProp)) {
+              updateForm("roomNumber", "");
+            }
+          }}
           options={propertyOptions}
           value={form.propertyId}
         />
@@ -830,12 +844,14 @@ export default function LeasesScreen() {
           placeholder="0"
           value={form.monthlyRent}
         />
-        <BaseField
-          label="Room Number"
-          onChangeText={(value) => updateForm("roomNumber", value)}
-          placeholder="Optional"
-          value={form.roomNumber}
-        />
+        {showRoomInput ? (
+          <BaseField
+            label="Room Number"
+            onChangeText={(value) => updateForm("roomNumber", value)}
+            placeholder="Optional"
+            value={form.roomNumber}
+          />
+        ) : null}
         <ChoiceField
           label="Status"
           onChange={(value) => updateForm("status", value as string)}
