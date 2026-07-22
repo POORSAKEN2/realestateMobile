@@ -1,9 +1,8 @@
-import { apiClient } from "./client";
+import { apiClient, authHeaders, unwrapCollection, unwrapData } from "./client";
 import type {
   AppNotification,
   ApiEnvelope,
   DevicePushToken,
-  PaginatedApiData,
   RegisterPushTokenPayload,
 } from "../types";
 
@@ -13,53 +12,6 @@ export type {
   DevicePushToken,
   RegisterPushTokenPayload,
 } from "../types";
-
-function authHeaders(accessToken?: string) {
-  return {
-    Accept: "application/json",
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-  };
-}
-
-function unwrapData<T>(response: ApiEnvelope<T> | T): T {
-  if (
-    response &&
-    typeof response === "object" &&
-    "data" in response &&
-    response.data !== undefined
-  ) {
-    return response.data;
-  }
-
-  return response as T;
-}
-
-function normalizeCollection<T>(
-  payload: ApiEnvelope<T[]> | ApiEnvelope<PaginatedApiData<T>> | T[],
-): T[] {
-  const data =
-    payload &&
-    typeof payload === "object" &&
-    !Array.isArray(payload) &&
-    "data" in payload
-      ? payload.data
-      : payload;
-
-  if (Array.isArray(data)) {
-    return data;
-  }
-
-  if (
-    data &&
-    typeof data === "object" &&
-    "data" in data &&
-    Array.isArray((data as PaginatedApiData<T>).data)
-  ) {
-    return (data as PaginatedApiData<T>).data ?? [];
-  }
-
-  return [];
-}
 
 function toPushTokenApiPayload(payload: RegisterPushTokenPayload) {
   return {
@@ -103,7 +55,7 @@ export async function fetchNotifications(accessToken?: string) {
     ApiEnvelope<AppNotification[]> | AppNotification[]
   >("/notifications", { headers: authHeaders(accessToken) });
 
-  return normalizeCollection(response);
+  return unwrapCollection(response);
 }
 
 export async function markNotificationRead(

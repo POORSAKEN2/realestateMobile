@@ -27,7 +27,7 @@ export default function AddButton({
   iconSize = 20,
   loading = false,
   disabled = false,
-  className = "flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200",
+  className = "min-h-11 flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200",
   textClassName = "font-soraSemiBold text-sm text-white",
   style,
 }: AddButtonProps) {
@@ -35,6 +35,9 @@ export default function AddButton({
 
   return (
     <TouchableOpacity
+      accessibilityLabel={title}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: isButtonDisabled }}
       activeOpacity={0.8}
       onPress={onPress}
       disabled={isButtonDisabled}

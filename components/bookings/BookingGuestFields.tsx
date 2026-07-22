@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import type { Lessee } from "../../types";
@@ -33,46 +34,85 @@ export function BookingGuestFields({
   }));
 
   return (
-    <View className="gap-3 rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-4">
-      <DropdownField
-        label="Guest"
-        onSelect={onSelectGuest}
-        options={guestOptions}
-        placeholder={
-          guests.length ? "Select an existing guest" : "No guests available"
-        }
-        subtitle="Select a saved guest or add a new one."
-        value={selectedGuestId}
-      />
+    <View className="gap-4">
+      {!isAddingGuest ? (
+        <DropdownField
+          label="Guest"
+          onSelect={onSelectGuest}
+          options={guestOptions}
+          placeholder={
+            guests.length ? "Select an existing guest" : "No guests available"
+          }
+          subtitle="Select a saved guest or add a new one."
+          value={selectedGuestId}
+          required
+          variant="filled"
+        />
+      ) : null}
 
       <TouchableOpacity
         activeOpacity={0.85}
-        className="self-start rounded-full bg-[#2563EB]/10 px-4 py-2.5"
+        accessibilityRole="button"
+        className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 py-3 ${
+          isAddingGuest
+            ? "border-[#2563EB]/30 bg-[#2563EB]/10"
+            : "border-slate-200 bg-slate-50"
+        }`}
         onPress={onToggleAddingGuest}
       >
-        <Text className="text-xs font-bold text-[#2563EB]">
-          {isAddingGuest ? "Cancel Add Guest" : "Add Guest"}
+        <View className="min-w-0 flex-1 flex-row items-center gap-3">
+          <View className="h-9 w-9 items-center justify-center rounded-xl bg-[#2563EB]/10">
+            <MaterialCommunityIcons
+              name={
+                isAddingGuest ? "account-check-outline" : "account-plus-outline"
+              }
+              color="#2563EB"
+              size={19}
+            />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-sm font-bold text-[#1d1d1f]">
+              {isAddingGuest ? "Entering a new guest" : "Guest not listed?"}
+            </Text>
+            <Text className="mt-0.5 text-xs leading-4 text-slate-600">
+              {isAddingGuest
+                ? "Use the fields below to add their details."
+                : "Create a guest while making this booking."}
+            </Text>
+          </View>
+        </View>
+        <Text className="ml-3 text-xs font-bold text-[#2563EB]">
+          {isAddingGuest ? "Cancel" : "Add"}
         </Text>
       </TouchableOpacity>
 
       {isAddingGuest ? (
-        <View className="gap-4 border-t border-[#1d1d1f]/10 pt-4">
+        <View className="gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <BaseField
-            label="Guest Name"
+            label="Guest name"
             onChangeText={(value) => onUpdateForm("guestName", value)}
+            placeholder="e.g. Alex Santos"
+            required
             value={form.guestName}
+            variant="filled"
           />
           <BaseField
             keyboardType="phone-pad"
-            label="Guest Phone"
+            label="Phone number"
             onChangeText={(value) => onUpdateForm("guestPhone", value)}
+            placeholder="e.g. 0917 123 4567"
             value={form.guestPhone}
+            variant="filled"
           />
           <BaseField
+            autoCapitalize="none"
             keyboardType="email-address"
-            label="Guest Email"
+            label="Email address"
             onChangeText={(value) => onUpdateForm("guestEmail", value)}
+            placeholder="e.g. alex@example.com"
+            required
             value={form.guestEmail}
+            variant="filled"
           />
         </View>
       ) : null}

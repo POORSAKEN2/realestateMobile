@@ -1,6 +1,6 @@
 import type { ApiErrorResponse } from "../types";
 
-function getFirstValidationError(errors?: Record<string, string[]>) {
+export function getFirstValidationError(errors?: Record<string, string[]>) {
   if (!errors) {
     return undefined;
   }

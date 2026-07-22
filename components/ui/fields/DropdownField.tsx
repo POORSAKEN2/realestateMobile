@@ -2,22 +2,24 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Modal, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons"; // Or your specific icon import
 
-export interface DropdownOption {
-  value: string;
+export interface DropdownOption<T extends string = string> {
+  value: T;
   label: string;
 }
 
-interface DropdownProps {
+interface DropdownProps<T extends string> {
   label: string;
   placeholder?: string;
   subtitle?: string;
-  value: string;
-  options: DropdownOption[];
+  value: T;
+  options: readonly DropdownOption<T>[];
   required?: boolean;
-  onSelect: (value: string) => void;
+  onSelect: (value: T) => void;
+  variant?: "default" | "filled";
+  wrapperClassName?: string;
 }
 
-export function DropdownField({
+export function DropdownField<T extends string>({
   label,
   placeholder = "Select an option",
   subtitle,
@@ -25,20 +27,29 @@ export function DropdownField({
   required,
   options,
   onSelect,
-}: DropdownProps) {
+  variant = "default",
+  wrapperClassName = "",
+}: DropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
+  const isFilledVariant = variant === "filled";
 
   const selectedLabel =
     options.find((option) => option.value === value)?.label || value;
 
-  function handleSelect(selectedValue: string) {
+  function handleSelect(selectedValue: T) {
     onSelect(selectedValue);
     setIsOpen(false);
   }
 
   return (
-    <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+    <View className={`gap-2 ${wrapperClassName}`}>
+      <Text
+        className={
+          isFilledVariant
+            ? "font-soraMedium text-sm text-slate-600"
+            : "text-xs font-semibold text-slate-600"
+        }
+      >
         {label}
         <Text className="text-red-600">{required ? " *" : ""}</Text>
       </Text>
@@ -47,13 +58,26 @@ export function DropdownField({
         activeOpacity={0.85}
         accessibilityLabel={`${label}${required ? ", required" : ""}`}
         accessibilityRole="button"
-        className="h-14 flex-row items-center justify-between rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+        className={
+          isFilledVariant
+            ? "h-14 flex-row items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4"
+            : "h-14 flex-row items-center justify-between rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+        }
         onPress={() => setIsOpen(true)}
       >
-        <Text className="min-w-0 flex-1 text-base font-semibold text-[#1d1d1f]" numberOfLines={1}>
+        <Text
+          className={`min-w-0 flex-1 text-base text-[#1d1d1f] ${
+            isFilledVariant ? "font-soraMedium" : "font-semibold"
+          }`}
+          numberOfLines={1}
+        >
           {selectedLabel || placeholder}
         </Text>
-        <MaterialCommunityIcons name="chevron-down" color="#6F6D6D" size={22} />
+        <MaterialCommunityIcons
+          name={isFilledVariant ? "chevron-right" : "chevron-down"}
+          color="#6F6D6D"
+          size={22}
+        />
       </TouchableOpacity>
 
       <Modal
@@ -81,8 +105,10 @@ export function DropdownField({
                 ) : null}
               </View>
               <TouchableOpacity
+                accessibilityLabel={`Close ${label} options`}
+                accessibilityRole="button"
                 activeOpacity={0.85}
-                className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/10"
+                className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
                 onPress={() => setIsOpen(false)}
               >
                 <MaterialCommunityIcons

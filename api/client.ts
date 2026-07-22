@@ -1,22 +1,69 @@
-import Constants from "expo-constants";
-import type { ApiErrorResponse, RequestOptions } from "../types";
+import type {
+  ApiEnvelope,
+  ApiErrorResponse,
+  PaginatedApiData,
+  RequestOptions,
+} from "../types";
 
 export { API_BASE_URL } from "./config";
 
 import { axiosInstance } from "./axios";
+import { getFirstValidationError } from "./response";
 
-function getFirstValidationError(errors?: Record<string, string[]>) {
-  if (!errors) return undefined;
-  const [firstError] = Object.values(errors).flat();
-  return firstError;
+export function authHeaders(accessToken?: string) {
+  return {
+    Accept: "application/json",
+    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+  };
+}
+
+export function unwrapData<T>(response: ApiEnvelope<T> | T): T {
+  if (
+    response &&
+    typeof response === "object" &&
+    "data" in response &&
+    response.data !== undefined
+  ) {
+    return response.data;
+  }
+
+  return response as T;
+}
+
+export function unwrapCollection<T>(
+  payload: ApiEnvelope<T[]> | ApiEnvelope<PaginatedApiData<T>> | T[],
+): T[] {
+  const data =
+    payload &&
+    typeof payload === "object" &&
+    !Array.isArray(payload) &&
+    "data" in payload
+      ? payload.data
+      : payload;
+
+  if (Array.isArray(data)) return data;
+
+  if (
+    data &&
+    typeof data === "object" &&
+    "data" in data &&
+    Array.isArray((data as PaginatedApiData<T>).data)
+  ) {
+    return (data as PaginatedApiData<T>).data ?? [];
+  }
+
+  return [];
 }
 
 async function request<T>(
   path: string,
-  options: RequestOptions & { method: string; body?: unknown } = { method: "GET" },
+  options: RequestOptions & { method: string; body?: unknown } = {
+    method: "GET",
+  },
 ): Promise<T> {
   const url = path;
-  const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
+  const isFormData =
+    typeof FormData !== "undefined" && options.body instanceof FormData;
   const headers = { ...options.headers } as Record<string, any>;
   if (isFormData) {
     headers["Content-Type"] = undefined;
@@ -35,9 +82,11 @@ async function request<T>(
     if (error.response) {
       const data = error.response.data as ApiErrorResponse;
       const validationMessage = getFirstValidationError(data?.errors);
-      
+
       throw new Error(
-        data?.message || validationMessage || `API request failed with status ${error.response.status}`
+        data?.message ||
+          validationMessage ||
+          `API request failed with status ${error.response.status}`,
       );
     }
     throw error;

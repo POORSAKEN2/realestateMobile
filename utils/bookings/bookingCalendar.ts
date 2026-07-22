@@ -142,16 +142,30 @@ export function isDatePickerField(field: BookingPickerField) {
   return field === "startDate" || field === "endDate";
 }
 
+export function getBookingPickerMinimumDate(
+  form: BookingFormState,
+  field: BookingPickerField,
+) {
+  return field === "endDate" && form.startDate
+    ? new Date(`${form.startDate}T12:00:00`)
+    : undefined;
+}
+
 export function getBookingPickerValue(
   form: BookingFormState,
   field: BookingPickerField,
 ) {
-  if (isDatePickerField(field)) {
-    return new Date(`${form[field]}T12:00:00`);
+  if (!isDatePickerField(field)) {
+    const [hours, minutes] = form[field].split(":").map(Number);
+    return new Date(2026, 0, 1, hours || 0, minutes || 0);
   }
 
-  const [hours, minutes] = form[field].split(":").map(Number);
-  return new Date(2026, 0, 1, hours || 0, minutes || 0);
+  const pickerValue = new Date(`${form[field]}T12:00:00`);
+  const minimumDate = getBookingPickerMinimumDate(form, field);
+
+  return minimumDate && pickerValue.getTime() < minimumDate.getTime()
+    ? minimumDate
+    : pickerValue;
 }
 
 export function getBookingPickerSelection(

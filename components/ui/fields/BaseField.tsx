@@ -8,6 +8,8 @@ interface FieldProps extends Omit<TextInputProps, "onChangeText"> {
   onChangeText: (value: string) => void;
   icon?: keyof typeof Ionicons.glyphMap;
   required?: boolean;
+  variant?: "default" | "filled";
+  wrapperClassName?: string;
 }
 
 export function BaseField({
@@ -20,25 +22,34 @@ export function BaseField({
   multiline = false,
   icon,
   autoCapitalize,
+  variant = "default",
+  wrapperClassName = "",
   ...rest
 }: FieldProps) {
   // 1. Determine layout variant styles (Profile Icon style vs Standard style)
-  const isIconVariant = !!icon;
+  const isFilledVariant = variant === "filled";
+  const isIconVariant = !!icon && !isFilledVariant;
 
   // 2. Resolve conflicting style classes between modules
-  const labelClassName = isIconVariant
-    ? "text-[11px] font-bold uppercase tracking-wide text-slate-500"
-    : "text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]";
+  const labelClassName = isFilledVariant
+    ? "font-soraMedium text-sm text-slate-600"
+    : "text-xs font-semibold text-slate-600";
 
-  const containerClassName = isIconVariant
-    ? "h-14 flex-row items-center rounded-xl border border-slate-200 bg-white px-4 shadow-sm shadow-slate-900/5"
-    : `rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 ${
-        multiline ? "min-h-28 py-4" : "h-14"
-      }`;
+  const containerClassName = isFilledVariant
+    ? `rounded-2xl border border-slate-200 bg-slate-50 px-4 ${
+        multiline ? "min-h-24 py-3" : "h-14"
+      }`
+    : isIconVariant
+      ? "h-14 flex-row items-center rounded-xl border border-slate-200 bg-white px-4 shadow-sm shadow-slate-900/5"
+      : `rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 ${
+          multiline ? "min-h-28 py-4" : "h-14"
+        }`;
 
-  const inputClassName = isIconVariant
-    ? "ml-3 flex-1 text-base font-semibold text-slate-950"
-    : "flex-1 text-base text-[#1d1d1f]";
+  const inputClassName = isFilledVariant
+    ? "flex-1 font-sora text-base text-[#1d1d1f]"
+    : isIconVariant
+      ? "ml-3 flex-1 text-base font-semibold text-slate-950"
+      : "flex-1 text-base text-[#1d1d1f]";
 
   const resolvedPlaceholderColor = isIconVariant ? "#94A3B8" : "#6F6D6D";
 
@@ -50,7 +61,9 @@ export function BaseField({
       : "words";
 
   return (
-    <View className="gap-1">
+    <View
+      className={`${isFilledVariant ? "gap-2" : "gap-1.5"} ${wrapperClassName}`}
+    >
       <Text className={labelClassName}>
         {label}
         <Text className="text-red-600">{required ? " *" : ""}</Text>

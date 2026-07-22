@@ -6,13 +6,21 @@ import {
   Easing,
   Modal,
   Pressable,
-  StyleSheet,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Svg, {
+  Circle,
+  Defs,
+  Line,
+  LinearGradient,
+  Path,
+  Stop,
+} from "react-native-svg";
 
 import { colors } from "../../constants/colors";
 
@@ -27,69 +35,44 @@ type MenuItem = {
       };
 };
 
-type MenuSection = {
-  title: string;
-  items: MenuItem[];
-};
-
 type MoreBottomSheetProps = {
   visible: boolean;
   onClose: () => void;
 };
 
-const sections: MenuSection[] = [
+const menuItems: MenuItem[] = [
   {
-    title: "General",
-    items: [
-      {
-        label: "Analytics",
-        href: "/(tabs)/analytics",
-        icon: { family: "Ionicons", name: "analytics-outline" },
-      },
-    ],
+    label: "Analytics",
+    href: "/(tabs)/analytics",
+    icon: { family: "Ionicons", name: "analytics-outline" },
   },
   {
-    title: "Property Management",
-    items: [
-      {
-        label: "Leases",
-        href: "/(tabs)/leases",
-        icon: { family: "Ionicons", name: "document-text-outline" },
-      },
-      {
-        label: "Tenants",
-        href: "/(tabs)/tenants",
-        icon: { family: "Ionicons", name: "people-outline" },
-      },
-    ],
+    label: "Leases",
+    href: "/(tabs)/leases",
+    icon: { family: "Ionicons", name: "document-text-outline" },
   },
   {
-    title: "Operations",
-    items: [
-      {
-        label: "Documents",
-        href: "/(tabs)/documents",
-        icon: {
-          family: "MaterialCommunityIcons",
-          name: "file-document-outline",
-        },
-      },
-    ],
+    label: "Tenants",
+    href: "/(tabs)/tenants",
+    icon: { family: "Ionicons", name: "people-outline" },
   },
   {
-    title: "Account",
-    items: [
-      {
-        label: "Profile",
-        href: "/(tabs)/profile",
-        icon: { family: "Ionicons", name: "person-outline" },
-      },
-      {
-        label: "Settings",
-        href: "/(tabs)/settings",
-        icon: { family: "Ionicons", name: "settings-outline" },
-      },
-    ],
+    label: "Documents",
+    href: "/(tabs)/documents",
+    icon: {
+      family: "MaterialCommunityIcons",
+      name: "file-document-outline",
+    },
+  },
+  {
+    label: "Profile",
+    href: "/(tabs)/profile",
+    icon: { family: "Ionicons", name: "person-outline" },
+  },
+  {
+    label: "Settings",
+    href: "/(tabs)/settings",
+    icon: { family: "Ionicons", name: "settings-outline" },
   },
 ];
 
@@ -103,6 +86,166 @@ function MenuIcon({ icon }: { icon: MenuItem["icon"] }) {
   );
 }
 
+function AnalyticsCard({
+  item,
+  onPress,
+}: {
+  item: MenuItem;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel="Open analytics"
+      activeOpacity={0.82}
+      onPress={onPress}
+      className="overflow-hidden rounded-[22px] border border-[#DBE3EF] bg-white px-4 pt-4"
+    >
+      <View className="flex-row items-center">
+        <View className="h-[46px] w-[46px] items-center justify-center rounded-2xl bg-blue-50">
+          <MenuIcon icon={item.icon} />
+        </View>
+        <View className="ml-3 flex-1">
+          <Text className="font-soraBold text-lg text-slate-900">
+            {item.label}
+          </Text>
+          <Text className="mt-0.5 font-soraSemiBold text-[13px] text-slate-500">
+            View insights
+          </Text>
+        </View>
+        <View className="h-[38px] w-[38px] items-center justify-center rounded-2xl bg-blue-50">
+          <Ionicons name="arrow-forward" color={colors.primary} size={18} />
+        </View>
+      </View>
+
+      <View className="mt-2.5 h-28">
+        <Svg width="100%" height="112" viewBox="0 0 320 112">
+          <Defs>
+            <LinearGradient id="analyticsArea" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor={colors.primary} stopOpacity={0.2} />
+              <Stop offset="1" stopColor={colors.primary} stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+
+          {[24, 56, 88].map((y) => (
+            <Line
+              key={y}
+              x1="0"
+              x2="320"
+              y1={y}
+              y2={y}
+              stroke="#DBEAFE"
+              strokeDasharray="5 6"
+              strokeWidth="1"
+            />
+          ))}
+
+          <Path
+            d="M0 94 C18 88 24 98 39 86 C53 74 61 76 76 88 C92 101 103 83 118 87 C138 91 146 69 165 64 C181 59 188 72 204 61 C220 49 228 55 243 38 C257 23 266 43 280 29 C294 14 303 23 320 6 L320 112 L0 112 Z"
+            fill="url(#analyticsArea)"
+          />
+          <Path
+            d="M0 94 C18 88 24 98 39 86 C53 74 61 76 76 88 C92 101 103 83 118 87 C138 91 146 69 165 64 C181 59 188 72 204 61 C220 49 228 55 243 38 C257 23 266 43 280 29 C294 14 303 23 320 6"
+            fill="none"
+            stroke={colors.primary}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="3"
+          />
+          <Circle
+            cx="320"
+            cy="6"
+            r="5"
+            fill={colors.whitePrimary}
+            stroke={colors.primary}
+            strokeWidth="3"
+          />
+        </Svg>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function CompactBentoCard({
+  item,
+  onPress,
+}: {
+  item: MenuItem;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${item.label}`}
+      activeOpacity={0.8}
+      onPress={onPress}
+      className="min-h-[122px] flex-1 justify-between rounded-[22px] border border-slate-200 bg-white p-4"
+    >
+      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-blue-50">
+        <MenuIcon icon={item.icon} />
+      </View>
+      <View className="flex-row items-center">
+        <Text className="flex-1 font-soraSemiBold text-[15px] text-slate-900">
+          {item.label}
+        </Text>
+        <Ionicons name="chevron-forward" color={colors.primary} size={18} />
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function WideBentoCard({
+  item,
+  onPress,
+}: {
+  item: MenuItem;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${item.label}`}
+      activeOpacity={0.8}
+      onPress={onPress}
+      className="min-h-[78px] flex-row items-center rounded-[22px] border border-slate-200 bg-white px-4"
+    >
+      <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-blue-50">
+        <MenuIcon icon={item.icon} />
+      </View>
+      <Text className="flex-1 font-soraSemiBold text-[15px] text-slate-900">
+        {item.label}
+      </Text>
+      <Ionicons name="chevron-forward" color={colors.primary} size={19} />
+    </TouchableOpacity>
+  );
+}
+
+function UtilityBentoCard({
+  item,
+  onPress,
+}: {
+  item: MenuItem;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${item.label}`}
+      activeOpacity={0.8}
+      onPress={onPress}
+      className="min-h-[70px] flex-1 flex-row items-center rounded-[20px] border border-slate-200 bg-slate-50 px-3.5"
+    >
+      <View className="mr-2.5 h-10 w-10 items-center justify-center rounded-2xl bg-blue-50">
+        <MenuIcon icon={item.icon} />
+      </View>
+      <Text className="flex-1 font-soraSemiBold text-sm text-slate-900">
+        {item.label}
+      </Text>
+      <Ionicons name="chevron-forward" color="#94A3B8" size={17} />
+    </TouchableOpacity>
+  );
+}
+
 export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
@@ -110,6 +253,14 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
   const translateY = useRef(new Animated.Value(height)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetOpacity = useRef(new Animated.Value(0)).current;
+  const [
+    analyticsItem,
+    leasesItem,
+    tenantsItem,
+    documentsItem,
+    profileItem,
+    settingsItem,
+  ] = menuItems;
 
   useEffect(() => {
     const closedPosition = height;
@@ -178,173 +329,86 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
       statusBarTranslucent
       onRequestClose={onClose}
     >
-      <View style={styles.modalRoot}>
+      <View className="flex-1 justify-end">
         <Animated.View
           pointerEvents={visible ? "auto" : "none"}
-          style={[styles.backdrop, { opacity: backdropOpacity }]}
+          className="absolute inset-0 bg-slate-950/40"
+          style={{ opacity: backdropOpacity }}
         >
-          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+          <Pressable className="absolute inset-0" onPress={onClose} />
         </Animated.View>
 
         <Animated.View
-          style={[
-            styles.sheet,
-            {
-              opacity: sheetOpacity,
-              paddingBottom: Math.max(insets.bottom, 18),
-              transform: [{ translateY }],
-            },
-          ]}
+          className="rounded-t-[30px] bg-white px-5 pt-2.5 shadow-2xl shadow-slate-950/20"
+          style={{
+            maxHeight: height - Math.max(insets.top, 20) - 12,
+            opacity: sheetOpacity,
+            paddingBottom: Math.max(insets.bottom, 18),
+            transform: [{ translateY }],
+          }}
         >
-          <View style={styles.handle} />
+          <View className="mb-[18px] h-[5px] w-11 self-center rounded-full bg-slate-300" />
 
-          <View style={styles.header}>
+          <View className="mb-[18px] flex-row items-center justify-between">
             <View>
-              <Text style={styles.eyebrow}>Menu</Text>
-              <Text style={styles.title}>Manage Portfolio</Text>
+              <Text className="font-soraBold text-[11px] uppercase tracking-[0.8px] text-slate-500">
+                Menu
+              </Text>
+              <Text className="mt-1 font-soraBold text-[22px] text-blackPrimary">
+                Manage Portfolio
+              </Text>
             </View>
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="Close menu"
               activeOpacity={0.75}
               onPress={onClose}
-              style={styles.closeButton}
+              className="h-10 w-10 items-center justify-center rounded-[18px] border border-slate-200 bg-slate-50"
             >
               <Ionicons name="close" color="#475569" size={20} />
             </TouchableOpacity>
           </View>
 
-          <View style={styles.sections}>
-            {sections.map((section) => (
-              <View key={section.title} style={styles.section}>
-                <Text style={styles.sectionTitle}>{section.title}</Text>
-                <View style={styles.itemGroup}>
-                  {section.items.map((item) => (
-                    <TouchableOpacity
-                      key={item.label}
-                      accessibilityRole="button"
-                      activeOpacity={0.78}
-                      onPress={() => handleItemPress(item.href)}
-                      style={styles.item}
-                    >
-                      <View style={styles.iconBox}>
-                        <MenuIcon icon={item.icon} />
-                      </View>
-                      <Text style={styles.itemLabel}>{item.label}</Text>
-                      <Ionicons
-                        name="chevron-forward"
-                        color="#CBD5E1"
-                        size={19}
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </View>
+          <View
+            className="gap-[18px] pb-0.5"
+            // showsVerticalScrollIndicator={false}
+          >
+            <AnalyticsCard
+              item={analyticsItem}
+              onPress={() => handleItemPress(analyticsItem.href)}
+            />
+
+            <View className="gap-3.5">
+              <View className="flex-row gap-3">
+                <CompactBentoCard
+                  item={leasesItem}
+                  onPress={() => handleItemPress(leasesItem.href)}
+                />
+                <CompactBentoCard
+                  item={tenantsItem}
+                  onPress={() => handleItemPress(tenantsItem.href)}
+                />
               </View>
-            ))}
+
+              <WideBentoCard
+                item={documentsItem}
+                onPress={() => handleItemPress(documentsItem.href)}
+              />
+
+              <View className="flex-row gap-3">
+                <UtilityBentoCard
+                  item={profileItem}
+                  onPress={() => handleItemPress(profileItem.href)}
+                />
+                <UtilityBentoCard
+                  item={settingsItem}
+                  onPress={() => handleItemPress(settingsItem.href)}
+                />
+              </View>
+            </View>
           </View>
         </Animated.View>
       </View>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalRoot: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(15, 23, 42, 0.42)",
-  },
-  sheet: {
-    backgroundColor: colors.whitePrimary,
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    shadowColor: "#020617",
-    shadowOffset: { width: 0, height: -14 },
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
-    elevation: 24,
-  },
-  handle: {
-    alignSelf: "center",
-    width: 44,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: "#CBD5E1",
-    marginBottom: 18,
-  },
-  header: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
-  eyebrow: {
-    color: "#64748B",
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-  },
-  title: {
-    color: colors.black,
-    fontSize: 22,
-    fontWeight: "800",
-    marginTop: 4,
-  },
-  closeButton: {
-    alignItems: "center",
-    backgroundColor: "#F8FAFC",
-    borderColor: "#E2E8F0",
-    borderRadius: 18,
-    borderWidth: 1,
-    height: 40,
-    justifyContent: "center",
-    width: 40,
-  },
-  sections: {
-    gap: 16,
-  },
-  section: {
-    gap: 8,
-  },
-  sectionTitle: {
-    color: "#64748B",
-    fontSize: 12,
-    fontWeight: "800",
-    paddingHorizontal: 4,
-    textTransform: "uppercase",
-  },
-  itemGroup: {
-    backgroundColor: "#F8FAFC",
-    borderColor: "#E2E8F0",
-    borderRadius: 22,
-    borderWidth: 1,
-    overflow: "hidden",
-  },
-  item: {
-    alignItems: "center",
-    flexDirection: "row",
-    minHeight: 62,
-    paddingHorizontal: 14,
-  },
-  iconBox: {
-    alignItems: "center",
-    backgroundColor: "#EFF6FF",
-    borderRadius: 16,
-    height: 40,
-    justifyContent: "center",
-    marginRight: 12,
-    width: 40,
-  },
-  itemLabel: {
-    color: "#0F172A",
-    flex: 1,
-    fontSize: 15,
-    fontWeight: "700",
-  },
-});

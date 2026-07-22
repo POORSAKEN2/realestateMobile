@@ -2,7 +2,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef, useState } from "react";
 import {
   Animated,
-  Image,
   PanResponder,
   Modal,
   Pressable,

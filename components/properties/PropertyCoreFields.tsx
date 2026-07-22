@@ -14,7 +14,6 @@ import {
 } from "../../utils/properties/propertyForm";
 import { BaseField } from "../ui/fields/BaseField";
 import { DropdownField } from "../ui/fields/DropdownField";
-import { ChoiceGroup } from "../ui/groups/ChoiceGroup";
 import { LocationPinPicker } from "./LocationPinPicker";
 import { PropertyFormSection } from "./PropertyFormSection";
 
@@ -48,8 +47,13 @@ export function PropertyCoreFields({
 
   return (
     <>
-      <View className="rounded-2xl bg-[#2563EB]/10 px-4 py-3">
-        <Text className="text-xs leading-5 text-[#1E40AF]">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3.5">
+        <MaterialCommunityIcons
+          name="information-outline"
+          color="#2563EB"
+          size={20}
+        />
+        <Text className="min-w-0 flex-1 font-sora text-sm leading-5 text-[#1E40AF]">
           Fields marked with * are required. You can add images and documents
           now or later.
         </Text>
@@ -59,6 +63,7 @@ export function PropertyCoreFields({
         description="Name the property and choose its current portfolio status."
         icon="home-outline"
         title="Basics"
+        variant="card"
       >
         <BaseField
           autoCorrect={false}
@@ -67,12 +72,16 @@ export function PropertyCoreFields({
           placeholder="e.g. Greenfield Residences"
           value={form.title}
           required
+          variant="filled"
         />
-        <ChoiceGroup
-          choices={propertyStatusChoices}
+        <DropdownField
           label="Current status"
+          options={propertyStatusChoices}
           onSelect={(value) => updateForm("status", value)}
+          placeholder="Select a status"
           value={form.status}
+          required
+          variant="filled"
         />
       </PropertyFormSection>
 
@@ -80,6 +89,7 @@ export function PropertyCoreFields({
         description="Enter the city, then confirm the exact position on the map."
         icon="map-marker-outline"
         title="Location"
+        variant="card"
       >
         <BaseField
           label="City or area"
@@ -87,11 +97,12 @@ export function PropertyCoreFields({
           placeholder="e.g. Makati City"
           value={form.location}
           required
+          variant="filled"
         />
 
         {filteredLocationSuggestions.length > 0 ? (
           <View className="gap-2">
-            <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+            <Text className="text-xs font-semibold text-slate-600">
               Quick choices
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -120,6 +131,7 @@ export function PropertyCoreFields({
           options={seaCountryChoices}
           onSelect={(value) => updateForm("country", value)}
           required
+          variant="filled"
         />
 
         <LocationPinPicker
@@ -135,18 +147,25 @@ export function PropertyCoreFields({
         description="Classify the asset and add the physical details buyers or operators need."
         icon="office-building-outline"
         title="Property details"
+        variant="card"
       >
-        <ChoiceGroup
-          choices={propertyClassificationChoices}
+        <DropdownField
           label="Classification"
+          options={propertyClassificationChoices}
           onSelect={updateClassification}
+          placeholder="Select a classification"
           value={form.classification}
+          required
+          variant="filled"
         />
-        <ChoiceGroup
-          choices={propertyTypeChoices}
+        <DropdownField
           label="Property type"
+          options={propertyTypeChoices}
           onSelect={(value) => updateForm("type", value)}
+          placeholder="Select a property type"
           value={form.type}
+          required
+          variant="filled"
         />
 
         {requiresBedroomAndBathroomCounts(form.classification, form.type) ? (
@@ -161,6 +180,7 @@ export function PropertyCoreFields({
                 placeholder="0"
                 value={form.bedrooms}
                 required
+                variant="filled"
               />
             </View>
             <View className="flex-1">
@@ -173,6 +193,7 @@ export function PropertyCoreFields({
                 placeholder="0"
                 value={form.bathrooms}
                 required
+                variant="filled"
               />
             </View>
           </View>
@@ -183,6 +204,7 @@ export function PropertyCoreFields({
           onChangeText={(value) => updateForm("area", value)}
           placeholder="e.g. 120 sqm"
           value={form.area}
+          variant="filled"
         />
         <BaseField
           label="Description"
@@ -191,6 +213,7 @@ export function PropertyCoreFields({
           onChangeText={(value) => updateForm("description", value)}
           placeholder="Add useful notes about the property (optional)"
           value={form.description}
+          variant="filled"
         />
       </PropertyFormSection>
 
@@ -198,6 +221,7 @@ export function PropertyCoreFields({
         description="Add valuation and operating information for portfolio reporting."
         icon="chart-line"
         title="Financials & use"
+        variant="card"
       >
         <View className="flex-row gap-3">
           <View className="flex-1">
@@ -208,6 +232,7 @@ export function PropertyCoreFields({
               placeholder="0"
               value={form.value}
               required
+              variant="filled"
             />
           </View>
           <View className="w-28">
@@ -218,6 +243,7 @@ export function PropertyCoreFields({
               placeholder="0"
               value={form.roi}
               required
+              variant="filled"
             />
           </View>
         </View>
@@ -229,9 +255,10 @@ export function PropertyCoreFields({
           onChangeText={(value) => updateForm("occupancy", cleanDecimal(value))}
           placeholder="e.g. 85"
           value={form.occupancy}
+          variant="filled"
         />
 
-        <View className="rounded-2xl bg-[#F7F8FA] p-4">
+        <View className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <View className="flex-row items-center justify-between gap-4">
             <View className="min-w-0 flex-1 flex-row items-center gap-3">
               <View className="h-10 w-10 items-center justify-center rounded-2xl bg-[#2563EB]/10">

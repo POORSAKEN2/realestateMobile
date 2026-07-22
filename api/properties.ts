@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiClient } from "./client";
+import { API_BASE_URL, apiClient, authHeaders, unwrapData } from "./client";
 import type {
   ApiEnvelope,
   CreatePropertyPayload,
@@ -17,26 +17,6 @@ export type {
 const DEFAULT_PROPERTY_IMAGE =
   "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800";
 const MAX_PROPERTY_IMAGES = 5;
-
-function authHeaders(accessToken?: string) {
-  return {
-    Accept: "application/json",
-    ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-  };
-}
-
-function unwrapData<T>(response: ApiEnvelope<T> | T): T {
-  if (
-    response &&
-    typeof response === "object" &&
-    "data" in response &&
-    response.data !== undefined
-  ) {
-    return response.data;
-  }
-
-  return response as T;
-}
 
 function unwrapList(
   response:
@@ -226,14 +206,18 @@ export async function updateProperty(
 ) {
   const { image, images, ...propertyFields } = payload;
   const imageUploads = normalizeImageUploads(images ?? image);
-  
-  const stringImages = Array.isArray(images) 
+
+  const stringImages = Array.isArray(images)
     ? images.filter((img): img is string => typeof img === "string")
-    : typeof image === "string" ? [image] : [];
-  
+    : typeof image === "string"
+      ? [image]
+      : [];
+
   const payloadToSubmit = {
     ...propertyFields,
-    ...(stringImages.length && !payload.retained_images ? { retained_images: stringImages } : {}),
+    ...(stringImages.length && !payload.retained_images
+      ? { retained_images: stringImages }
+      : {}),
   };
 
   const body = imageUploads.length
@@ -285,11 +269,12 @@ function toPropertyFormData(
   return formData;
 }
 
-function normalizeImageUploads(
-  images?: any,
-): PropertyImageUpload[] {
+function normalizeImageUploads(images?: any): PropertyImageUpload[] {
   const imageList = Array.isArray(images) ? images : images ? [images] : [];
   return imageList
-    .filter((img): img is PropertyImageUpload => typeof img === "object" && img !== null && "uri" in img)
+    .filter(
+      (img): img is PropertyImageUpload =>
+        typeof img === "object" && img !== null && "uri" in img,
+    )
     .slice(0, MAX_PROPERTY_IMAGES);
 }

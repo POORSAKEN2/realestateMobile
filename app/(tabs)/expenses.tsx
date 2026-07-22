@@ -1,12 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import DateTimePicker, {
-  type DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   ActivityIndicator,
-  Modal,
   Platform,
   RefreshControl,
   ScrollView,
@@ -20,30 +15,21 @@ import AddButton from "../../components/ui/buttons/AddButton";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { DropdownField } from "../../components/ui/fields/DropdownField";
-import { PickerField } from "../../components/ui/fields/PickerField";
+import {
+  PickerField,
+  PickerModalShell,
+} from "../../components/ui/fields/PickerField";
+import { FormSection } from "../../components/ui/forms/FormSection";
 import { ChoiceGroup } from "../../components/ui/groups/ChoiceGroup";
 
-import { useAuth } from "../../hooks/useAuth";
-import { useProperties } from "../../hooks/api/useProperties";
-
 import {
-  emptyForm,
-  FormState,
   cleanDecimal,
-  parseNumber,
   formatPeso,
-  formatDateValue,
   parseDateValue,
 } from "../../utils/expenses/expenseForm";
-import {
-  CreateExpensePayload,
-  UpdateExpensePayload,
-  Expense,
-} from "../../types/domain/expenses";
-import { expenseFetchers, useExpenses } from "../../hooks/api/useExpenses";
+import { Expense } from "../../types/domain/expenses";
 import { Choice } from "../../constants/propertyChoices";
-
-type ExpenseFormPayload = CreateExpensePayload | UpdateExpensePayload;
+import { useExpenseForm } from "../../hooks/expenses/useExpenseForm";
 
 const expenseCategoryChoices = [
   { label: "Maintenance & Repairs", value: "MAINTENANCE" },
@@ -59,6 +45,12 @@ const expenseStatusChoices: Choice<Expense["status"]>[] = [
   { label: "Paid", value: "Paid" },
 ];
 
+const expenseDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
+
 const summary = [
   { label: "Monthly Spend", value: "₱128.4k", icon: "receipt-outline" },
   { label: "Maintenance", value: "₱42.8k", icon: "construct-outline" },
@@ -66,164 +58,25 @@ const summary = [
 ] as const;
 
 export default function ExpensesScreen() {
-  const { session } = useAuth();
-  const accessToken = session?.accessToken;
-  const tenantId =
-    session?.user &&
-    typeof session.user === "object" &&
-    "id" in session.user &&
-    session.user.id !== undefined
-      ? String(session.user.id)
-      : "";
-  const queryClient = useQueryClient();
-
-  // --- Modal & Form State ---
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
-  const [form, setForm] = useState<FormState>(emptyForm);
-  const [formError, setFormError] = useState("");
-  const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
-
-  // --- Fetch Properties for dropdown selection ---
-  const { useList: usePropertiesList } = useProperties();
-  const { data: properties = [] } = usePropertiesList();
-
-  const propertyOptions = useMemo(() => {
-    return properties.map((property) => ({
-      label: `${property.title} · ${property.location}`,
-      value: property.id,
-    }));
-  }, [properties]);
-  const selectedProperty = useMemo(
-    () => properties.find((property) => property.id === form.propertyId),
-    [form.propertyId, properties],
-  );
-
-  // --- Fetch Expenses ---
-  const { useList: useExpensesList } = useExpenses();
-  // Destructured 'isRefetching' and 'refetch' to power the pull-to-refresh
-  const { data: expenses = [], isLoading, refetch } = useExpensesList();
-
-  // --- Save / Edit Mutation ---
-  const saveMutation = useMutation({
-    mutationFn: async (payload: ExpenseFormPayload) => {
-      return editingExpense
-        ? await expenseFetchers.update({ id: editingExpense.id, payload })
-        : await expenseFetchers.create(payload);
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["expenses"] });
-      await queryClient.invalidateQueries({ queryKey: ["analytics"] });
-      closeForm();
-    },
-    onError: (error) => {
-      setFormError(
-        error instanceof Error ? error.message : "Failed to save expense.",
-      );
-    },
-  });
-
-  // --- Form Handlers ---
-  function updateForm<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((current) => ({ ...current, [key]: value }));
-  }
-
-  function openForm() {
-    setForm({
-      ...emptyForm,
-      date: new Date().toISOString().split("T")[0],
-    });
-    setFormError("");
-    setEditingExpense(null);
-    setIsDatePickerVisible(false);
-    setIsFormVisible(true);
-  }
-
-  function openEditForm(expense: Expense) {
-    setForm({
-      propertyId: expense.property_id || "",
-      category: expense.category || "",
-      amount: expense.amount ? String(expense.amount) : "",
-      date: expense.date || new Date().toISOString().split("T")[0],
-      referenceNumber: expense.reference_no || "",
-      description: expense.description || "",
-      status: expense.status || "PENDING",
-    });
-    setFormError("");
-    setEditingExpense(expense);
-    setIsDatePickerVisible(false);
-    setIsFormVisible(true);
-  }
-
-  function closeForm() {
-    setForm(emptyForm);
-    setFormError("");
-    setEditingExpense(null);
-    setIsDatePickerVisible(false);
-    setIsFormVisible(false);
-  }
-
-  function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (Platform.OS === "android") setIsDatePickerVisible(false);
-    if (event.type === "dismissed" || !selectedDate) return;
-
-    updateForm("date", formatDateValue(selectedDate));
-  }
-
-  // --- Validation and Submit ---
-  function handleSubmit() {
-    setFormError("");
-
-    if (saveMutation.isPending) return;
-
-    if (!accessToken) {
-      setFormError("Please log in before submitting transaction updates.");
-      return;
-    }
-
-    const propertyId = form.propertyId.trim();
-    const category = form.category.trim();
-    const amount = parseNumber(form.amount);
-    const referenceNumber = form.referenceNumber.trim();
-    const description = form.description.trim();
-    const date =
-      form.date.trim().split("T")[0] || new Date().toISOString().split("T")[0];
-
-    if (!propertyId || !selectedProperty) {
-      setFormError("An active linked property asset is required.");
-      return;
-    }
-
-    if (!tenantId) {
-      setFormError("Your user account could not be identified.");
-      return;
-    }
-
-    if (!category) {
-      setFormError("Please select a transaction category.");
-      return;
-    }
-
-    if (amount === undefined || amount <= 0) {
-      setFormError("Amount must be a valid number greater than 0.");
-      return;
-    }
-
-    const payload: ExpenseFormPayload = {
-      property_id: propertyId,
-      tenant_id: tenantId,
-      support_ticket_id: editingExpense?.support_ticket_id ?? null,
-      property: selectedProperty,
-      category,
-      amount,
-      date,
-      status: form.status,
-      reference_no: referenceNumber || null,
-      description: description || null,
-    };
-
-    saveMutation.mutate(payload);
-  }
+  const {
+    closeForm,
+    editingExpense,
+    expenses,
+    form,
+    formError,
+    handleDateChange,
+    isDatePickerVisible,
+    isFormVisible,
+    isLoading,
+    isSaving,
+    openEditForm,
+    openForm,
+    propertyOptions,
+    refetch,
+    setIsDatePickerVisible,
+    submit,
+    updateForm,
+  } = useExpenseForm();
 
   return (
     <Screen className="bg-slate-50">
@@ -327,6 +180,7 @@ export default function ExpensesScreen() {
 
       {/* --- ADD / EDIT FORM MODAL --- */}
       <AddEditModal
+        appearance="card"
         isVisible={isFormVisible}
         onClose={closeForm}
         title={editingExpense ? "Expense Details" : "Record an expense"}
@@ -335,100 +189,127 @@ export default function ExpensesScreen() {
             ? "Update properties operating costs."
             : "Track property costs and recurring operating expenses."
         }
-        isPending={saveMutation.isPending}
+        isPending={isSaving}
         submitText={editingExpense ? "Save Expense" : "Add Expense"}
-        onSubmit={handleSubmit}
+        onSubmit={submit}
         formError={formError}
+        showCancelAction
       >
-        <DropdownField
-          required
-          label="Linked Asset"
-          placeholder="Select a property"
-          value={form.propertyId}
-          options={propertyOptions}
-          onSelect={(value) => updateForm("propertyId", value)}
-        />
-
-        <DropdownField
-          label="Category"
-          placeholder="Select expense category"
-          value={form.category}
-          options={expenseCategoryChoices}
-          onSelect={(value) => updateForm("category", value)}
-        />
-
-        <BaseField
-          keyboardType="decimal-pad"
-          label="Amount"
-          placeholder="0.00"
-          value={form.amount}
-          onChangeText={(value) => updateForm("amount", cleanDecimal(value))}
-          required
-        />
-
-        <PickerField
-          label="Transaction Date"
-          placeholder="Select transaction date"
-          value={form.date}
-          onPress={() => setIsDatePickerVisible(true)}
-        />
-
-        {isDatePickerVisible ? (
-          <Modal
-            animationType="fade"
-            onRequestClose={() => setIsDatePickerVisible(false)}
-            transparent
-            visible
-          >
-            <View className="flex-1 justify-center bg-black/40 px-5">
-              <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
-                <View className="mb-2 flex-row items-center justify-between">
-                  <Text className="text-sm font-bold text-[#1d1d1f]"></Text>
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
-                    onPress={() => setIsDatePickerVisible(false)}
-                  >
-                    <Text className="text-xs font-bold text-[#2563EB]">
-                      Done
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <DateTimePicker
-                  display={Platform.OS === "ios" ? "inline" : "default"}
-                  mode="date"
-                  onChange={handleDateChange}
-                  value={parseDateValue(form.date)}
-                />
-              </View>
-            </View>
-          </Modal>
-        ) : null}
-
-        <BaseField
-          label="Reference No."
-          required
-          placeholder="Invoice, receipt, or check sequence"
-          value={form.referenceNumber}
-          onChangeText={(value) => updateForm("referenceNumber", value)}
-        />
-
-        <View className="gap-4 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF]/95 p-4 shadow-sm">
-          <ChoiceGroup
-            choices={expenseStatusChoices}
-            label="Transaction Status"
-            value={form.status}
-            onSelect={(value) => updateForm("status", value)}
+        <View className="flex-row items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3.5">
+          <MaterialCommunityIcons
+            name="information-outline"
+            color="#2563EB"
+            size={20}
           />
+          <Text className="min-w-0 flex-1 font-sora text-sm leading-5 text-[#1E40AF]">
+            Link each expense to a property for accurate reporting.
+          </Text>
         </View>
 
-        <BaseField
-          label="Description"
-          multiline
-          placeholder="Optional expenditure breakdown details..."
-          value={form.description}
-          onChangeText={(value) => updateForm("description", value)}
-        />
+        <FormSection
+          icon="office-building-outline"
+          title="Expense details"
+          variant="card"
+        >
+          <DropdownField
+            required
+            label="Linked property"
+            placeholder="Select a property"
+            value={form.propertyId}
+            options={propertyOptions}
+            onSelect={(value) => updateForm("propertyId", value)}
+            variant="filled"
+          />
+
+          <DropdownField
+            required
+            label="Category"
+            placeholder="Select expense category"
+            value={form.category}
+            options={expenseCategoryChoices}
+            onSelect={(value) => updateForm("category", value)}
+            variant="filled"
+          />
+        </FormSection>
+
+        <FormSection
+          icon="cash-multiple"
+          title="Payment details"
+          variant="card"
+        >
+          <BaseField
+            keyboardType="decimal-pad"
+            label="Amount (PHP)"
+            placeholder="0.00"
+            value={form.amount}
+            onChangeText={(value) => updateForm("amount", cleanDecimal(value))}
+            required
+            variant="filled"
+          />
+
+          <View className="flex-row gap-3">
+            <PickerField
+              className="min-w-0 flex-1 gap-2"
+              label="Transaction date"
+              placeholder="Select transaction date"
+              required
+              value={
+                form.date
+                  ? expenseDateFormatter.format(parseDateValue(form.date))
+                  : ""
+              }
+              onPress={() => setIsDatePickerVisible(true)}
+              variant="filled"
+            />
+
+            <BaseField
+              label="Reference number"
+              placeholder="Optional"
+              value={form.referenceNumber}
+              onChangeText={(value) => updateForm("referenceNumber", value)}
+              variant="filled"
+              wrapperClassName="min-w-0 flex-1"
+            />
+          </View>
+
+          {isDatePickerVisible ? (
+            <PickerModalShell
+              onClose={() => setIsDatePickerVisible(false)}
+              title="Select transaction date"
+            >
+              <DateTimePicker
+                display={Platform.OS === "ios" ? "inline" : "default"}
+                mode="date"
+                onChange={handleDateChange}
+                value={parseDateValue(form.date)}
+              />
+            </PickerModalShell>
+          ) : null}
+        </FormSection>
+
+        <FormSection
+          icon="clipboard-text-outline"
+          title="Status & notes"
+          variant="card"
+        >
+          <ChoiceGroup
+            choices={expenseStatusChoices}
+            label="Transaction status"
+            value={form.status}
+            onSelect={(value) => updateForm("status", value)}
+            variant="segmented"
+          />
+
+          <BaseField
+            label="Description"
+            multiline
+            numberOfLines={4}
+            placeholder="Add an optional cost breakdown or note"
+            value={form.description}
+            onChangeText={(value) => updateForm("description", value)}
+            variant="filled"
+          />
+        </FormSection>
       </AddEditModal>
     </Screen>
   );
