@@ -7,7 +7,7 @@ import { OnboardingControls, OnboardingProgress } from './OnboardingControls';
 import analytics from '../../assets/images/analytics.png';
 const analyticsCardShadow = {
   elevation: 10,
-  shadowColor: '#0F172A',
+  shadowColor: '#1E1F45',
   shadowOffset: { width: 0, height: 18 },
   shadowOpacity: 0.16,
   shadowRadius: 28,
@@ -41,7 +41,7 @@ export function OnboardingFour() {
               </View>
 
               <View className="h-11 w-11 items-center justify-center rounded-2xl border border-rose-100 bg-whitePrimary/90 shadow-sm">
-                <Feather name="trending-up" size={20} color="#0F172A" />
+                <Feather name="trending-up" size={20} color="#1E1F45" />
               </View>
             </View>
 

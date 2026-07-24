@@ -9,10 +9,10 @@ export function ModuleLoadingState({
   title: string;
 }) {
   return (
-    <View className="flex-1 justify-center rounded-[28px] border border-[#1d1d1f]/10 bg-white p-6 shadow-sm">
+    <View className="flex-1 justify-center rounded-[28px] border border-textPrimary/10 bg-white p-6 shadow-sm">
       <View className="items-center">
-        <ActivityIndicator color="#2563EB" />
-        <Text className="mt-3 text-sm font-ralewayBold text-[#1d1d1f]">
+        <ActivityIndicator color="#634CE4" />
+        <Text className="mt-3 text-sm font-ralewayBold text-textPrimary">
           {title}
         </Text>
         <Text className="mt-1 text-center text-xs leading-5 text-[#6F6D6D]">
@@ -21,7 +21,7 @@ export function ModuleLoadingState({
       </View>
       <View className="mt-6 gap-3">
         {Array.from({ length: 3 }).map((_, index) => (
-          <View className="h-16 rounded-2xl bg-[#1d1d1f]/5" key={index} />
+          <View className="h-16 rounded-2xl bg-textPrimary/5" key={index} />
         ))}
       </View>
     </View>
@@ -38,9 +38,9 @@ export function ModuleEmptyState({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-[28px] border border-dashed border-[#1d1d1f]/20 bg-white/95 p-8 shadow-sm">
-      <Ionicons name={icon} color="#2563EB" size={38} />
-      <Text className="mt-3 text-base font-ralewayExtraBold text-[#1d1d1f]">{title}</Text>
+    <View className="items-center rounded-[28px] border border-dashed border-textPrimary/20 bg-white/95 p-8 shadow-sm">
+      <Ionicons name={icon} color="#634CE4" size={38} />
+      <Text className="mt-3 text-base font-ralewayExtraBold text-textPrimary">{title}</Text>
       <Text className="mt-1 text-center text-sm leading-5 text-[#6F6D6D]">
         {description}
       </Text>

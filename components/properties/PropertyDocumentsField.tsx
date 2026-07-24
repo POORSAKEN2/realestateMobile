@@ -27,15 +27,15 @@ export function PropertyDocumentsField({
     <View className="gap-4 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
+          <View className="bg-secondary/20 h-12 w-12 items-center justify-center rounded-2xl">
             <MaterialCommunityIcons
               name="file-document-outline"
-              color="#2563EB"
+              color="#634CE4"
               size={22}
             />
           </View>
           <View className="flex-1">
-            <Text className="text-sm font-ralewayExtraBold text-[#1d1d1f]">
+            <Text className="font-ralewayExtraBold text-textPrimary text-sm">
               Property documents
             </Text>
             <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
@@ -51,17 +51,17 @@ export function PropertyDocumentsField({
               : "Choose property documents"
           }
           accessibilityRole="button"
-          className="min-h-11 justify-center rounded-2xl bg-[#2563EB] px-4 py-2.5"
+          className="min-h-11 justify-center rounded-2xl bg-primary px-4 py-2.5"
           onPress={onPick}
         >
-          <Text className="text-xs font-ralewayExtraBold text-[#FFFFFF]">
+          <Text className="font-ralewayExtraBold text-xs text-[#FFFFFF]">
             {documents.length > 0 ? "Add More" : "Choose"}
           </Text>
         </TouchableOpacity>
       </View>
 
       {isEditing ? (
-        <View className="rounded-2xl bg-[#2563EB]/5 px-3 py-2">
+        <View className="bg-secondary/20 rounded-2xl px-3 py-2">
           <Text className="text-xs leading-5 text-[#6F6D6D]">
             Existing documents stay attached. Add files here to upload more
             documents to this property.
@@ -71,31 +71,31 @@ export function PropertyDocumentsField({
 
       {isEditing ? (
         <View className="gap-2">
-          <Text className="text-xs font-ralewayBold text-slate-600">
+          <Text className="font-ralewayBold text-xs text-slate-600">
             Attached documents
           </Text>
           {isLoadingExistingDocuments ? (
-            <View className="h-14 justify-center rounded-2xl bg-[#2563EB]/5 px-3">
-              <ActivityIndicator color="#2563EB" />
+            <View className="bg-secondary/20 h-14 justify-center rounded-2xl px-3">
+              <ActivityIndicator color="#634CE4" />
             </View>
           ) : existingDocuments.length > 0 ? (
             existingDocuments.map((document) => (
               <TouchableOpacity
                 key={document.id}
                 activeOpacity={0.8}
-                className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
+                className="border-textPrimary/10 bg-secondary/20 flex-row items-center gap-3 rounded-2xl border p-3"
                 onPress={() => openPropertyDocument(document)}
               >
                 <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
                   <MaterialCommunityIcons
                     name="file-eye-outline"
-                    color="#2563EB"
+                    color="#634CE4"
                     size={18}
                   />
                 </View>
                 <View className="min-w-0 flex-1">
                   <Text
-                    className="text-xs font-ralewayExtraBold text-[#1d1d1f]"
+                    className="font-ralewayExtraBold text-textPrimary text-xs"
                     numberOfLines={1}
                   >
                     {document.name}
@@ -112,8 +112,8 @@ export function PropertyDocumentsField({
               </TouchableOpacity>
             ))
           ) : (
-            <View className="rounded-2xl border border-dashed border-[#1d1d1f]/15 bg-[#2563EB]/5 px-3 py-4">
-              <Text className="text-center text-xs font-ralewayBold text-[#6F6D6D]">
+            <View className="border-textPrimary/15 bg-secondary/20 rounded-2xl border border-dashed px-3 py-4">
+              <Text className="text-center font-ralewayBold text-xs text-[#6F6D6D]">
                 No documents attached yet.
               </Text>
             </View>
@@ -123,24 +123,24 @@ export function PropertyDocumentsField({
 
       {documents.length > 0 ? (
         <View className="gap-2">
-          <Text className="text-xs font-ralewayBold text-slate-600">
+          <Text className="font-ralewayBold text-xs text-slate-600">
             New uploads
           </Text>
           {documents.map((document, index) => (
             <View
               key={`${document.name}-${document.size ?? index}`}
-              className="flex-row items-center gap-3 rounded-2xl border border-[#1d1d1f]/10 bg-[#2563EB]/5 p-3"
+              className="border-textPrimary/10 bg-secondary/20 flex-row items-center gap-3 rounded-2xl border p-3"
             >
               <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
                 <MaterialCommunityIcons
                   name="file-document-outline"
-                  color="#2563EB"
+                  color="#634CE4"
                   size={18}
                 />
               </View>
               <View className="min-w-0 flex-1">
                 <Text
-                  className="text-xs font-ralewayExtraBold text-[#1d1d1f]"
+                  className="font-ralewayExtraBold text-textPrimary text-xs"
                   numberOfLines={1}
                 >
                   {document.name}

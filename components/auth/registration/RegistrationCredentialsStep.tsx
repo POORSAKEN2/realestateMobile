@@ -47,7 +47,7 @@ export function RegistrationCredentialsStep({
         />
         <Text
           className={`mt-2 text-xs leading-5 ${
-            passwordWarning ? "text-amber-700" : "text-[#708080]"
+            passwordWarning ? "text-amber-700" : "text-description"
           }`}
         >
           {passwordWarning ||
@@ -56,12 +56,12 @@ export function RegistrationCredentialsStep({
       </View>
 
       <View className="mt-2 flex-row items-center justify-center">
-        <Text className="text-sm text-[#647171]">
+        <Text className="text-sm text-description">
           Already have an account?{" "}
         </Text>
         <Link href="/(auth)/login" asChild>
           <Pressable accessibilityRole="link" hitSlop={8}>
-            <Text className="font-ralewayBold text-sm text-[#0f766e]">
+            <Text className="font-ralewayBold text-sm text-primary">
               Sign in
             </Text>
           </Pressable>

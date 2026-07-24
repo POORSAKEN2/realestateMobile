@@ -32,7 +32,7 @@ export function ProfileSummaryCard({
           onPress={onChangePhoto}
           className="relative"
         >
-          <View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-blue-50">
+          <View className="bg-secondary/20 h-24 w-24 items-center justify-center overflow-hidden rounded-full">
             {imageUri ? (
               <Image
                 source={{ uri: imageUri }}
@@ -40,12 +40,12 @@ export function ProfileSummaryCard({
                 resizeMode="cover"
               />
             ) : (
-              <Text className="font-ralewayExtraBold text-3xl text-blue-700">
+              <Text className="font-ralewayExtraBold text-3xl text-primary">
                 {getInitials(name)}
               </Text>
             )}
           </View>
-          <View className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-[3px] border-white bg-blue-600">
+          <View className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-[3px] border-white bg-primary">
             <Ionicons name="camera" color="#FFFFFF" size={16} />
           </View>
         </TouchableOpacity>
@@ -56,13 +56,13 @@ export function ProfileSummaryCard({
           onPress={onChangePhoto}
           className="mt-3 min-h-11 justify-center px-3"
         >
-          <Text className="font-ralewayBold text-sm text-blue-600">
+          <Text className="font-ralewayBold text-sm text-primary">
             {imageUri ? "Change photo" : "Add profile photo"}
           </Text>
         </TouchableOpacity>
 
         <Text
-          className="mt-1 font-ralewayBold text-xl text-slate-950"
+          className="text-textPrimary mt-1 font-ralewayBold text-xl"
           numberOfLines={1}
         >
           {name.trim() || "Your name"}
@@ -77,13 +77,13 @@ export function ProfileSummaryCard({
           <Text className="font-ralewayBold text-sm text-slate-700">
             Profile completion
           </Text>
-          <Text className="font-ralewayBold text-sm text-blue-600">
+          <Text className="font-ralewayBold text-sm text-primary">
             {completion.percent}%
           </Text>
         </View>
         <View className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
           <View
-            className="h-full rounded-full bg-blue-600"
+            className="h-full rounded-full bg-primary"
             style={{ width: `${completion.percent}%` }}
           />
         </View>

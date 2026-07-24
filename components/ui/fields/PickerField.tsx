@@ -30,7 +30,7 @@ export function PickerField({
   onPress,
   required,
   iconName = "calendar-outline", // Default to calendar
-  iconColor = "#2563EB", // Default to your vibrant blue
+  iconColor = "#634CE4", // Default to the brand primary color
   iconSize = 20,
   rightElement,
   className = "gap-2",
@@ -45,7 +45,7 @@ export function PickerField({
         className={
           isFilledVariant
             ? "font-ralewaySemiBold text-sm text-slate-600"
-            : "text-xs font-ralewayBold text-slate-600"
+            : "font-ralewayBold text-xs text-slate-600"
         }
       >
         {label}
@@ -58,15 +58,15 @@ export function PickerField({
         accessibilityRole="button"
         className={`h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
           isFilledVariant
-            ? "border-slate-200 bg-slate-50"
-            : "border-[#1d1d1f]/10 bg-[#FFFFFF] shadow-sm"
+            ? "bg-surface border-slate-200"
+            : "border-textPrimary/10 bg-[#FFFFFF] shadow-sm"
         }`}
         onPress={onPress}
       >
         <Text
           className={`text-base ${
             isFilledVariant ? "min-w-0 flex-1 font-ralewayMedium" : ""
-          } ${value ? "text-[#1d1d1f]" : "text-[#6F6D6D]"}`}
+          } ${value ? "text-textPrimary" : "text-[#6F6D6D]"}`}
           numberOfLines={isFilledVariant ? 1 : undefined}
         >
           {value || placeholder}
@@ -91,17 +91,21 @@ export function PickerModalShell({
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent visible>
       <View className="flex-1 justify-center bg-black/40 px-5">
-        <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
+        <View className="border-textPrimary/10 rounded-3xl border bg-[#FFFFFF] p-5 shadow-xl">
           <View className="mb-2 flex-row items-center justify-between">
-            <Text className="text-sm font-ralewayExtraBold text-[#1d1d1f]">{title}</Text>
+            <Text className="font-ralewayExtraBold text-textPrimary text-sm">
+              {title}
+            </Text>
             <TouchableOpacity
               accessibilityLabel={`Close ${title}`}
               accessibilityRole="button"
               activeOpacity={0.8}
-              className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
+              className="bg-secondary/20 rounded-full px-3 py-1.5"
               onPress={onClose}
             >
-              <Text className="text-xs font-ralewayExtraBold text-[#2563EB]">Done</Text>
+              <Text className="font-ralewayExtraBold text-xs text-primary">
+                Done
+              </Text>
             </TouchableOpacity>
           </View>
           {children}

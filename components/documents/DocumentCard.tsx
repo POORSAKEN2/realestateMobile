@@ -67,7 +67,7 @@ export function DocumentCard({
 
           <View className="min-w-0 flex-1 py-0.5">
             <Text
-              className="pr-1 font-ralewayExtraBold text-[16px] leading-6 text-slate-950"
+              className="pr-1 font-ralewayExtraBold text-[16px] leading-6 text-textPrimary"
               numberOfLines={2}
             >
               {document.name}
@@ -136,7 +136,7 @@ export function DocumentCard({
         >
           <MaterialCommunityIcons
             name="dots-horizontal"
-            color="#0F172A"
+            color="#1E1F45"
             size={21}
           />
         </TouchableOpacity>

@@ -31,7 +31,7 @@ export function BookingReservationList({
     <View className="mb-16 gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
       <View className="flex-row items-end justify-between gap-3">
         <View>
-          <Text className="font-ralewayBold text-lg text-slate-950">
+          <Text className="font-ralewayBold text-lg text-textPrimary">
             All reservations
           </Text>
           <Text className="mt-1 text-xs font-ralewaySemiBold text-slate-500">
@@ -91,13 +91,13 @@ function ReservationCard({
         <Text className="text-[10px] font-ralewayExtraBold uppercase text-slate-400">
           {monthFormatter.format(startDate)}
         </Text>
-        <Text className="font-ralewayBold text-lg text-slate-900">
+        <Text className="font-ralewayBold text-lg text-textPrimary">
           {startDate.getDate()}
         </Text>
       </View>
       <View className="min-w-0 flex-1">
         <Text
-          className="font-ralewayBold text-sm text-slate-900"
+          className="font-ralewayBold text-sm text-textPrimary"
           numberOfLines={1}
         >
           {booking.guestName}

@@ -35,7 +35,7 @@ export function LeaseCard({
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-2">
               <Text
-                className="min-w-0 flex-1 font-ralewayBold text-lg tracking-tight text-[#1d1d1f]"
+                className="min-w-0 flex-1 font-ralewayBold text-lg tracking-tight text-textPrimary"
                 numberOfLines={1}
               >
                 {lessee?.name ?? lease.lessee?.name ?? "Unknown Tenant"}
@@ -111,7 +111,7 @@ export function LeaseCard({
               </Text>
             </View>
             <Text
-              className="mt-1.5 font-ralewayBold text-xl tracking-tight text-[#2563EB]"
+              className="mt-1.5 font-ralewayBold text-xl tracking-tight text-primary"
               numberOfLines={1}
               adjustsFontSizeToFit
             >
@@ -131,7 +131,7 @@ export function LeaseCard({
               </Text>
             </View>
             <Text
-              className="mt-1.5 text-sm font-ralewaySemiBold leading-5 text-[#1d1d1f]"
+              className="mt-1.5 text-sm font-ralewaySemiBold leading-5 text-textPrimary"
               numberOfLines={1}
             >
               {lease.startDate} to {lease.endDate}

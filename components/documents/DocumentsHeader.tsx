@@ -13,7 +13,7 @@ export function DocumentsHeader({
       <View className="min-w-0 flex-1">
         <Text
           accessibilityRole="header"
-          className="font-ralewayExtraBold text-[30px] leading-10 text-slate-950"
+          className="font-ralewayExtraBold text-[30px] leading-10 text-textPrimary"
         >
           Documents
         </Text>
@@ -26,7 +26,7 @@ export function DocumentsHeader({
         accessibilityLabel="Upload document"
         accessibilityRole="button"
         activeOpacity={0.85}
-        className="min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-blue-600 px-4"
+        className="min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary px-4"
         onPress={onUpload}
       >
         <MaterialCommunityIcons name="plus" color="#FFFFFF" size={21} />

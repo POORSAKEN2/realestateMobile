@@ -42,23 +42,23 @@ export function RegistrationField({
 
   return (
     <View>
-      <Text className="mb-2 font-ralewayBold text-sm text-[#172121]">
+      <Text className="mb-2 font-ralewayBold text-sm text-textPrimary">
         {label}
       </Text>
       <View
         className={`h-14 flex-row items-center rounded-[14px] border-[1.5px] bg-white pl-4 ${
-          isFocused ? "border-[#2563EB]" : "border-[#dfe5e5]"
+          isFocused ? "border-primary" : "border-[#dfe5e5]"
         }`}
       >
         <Feather
           name={icon}
           size={19}
-          color={isFocused ? "#2563EB" : "#708080"}
+          color={isFocused ? "#634CE4" : "#6F6D6D"}
         />
         <TextInput
           autoCapitalize={autoCapitalize}
           autoComplete={autoComplete}
-          className="ml-3 h-full flex-1 pr-4 text-[15px] text-[#172121]"
+          className="ml-3 h-full flex-1 pr-4 text-[15px] text-textPrimary"
           keyboardType={keyboardType}
           onBlur={() => setIsFocused(false)}
           onChangeText={onChangeText}
@@ -83,7 +83,7 @@ export function RegistrationField({
             <Feather
               name={isValueVisible ? "eye" : "eye-off"}
               size={19}
-              color="#708080"
+              color="#6F6D6D"
             />
           </Pressable>
         ) : null}

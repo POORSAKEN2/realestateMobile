@@ -77,13 +77,13 @@ export function BookingFormModal({
       title={mode === "create" ? "Create a booking" : "Edit booking"}
       showCancelAction
     >
-      <View className="flex-row items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3.5">
+      <View className="border-secondary bg-secondary/20 flex-row items-start gap-3 rounded-2xl border px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
-          color="#2563EB"
+          color="#634CE4"
           size={20}
         />
-        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-[#1E40AF]">
+        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-primary">
           Fields marked with * are required. Availability updates as you enter
           the room and stay dates.
         </Text>
@@ -134,18 +134,18 @@ export function BookingFormModal({
 
         {selectedBuilding ? (
           <View className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#2563EB]/10">
+            <View className="bg-secondary/20 h-10 w-10 items-center justify-center rounded-xl">
               <MaterialCommunityIcons
                 name="door-open"
-                color="#2563EB"
+                color="#634CE4"
                 size={20}
               />
             </View>
             <View className="min-w-0 flex-1">
-              <Text className="text-xs font-ralewayBold text-slate-500">
+              <Text className="font-ralewayBold text-xs text-slate-500">
                 Booking location
               </Text>
-              <Text className="mt-0.5 text-sm font-ralewayExtraBold text-[#1d1d1f]">
+              <Text className="font-ralewayExtraBold text-textPrimary mt-0.5 text-sm">
                 {selectedBuilding.title}
                 {form.roomNumber ? ` · Room ${form.roomNumber}` : ""}
               </Text>
@@ -217,7 +217,7 @@ export function BookingFormModal({
       {mode === "edit" && editingBooking?.status === "Booked" ? (
         <View className="gap-3 rounded-[24px] border border-rose-500/20 bg-rose-50 p-4">
           <View>
-            <Text className="text-sm font-ralewayExtraBold text-rose-700">
+            <Text className="font-ralewayExtraBold text-sm text-rose-700">
               Cancel this booking
             </Text>
             <Text className="mt-1 text-xs leading-5 text-rose-700/80">
@@ -234,7 +234,9 @@ export function BookingFormModal({
             {isCancelling ? (
               <ActivityIndicator color="#DC2626" />
             ) : (
-              <Text className="font-ralewayExtraBold text-rose-600">Cancel Booking</Text>
+              <Text className="font-ralewayExtraBold text-rose-600">
+                Cancel Booking
+              </Text>
             )}
           </TouchableOpacity>
         </View>

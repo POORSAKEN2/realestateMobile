@@ -36,20 +36,20 @@ export function BaseField({
     : "text-xs font-ralewayBold text-slate-600";
 
   const containerClassName = isFilledVariant
-    ? `rounded-2xl border border-slate-200 bg-slate-50 px-4 ${
+    ? `rounded-2xl border border-slate-200 bg-surface px-4 ${
         multiline ? "min-h-24 py-3" : "h-14"
       }`
     : isIconVariant
       ? "h-14 flex-row items-center rounded-xl border border-slate-200 bg-white px-4 shadow-sm shadow-slate-900/5"
-      : `rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 ${
+      : `rounded-xl border border-textPrimary/10 bg-[#FFFFFF] px-4 ${
           multiline ? "min-h-28 py-4" : "h-14"
         }`;
 
   const inputClassName = isFilledVariant
-    ? "flex-1 font-ralewayMedium text-base text-[#1d1d1f]"
+    ? "flex-1 font-ralewayMedium mb-2 text-base text-textPrimary"
     : isIconVariant
-      ? "ml-3 flex-1 text-base font-ralewayBold text-slate-950"
-      : "flex-1 text-base text-[#1d1d1f]";
+      ? "ml-3 flex-1 text-base font-ralewayBold text-textPrimary"
+      : "flex-1 text-base text-textPrimary";
 
   const resolvedPlaceholderColor = isIconVariant ? "#94A3B8" : "#6F6D6D";
 

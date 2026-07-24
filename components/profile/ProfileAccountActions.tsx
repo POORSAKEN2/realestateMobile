@@ -12,7 +12,7 @@ export function ProfileAccountActions({
 }: ProfileAccountActionsProps) {
   return (
     <View className="mt-8 border-t border-slate-200 pt-6">
-      <Text className="font-ralewayBold text-base text-slate-950">
+      <Text className="font-ralewayBold text-base text-textPrimary">
         Account
       </Text>
       <TouchableOpacity

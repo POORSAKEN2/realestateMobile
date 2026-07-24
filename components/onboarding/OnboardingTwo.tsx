@@ -8,7 +8,7 @@ import onboard2 from '../../assets/images/onboard2.webp';
 import onboard3 from '../../assets/images/onboard3.jpg'
 const imageCardShadow = {
   elevation: 4,
-  shadowColor: '#1d1d1f',
+  shadowColor: '#1E1F45',
   shadowOffset: { width: 0, height: 15 },
   shadowOpacity: 0.2,
   shadowRadius: 30,

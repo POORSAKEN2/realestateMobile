@@ -32,7 +32,7 @@ export function BookingFilters({
             Property calendar
           </Text>
           <Text
-            className="mt-1 font-ralewayBold text-lg text-slate-950"
+            className="mt-1 font-ralewayBold text-lg text-textPrimary"
             numberOfLines={1}
           >
             {selectedBuilding?.title ?? "No building selected"}
@@ -50,7 +50,7 @@ export function BookingFilters({
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 className={`h-11 justify-center rounded-full px-3 ${
-                  selected ? "bg-blue-600" : "bg-transparent"
+                  selected ? "bg-primary" : "bg-transparent"
                 }`}
                 onPress={() => onSelectStatus(option.value)}
               >

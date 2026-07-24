@@ -35,7 +35,7 @@ export function PropertyListToolbar({
           <MaterialCommunityIcons name="magnify" color="#475569" size={20} />
           <TextInput
             accessibilityLabel="Search properties by name or location"
-            className="ml-2 min-w-0 flex-1 text-base text-[#1d1d1f]"
+            className="text-textPrimary ml-2 min-w-0 flex-1 text-base"
             onChangeText={onChangeSearch}
             placeholder="Search name or location"
             placeholderTextColor="#64748B"
@@ -64,13 +64,13 @@ export function PropertyListToolbar({
           accessibilityRole="button"
           activeOpacity={0.8}
           className={`h-12 min-w-12 flex-row items-center justify-center gap-2 rounded-2xl px-3.5 ${
-            hasActiveFilter ? "bg-[#2563EB]" : "bg-[#2563EB]/10"
+            hasActiveFilter ? "bg-primary" : "bg-secondary/20"
           }`}
           onPress={() => setIsFilterVisible(true)}
         >
           <MaterialCommunityIcons
             name="tune-variant"
-            color={hasActiveFilter ? "#FFFFFF" : "#2563EB"}
+            color={hasActiveFilter ? "#FFFFFF" : "#634CE4"}
             size={20}
           />
           {hasActiveFilter ? (
@@ -80,10 +80,10 @@ export function PropertyListToolbar({
       </View>
 
       <View className="mt-3 flex-row items-center justify-between px-1">
-        <Text className="text-xs font-ralewayBold text-slate-600">
+        <Text className="font-ralewayBold text-xs text-slate-600">
           {resultLabel}
         </Text>
-        <Text className="ml-4 flex-1 text-right text-xs font-ralewaySemiBold text-slate-600">
+        <Text className="ml-4 flex-1 text-right font-ralewaySemiBold text-xs text-slate-600">
           {getFilterLabel(statusFilter)}
         </Text>
       </View>
@@ -105,7 +105,7 @@ export function PropertyListToolbar({
           <View className="rounded-t-[28px] bg-white px-5 pb-9 pt-5">
             <View className="mb-4 flex-row items-center justify-between">
               <View>
-                <Text className="font-ralewayBold text-xl text-[#1d1d1f]">
+                <Text className="text-textPrimary font-ralewayBold text-xl">
                   Filter properties
                 </Text>
                 <Text className="mt-1 text-sm text-slate-600">
@@ -121,7 +121,7 @@ export function PropertyListToolbar({
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#1D1D1F"
+                  color="#1E1F45"
                   size={21}
                 />
               </TouchableOpacity>
@@ -139,7 +139,7 @@ export function PropertyListToolbar({
                     activeOpacity={0.8}
                     className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
                       selected
-                        ? "border-[#2563EB] bg-[#2563EB]/10"
+                        ? "bg-secondary/20 border-primary"
                         : "border-slate-200 bg-white"
                     }`}
                     onPress={() => {
@@ -148,8 +148,8 @@ export function PropertyListToolbar({
                     }}
                   >
                     <Text
-                      className={`text-base font-ralewayBold ${
-                        selected ? "text-[#2563EB]" : "text-[#1d1d1f]"
+                      className={`font-ralewayBold text-base ${
+                        selected ? "text-primary" : "text-textPrimary"
                       }`}
                     >
                       {choice.label}
@@ -157,7 +157,7 @@ export function PropertyListToolbar({
                     {selected ? (
                       <MaterialCommunityIcons
                         name="check-circle"
-                        color="#2563EB"
+                        color="#634CE4"
                         size={21}
                       />
                     ) : null}

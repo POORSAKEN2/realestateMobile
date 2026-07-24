@@ -33,10 +33,10 @@ export default function ChoiceChips<T extends string | number | boolean>({
   value,
   onSelect,
   isMultiSelect = false,
-  activeClassName = "border-[#2563EB] bg-[#2563EB]",
-  inactiveClassName = "border-[#1d1d1f]/10 bg-[#FFFFFF]",
+  activeClassName = "border-primary bg-primary",
+  inactiveClassName = "border-textPrimary/10 bg-[#FFFFFF]",
   activeTextClassName = "text-[#FFFFFF]",
-  inactiveTextClassName = "text-[#1d1d1f]",
+  inactiveTextClassName = "text-textPrimary",
   className = "flex-row flex-wrap gap-2",
   style,
 }: ChoiceChipsProps<T>) {

@@ -129,7 +129,7 @@ export function DocumentFilterSheet({
               <View className="flex-row items-center justify-between border-b border-slate-100 px-5 pb-4">
                 <Text
                   accessibilityRole="header"
-                  className="font-ralewayExtraBold text-xl text-slate-950"
+                  className="font-ralewayExtraBold text-xl text-textPrimary"
                 >
                   Filter documents
                 </Text>
@@ -215,7 +215,7 @@ export function DocumentFilterSheet({
                 <TouchableOpacity
                   accessibilityRole="button"
                   activeOpacity={0.82}
-                  className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-blue-600"
+                  className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-primary"
                   onPress={() => onApply(draft)}
                 >
                   <Text className="font-ralewayExtraBold text-sm text-white">

@@ -25,7 +25,7 @@ export function ChoiceGroup<T extends string>({
     <View
       className={
         isSegmented
-          ? "flex-row overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-0.5"
+          ? "bg-surface flex-row overflow-hidden rounded-2xl border border-slate-200 p-0.5"
           : "flex-row flex-wrap gap-2"
       }
     >
@@ -41,23 +41,23 @@ export function ChoiceGroup<T extends string>({
             className={
               isSegmented
                 ? `h-14 flex-1 items-center justify-center rounded-[14px] ${
-                    selected ? "bg-[#2563EB]" : "bg-transparent"
+                    selected ? "bg-primary" : "bg-transparent"
                   }`
                 : `min-h-11 items-center justify-center rounded-full border px-3.5 py-2.5 ${
                     selected
-                      ? "border-[#2563EB] bg-[#2563EB]"
-                      : "border-[#1d1d1f]/10 bg-[#2563EB]/5"
+                      ? "border-primary bg-primary"
+                      : "border-textPrimary/10 bg-secondary/20"
                   }`
             }
             onPress={() => onSelect(choice.value)}
           >
             <Text
-              className={`${isSegmented ? "font-ralewaySemiBold text-base" : "text-xs font-ralewayBold"} ${
+              className={`${isSegmented ? "font-ralewaySemiBold text-base" : "font-ralewayBold text-xs"} ${
                 selected
                   ? "text-[#FFFFFF]"
                   : isSegmented
                     ? "text-slate-600"
-                    : "text-[#1d1d1f]"
+                    : "text-textPrimary"
               }`}
             >
               {choice.label}
@@ -75,7 +75,7 @@ export function ChoiceGroup<T extends string>({
           className={
             isSegmented
               ? "font-ralewaySemiBold text-sm text-slate-600"
-              : "text-[11px] font-ralewayExtraBold uppercase tracking-wide text-[#6F6D6D]"
+              : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-[#6F6D6D]"
           }
         >
           {label}

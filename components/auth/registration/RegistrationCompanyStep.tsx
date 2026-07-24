@@ -24,7 +24,7 @@ export function RegistrationCompanyStep({
         textContentType="organizationName"
         value={company}
       />
-      <Text className="mt-3 text-xs leading-5 text-[#708080]">
+      <Text className="mt-3 text-xs leading-5 text-description">
         This will be used as the name of your real estate workspace.
       </Text>
     </View>

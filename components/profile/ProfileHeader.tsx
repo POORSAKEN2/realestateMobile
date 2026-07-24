@@ -15,10 +15,10 @@ export function ProfileHeader({ onBack }: ProfileHeaderProps) {
         onPress={onBack}
         className="h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white"
       >
-        <Ionicons name="chevron-back" color="#0F172A" size={22} />
+        <Ionicons name="chevron-back" color="#1E1F45" size={22} />
       </TouchableOpacity>
       <View className="ml-4 flex-1">
-        <Text className="font-ralewayExtraBold text-2xl text-slate-950">
+        <Text className="font-ralewayExtraBold text-2xl text-textPrimary">
           Your profile
         </Text>
         <Text className="mt-0.5 text-sm text-slate-500">
