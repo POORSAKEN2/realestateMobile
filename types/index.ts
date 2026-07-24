@@ -10,6 +10,7 @@ export type {
   AuthSession,
   AuthUser,
   RegisterFormData,
+  RegistrationDraft,
 } from "./auth";
 export type { PortfolioSnapshot, PortfolioStats } from "./domain/analytics";
 export type {

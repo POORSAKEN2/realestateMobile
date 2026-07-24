@@ -45,4 +45,14 @@ export type RegisterFormData = {
   password: string;
   password_confirmation: string;
   company: string;
+  otp_code: string;
+};
+
+export type RegistrationDraft = {
+  email: string;
+  password: string;
+  verificationCode: string;
+  firstName: string;
+  lastName: string;
+  company: string;
 };
