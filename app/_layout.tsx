@@ -1,10 +1,12 @@
 import {
-  Sora_400Regular,
-  Sora_500Medium,
-  Sora_600SemiBold,
-  Sora_700Bold,
+  Raleway_400Regular,
+  Raleway_500Medium,
+  Raleway_600SemiBold,
+  Raleway_700Bold,
+  Raleway_800ExtraBold,
+  Raleway_900Black,
   useFonts,
-} from "@expo-google-fonts/sora";
+} from "@expo-google-fonts/raleway";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useState } from "react";
@@ -31,7 +33,7 @@ type TextInputWithDefaultProps = typeof TextInput & {
   };
 };
 
-const defaultFontStyle = { fontFamily: "Sora_400Regular" };
+const defaultFontStyle = { fontFamily: "Raleway_500Medium" };
 
 (Text as TextWithDefaultProps).defaultProps = {
   ...(Text as TextWithDefaultProps).defaultProps,
@@ -57,10 +59,12 @@ export default function RootLayout() {
   );
 
   const [fontsLoaded] = useFonts({
-    Sora_400Regular,
-    Sora_500Medium,
-    Sora_600SemiBold,
-    Sora_700Bold,
+    Raleway_400Regular,
+    Raleway_500Medium,
+    Raleway_600SemiBold,
+    Raleway_700Bold,
+    Raleway_800ExtraBold,
+    Raleway_900Black,
   });
 
   if (!fontsLoaded) {

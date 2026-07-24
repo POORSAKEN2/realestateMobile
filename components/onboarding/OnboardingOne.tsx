@@ -19,7 +19,7 @@ export function OnboardingOne() {
        <View className="gap-8">
           <View className=' mb-5'>
 
-            <Text className="my-5 text-4xl font-bold leading-tight text-black">
+            <Text className="my-5 text-4xl font-ralewayExtraBold leading-tight text-black">
               {item.title}
             </Text>
 

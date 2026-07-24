@@ -38,7 +38,7 @@ export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
           />
         </View>
 
-        <Text className="shrink-0 text-font12 font-soraSemiBold text-blackPrimary">
+        <Text className="shrink-0 text-font12 font-ralewayBold text-blackPrimary">
           {currentStep}/{totalScreens}
         </Text>
       </View>
@@ -100,7 +100,7 @@ export function OnboardingControls({
             className="h-12 min-w-28 items-center justify-center rounded-full border border-description px-6"
             onPress={finishOnboarding}
           >
-            <Text className="text-font14 font-soraMedium text-description">Skip</Text>
+            <Text className="text-font14 font-ralewaySemiBold text-description">Skip</Text>
           </Pressable>
         ) : fullWidthButton ? null : (
           <View className="min-w-28" />
@@ -113,7 +113,7 @@ export function OnboardingControls({
           }`}
           onPress={handleNext}
         >
-          <Text className="text-font14 font-soraMedium text-whitePrimary">
+          <Text className="text-font14 font-ralewaySemiBold text-whitePrimary">
             {buttonTitle ?? (isLast ? 'Get started' : 'Next')}
           </Text>
         </Pressable>

@@ -30,7 +30,7 @@ export function BuildingChoices({
             onPress={() => onSelect(building.id)}
           >
             <Text
-              className={`text-xs font-bold ${selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"}`}
+              className={`text-xs font-ralewayExtraBold ${selected ? "text-[#FFFFFF]" : "text-[#1d1d1f]"}`}
             >
               {building.title}
             </Text>

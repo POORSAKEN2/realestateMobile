@@ -157,11 +157,11 @@ export function DocumentFormModal({
                 <View className="min-w-0 flex-1 pr-3">
                   <Text
                     accessibilityRole="header"
-                    className="font-soraSemiBold text-[28px] leading-9 tracking-tight text-slate-950"
+                    className="font-ralewayBold text-[28px] leading-9 tracking-tight text-slate-950"
                   >
                     {editingDocument ? "Edit document" : "Upload document"}
                   </Text>
-                  <Text className="mt-2 font-sora text-sm leading-5 text-slate-500">
+                  <Text className="mt-2 font-ralewayMedium text-sm leading-5 text-slate-500">
                     {editingDocument
                       ? "Update its details or choose a replacement file."
                       : "Organize a file by category, property, and tenant."}
@@ -192,7 +192,7 @@ export function DocumentFormModal({
                     accessibilityRole="alert"
                     className="rounded-2xl bg-red-50 px-4 py-3"
                   >
-                    <Text className="font-soraSemiBold text-sm text-red-700">
+                    <Text className="font-ralewayBold text-sm text-red-700">
                       {formError}
                     </Text>
                   </View>
@@ -221,7 +221,7 @@ export function DocumentFormModal({
                     <FieldLabel label="Name" required />
                     <TextInput
                       accessibilityLabel="Document name, required"
-                      className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-sora text-base text-slate-950 ${
+                      className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-slate-950 ${
                         errors.name ? "border-red-400" : "border-slate-200"
                       }`}
                       onChangeText={(name) => onChangeForm({ ...form, name })}
@@ -232,7 +232,7 @@ export function DocumentFormModal({
                     {errors.name ? (
                       <Text
                         accessibilityLiveRegion="assertive"
-                        className="font-soraMedium text-xs text-red-600"
+                        className="font-ralewaySemiBold text-xs text-red-600"
                       >
                         {errors.name}
                       </Text>
@@ -258,7 +258,7 @@ export function DocumentFormModal({
                             onPress={() => onChangeForm({ ...form, category })}
                           >
                             <Text
-                              className={`font-soraSemiBold text-xs ${
+                              className={`font-ralewayBold text-xs ${
                                 isSelected ? "text-white" : "text-slate-600"
                               }`}
                             >
@@ -286,7 +286,7 @@ export function DocumentFormModal({
                       <FieldLabel label="Version note" />
                       <TextInput
                         accessibilityLabel="Version note"
-                        className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-sora text-base text-slate-950"
+                        className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-slate-950"
                         multiline
                         onChangeText={(revisionComment) =>
                           onChangeForm({ ...form, revisionComment })
@@ -312,7 +312,7 @@ export function DocumentFormModal({
                   disabled={isSaving}
                   onPress={onClose}
                 >
-                  <Text className="font-soraSemiBold text-base text-[#2563EB]">
+                  <Text className="font-ralewayBold text-base text-[#2563EB]">
                     Cancel
                   </Text>
                 </TouchableOpacity>
@@ -329,7 +329,7 @@ export function DocumentFormModal({
                   {isSaving ? (
                     <ActivityIndicator color="#FFFFFF" />
                   ) : (
-                    <Text className="font-soraSemiBold text-base text-white">
+                    <Text className="font-ralewayBold text-base text-white">
                       {editingDocument ? "Save changes" : "Upload document"}
                     </Text>
                   )}
@@ -351,7 +351,7 @@ function FieldLabel({
   required?: boolean;
 }) {
   return (
-    <Text className="font-soraMedium text-sm text-slate-600">
+    <Text className="font-ralewaySemiBold text-sm text-slate-600">
       {label}
       {required ? <Text className="text-red-600"> *</Text> : null}
     </Text>

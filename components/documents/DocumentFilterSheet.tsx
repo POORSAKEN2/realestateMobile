@@ -129,7 +129,7 @@ export function DocumentFilterSheet({
               <View className="flex-row items-center justify-between border-b border-slate-100 px-5 pb-4">
                 <Text
                   accessibilityRole="header"
-                  className="font-soraBold text-xl text-slate-950"
+                  className="font-ralewayExtraBold text-xl text-slate-950"
                 >
                   Filter documents
                 </Text>
@@ -164,7 +164,7 @@ export function DocumentFilterSheet({
                 />
 
                 <View className="gap-2">
-                  <Text className="font-soraSemiBold text-xs uppercase tracking-wide text-slate-500">
+                  <Text className="font-ralewayBold text-xs uppercase tracking-wide text-slate-500">
                     File type
                   </Text>
                   <View className="flex-row flex-wrap gap-2">
@@ -186,7 +186,7 @@ export function DocumentFilterSheet({
                           }
                         >
                           <Text
-                            className={`font-soraSemiBold text-xs ${
+                            className={`font-ralewayBold text-xs ${
                               isSelected ? "text-white" : "text-slate-600"
                             }`}
                           >
@@ -208,7 +208,7 @@ export function DocumentFilterSheet({
                     setDraft({ propertyId: "", lesseeId: "", type: "All" })
                   }
                 >
-                  <Text className="font-soraBold text-sm text-slate-700">
+                  <Text className="font-ralewayExtraBold text-sm text-slate-700">
                     Reset
                   </Text>
                 </TouchableOpacity>
@@ -218,7 +218,7 @@ export function DocumentFilterSheet({
                   className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-blue-600"
                   onPress={() => onApply(draft)}
                 >
-                  <Text className="font-soraBold text-sm text-white">
+                  <Text className="font-ralewayExtraBold text-sm text-white">
                     Apply filters
                   </Text>
                 </TouchableOpacity>

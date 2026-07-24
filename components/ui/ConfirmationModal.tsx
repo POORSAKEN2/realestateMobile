@@ -32,7 +32,7 @@ export function ConfirmationModal({
     >
       <View className="flex-1 items-center justify-center bg-[#1d1d1f]/40 px-6">
         <View className="w-full rounded-[28px] bg-white p-6">
-          <Text className="text-xl font-bold text-[#1d1d1f]">{title}</Text>
+          <Text className="text-xl font-ralewayExtraBold text-[#1d1d1f]">{title}</Text>
           <Text className="mt-2 text-sm leading-5 text-[#6F6D6D]">
             {description}
           </Text>
@@ -42,7 +42,7 @@ export function ConfirmationModal({
               disabled={isPending}
               onPress={onCancel}
             >
-              <Text className="font-bold text-[#1d1d1f]">Cancel</Text>
+              <Text className="font-ralewayExtraBold text-[#1d1d1f]">Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               className="h-12 flex-1 items-center justify-center rounded-2xl bg-[#1d1d1f]"
@@ -52,7 +52,7 @@ export function ConfirmationModal({
               {isPending ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text className="font-bold text-white">{confirmLabel}</Text>
+                <Text className="font-ralewayExtraBold text-white">{confirmLabel}</Text>
               )}
             </TouchableOpacity>
           </View>

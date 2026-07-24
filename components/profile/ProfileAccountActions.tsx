@@ -12,7 +12,7 @@ export function ProfileAccountActions({
 }: ProfileAccountActionsProps) {
   return (
     <View className="mt-8 border-t border-slate-200 pt-6">
-      <Text className="font-soraSemiBold text-base text-slate-950">
+      <Text className="font-ralewayBold text-base text-slate-950">
         Account
       </Text>
       <TouchableOpacity
@@ -28,7 +28,7 @@ export function ProfileAccountActions({
             size={19}
           />
         </View>
-        <Text className="ml-3 flex-1 font-soraMedium text-sm text-slate-800">
+        <Text className="ml-3 flex-1 font-ralewaySemiBold text-sm text-slate-800">
           Password and security
         </Text>
         <Ionicons name="chevron-forward" color="#94A3B8" size={20} />
@@ -44,7 +44,7 @@ export function ProfileAccountActions({
         <View className="h-9 w-9 items-center justify-center rounded-xl bg-white">
           <Ionicons name="log-out-outline" color="#DC2626" size={19} />
         </View>
-        <Text className="ml-3 flex-1 font-soraSemiBold text-sm text-red-600">
+        <Text className="ml-3 flex-1 font-ralewayBold text-sm text-red-600">
           Sign out
         </Text>
       </TouchableOpacity>

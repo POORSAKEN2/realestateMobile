@@ -35,7 +35,7 @@ export function PropertyDocumentsField({
             />
           </View>
           <View className="flex-1">
-            <Text className="text-sm font-bold text-[#1d1d1f]">
+            <Text className="text-sm font-ralewayExtraBold text-[#1d1d1f]">
               Property documents
             </Text>
             <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
@@ -54,7 +54,7 @@ export function PropertyDocumentsField({
           className="min-h-11 justify-center rounded-2xl bg-[#2563EB] px-4 py-2.5"
           onPress={onPick}
         >
-          <Text className="text-xs font-bold text-[#FFFFFF]">
+          <Text className="text-xs font-ralewayExtraBold text-[#FFFFFF]">
             {documents.length > 0 ? "Add More" : "Choose"}
           </Text>
         </TouchableOpacity>
@@ -71,7 +71,7 @@ export function PropertyDocumentsField({
 
       {isEditing ? (
         <View className="gap-2">
-          <Text className="text-xs font-semibold text-slate-600">
+          <Text className="text-xs font-ralewayBold text-slate-600">
             Attached documents
           </Text>
           {isLoadingExistingDocuments ? (
@@ -95,7 +95,7 @@ export function PropertyDocumentsField({
                 </View>
                 <View className="min-w-0 flex-1">
                   <Text
-                    className="text-xs font-bold text-[#1d1d1f]"
+                    className="text-xs font-ralewayExtraBold text-[#1d1d1f]"
                     numberOfLines={1}
                   >
                     {document.name}
@@ -113,7 +113,7 @@ export function PropertyDocumentsField({
             ))
           ) : (
             <View className="rounded-2xl border border-dashed border-[#1d1d1f]/15 bg-[#2563EB]/5 px-3 py-4">
-              <Text className="text-center text-xs font-semibold text-[#6F6D6D]">
+              <Text className="text-center text-xs font-ralewayBold text-[#6F6D6D]">
                 No documents attached yet.
               </Text>
             </View>
@@ -123,7 +123,7 @@ export function PropertyDocumentsField({
 
       {documents.length > 0 ? (
         <View className="gap-2">
-          <Text className="text-xs font-semibold text-slate-600">
+          <Text className="text-xs font-ralewayBold text-slate-600">
             New uploads
           </Text>
           {documents.map((document, index) => (
@@ -140,7 +140,7 @@ export function PropertyDocumentsField({
               </View>
               <View className="min-w-0 flex-1">
                 <Text
-                  className="text-xs font-bold text-[#1d1d1f]"
+                  className="text-xs font-ralewayExtraBold text-[#1d1d1f]"
                   numberOfLines={1}
                 >
                   {document.name}

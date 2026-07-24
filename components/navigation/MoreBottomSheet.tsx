@@ -106,10 +106,10 @@ function AnalyticsCard({
           <MenuIcon icon={item.icon} />
         </View>
         <View className="ml-3 flex-1">
-          <Text className="font-soraBold text-lg text-slate-900">
+          <Text className="font-ralewayExtraBold text-lg text-slate-900">
             {item.label}
           </Text>
-          <Text className="mt-0.5 font-soraSemiBold text-[13px] text-slate-500">
+          <Text className="mt-0.5 font-ralewayBold text-[13px] text-slate-500">
             View insights
           </Text>
         </View>
@@ -185,7 +185,7 @@ function CompactBentoCard({
         <MenuIcon icon={item.icon} />
       </View>
       <View className="flex-row items-center">
-        <Text className="flex-1 font-soraSemiBold text-[15px] text-slate-900">
+        <Text className="flex-1 font-ralewayBold text-[15px] text-slate-900">
           {item.label}
         </Text>
         <Ionicons name="chevron-forward" color={colors.primary} size={18} />
@@ -212,7 +212,7 @@ function WideBentoCard({
       <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-blue-50">
         <MenuIcon icon={item.icon} />
       </View>
-      <Text className="flex-1 font-soraSemiBold text-[15px] text-slate-900">
+      <Text className="flex-1 font-ralewayBold text-[15px] text-slate-900">
         {item.label}
       </Text>
       <Ionicons name="chevron-forward" color={colors.primary} size={19} />
@@ -238,7 +238,7 @@ function UtilityBentoCard({
       <View className="mr-2.5 h-10 w-10 items-center justify-center rounded-2xl bg-blue-50">
         <MenuIcon icon={item.icon} />
       </View>
-      <Text className="flex-1 font-soraSemiBold text-sm text-slate-900">
+      <Text className="flex-1 font-ralewayBold text-sm text-slate-900">
         {item.label}
       </Text>
       <Ionicons name="chevron-forward" color="#94A3B8" size={17} />
@@ -351,10 +351,10 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
 
           <View className="mb-[18px] flex-row items-center justify-between">
             <View>
-              <Text className="font-soraBold text-[11px] uppercase tracking-[0.8px] text-slate-500">
+              <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-[0.8px] text-slate-500">
                 Menu
               </Text>
-              <Text className="mt-1 font-soraBold text-[22px] text-blackPrimary">
+              <Text className="mt-1 font-ralewayExtraBold text-[22px] text-blackPrimary">
                 Manage Portfolio
               </Text>
             </View>

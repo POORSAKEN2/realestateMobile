@@ -145,10 +145,10 @@ export default function PropertiesScreen() {
             <View className="gap-5 pb-5">
               <View className="flex-row items-center justify-between px-1">
                 <View className="min-w-0 flex-1 pr-4">
-                  <Text className="text-xs font-semibold text-slate-600">
+                  <Text className="text-xs font-ralewayBold text-slate-600">
                     Asset management
                   </Text>
-                  <Text className="font-soraSemiBold text-3xl tracking-tight text-[#1d1d1f]">
+                  <Text className="font-ralewayBold text-3xl tracking-tight text-[#1d1d1f]">
                     Properties
                   </Text>
                 </View>

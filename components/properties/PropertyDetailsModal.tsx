@@ -145,11 +145,11 @@ export function PropertyDetailsModal({
                       ))}
                     </View>
                   ) : null}
-                  <Text className="self-start rounded-md bg-teal-600 px-2 py-1 font-soraSemiBold text-[10px] uppercase text-white">
+                  <Text className="self-start rounded-md bg-teal-600 px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
                     {formatPropertyStatus(property.status)}
                   </Text>
                   <Text
-                    className="mt-2 font-soraSemiBold text-2xl text-white"
+                    className="mt-2 font-ralewayBold text-2xl text-white"
                     numberOfLines={2}
                   >
                     {property.title}
@@ -231,7 +231,7 @@ export function PropertyDetailsModal({
                           <View className="flex-row items-start justify-between gap-2">
                             <View className="min-w-0 flex-1">
                               <Text
-                                className="font-soraSemiBold text-sm text-zinc-950"
+                                className="font-ralewayBold text-sm text-zinc-950"
                                 numberOfLines={1}
                               >
                                 {lessee?.name ?? "Linked tenant"}
@@ -244,7 +244,7 @@ export function PropertyDetailsModal({
                                 {lease.startDate} to {lease.endDate}
                               </Text>
                             </View>
-                            <Text className="rounded-full bg-white px-2 py-0.5 font-soraSemiBold text-[9px] uppercase text-zinc-500">
+                            <Text className="rounded-full bg-white px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-zinc-500">
                               {lease.status}
                             </Text>
                           </View>
@@ -272,7 +272,7 @@ export function PropertyDetailsModal({
                         </View>
                         <View className="min-w-0 flex-1">
                           <Text
-                            className="font-soraSemiBold text-sm text-zinc-950"
+                            className="font-ralewayBold text-sm text-zinc-950"
                             numberOfLines={1}
                           >
                             {document.name}
@@ -332,13 +332,13 @@ function DetailMetric({
         className={`rounded-2xl border p-3 ${accent ? "border-emerald-100 bg-emerald-50" : "border-zinc-100 bg-zinc-50"}`}
       >
         <Text
-          className={`font-soraSemiBold text-[10px] uppercase ${accent ? "text-emerald-700/70" : "text-zinc-400"}`}
+          className={`font-ralewayBold text-[10px] uppercase ${accent ? "text-emerald-700/70" : "text-zinc-400"}`}
         >
           {label}
         </Text>
         <Text
           adjustsFontSizeToFit
-          className={`mt-1 text-lg font-bold ${accent ? "text-emerald-700" : "text-zinc-950"}`}
+          className={`mt-1 text-lg font-ralewayExtraBold ${accent ? "text-emerald-700" : "text-zinc-950"}`}
           numberOfLines={1}
         >
           {value}
@@ -363,11 +363,11 @@ function CountMetric({
     <View className="flex-1 rounded-2xl border border-teal-100 bg-teal-50 p-4">
       <View className="flex-row items-center gap-2">
         <Feather name={icon} color="#0f766e" size={16} />
-        <Text className="font-soraSemiBold text-[10px] uppercase text-teal-700">
+        <Text className="font-ralewayBold text-[10px] uppercase text-teal-700">
           {label}
         </Text>
       </View>
-      <Text className="mt-2 text-2xl font-bold text-zinc-950">
+      <Text className="mt-2 text-2xl font-ralewayExtraBold text-zinc-950">
         {loading ? "..." : value}
       </Text>
     </View>
@@ -383,7 +383,7 @@ function DetailsSection({
 }) {
   return (
     <View className="mt-6 border-t border-zinc-100 pt-5">
-      <Text className="font-soraSemiBold text-xs uppercase text-zinc-400">
+      <Text className="font-ralewayBold text-xs uppercase text-zinc-400">
         {title}
       </Text>
       <View className="mt-3 gap-2">{children}</View>
@@ -394,7 +394,7 @@ function DetailsSection({
 function EmptyDetail({ text }: { text: string }) {
   return (
     <View className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5">
-      <Text className="font-soraMedium text-xs text-zinc-500">{text}</Text>
+      <Text className="font-ralewaySemiBold text-xs text-zinc-500">{text}</Text>
     </View>
   );
 }
@@ -414,11 +414,11 @@ function Attribute({
         <Feather name={icon} color="#52525b" size={15} />
       </View>
       <View className="min-w-0 flex-1">
-        <Text className="font-soraSemiBold text-[9px] uppercase text-zinc-400">
+        <Text className="font-ralewayBold text-[9px] uppercase text-zinc-400">
           {label}
         </Text>
         <Text
-          className="font-soraSemiBold text-xs text-zinc-950"
+          className="font-ralewayBold text-xs text-zinc-950"
           numberOfLines={1}
         >
           {value}

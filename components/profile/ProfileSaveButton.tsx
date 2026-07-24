@@ -39,7 +39,7 @@ export function ProfileSaveButton({
           size={20}
         />
       )}
-      <Text className="ml-2 font-soraSemiBold text-base text-white">
+      <Text className="ml-2 font-ralewayBold text-base text-white">
         {isSaving
           ? "Saving changes…"
           : hasChanges

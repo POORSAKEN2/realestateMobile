@@ -39,14 +39,14 @@ export function TenantCard({
             <View className="min-w-0 flex-1 pt-0.5">
               <View className="flex-row items-center gap-2">
                 <Text
-                  className="font-soraSemiBold text-lg tracking-tight text-[#1d1d1f]"
+                  className="font-ralewayBold text-lg tracking-tight text-[#1d1d1f]"
                   numberOfLines={1}
                 >
                   {tenant.name}
                 </Text>
                 {/* Subtle Inline Badge */}
                 <View className="rounded-md bg-slate-100 px-2 py-0.5">
-                  <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-600">
                     {leaseCount} Lease{leaseCount === 1 ? "" : "s"}
                   </Text>
                 </View>
@@ -92,12 +92,12 @@ export function TenantCard({
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-1.5">
               <Ionicons name="wallet-outline" color="#94A3B8" size={14} />
-              <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-500">
                 Monthly Rent
               </Text>
             </View>
             <Text
-              className="mt-1.5 font-soraSemiBold text-2xl tracking-tight text-[#2563EB]"
+              className="mt-1.5 font-ralewayBold text-2xl tracking-tight text-[#2563EB]"
               numberOfLines={1}
               adjustsFontSizeToFit
             >
@@ -112,12 +112,12 @@ export function TenantCard({
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-1.5">
               <Ionicons name="business-outline" color="#94A3B8" size={14} />
-              <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-500">
                 Properties
               </Text>
             </View>
             <Text
-              className="mt-1.5 text-sm font-medium leading-5 text-[#1d1d1f]"
+              className="mt-1.5 text-sm font-ralewaySemiBold leading-5 text-[#1d1d1f]"
               numberOfLines={2}
             >
               {propertyNames.length > 0

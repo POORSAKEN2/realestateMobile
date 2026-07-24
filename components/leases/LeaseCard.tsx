@@ -35,7 +35,7 @@ export function LeaseCard({
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-2">
               <Text
-                className="min-w-0 flex-1 font-soraSemiBold text-lg tracking-tight text-[#1d1d1f]"
+                className="min-w-0 flex-1 font-ralewayBold text-lg tracking-tight text-[#1d1d1f]"
                 numberOfLines={1}
               >
                 {lessee?.name ?? lease.lessee?.name ?? "Unknown Tenant"}
@@ -52,7 +52,7 @@ export function LeaseCard({
                 }`}
               >
                 <Text
-                  className={`text-[10px] font-bold uppercase tracking-wider ${
+                  className={`text-[10px] font-ralewayExtraBold uppercase tracking-wider ${
                     isActive
                       ? "text-emerald-600"
                       : isExpired
@@ -69,7 +69,7 @@ export function LeaseCard({
             <View className="mt-1 flex-row items-center gap-1.5">
               <Ionicons name="business-outline" size={14} color="#94A3B8" />
               <Text
-                className="min-w-0 flex-1 text-sm font-medium text-slate-500"
+                className="min-w-0 flex-1 text-sm font-ralewaySemiBold text-slate-500"
                 numberOfLines={1}
               >
                 {property?.title ?? "Unknown Property"}
@@ -106,12 +106,12 @@ export function LeaseCard({
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-1.5">
               <Ionicons name="wallet-outline" color="#94A3B8" size={14} />
-              <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-500">
                 Monthly Rent
               </Text>
             </View>
             <Text
-              className="mt-1.5 font-soraSemiBold text-xl tracking-tight text-[#2563EB]"
+              className="mt-1.5 font-ralewayBold text-xl tracking-tight text-[#2563EB]"
               numberOfLines={1}
               adjustsFontSizeToFit
             >
@@ -126,12 +126,12 @@ export function LeaseCard({
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-1.5">
               <Ionicons name="calendar-outline" color="#94A3B8" size={14} />
-              <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-500">
                 Lease Term
               </Text>
             </View>
             <Text
-              className="mt-1.5 text-sm font-medium leading-5 text-[#1d1d1f]"
+              className="mt-1.5 text-sm font-ralewaySemiBold leading-5 text-[#1d1d1f]"
               numberOfLines={1}
             >
               {lease.startDate} to {lease.endDate}

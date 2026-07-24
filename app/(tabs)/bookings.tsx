@@ -126,10 +126,10 @@ export default function BookingsScreen() {
       <View className="flex-1 gap-5">
         <View className="flex-row items-center justify-between px-1">
           <View>
-            <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
+            <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-slate-400">
               Short Stay
             </Text>
-            <Text className="font-soraSemiBold text-3xl tracking-tight text-slate-950">
+            <Text className="font-ralewayBold text-3xl tracking-tight text-slate-950">
               Bookings
             </Text>
           </View>

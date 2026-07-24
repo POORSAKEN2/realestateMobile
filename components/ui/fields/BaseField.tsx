@@ -32,8 +32,8 @@ export function BaseField({
 
   // 2. Resolve conflicting style classes between modules
   const labelClassName = isFilledVariant
-    ? "font-soraMedium text-sm text-slate-600"
-    : "text-xs font-semibold text-slate-600";
+    ? "font-ralewaySemiBold text-sm text-slate-600"
+    : "text-xs font-ralewayBold text-slate-600";
 
   const containerClassName = isFilledVariant
     ? `rounded-2xl border border-slate-200 bg-slate-50 px-4 ${
@@ -46,9 +46,9 @@ export function BaseField({
         }`;
 
   const inputClassName = isFilledVariant
-    ? "flex-1 font-sora text-base text-[#1d1d1f]"
+    ? "flex-1 font-ralewayMedium text-base text-[#1d1d1f]"
     : isIconVariant
-      ? "ml-3 flex-1 text-base font-semibold text-slate-950"
+      ? "ml-3 flex-1 text-base font-ralewayBold text-slate-950"
       : "flex-1 text-base text-[#1d1d1f]";
 
   const resolvedPlaceholderColor = isIconVariant ? "#94A3B8" : "#6F6D6D";

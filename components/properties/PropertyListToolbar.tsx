@@ -80,10 +80,10 @@ export function PropertyListToolbar({
       </View>
 
       <View className="mt-3 flex-row items-center justify-between px-1">
-        <Text className="text-xs font-semibold text-slate-600">
+        <Text className="text-xs font-ralewayBold text-slate-600">
           {resultLabel}
         </Text>
-        <Text className="ml-4 flex-1 text-right text-xs font-medium text-slate-600">
+        <Text className="ml-4 flex-1 text-right text-xs font-ralewaySemiBold text-slate-600">
           {getFilterLabel(statusFilter)}
         </Text>
       </View>
@@ -105,7 +105,7 @@ export function PropertyListToolbar({
           <View className="rounded-t-[28px] bg-white px-5 pb-9 pt-5">
             <View className="mb-4 flex-row items-center justify-between">
               <View>
-                <Text className="font-soraSemiBold text-xl text-[#1d1d1f]">
+                <Text className="font-ralewayBold text-xl text-[#1d1d1f]">
                   Filter properties
                 </Text>
                 <Text className="mt-1 text-sm text-slate-600">
@@ -148,7 +148,7 @@ export function PropertyListToolbar({
                     }}
                   >
                     <Text
-                      className={`text-base font-semibold ${
+                      className={`text-base font-ralewayBold ${
                         selected ? "text-[#2563EB]" : "text-[#1d1d1f]"
                       }`}
                     >

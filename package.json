@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@expo-google-fonts/sora": "^0.4.2",
+    "@expo-google-fonts/raleway": "^0.4.2",
     "@expo/vector-icons": "^15.0.3",
     "@react-native-community/datetimepicker": "8.4.4",
     "@sbaiahmed1/react-native-blur": "^4.6.2",

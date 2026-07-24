@@ -54,11 +54,11 @@ export function OnboardingSix() {
                 <View className="h-8 w-8 items-center justify-center rounded-2xl bg-teal-50">
                   <Feather name="navigation" size={15} color="#0F766E" />
                 </View>
-                <Text className="flex-1 font-soraSemiBold text-sm text-blackPrimary">
+                <Text className="flex-1 font-ralewayBold text-sm text-blackPrimary">
                   Property Location
                 </Text>
               </View>
-              <Text className="mt-3 text-xs font-soraMedium leading-5 text-description">
+              <Text className="mt-3 text-xs font-ralewaySemiBold leading-5 text-description">
                 Calapan, Oriental Mindoro
               </Text>
               <View className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
@@ -67,10 +67,10 @@ export function OnboardingSix() {
             </View>
 
             <View className="absolute bottom-5 left-5 rounded-2xl border border-white/80 bg-whitePrimary/90 px-4 py-3 shadow-sm">
-              <Text className="text-font10 font-soraBold uppercase tracking-widest text-description">
+              <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
                 Region
               </Text>
-              <Text className="mt-1 font-soraSemiBold text-sm text-blackPrimary">
+              <Text className="mt-1 font-ralewayBold text-sm text-blackPrimary">
                 Philippines
               </Text>
             </View>
@@ -80,7 +80,7 @@ export function OnboardingSix() {
         <View className="gap-8">
           <View className=' mb-5'>
 
-            <Text className="my-5 text-4xl font-bold leading-tight  text-black">
+            <Text className="my-5 text-4xl font-ralewayExtraBold leading-tight  text-black">
               {item.title}
             </Text>
 

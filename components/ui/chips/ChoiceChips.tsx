@@ -75,7 +75,7 @@ export default function ChoiceChips<T extends string | number | boolean>({
             onPress={() => handlePress(option.value)}
           >
             <Text
-              className={`text-xs font-bold ${
+              className={`text-xs font-ralewayExtraBold ${
                 selected ? activeTextClassName : inactiveTextClassName
               }`}
             >

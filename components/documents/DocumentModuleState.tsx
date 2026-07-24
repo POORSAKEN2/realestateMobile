@@ -24,7 +24,7 @@ export function DocumentModuleState({
         className="h-52 items-center justify-center rounded-[24px] border border-slate-200 bg-white"
       >
         <ActivityIndicator color="#2563EB" />
-        <Text className="mt-3 font-soraMedium text-sm text-slate-500">
+        <Text className="mt-3 font-ralewaySemiBold text-sm text-slate-500">
           Loading documents
         </Text>
       </View>
@@ -84,10 +84,10 @@ function StateCard({
       <View className="h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
         <MaterialCommunityIcons name={icon} color="#2563EB" size={28} />
       </View>
-      <Text className="mt-4 text-center font-soraBold text-lg text-slate-950">
+      <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-slate-950">
         {title}
       </Text>
-      <Text className="mt-2 text-center font-sora text-sm leading-6 text-slate-500">
+      <Text className="mt-2 text-center font-ralewayMedium text-sm leading-6 text-slate-500">
         {description}
       </Text>
       <TouchableOpacity
@@ -96,7 +96,7 @@ function StateCard({
         className="mt-5 min-h-12 justify-center rounded-2xl bg-blue-600 px-5"
         onPress={onAction}
       >
-        <Text className="font-soraBold text-sm text-white">{actionLabel}</Text>
+        <Text className="font-ralewayExtraBold text-sm text-white">{actionLabel}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -116,7 +116,7 @@ export function DocumentFeedbackToast({ message }: { message: string }) {
         color="#86EFAC"
         size={20}
       />
-      <Text className="min-w-0 flex-1 font-soraSemiBold text-sm text-white">
+      <Text className="min-w-0 flex-1 font-ralewayBold text-sm text-white">
         {message}
       </Text>
     </View>

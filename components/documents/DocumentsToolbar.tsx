@@ -39,7 +39,7 @@ export function DocumentsToolbar({
         <MaterialCommunityIcons name="magnify" color="#64748B" size={22} />
         <TextInput
           accessibilityLabel="Search documents, properties, or tenants"
-          className="min-w-0 flex-1 py-3 font-soraMedium text-sm text-slate-950"
+          className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-slate-950"
           onChangeText={onChangeSearch}
           placeholder="Search documents, properties, tenants"
           placeholderTextColor="#94A3B8"
@@ -86,7 +86,7 @@ export function DocumentsToolbar({
                   onPress={() => onChangeCategory(option)}
                 >
                   <Text
-                    className={`font-soraSemiBold text-xs ${
+                    className={`font-ralewayBold text-xs ${
                       isSelected ? "text-white" : "text-slate-700"
                     }`}
                   >
@@ -116,7 +116,7 @@ export function DocumentsToolbar({
           />
           {activeFilterCount ? (
             <View className="absolute -right-1.5 -top-1.5 h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1">
-              <Text className="font-soraBold text-[10px] text-white">
+              <Text className="font-ralewayExtraBold text-[10px] text-white">
                 {activeFilterCount}
               </Text>
             </View>
@@ -127,7 +127,7 @@ export function DocumentsToolbar({
       <View className="flex-row items-center justify-between">
         <Text
           accessibilityLiveRegion="polite"
-          className="font-soraMedium text-sm text-slate-500"
+          className="font-ralewaySemiBold text-sm text-slate-500"
         >
           {resultCount} {resultCount === 1 ? "document" : "documents"}
         </Text>
@@ -138,7 +138,7 @@ export function DocumentsToolbar({
           className="min-h-11 flex-row items-center gap-1 rounded-xl px-2"
           onPress={onOpenSort}
         >
-          <Text className="font-soraSemiBold text-sm text-slate-800">
+          <Text className="font-ralewayBold text-sm text-slate-800">
             {sortLabel}
           </Text>
           <MaterialCommunityIcons

@@ -78,8 +78,8 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               <Text
                 className={
                   isCardAppearance
-                    ? "font-soraSemiBold text-[28px] leading-9 tracking-tight text-[#1d1d1f]"
-                    : "font-soraSemiBold text-2xl text-[#1d1d1f]"
+                    ? "font-ralewayBold text-[28px] leading-9 tracking-tight text-[#1d1d1f]"
+                    : "font-ralewayBold text-2xl text-[#1d1d1f]"
                 }
                 numberOfLines={2}
               >
@@ -89,8 +89,8 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 <Text
                   className={
                     isCardAppearance
-                      ? "mt-2 font-sora text-base leading-6 text-slate-500"
-                      : "mt-1 font-sora text-sm text-[#6F6D6D]"
+                      ? "mt-2 font-ralewayMedium text-base leading-6 text-slate-500"
+                      : "mt-1 font-ralewayMedium text-sm text-[#6F6D6D]"
                   }
                   numberOfLines={2}
                 >
@@ -127,7 +127,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
             <View className="flex-row items-start gap-3 rounded-2xl border border-[#B42318]/20 bg-[#FEF3F2] p-4">
               <Ionicons name="alert-circle-outline" color="#B42318" size={20} />
               <View className="min-w-0 flex-1">
-                <Text className="text-sm font-semibold text-[#B42318]">
+                <Text className="text-sm font-ralewayBold text-[#B42318]">
                   Please review the form
                 </Text>
                 <Text className="mt-1 text-xs leading-5 text-[#7A271A]">
@@ -156,7 +156,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 disabled={isPending}
                 onPress={onClose}
               >
-                <Text className="font-soraSemiBold text-base text-[#2563EB]">
+                <Text className="font-ralewayBold text-base text-[#2563EB]">
                   {cancelText}
                 </Text>
               </TouchableOpacity>
@@ -177,8 +177,8 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 <Text
                   className={
                     isCardAppearance
-                      ? "font-soraSemiBold text-base text-white"
-                      : "text-lg font-semibold text-white"
+                      ? "font-ralewayBold text-base text-white"
+                      : "text-lg font-ralewayBold text-white"
                   }
                 >
                   {submitText}

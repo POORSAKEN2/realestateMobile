@@ -28,11 +28,11 @@ export function BookingFilters({
     <View className="gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
       <View className="flex-row items-start justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+          <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
             Property calendar
           </Text>
           <Text
-            className="mt-1 font-soraSemiBold text-lg text-slate-950"
+            className="mt-1 font-ralewayBold text-lg text-slate-950"
             numberOfLines={1}
           >
             {selectedBuilding?.title ?? "No building selected"}
@@ -55,7 +55,7 @@ export function BookingFilters({
                 onPress={() => onSelectStatus(option.value)}
               >
                 <Text
-                  className={`text-xs font-bold ${
+                  className={`text-xs font-ralewayExtraBold ${
                     selected ? "text-white" : "text-slate-600"
                   }`}
                 >
