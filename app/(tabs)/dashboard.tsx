@@ -173,7 +173,7 @@ export default function DashboardScreen() {
                   resizeMode="cover"
                 />
               ) : (
-                <Text className="font-soraSemiBold text-base text-white">
+                <Text className="font-ralewayBold text-base text-white">
                   {getInitials(displayName, displayEmail)}
                 </Text>
               )}
@@ -181,7 +181,7 @@ export default function DashboardScreen() {
 
             <View className="min-w-0 flex-1">
               <Text
-                className="text-base font-semibold text-white"
+                className="text-base font-ralewayBold text-white"
                 numberOfLines={1}
               >
                 {capitalizeWords(displayName)}
@@ -259,7 +259,7 @@ export default function DashboardScreen() {
         >
           <View className="flex-row items-center gap-2">
             <View className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" />
-            <Text className="font-soraSemiBold text-[13px] tracking-tight text-slate-900">
+            <Text className="font-ralewayBold text-[13px] tracking-tight text-slate-900">
               Analytics Overview
             </Text>
           </View>
@@ -335,14 +335,14 @@ export default function DashboardScreen() {
                 </View>
 
                 <Text
-                  className="font-soraSemiBold text-base tracking-tighter text-slate-900"
+                  className="font-ralewayBold text-base tracking-tighter text-slate-900"
                   numberOfLines={1}
                   adjustsFontSizeToFit
                 >
                   {isLoadingAnalytics ? "..." : item.val}
                 </Text>
                 <Text
-                  className={`text-[9px] font-bold uppercase tracking-wider text-${item.color}-500/60`}
+                  className={`text-[9px] font-ralewayExtraBold uppercase tracking-wider text-${item.color}-500/60`}
                 >
                   {item.label}
                 </Text>
@@ -354,8 +354,8 @@ export default function DashboardScreen() {
 
       <View className="flex flex-row items-center justify-between">
         <View className="my-5">
-          <Text className="font-soraSemiBold">Portfolio Assets</Text>
-          <Text className="font-regular text-description">
+          <Text className="font-ralewayBold">Portfolio Assets</Text>
+          <Text className="font-ralewayMedium text-description">
             High-value holdings
           </Text>
         </View>
@@ -377,12 +377,12 @@ export default function DashboardScreen() {
           </View>
 
           <View className="min-w-0 flex-1">
-            <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-primary">
+            <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-primary">
               Find property
             </Text>
             <TextInput
               accessibilityLabel="Search portfolio assets"
-              className="h-7 p-0 font-soraMedium text-sm text-zinc-950"
+              className="h-7 p-0 font-ralewaySemiBold text-sm text-zinc-950"
               placeholder="Location, unit, tenant, or asset"
               placeholderTextColor="#94a3b8"
               returnKeyType="search"
@@ -421,7 +421,7 @@ export default function DashboardScreen() {
         {showAssetFilters && (
           <View className="mt-4 gap-3 border-t border-teal-50 pt-3">
             <View>
-              <Text className="mb-2 font-soraSemiBold text-[10px] uppercase text-zinc-400">
+              <Text className="mb-2 font-ralewayBold text-[10px] uppercase text-zinc-400">
                 Sort by
               </Text>
               <View className="flex-row gap-2">
@@ -457,7 +457,7 @@ export default function DashboardScreen() {
                       }`}
                     >
                       <Text
-                        className={`font-soraSemiBold text-[11px] ${
+                        className={`font-ralewayBold text-[11px] ${
                           isActive ? "text-white" : "text-zinc-500"
                         }`}
                       >
@@ -481,7 +481,7 @@ export default function DashboardScreen() {
             </View>
 
             <View>
-              <Text className="mb-2 font-soraSemiBold text-[10px] uppercase text-zinc-400">
+              <Text className="mb-2 font-ralewayBold text-[10px] uppercase text-zinc-400">
                 Status
               </Text>
               <View className="flex-row flex-wrap gap-2">
@@ -502,7 +502,7 @@ export default function DashboardScreen() {
                       }`}
                     >
                       <Text
-                        className={`font-soraSemiBold text-[10px] ${
+                        className={`font-ralewayBold text-[10px] ${
                           isActive ? "text-white" : "text-zinc-500"
                         }`}
                       >
@@ -559,7 +559,7 @@ export default function DashboardScreen() {
                   />
                   {getPropertyImages(property).length > 1 ? (
                     <View className="absolute bottom-1.5 right-1.5 rounded-full bg-black/55 px-1.5 py-0.5">
-                      <Text className="font-soraSemiBold text-[9px] text-white">
+                      <Text className="font-ralewayBold text-[9px] text-white">
                         {getPropertyImages(property).length}
                       </Text>
                     </View>
@@ -570,12 +570,12 @@ export default function DashboardScreen() {
                   <View>
                     <View className="flex-row items-start justify-between gap-2">
                       <Text
-                        className="min-w-0 flex-1 font-soraSemiBold text-sm text-zinc-950"
+                        className="min-w-0 flex-1 font-ralewayBold text-sm text-zinc-950"
                         numberOfLines={1}
                       >
                         {property.title}
                       </Text>
-                      <Text className="rounded-full bg-teal-50 px-2 py-0.5 font-soraSemiBold text-[9px] uppercase text-teal-700">
+                      <Text className="rounded-full bg-teal-50 px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-teal-700">
                         {property.roi}% ROI
                       </Text>
                     </View>
@@ -592,10 +592,10 @@ export default function DashboardScreen() {
                   </View>
 
                   <View className="flex-row items-center justify-between">
-                    <Text className="font-soraMedium text-[11px] text-zinc-500">
+                    <Text className="font-ralewaySemiBold text-[11px] text-zinc-500">
                       {formatPropertyStatus(property.status)}
                     </Text>
-                    <Text className="font-soraSemiBold text-xs text-zinc-950">
+                    <Text className="font-ralewayBold text-xs text-zinc-950">
                       {formatPesoValue(property.value)}
                     </Text>
                   </View>
@@ -606,7 +606,7 @@ export default function DashboardScreen() {
         ) : (
           <View className="items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-6">
             <Feather name="search" size={22} color="#a1a1aa" />
-            <Text className="mt-2 font-soraMedium text-xs text-zinc-500">
+            <Text className="mt-2 font-ralewaySemiBold text-xs text-zinc-500">
               No assets found
             </Text>
           </View>

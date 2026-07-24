@@ -244,14 +244,14 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     color: "#64748B",
+    fontFamily: "Raleway_900Black",
     fontSize: 11,
-    fontWeight: "800",
     textTransform: "uppercase",
   },
   summaryValue: {
     color: "#0F172A",
+    fontFamily: "Raleway_900Black",
     fontSize: 15,
-    fontWeight: "800",
     marginTop: 2,
   },
   centerPanel: {
@@ -272,8 +272,8 @@ const styles = StyleSheet.create({
   },
   centerTitle: {
     color: "#0F172A",
+    fontFamily: "Raleway_900Black",
     fontSize: 16,
-    fontWeight: "800",
     marginTop: 12,
     textAlign: "center",
   },
@@ -293,8 +293,8 @@ const styles = StyleSheet.create({
   },
   retryText: {
     color: "#FFFFFF",
+    fontFamily: "Raleway_900Black",
     fontSize: 13,
-    fontWeight: "800",
   },
   unmappedNotice: {
     alignItems: "center",
@@ -315,8 +315,8 @@ const styles = StyleSheet.create({
   },
   unmappedText: {
     color: "#334155",
+    fontFamily: "Raleway_800ExtraBold",
     fontSize: 12,
-    fontWeight: "700",
   },
   unmappedNoticeRaised: {
     bottom: 210,

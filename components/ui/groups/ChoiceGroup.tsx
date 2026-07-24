@@ -52,7 +52,7 @@ export function ChoiceGroup<T extends string>({
             onPress={() => onSelect(choice.value)}
           >
             <Text
-              className={`${isSegmented ? "font-soraMedium text-base" : "text-xs font-semibold"} ${
+              className={`${isSegmented ? "font-ralewaySemiBold text-base" : "text-xs font-ralewayBold"} ${
                 selected
                   ? "text-[#FFFFFF]"
                   : isSegmented
@@ -74,8 +74,8 @@ export function ChoiceGroup<T extends string>({
         <Text
           className={
             isSegmented
-              ? "font-soraMedium text-sm text-slate-600"
-              : "text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]"
+              ? "font-ralewaySemiBold text-sm text-slate-600"
+              : "text-[11px] font-ralewayExtraBold uppercase tracking-wide text-[#6F6D6D]"
           }
         >
           {label}

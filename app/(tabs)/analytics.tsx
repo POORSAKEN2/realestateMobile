@@ -92,7 +92,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
     <View className="mt-4 rounded-[28px] border border-slate-100 bg-white p-4 shadow-sm shadow-slate-900/10">
       <View className="flex-row items-start justify-between">
         <View>
-          <Text className="font-soraSemiBold text-base text-zinc-950">
+          <Text className="font-ralewayBold text-base text-zinc-950">
             Portfolio Performance
           </Text>
           <Text className="mt-1 text-xs text-zinc-500">Total value trend</Text>
@@ -147,7 +147,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
               {sortedHistory.map((snapshot) => (
                 <Text
                   key={snapshot.id}
-                  className="text-[10px] font-medium text-slate-400"
+                  className="text-[10px] font-ralewaySemiBold text-slate-400"
                 >
                   {formatSnapshotLabel(snapshot)}
                 </Text>
@@ -156,7 +156,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
           </>
         ) : (
           <View className="h-48 items-center justify-center">
-            <Text className="font-soraMedium text-xs text-zinc-400">
+            <Text className="font-ralewaySemiBold text-xs text-zinc-400">
               No performance history yet
             </Text>
           </View>
@@ -178,7 +178,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
     <View className="mt-4 rounded-[28px] border border-slate-100 bg-white p-4 shadow-sm shadow-slate-900/10">
       <View className="flex-row items-start justify-between">
         <View className="min-w-0 flex-1 pr-4">
-          <Text className="font-soraSemiBold text-base uppercase text-zinc-950">
+          <Text className="font-ralewayBold text-base uppercase text-zinc-950">
             Portfolio Distribution
           </Text>
           <Text className="mt-1 text-xs text-zinc-500">
@@ -232,14 +232,14 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
             </Svg>
           ) : (
             <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-slate-50">
-              <Text className="font-soraMedium text-xs text-slate-400">
+              <Text className="font-ralewaySemiBold text-xs text-slate-400">
                 No assets
               </Text>
             </View>
           )}
           {totalValue > 0 && (
             <View className="absolute items-center">
-              <Text className="font-soraSemiBold text-lg text-zinc-950">
+              <Text className="font-ralewayBold text-lg text-zinc-950">
                 {slices.length}
               </Text>
               <Text className="text-[10px] uppercase text-zinc-400">
@@ -264,13 +264,13 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
                         style={{ backgroundColor: slice.color }}
                       />
                       <Text
-                        className="min-w-0 flex-1 font-soraMedium text-xs text-zinc-700"
+                        className="min-w-0 flex-1 font-ralewaySemiBold text-xs text-zinc-700"
                         numberOfLines={1}
                       >
                         {slice.label}
                       </Text>
                     </View>
-                    <Text className="font-soraSemiBold text-xs text-zinc-950">
+                    <Text className="font-ralewayBold text-xs text-zinc-950">
                       {percent.toFixed(0)}%
                     </Text>
                   </View>
@@ -281,7 +281,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
               );
             })
           ) : (
-            <Text className="font-soraMedium text-xs text-zinc-400">
+            <Text className="font-ralewaySemiBold text-xs text-zinc-400">
               Add properties to see allocation.
             </Text>
           )}
@@ -365,10 +365,10 @@ export default function AnalyticsScreen() {
       >
         <View className="flex-row items-center justify-between">
           <View>
-            <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
+            <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-slate-400">
               Portfolio Intelligence
             </Text>
-            <Text className="font-soraSemiBold text-3xl text-[#1d1d1f]">
+            <Text className="font-ralewayBold text-3xl text-[#1d1d1f]">
               Analytics
             </Text>
           </View>
@@ -388,13 +388,13 @@ export default function AnalyticsScreen() {
                   <Feather name={card.icon} size={18} color={card.iconColor} />
                 </View>
                 <Text
-                  className="mt-4 font-soraSemiBold text-lg text-zinc-950"
+                  className="mt-4 font-ralewayBold text-lg text-zinc-950"
                   numberOfLines={1}
                   adjustsFontSizeToFit
                 >
                   {card.value}
                 </Text>
-                <Text className="mt-1 text-[11px] font-medium uppercase leading-4 text-zinc-400">
+                <Text className="mt-1 text-[11px] font-ralewaySemiBold uppercase leading-4 text-zinc-400">
                   {card.label}
                 </Text>
               </View>

@@ -5,8 +5,10 @@ export const fontSizes = {
 };
 
 export const fontFamilies = {
-  sora: 'Sora_400Regular',
-  soraMedium: 'Sora_500Medium',
-  soraSemiBold: 'Sora_600SemiBold',
-  soraBold: 'Sora_700Bold',
+  raleway: 'Raleway_400Regular',
+  ralewayMedium: 'Raleway_500Medium',
+  ralewaySemiBold: 'Raleway_600SemiBold',
+  ralewayBold: 'Raleway_700Bold',
+  ralewayExtraBold: 'Raleway_800ExtraBold',
+  ralewayBlack: 'Raleway_900Black',
 };

@@ -46,7 +46,7 @@ export function ProfileField({
   return (
     <View>
       <View className="mb-2 flex-row items-center">
-        <Text className="font-soraMedium text-sm text-slate-700">{label}</Text>
+        <Text className="font-ralewaySemiBold text-sm text-slate-700">{label}</Text>
         {required ? (
           <Text className="ml-1 text-red-500" accessibilityLabel="required">
             *
@@ -64,7 +64,7 @@ export function ProfileField({
         />
         <TextInput
           accessibilityLabel={label}
-          className="ml-3 min-h-14 flex-1 font-soraMedium text-base text-slate-950"
+          className="ml-3 min-h-14 flex-1 font-ralewaySemiBold text-base text-slate-950"
           value={value}
           onChangeText={onChangeText}
           onBlur={() => setIsFocused(false)}

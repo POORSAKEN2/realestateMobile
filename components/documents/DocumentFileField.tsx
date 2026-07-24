@@ -18,7 +18,7 @@ export function DocumentFileField({
 }) {
   return (
     <View className="gap-2">
-      <Text className="font-soraMedium text-sm text-slate-600">
+      <Text className="font-ralewaySemiBold text-sm text-slate-600">
         File{!editingDocument ? <Text className="text-red-600"> *</Text> : null}
       </Text>
       <View
@@ -46,7 +46,7 @@ export function DocumentFileField({
           </View>
           <View className="min-w-0 flex-1">
             <Text
-              className="font-soraBold text-sm text-slate-950"
+              className="font-ralewayExtraBold text-sm text-slate-950"
               numberOfLines={1}
             >
               {selectedFile
@@ -55,7 +55,7 @@ export function DocumentFileField({
                   ? "Choose replacement file"
                   : "Choose file"}
             </Text>
-            <Text className="mt-1 font-sora text-xs text-slate-500">
+            <Text className="mt-1 font-ralewayMedium text-xs text-slate-500">
               {selectedFile
                 ? formatFileSize(selectedFile.size)
                 : editingDocument
@@ -79,7 +79,7 @@ export function DocumentFileField({
       {error ? (
         <Text
           accessibilityLiveRegion="assertive"
-          className="font-soraMedium text-xs text-red-600"
+          className="font-ralewaySemiBold text-xs text-red-600"
         >
           {error}
         </Text>

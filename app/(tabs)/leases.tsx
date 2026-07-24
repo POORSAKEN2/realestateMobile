@@ -83,10 +83,10 @@ export default function LeasesScreen() {
         {/* --- TOP HEADER: Title & Primary Action --- */}
         <View className="flex-row items-center justify-between px-1">
           <View>
-            <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
+            <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-slate-400">
               Contract Management
             </Text>
-            <Text className="font-soraSemiBold text-3xl tracking-tight text-[#1d1d1f]">
+            <Text className="font-ralewayBold text-3xl tracking-tight text-[#1d1d1f]">
               Leases
             </Text>
           </View>
@@ -103,13 +103,13 @@ export default function LeasesScreen() {
             <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
               <Ionicons name="cash-outline" color="#FFFFFF" size={20} />
             </View>
-            <Text className="text-xs font-bold uppercase tracking-widest text-white/60">
+            <Text className="text-xs font-ralewayExtraBold uppercase tracking-widest text-white/60">
               Contracted Revenue
             </Text>
           </View>
 
           <View className="mt-5">
-            <Text className="font-soraSemiBold text-4xl text-white">
+            <Text className="font-ralewayBold text-4xl text-white">
               {formatCurrency(monthlyRevenue)}
             </Text>
             <Text className="mt-2 text-sm leading-5 text-white/50">
@@ -126,15 +126,15 @@ export default function LeasesScreen() {
               <View className="h-8 w-8 items-center justify-center rounded-xl bg-slate-50">
                 <Ionicons name="document-text" color="#2563EB" size={16} />
               </View>
-              <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
                 Total
               </Text>
             </View>
             <View className="mt-3 flex-row items-end gap-1">
-              <Text className="font-soraSemiBold text-2xl text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-2xl text-[#1d1d1f]">
                 {leases.length}
               </Text>
-              <Text className="mb-1 text-xs font-medium text-slate-400">
+              <Text className="mb-1 text-xs font-ralewaySemiBold text-slate-400">
                 Files
               </Text>
             </View>
@@ -147,18 +147,18 @@ export default function LeasesScreen() {
                 <View className="h-8 w-8 items-center justify-center rounded-xl bg-blue-50">
                   <Ionicons name="checkmark-circle" color="#2563EB" size={16} />
                 </View>
-                <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
                   Active
                 </Text>
               </View>
               {/* Simple Health % */}
-              <Text className="rounded-md bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-600">
+              <Text className="rounded-md bg-blue-50 px-1.5 py-0.5 text-[10px] font-ralewayExtraBold text-blue-600">
                 {Math.round(activeLeasePercentage)}%
               </Text>
             </View>
 
             <View className="mt-3">
-              <Text className="font-soraSemiBold text-2xl text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-2xl text-[#1d1d1f]">
                 {activeLeaseCount}
               </Text>
               {/* Visual Progress toward 100% active capacity */}
@@ -179,13 +179,13 @@ export default function LeasesScreen() {
             </View>
 
             <View className="min-w-0 flex-1">
-              <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-[#1d1d1f]">
+              <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-[#1d1d1f]">
                 Find lease
               </Text>
 
               <TextInput
                 accessibilityLabel="Search leases"
-                className="h-10 p-0 font-soraMedium text-sm text-zinc-950"
+                className="h-10 p-0 font-ralewaySemiBold text-sm text-zinc-950"
                 placeholder="Tenant, unit, property, or lease"
                 placeholderTextColor="#94a3b8"
                 returnKeyType="search"
@@ -303,10 +303,10 @@ export default function LeasesScreen() {
 
           {form.startDate && Number(form.durationMonths) >= 1 ? (
             <View className="flex-row items-center justify-between rounded-2xl border border-[#2563EB]/15 bg-[#2563EB]/5 px-4 py-3.5">
-              <Text className="text-xs font-bold uppercase tracking-wider text-[#2563EB]">
+              <Text className="text-xs font-ralewayExtraBold uppercase tracking-wider text-[#2563EB]">
                 Calculated End Date
               </Text>
-              <Text className="font-soraSemiBold text-sm text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-sm text-[#1d1d1f]">
                 {formatLeaseDateLabel(
                   calculateLeaseEndDate(
                     form.startDate,

@@ -32,10 +32,10 @@ export function OnboardingFour() {
 
             <View className="flex-row items-start justify-between">
               <View>
-                <Text className="text-font10 font-soraBold uppercase tracking-widest text-description">
+                <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
                   Analytics
                 </Text>
-                <Text className="mt-2 font-soraSemiBold text-3xl text-blackPrimary">
+                <Text className="mt-2 font-ralewayBold text-3xl text-blackPrimary">
                   Cash flow
                 </Text>
               </View>
@@ -55,16 +55,16 @@ export function OnboardingFour() {
 
             <View className=" flex-row gap-3">
               <View className="flex-1 rounded-2xl border border-white/80 bg-whitePrimary/85 p-3 shadow-sm">
-                <Text className="text-font10 font-soraBold uppercase tracking-widest text-description">
+                <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
                   Return
                 </Text>
-                <Text className="mt-1 font-soraSemiBold text-lg text-teal-700">+18%</Text>
+                <Text className="mt-1 font-ralewayBold text-lg text-teal-700">+18%</Text>
               </View>
               <View className="flex-1 rounded-2xl border border-white/80 bg-whitePrimary/85 p-3 shadow-sm">
-                <Text className="text-font10 font-soraBold uppercase tracking-widest text-description">
+                <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
                   Expenses
                 </Text>
-                <Text className="mt-1 font-soraSemiBold text-lg text-rose-700">42k</Text>
+                <Text className="mt-1 font-ralewayBold text-lg text-rose-700">42k</Text>
               </View>
             </View>
           </View>
@@ -73,7 +73,7 @@ export function OnboardingFour() {
         <View className="gap-8">
           <View className=' mb-5'>
 
-            <Text className="my-5 text-4xl font-bold leading-tight  text-black">
+            <Text className="my-5 text-4xl font-ralewayExtraBold leading-tight  text-black">
               {item.title}
             </Text>
 

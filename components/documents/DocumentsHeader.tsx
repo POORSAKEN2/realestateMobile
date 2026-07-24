@@ -13,11 +13,11 @@ export function DocumentsHeader({
       <View className="min-w-0 flex-1">
         <Text
           accessibilityRole="header"
-          className="font-soraBold text-[30px] leading-10 text-slate-950"
+          className="font-ralewayExtraBold text-[30px] leading-10 text-slate-950"
         >
           Documents
         </Text>
-        <Text className="mt-1 font-sora text-sm text-slate-500">
+        <Text className="mt-1 font-ralewayMedium text-sm text-slate-500">
           {documentCount} {documentCount === 1 ? "document" : "documents"}
         </Text>
       </View>
@@ -30,7 +30,7 @@ export function DocumentsHeader({
         onPress={onUpload}
       >
         <MaterialCommunityIcons name="plus" color="#FFFFFF" size={21} />
-        <Text className="font-soraBold text-sm text-white">Upload</Text>
+        <Text className="font-ralewayExtraBold text-sm text-white">Upload</Text>
       </TouchableOpacity>
     </View>
   );

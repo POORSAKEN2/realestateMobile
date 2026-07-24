@@ -183,10 +183,10 @@ export default function PropertyImageGallery({
       <View className="flex-1 bg-[#09090B]">
         <View className="absolute left-5 right-5 top-14 z-10 flex-row items-center justify-between gap-3">
           <View className="min-w-0 flex-1 rounded-2xl bg-black/45 px-4 py-3">
-            <Text className="text-base font-bold text-white" numberOfLines={1}>
+            <Text className="text-base font-ralewayExtraBold text-white" numberOfLines={1}>
               {title}
             </Text>
-            <Text className="mt-0.5 text-xs font-medium text-white/65">
+            <Text className="mt-0.5 text-xs font-ralewaySemiBold text-white/65">
               {images.length
                 ? `${activeIndex + 1} of ${images.length}`
                 : "No images"}
@@ -244,7 +244,7 @@ export default function PropertyImageGallery({
 
         <View className="absolute bottom-10 left-5 right-5 items-center gap-3">
           <View className="rounded-full bg-white/10 px-4 py-2">
-            <Text className="text-xs font-semibold text-white/80">
+            <Text className="text-xs font-ralewayBold text-white/80">
               Double tap image to zoom
             </Text>
           </View>

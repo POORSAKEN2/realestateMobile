@@ -84,10 +84,10 @@ export default function RegisterScreen() {
               <View className="mb-4 h-14 w-14 items-center justify-center rounded-[14px] bg-[#134e4a]">
                 <Feather name="home" size={28} color="#FFFFFF" />
               </View>
-              <Text className="font-soraBold text-3xl text-[#151717]">
+              <Text className="font-ralewayExtraBold text-3xl text-[#151717]">
                 Create Tenant
               </Text>
-              <Text className="mt-1 text-center font-soraMedium text-sm text-[#5f6b6b]">
+              <Text className="mt-1 text-center font-ralewaySemiBold text-sm text-[#5f6b6b]">
                 Initialize your real estate portfolio
               </Text>
             </View>
@@ -135,7 +135,7 @@ export default function RegisterScreen() {
               />
 
               <View>
-                <Text className="mb-2 font-soraSemiBold text-sm text-[#151717]">
+                <Text className="mb-2 font-ralewayBold text-sm text-[#151717]">
                   Password
                 </Text>
                 <View
@@ -182,7 +182,7 @@ export default function RegisterScreen() {
               </View>
 
               <View>
-                <Text className="mb-2 font-soraSemiBold text-sm text-[#151717]">
+                <Text className="mb-2 font-ralewayBold text-sm text-[#151717]">
                   Confirm Password
                 </Text>
                 <View
@@ -249,7 +249,7 @@ export default function RegisterScreen() {
               {isLoading ? (
                 <ActivityIndicator color="#ffffff" />
               ) : (
-                <Text className="font-soraMedium text-[15px] text-white">
+                <Text className="font-ralewaySemiBold text-[15px] text-white">
                   Create Account
                 </Text>
               )}
@@ -268,7 +268,7 @@ export default function RegisterScreen() {
                     accessibilityRole="link"
                     className="items-center justify-center  active:bg-[#e6fffb]"
                   >
-                    <Text className="font-soraSemiBold text-sm text-[#0f766e]">
+                    <Text className="font-ralewayBold text-sm text-[#0f766e]">
                       Login to your account
                     </Text>
                   </Pressable>
@@ -313,7 +313,7 @@ function AuthInput({
 }: AuthInputProps) {
   return (
     <View>
-      <Text className="mb-2 font-soraSemiBold text-sm text-[#151717]">
+      <Text className="mb-2 font-ralewayBold text-sm text-[#151717]">
         {label}
       </Text>
       <View

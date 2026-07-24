@@ -58,10 +58,10 @@ export function LocationPinPicker({
     <View className="gap-3 rounded-2xl border border-slate-200 bg-white p-4">
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="text-xs font-semibold text-slate-600">
+          <Text className="text-xs font-ralewayBold text-slate-600">
             Pin Location
           </Text>
-          <Text className="mt-1 text-sm font-bold text-[#1d1d1f]">
+          <Text className="mt-1 text-sm font-ralewayExtraBold text-[#1d1d1f]">
             {coordinateLabel}
           </Text>
         </View>
@@ -86,7 +86,7 @@ export function LocationPinPicker({
         onPress={() => setIsMapVisible(true)}
       >
         <MaterialCommunityIcons name="map-search" color="#2563EB" size={19} />
-        <Text className="text-sm font-bold text-[#2563EB]">
+        <Text className="text-sm font-ralewayExtraBold text-[#2563EB]">
           {markerCoordinate ? "Update Pin on Map" : "Pin Property on Map"}
         </Text>
       </TouchableOpacity>
@@ -112,7 +112,7 @@ export function LocationPinPicker({
           />
         )}
         <Text
-          className={`text-sm font-bold ${
+          className={`text-sm font-ralewayExtraBold ${
             markerCoordinate ? "text-[#FFFFFF]" : "text-[#8E8E93]"
           }`}
         >
@@ -120,7 +120,7 @@ export function LocationPinPicker({
         </Text>
       </TouchableOpacity>
       {pinLocationError ? (
-        <Text className="text-center text-xs font-semibold text-[#B42318]">
+        <Text className="text-center text-xs font-ralewayBold text-[#B42318]">
           {pinLocationError}
         </Text>
       ) : null}
@@ -151,10 +151,10 @@ export function LocationPinPicker({
           <View className="absolute left-5 right-8 top-16 rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 py-6 shadow-sm">
             <View className="flex-row items-center justify-between gap-3">
               <View className="min-w-0 flex-1">
-                <Text className="text-xs font-semibold text-slate-600">
+                <Text className="text-xs font-ralewayBold text-slate-600">
                   Property Pin
                 </Text>
-                <Text className="m-1 text-sm font-bold text-[#1d1d1f]">
+                <Text className="m-1 text-sm font-ralewayExtraBold text-[#1d1d1f]">
                   {markerCoordinate
                     ? coordinateLabel
                     : "Tap the map to place the pin"}
@@ -229,7 +229,7 @@ export function LocationPinPicker({
               </TouchableOpacity>
             </View>
             {searchError ? (
-              <Text className="mt-2 text-xs font-semibold text-[#B42318]">
+              <Text className="mt-2 text-xs font-ralewayBold text-[#B42318]">
                 {searchError}
               </Text>
             ) : null}
@@ -271,7 +271,7 @@ export function LocationPinPicker({
               className="h-14 items-center justify-center rounded-2xl bg-[#2563EB]"
               onPress={() => setIsMapVisible(false)}
             >
-              <Text className="text-base font-bold text-[#FFFFFF]">Done</Text>
+              <Text className="text-base font-ralewayExtraBold text-[#FFFFFF]">Done</Text>
             </TouchableOpacity>
           </View>
         </View>

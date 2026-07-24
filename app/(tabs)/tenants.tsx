@@ -51,10 +51,10 @@ export default function TenantsScreen() {
         {/* --- TOP HEADER: Title & Global Action --- */}
         <View className="flex-row items-center justify-between px-1">
           <View>
-            <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
+            <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-slate-400">
               CRM Dashboard
             </Text>
-            <Text className="font-soraSemiBold text-3xl tracking-tight text-[#1d1d1f]">
+            <Text className="font-ralewayBold text-3xl tracking-tight text-[#1d1d1f]">
               Tenants
             </Text>
           </View>
@@ -71,13 +71,13 @@ export default function TenantsScreen() {
             <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
               <Ionicons name="wallet-outline" color="#FFFFFF" size={20} />
             </View>
-            <Text className="text-xs font-bold uppercase tracking-widest text-white/60">
+            <Text className="text-xs font-ralewayExtraBold uppercase tracking-widest text-white/60">
               Linked Revenue
             </Text>
           </View>
 
           <View className="mt-5">
-            <Text className="font-soraSemiBold text-4xl text-white">
+            <Text className="font-ralewayBold text-4xl text-white">
               {formatCurrency(tenantMonthlyRent)}
             </Text>
             <Text className="mt-2 text-sm leading-5 text-white/50">
@@ -95,15 +95,15 @@ export default function TenantsScreen() {
               <View className="h-8 w-8 items-center justify-center rounded-xl bg-slate-50">
                 <Ionicons name="people" color="#2563EB" size={16} />
               </View>
-              <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
                 Capacity
               </Text>
             </View>
             <View className="mt-3 flex-row items-end gap-1">
-              <Text className="font-soraSemiBold text-2xl text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-2xl text-[#1d1d1f]">
                 {tenants.length}
               </Text>
-              <Text className="mb-1 text-xs font-medium text-slate-400">
+              <Text className="mb-1 text-xs font-ralewaySemiBold text-slate-400">
                 Profiles
               </Text>
             </View>
@@ -116,18 +116,18 @@ export default function TenantsScreen() {
                 <View className="h-8 w-8 items-center justify-center rounded-xl bg-emerald-50">
                   <Ionicons name="link" color="#10B981" size={16} />
                 </View>
-                <Text className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
                   Linkage
                 </Text>
               </View>
               {/* Simple Health Badge */}
-              <Text className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600">
+              <Text className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-ralewayExtraBold text-emerald-600">
                 {Math.round(linkedTenantPercentage)}%
               </Text>
             </View>
 
             <View className="mt-3">
-              <Text className="font-soraSemiBold text-2xl text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-2xl text-[#1d1d1f]">
                 {linkedTenantCount}
               </Text>
               {/* Mini Progress Bar for Linkage Health */}
@@ -150,14 +150,14 @@ export default function TenantsScreen() {
             </View>
 
             <View className="min-w-0 flex-1">
-              <Text className="mb-0.5 font-soraSemiBold text-[11px] uppercase text-[#1d1d1f]">
+              <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-[#1d1d1f]">
                 Find tenant
               </Text>
 
               <TextInput
                 accessibilityLabel="Search tenants"
                 autoCapitalize="none"
-                className="h-10 p-0 font-soraMedium text-sm text-zinc-950"
+                className="h-10 p-0 font-ralewaySemiBold text-sm text-zinc-950"
                 placeholder="Name, email, phone, or unit"
                 placeholderTextColor="#94a3b8"
                 returnKeyType="search"

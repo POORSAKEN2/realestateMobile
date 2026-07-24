@@ -87,7 +87,7 @@ function EmptyState({ onRefresh }: { onRefresh: () => void }) {
       <View className="mb-5 h-16 w-16 items-center justify-center rounded-full bg-[#EFF6FF]">
         <Ionicons name="notifications-outline" size={30} color={colors.primary} />
       </View>
-      <Text className="text-center text-xl font-soraSemiBold text-[#1d1d1f]">
+      <Text className="text-center text-xl font-ralewayBold text-[#1d1d1f]">
         No notifications yet
       </Text>
       <Text className="mt-2 text-center text-sm leading-6 text-[#6F6D6D]">
@@ -98,7 +98,7 @@ function EmptyState({ onRefresh }: { onRefresh: () => void }) {
         className="mt-6 rounded-full bg-[#2563EB] px-5 py-3"
         onPress={onRefresh}
       >
-        <Text className="text-sm font-soraSemiBold text-white">Refresh</Text>
+        <Text className="text-sm font-ralewayBold text-white">Refresh</Text>
       </TouchableOpacity>
     </View>
   );
@@ -135,7 +135,7 @@ function NotificationRow({
         <View className="min-w-0 flex-1">
           <View className="flex-row items-start gap-2">
             <Text
-              className="min-w-0 flex-1 text-[15px] font-soraSemiBold text-[#1d1d1f]"
+              className="min-w-0 flex-1 text-[15px] font-ralewayBold text-[#1d1d1f]"
               numberOfLines={2}
             >
               {notification.title}
@@ -150,12 +150,12 @@ function NotificationRow({
           </Text>
 
           <View className="mt-3 flex-row items-center justify-between gap-3">
-            <Text className="text-xs font-soraSemiBold text-[#94A3B8]">
+            <Text className="text-xs font-ralewayBold text-[#94A3B8]">
               {formatTimestamp(notification.timestamp)}
             </Text>
             {notification.actionUrl ? (
               <View className="flex-row items-center gap-1">
-                <Text className="text-xs font-soraSemiBold text-[#2563EB]">
+                <Text className="text-xs font-ralewayBold text-[#2563EB]">
                   {notification.actionLabel || "Open"}
                 </Text>
                 <Ionicons name="chevron-forward" size={14} color={colors.primary} />
@@ -232,7 +232,7 @@ export default function NotificationScreen() {
         </TouchableOpacity>
 
         <View className="min-w-0 flex-1">
-          <Text className="text-2xl font-soraSemiBold text-[#1d1d1f]">
+          <Text className="text-2xl font-ralewayBold text-[#1d1d1f]">
             Notifications
           </Text>
           <Text className="mt-1 text-sm text-[#6F6D6D]">
@@ -266,7 +266,7 @@ export default function NotificationScreen() {
 
       {notificationsQuery.isError ? (
         <View className="rounded-[24px] border border-rose-100 bg-rose-50 p-4">
-          <Text className="font-soraSemiBold text-rose-700">
+          <Text className="font-ralewayBold text-rose-700">
             Could not load notifications
           </Text>
           <Text className="mt-1 text-sm leading-5 text-rose-600">
@@ -280,7 +280,7 @@ export default function NotificationScreen() {
       {isInitialLoading ? (
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text className="mt-3 text-sm font-soraSemiBold text-[#6F6D6D]">
+          <Text className="mt-3 text-sm font-ralewayBold text-[#6F6D6D]">
             Loading notifications
           </Text>
         </View>

@@ -6,9 +6,9 @@ import { formatPeso } from "../../utils/properties/propertyForm";
 function SummaryMetric({ label, value }: { label: string; value: string }) {
   return (
     <View className="min-w-0 flex-1">
-      <Text className="text-xs font-medium text-white/70">{label}</Text>
+      <Text className="text-xs font-ralewaySemiBold text-white/70">{label}</Text>
       <Text
-        className="mt-1 font-soraSemiBold text-base text-white"
+        className="mt-1 font-ralewayBold text-base text-white"
         numberOfLines={1}
       >
         {value}
@@ -44,12 +44,12 @@ export function PropertyPortfolioSummary({
 
       <View className="flex-row items-start justify-between gap-4">
         <View className="min-w-0 flex-1">
-          <Text className="text-xs font-medium text-white/70">
+          <Text className="text-xs font-ralewaySemiBold text-white/70">
             Total portfolio value
           </Text>
           <Text
             adjustsFontSizeToFit
-            className="mt-1 font-soraSemiBold text-3xl text-white"
+            className="mt-1 font-ralewayBold text-3xl text-white"
             numberOfLines={1}
           >
             {portfolioValueLabel}

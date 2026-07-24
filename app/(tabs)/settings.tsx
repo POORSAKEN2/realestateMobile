@@ -31,13 +31,13 @@ function PasswordField({
 
   return (
     <View className="gap-2">
-      <Text className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+      <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wide text-slate-500">
         {label}
       </Text>
       <View className="h-14 flex-row items-center rounded-2xl border border-slate-200 bg-white px-4 shadow-sm shadow-slate-900/5">
         <Ionicons name="lock-closed-outline" color="#64748B" size={18} />
         <TextInput
-          className="ml-3 flex-1 text-base font-semibold text-slate-950"
+          className="ml-3 flex-1 text-base font-ralewayBold text-slate-950"
           autoCapitalize="none"
           autoCorrect={false}
           onChangeText={onChangeText}
@@ -133,10 +133,10 @@ export default function SettingsScreen() {
           contentContainerClassName="px-6 pb-10"
           showsVerticalScrollIndicator={false}
         >
-          <Text className="text-xs font-bold uppercase tracking-widest text-slate-500">
+          <Text className="text-xs font-ralewayExtraBold uppercase tracking-widest text-slate-500">
             Account
           </Text>
-          <Text className="mt-2 text-3xl font-bold text-slate-950">
+          <Text className="mt-2 text-3xl font-ralewayExtraBold text-slate-950">
             Settings
           </Text>
           <Text className="mt-2 text-base leading-6 text-slate-500">
@@ -150,7 +150,7 @@ export default function SettingsScreen() {
                   <View className="h-9 w-9 items-center justify-center rounded-2xl bg-white">
                     <Ionicons name="construct-outline" color="#D97706" size={19} />
                   </View>
-                  <Text className="text-lg font-bold text-slate-950">
+                  <Text className="text-lg font-ralewayExtraBold text-slate-950">
                     Onboarding Preview
                   </Text>
                 </View>
@@ -177,14 +177,14 @@ export default function SettingsScreen() {
               }}
             >
               <Ionicons name="play-outline" color="#FFFFFF" size={19} />
-              <Text className="ml-2 font-bold text-white">Open Onboarding</Text>
+              <Text className="ml-2 font-ralewayExtraBold text-white">Open Onboarding</Text>
             </TouchableOpacity>
           </View>
 
           <View className="mt-5 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/10">
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-lg font-bold text-slate-950">
+                <Text className="text-lg font-ralewayExtraBold text-slate-950">
                   Change Password
                 </Text>
                 <Text className="mt-1 text-sm text-slate-500">
@@ -236,7 +236,7 @@ export default function SettingsScreen() {
                 color="#FFFFFF"
                 size={20}
               />
-              <Text className="ml-2 text-base font-bold text-white">
+              <Text className="ml-2 text-base font-ralewayExtraBold text-white">
                 {isSaving ? "Updating Password" : "Update Password"}
               </Text>
             </TouchableOpacity>
@@ -249,7 +249,7 @@ export default function SettingsScreen() {
           className="mb-2 mt-4 flex-row items-center justify-center rounded-2xl bg-slate-950 px-5 py-4"
         >
           <Ionicons name="log-out-outline" color="#FFFFFF" size={20} />
-          <Text className="ml-2 font-bold text-white">Sign out</Text>
+          <Text className="ml-2 font-ralewayExtraBold text-white">Sign out</Text>
         </TouchableOpacity> */}
       </View>
     </Screen>

@@ -84,14 +84,17 @@ export default function ExpensesScreen() {
         {/* Header Section */}
         <View className="flex-row items-center justify-between px-1">
           <View>
-            <Text className="text-[11px] font-bold uppercase tracking-[2px] text-slate-400">
+            <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-[2px] text-slate-400">
               Operations
             </Text>
-            <Text className="font-soraSemiBold text-3xl tracking-tight text-[#1d1d1f]">
+            <Text className="font-ralewayBold text-3xl tracking-tight text-[#1d1d1f]">
               Expenses
             </Text>
           </View>
-          <AddButton onPress={openForm} />
+          <AddButton
+            onPress={openForm}
+            textClassName="font-ralewayBold text-sm text-white"
+          />
         </View>
 
         {isLoading ? (
@@ -122,10 +125,10 @@ export default function ExpensesScreen() {
                     <Ionicons name={item.icon} color="#2563EB" size={22} />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-sm font-semibold text-slate-500">
+                    <Text className="font-ralewayBold text-sm text-slate-500">
                       {item.label}
                     </Text>
-                    <Text className="mt-1 text-xl font-bold text-slate-950">
+                    <Text className="mt-1 font-ralewayExtraBold text-xl text-slate-950">
                       {item.value}
                     </Text>
                   </View>
@@ -144,28 +147,28 @@ export default function ExpensesScreen() {
                   className="flex-row items-center justify-between rounded-3xl border border-slate-100 bg-white p-4 shadow-sm"
                 >
                   <View className="flex-1 gap-1">
-                    <Text className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <Text className="font-ralewayExtraBold text-xs uppercase tracking-wider text-slate-400">
                       {expense.category}
                     </Text>
                     <Text
-                      className="text-base font-semibold text-slate-900"
+                      className="font-ralewayBold text-base text-slate-900"
                       numberOfLines={1}
                     >
                       {expense.description || "No description provided"}
                     </Text>
-                    <Text className="text-xs text-slate-500">
+                    <Text className="font-ralewayMedium text-xs text-slate-500">
                       Ref: {expense.reference_no || "N/A"} • {expense.date}
                     </Text>
                   </View>
                   <View className="items-end gap-1">
-                    <Text className="font-soraSemiBold text-base text-slate-900">
+                    <Text className="font-ralewayBold text-base text-slate-900">
                       {formatPeso(expense.amount)}
                     </Text>
                     <View
                       className={`rounded-full px-2 py-0.5 ${expense.status === "Paid" ? "bg-emerald-50" : "bg-amber-50"}`}
                     >
                       <Text
-                        className={`text-[10px] font-bold ${expense.status === "Paid" ? "text-emerald-600" : "text-amber-600"}`}
+                        className={`font-ralewayExtraBold text-[10px] ${expense.status === "Paid" ? "text-emerald-600" : "text-amber-600"}`}
                       >
                         {expense.status}
                       </Text>
@@ -201,7 +204,7 @@ export default function ExpensesScreen() {
             color="#2563EB"
             size={20}
           />
-          <Text className="min-w-0 flex-1 font-sora text-sm leading-5 text-[#1E40AF]">
+          <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-[#1E40AF]">
             Link each expense to a property for accurate reporting.
           </Text>
         </View>

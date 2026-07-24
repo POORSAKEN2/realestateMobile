@@ -17,7 +17,7 @@ export function OnboardingSeven() {
         <View className="flex-1 justify-center">
           <View className="items-center">
             <View className="my-5 items-center">
-              <Text className="text-center font-soraSemiBold text-font24 text-blackPrimary">
+              <Text className="text-center font-ralewayBold text-font24 text-blackPrimary">
                 {item.title}
               </Text>
               <Text className="mt-2 text-center text-font14 text-description">
@@ -28,10 +28,10 @@ export function OnboardingSeven() {
             <View className="h-80 w-80 my-5  justify-between overflow-hidden rounded-[32px] border border-whitePrimary bg-whitePrimary/90 p-5 shadow-2xl">
               <View className="flex-row items-start justify-between gap-3">
                 <View>
-                  <Text className="text-font10 font-soraBold uppercase tracking-widest text-description">
+                  <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
                     Property Location
                   </Text>
-                  <Text className="mt-2 font-soraSemiBold text-xl leading-tight text-blackPrimary">
+                  <Text className="mt-2 font-ralewayBold text-xl leading-tight text-blackPrimary">
                     Makati City
                   </Text>
                 </View>
@@ -61,17 +61,17 @@ export function OnboardingSeven() {
               <View className="rounded-2xl border border-slate-200 bg-whitePrimary/80 p-3 shadow-sm">
                 <View className="flex-row items-center gap-2">
                   <Feather name="navigation" size={14} color="#0f766e" />
-                  <Text className="text-xs font-soraMedium text-description">
+                  <Text className="text-xs font-ralewaySemiBold text-description">
                     Pinned asset address
                   </Text>
                 </View>
-                <Text className="mt-1 text-sm font-soraSemiBold leading-snug text-blackPrimary">
+                <Text className="mt-1 text-sm font-ralewayBold leading-snug text-blackPrimary">
                   32 Ayala Avenue, Unit 1204
                 </Text>
               </View>
             </View>
 
-            {/* <Text className="mt-3 text-center text-4xl font-bold leading-tight text-white">
+            {/* <Text className="mt-3 text-center text-4xl font-ralewayExtraBold leading-tight text-white">
            
             </Text> */}
         

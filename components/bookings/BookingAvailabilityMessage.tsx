@@ -17,7 +17,7 @@ export function BookingAvailabilityMessage({
       }`}
     >
       <Text
-        className={`text-sm font-semibold ${
+        className={`text-sm font-ralewayBold ${
           conflict ? "text-amber-700" : "text-emerald-700"
         }`}
       >

@@ -18,8 +18,8 @@ export default function TabsLayout() {
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: "#94A3B8",
           tabBarLabelStyle: {
+            fontFamily: "Raleway_800ExtraBold",
             fontSize: 11,
-            fontWeight: "700",
           },
           tabBarItemStyle: {
             paddingVertical: 6,

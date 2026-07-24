@@ -47,8 +47,8 @@ export function FormSection({
           <Text
             className={
               isCard
-                ? "font-soraSemiBold text-xl text-[#1d1d1f]"
-                : "text-lg font-bold text-[#1d1d1f]"
+                ? "font-ralewayBold text-xl text-[#1d1d1f]"
+                : "text-lg font-ralewayExtraBold text-[#1d1d1f]"
             }
           >
             {title}

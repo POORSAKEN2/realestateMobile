@@ -83,7 +83,7 @@ export function BookingFormModal({
           color="#2563EB"
           size={20}
         />
-        <Text className="min-w-0 flex-1 font-sora text-sm leading-5 text-[#1E40AF]">
+        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-[#1E40AF]">
           Fields marked with * are required. Availability updates as you enter
           the room and stay dates.
         </Text>
@@ -142,10 +142,10 @@ export function BookingFormModal({
               />
             </View>
             <View className="min-w-0 flex-1">
-              <Text className="text-xs font-semibold text-slate-500">
+              <Text className="text-xs font-ralewayBold text-slate-500">
                 Booking location
               </Text>
-              <Text className="mt-0.5 text-sm font-bold text-[#1d1d1f]">
+              <Text className="mt-0.5 text-sm font-ralewayExtraBold text-[#1d1d1f]">
                 {selectedBuilding.title}
                 {form.roomNumber ? ` · Room ${form.roomNumber}` : ""}
               </Text>
@@ -217,7 +217,7 @@ export function BookingFormModal({
       {mode === "edit" && editingBooking?.status === "Booked" ? (
         <View className="gap-3 rounded-[24px] border border-rose-500/20 bg-rose-50 p-4">
           <View>
-            <Text className="text-sm font-bold text-rose-700">
+            <Text className="text-sm font-ralewayExtraBold text-rose-700">
               Cancel this booking
             </Text>
             <Text className="mt-1 text-xs leading-5 text-rose-700/80">
@@ -234,7 +234,7 @@ export function BookingFormModal({
             {isCancelling ? (
               <ActivityIndicator color="#DC2626" />
             ) : (
-              <Text className="font-bold text-rose-600">Cancel Booking</Text>
+              <Text className="font-ralewayExtraBold text-rose-600">Cancel Booking</Text>
             )}
           </TouchableOpacity>
         </View>

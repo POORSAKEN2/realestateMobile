@@ -31,16 +31,16 @@ export function OnboardingThree() {
 
               <View className="flex-row items-center gap-2.5">
                 <View className="h-9 w-9 items-center justify-center rounded-2xl border border-white/70 bg-teal-700">
-                  <Text className="text-xs font-bold text-whitePrimary">JD</Text>
+                  <Text className="text-xs font-ralewayExtraBold text-whitePrimary">JD</Text>
                 </View>
                 <View className="flex-1">
-                  <Text className="text-[9px] font-semibold uppercase tracking-widest text-description">
+                  <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-description">
                     Tenant
                   </Text>
-                  <Text className="text-sm font-bold text-slate-950">Juan De La Cruz</Text>
+                  <Text className="text-sm font-ralewayExtraBold text-slate-950">Juan De La Cruz</Text>
                 </View>
                 <View className="rounded-full border border-teal-100 bg-teal-50/90 px-2.5 py-1">
-                  <Text className="text-[9px] font-bold uppercase tracking-widest text-teal-800">
+                  <Text className="text-[9px] font-ralewayExtraBold uppercase tracking-widest text-teal-800">
                     Active
                   </Text>
                 </View>
@@ -48,34 +48,34 @@ export function OnboardingThree() {
 
               <View className="mt-3 gap-2">
                 <View className="rounded-2xl border border-white/80 bg-white/55 px-2.5 py-2">
-                  <Text className="text-[9px] font-semibold uppercase tracking-widest text-description">
+                  <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-description">
                     Property
                   </Text>
-                  <Text className="text-[11px] font-bold leading-4 text-slate-950">
+                  <Text className="text-[11px] font-ralewayExtraBold leading-4 text-slate-950">
                     The Shard (Calapan, Oriental Mindoro)
                   </Text>
                 </View>
 
                 <View className="flex-row gap-2">
                   <View className="flex-1 rounded-2xl border border-white/80 bg-white/55 px-2.5 py-2">
-                    <Text className="text-[9px] font-semibold uppercase tracking-widest text-description">
+                    <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-description">
                       Room
                     </Text>
-                    <Text className="text-xs font-bold text-slate-950">21</Text>
+                    <Text className="text-xs font-ralewayExtraBold text-slate-950">21</Text>
                   </View>
                   <View className="flex-[1.6] rounded-2xl px-2.5 py-2">
-                    <Text className="text-[9px] font-semibold uppercase tracking-widest text-teal-700">
+                    <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-teal-700">
                       Monthly Rent
                     </Text>
-                    <Text className="text-xs font-bold text-teal-900">50,000</Text>
+                    <Text className="text-xs font-ralewayExtraBold text-teal-900">50,000</Text>
                   </View>
                 </View>
 
                 <View className="rounded-2xl border border-sky-100/90 bg-sky-50/80 px-2.5 py-2">
-                  <Text className="text-[9px] font-semibold uppercase tracking-widest text-sky-700">
+                  <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-sky-700">
                     Lease Term
                   </Text>
-                  <Text className="text-[11px] font-bold leading-4 text-slate-950">
+                  <Text className="text-[11px] font-ralewayExtraBold leading-4 text-slate-950">
                     May 7, 2026 - June 30, 2026
                   </Text>
                 </View>
@@ -104,7 +104,7 @@ export function OnboardingThree() {
         <View className="gap-8">
           <View className=' mb-5'>
 
-            <Text className="my-5 max-w-[330px] text-4xl font-bold leading-tight text-black">
+            <Text className="my-5 max-w-[330px] text-4xl font-ralewayExtraBold leading-tight text-black">
               {item.title}
             </Text>
 

@@ -35,7 +35,7 @@ export function Button({
           color={variant === 'primary' ? colors.whitePrimary : colors.primary}
         />
       ) : (
-        <Text className={`text-base font-semibold ${textClassName}`}>{title}</Text>
+        <Text className={`text-base font-ralewayBold ${textClassName}`}>{title}</Text>
       )}
     </Pressable>
   );

@@ -40,7 +40,7 @@ export function ProfileSummaryCard({
                 resizeMode="cover"
               />
             ) : (
-              <Text className="font-soraBold text-3xl text-blue-700">
+              <Text className="font-ralewayExtraBold text-3xl text-blue-700">
                 {getInitials(name)}
               </Text>
             )}
@@ -56,13 +56,13 @@ export function ProfileSummaryCard({
           onPress={onChangePhoto}
           className="mt-3 min-h-11 justify-center px-3"
         >
-          <Text className="font-soraSemiBold text-sm text-blue-600">
+          <Text className="font-ralewayBold text-sm text-blue-600">
             {imageUri ? "Change photo" : "Add profile photo"}
           </Text>
         </TouchableOpacity>
 
         <Text
-          className="mt-1 font-soraSemiBold text-xl text-slate-950"
+          className="mt-1 font-ralewayBold text-xl text-slate-950"
           numberOfLines={1}
         >
           {name.trim() || "Your name"}
@@ -74,10 +74,10 @@ export function ProfileSummaryCard({
 
       <View className="mt-5 rounded-2xl bg-slate-50 p-4">
         <View className="flex-row items-center justify-between">
-          <Text className="font-soraSemiBold text-sm text-slate-700">
+          <Text className="font-ralewayBold text-sm text-slate-700">
             Profile completion
           </Text>
-          <Text className="font-soraSemiBold text-sm text-blue-600">
+          <Text className="font-ralewayBold text-sm text-blue-600">
             {completion.percent}%
           </Text>
         </View>

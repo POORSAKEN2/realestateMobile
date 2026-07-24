@@ -31,20 +31,20 @@ export function BookingReservationList({
     <View className="mb-16 gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
       <View className="flex-row items-end justify-between gap-3">
         <View>
-          <Text className="font-soraSemiBold text-lg text-slate-950">
+          <Text className="font-ralewayBold text-lg text-slate-950">
             All reservations
           </Text>
-          <Text className="mt-1 text-xs font-medium text-slate-500">
+          <Text className="mt-1 text-xs font-ralewaySemiBold text-slate-500">
             {buildingTitle ?? "Select a building"}
           </Text>
         </View>
-        <Text className="text-xs font-bold text-slate-400">
+        <Text className="text-xs font-ralewayExtraBold text-slate-400">
           {bookings.length} total
         </Text>
       </View>
 
       {isLoading ? (
-        <Text className="text-sm font-medium text-slate-500">
+        <Text className="text-sm font-ralewaySemiBold text-slate-500">
           Loading reservations...
         </Text>
       ) : sortedBookings.length > 0 ? (
@@ -57,7 +57,7 @@ export function BookingReservationList({
         ))
       ) : (
         <View className="items-center rounded-2xl border border-dashed border-slate-200 p-6">
-          <Text className="text-center text-sm font-bold text-slate-800">
+          <Text className="text-center text-sm font-ralewayExtraBold text-slate-800">
             No reservations found
           </Text>
           <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
@@ -88,28 +88,28 @@ function ReservationCard({
       onPress={() => onPress(booking)}
     >
       <View className="w-12 items-center rounded-xl bg-slate-50 py-2">
-        <Text className="text-[10px] font-bold uppercase text-slate-400">
+        <Text className="text-[10px] font-ralewayExtraBold uppercase text-slate-400">
           {monthFormatter.format(startDate)}
         </Text>
-        <Text className="font-soraSemiBold text-lg text-slate-900">
+        <Text className="font-ralewayBold text-lg text-slate-900">
           {startDate.getDate()}
         </Text>
       </View>
       <View className="min-w-0 flex-1">
         <Text
-          className="font-soraSemiBold text-sm text-slate-900"
+          className="font-ralewayBold text-sm text-slate-900"
           numberOfLines={1}
         >
           {booking.guestName}
         </Text>
-        <Text className="mt-1 text-xs font-medium text-slate-500">
+        <Text className="mt-1 text-xs font-ralewaySemiBold text-slate-500">
           Room {booking.roomNumber} · {formatDisplayDate(booking.startDate)}–
           {formatDisplayDate(booking.endDate)}
         </Text>
         <View
           className={`mt-2 self-start rounded-full px-2 py-1 ${status.backgroundClassName}`}
         >
-          <Text className={`text-[10px] font-bold ${status.textClassName}`}>
+          <Text className={`text-[10px] font-ralewayExtraBold ${status.textClassName}`}>
             {status.label}
           </Text>
         </View>

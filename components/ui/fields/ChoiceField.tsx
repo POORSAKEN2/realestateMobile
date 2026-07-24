@@ -55,8 +55,8 @@ export function ChoiceField<T extends string | number | boolean>({
       <Text
         className={
           hasFilledSurface
-            ? "font-soraMedium text-sm text-slate-600"
-            : "text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]"
+            ? "font-ralewaySemiBold text-sm text-slate-600"
+            : "text-[11px] font-ralewayExtraBold uppercase tracking-wide text-[#6F6D6D]"
         }
       >
         {label}
@@ -70,7 +70,7 @@ export function ChoiceField<T extends string | number | boolean>({
               : "border-[#1d1d1f]/20 bg-[#FFFFFF]/90"
           }`}
         >
-          <Text className="text-sm font-medium text-[#6F6D6D]">
+          <Text className="text-sm font-ralewaySemiBold text-[#6F6D6D]">
             {emptyText ?? "No options available."}
           </Text>
         </View>
@@ -107,7 +107,7 @@ export function ChoiceField<T extends string | number | boolean>({
                 onPress={() => handlePress(option.value)}
               >
                 <Text
-                  className={`${isSegmented ? "font-soraMedium text-sm" : "text-xs font-semibold"} ${
+                  className={`${isSegmented ? "font-ralewaySemiBold text-sm" : "text-xs font-ralewayBold"} ${
                     selected
                       ? "text-[#FFFFFF]"
                       : hasFilledSurface

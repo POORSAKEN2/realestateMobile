@@ -44,8 +44,8 @@ export function PickerField({
       <Text
         className={
           isFilledVariant
-            ? "font-soraMedium text-sm text-slate-600"
-            : "text-xs font-semibold text-slate-600"
+            ? "font-ralewaySemiBold text-sm text-slate-600"
+            : "text-xs font-ralewayBold text-slate-600"
         }
       >
         {label}
@@ -65,7 +65,7 @@ export function PickerField({
       >
         <Text
           className={`text-base ${
-            isFilledVariant ? "min-w-0 flex-1 font-sora" : ""
+            isFilledVariant ? "min-w-0 flex-1 font-ralewayMedium" : ""
           } ${value ? "text-[#1d1d1f]" : "text-[#6F6D6D]"}`}
           numberOfLines={isFilledVariant ? 1 : undefined}
         >
@@ -93,7 +93,7 @@ export function PickerModalShell({
       <View className="flex-1 justify-center bg-black/40 px-5">
         <View className="rounded-3xl border border-[#1d1d1f]/10 bg-[#FFFFFF] p-5 shadow-xl">
           <View className="mb-2 flex-row items-center justify-between">
-            <Text className="text-sm font-bold text-[#1d1d1f]">{title}</Text>
+            <Text className="text-sm font-ralewayExtraBold text-[#1d1d1f]">{title}</Text>
             <TouchableOpacity
               accessibilityLabel={`Close ${title}`}
               accessibilityRole="button"
@@ -101,7 +101,7 @@ export function PickerModalShell({
               className="rounded-full bg-[#2563EB]/5 px-3 py-1.5"
               onPress={onClose}
             >
-              <Text className="text-xs font-bold text-[#2563EB]">Done</Text>
+              <Text className="text-xs font-ralewayExtraBold text-[#2563EB]">Done</Text>
             </TouchableOpacity>
           </View>
           {children}

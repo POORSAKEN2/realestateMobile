@@ -23,7 +23,7 @@ export function TenantDetailsModal({
         <View className="rounded-t-[32px] bg-white p-6">
           <View className="flex-row items-start justify-between gap-4">
             <View className="flex-1">
-              <Text className="text-2xl font-bold text-[#1d1d1f]">
+              <Text className="text-2xl font-ralewayExtraBold text-[#1d1d1f]">
                 {tenant?.name}
               </Text>
               <Text className="mt-1 text-sm text-[#6F6D6D]">
@@ -34,10 +34,10 @@ export function TenantDetailsModal({
               </Text>
               {linkedLeaseCount !== undefined ? (
                 <View className="mt-5 rounded-2xl bg-[#2563EB]/5 p-4">
-                  <Text className="text-[11px] font-bold uppercase tracking-wide text-[#6F6D6D]">
+                  <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wide text-[#6F6D6D]">
                     Active Records
                   </Text>
-                  <Text className="mt-1 text-base font-bold text-[#1d1d1f]">
+                  <Text className="mt-1 text-base font-ralewayExtraBold text-[#1d1d1f]">
                     {linkedLeaseCount} linked leases
                   </Text>
                 </View>

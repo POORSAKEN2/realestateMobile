@@ -18,7 +18,7 @@ export function ProfileHeader({ onBack }: ProfileHeaderProps) {
         <Ionicons name="chevron-back" color="#0F172A" size={22} />
       </TouchableOpacity>
       <View className="ml-4 flex-1">
-        <Text className="font-soraBold text-2xl text-slate-950">
+        <Text className="font-ralewayExtraBold text-2xl text-slate-950">
           Your profile
         </Text>
         <Text className="mt-0.5 text-sm text-slate-500">

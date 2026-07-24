@@ -28,7 +28,7 @@ export default function AddButton({
   loading = false,
   disabled = false,
   className = "min-h-11 flex-row items-center gap-2 rounded-2xl bg-[#2563EB] px-4 py-3 shadow-md shadow-blue-200",
-  textClassName = "font-soraSemiBold text-sm text-white",
+  textClassName = "font-ralewayBold text-sm text-white",
   style,
 }: AddButtonProps) {
   const isButtonDisabled = disabled || loading;

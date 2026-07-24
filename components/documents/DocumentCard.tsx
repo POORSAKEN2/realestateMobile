@@ -58,7 +58,7 @@ export function DocumentCard({
               size={25}
             />
             <Text
-              className="mt-0.5 font-soraBold text-[9px]"
+              className="mt-0.5 font-ralewayExtraBold text-[9px]"
               style={{ color: category.color }}
             >
               {document.type}
@@ -67,7 +67,7 @@ export function DocumentCard({
 
           <View className="min-w-0 flex-1 py-0.5">
             <Text
-              className="pr-1 font-soraBold text-[16px] leading-6 text-slate-950"
+              className="pr-1 font-ralewayExtraBold text-[16px] leading-6 text-slate-950"
               numberOfLines={2}
             >
               {document.name}
@@ -81,7 +81,7 @@ export function DocumentCard({
                   size={16}
                 />
                 <Text
-                  className="min-w-0 flex-1 font-sora text-xs text-slate-500"
+                  className="min-w-0 flex-1 font-ralewayMedium text-xs text-slate-500"
                   numberOfLines={1}
                 >
                   {property.title}
@@ -97,7 +97,7 @@ export function DocumentCard({
                   size={16}
                 />
                 <Text
-                  className="min-w-0 flex-1 font-sora text-xs text-slate-500"
+                  className="min-w-0 flex-1 font-ralewayMedium text-xs text-slate-500"
                   numberOfLines={1}
                 >
                   {lessee.name}
@@ -114,13 +114,13 @@ export function DocumentCard({
                 }}
               >
                 <Text
-                  className="font-soraBold text-[10px]"
+                  className="font-ralewayExtraBold text-[10px]"
                   style={{ color: category.color }}
                 >
                   {category.label}
                 </Text>
               </View>
-              <Text className="font-sora text-[11px] text-slate-500">
+              <Text className="font-ralewayMedium text-[11px] text-slate-500">
                 {metadata}
               </Text>
             </View>

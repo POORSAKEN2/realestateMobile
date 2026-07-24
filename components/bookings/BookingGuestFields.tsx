@@ -71,7 +71,7 @@ export function BookingGuestFields({
             />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="text-sm font-bold text-[#1d1d1f]">
+            <Text className="text-sm font-ralewayExtraBold text-[#1d1d1f]">
               {isAddingGuest ? "Entering a new guest" : "Guest not listed?"}
             </Text>
             <Text className="mt-0.5 text-xs leading-4 text-slate-600">
@@ -81,7 +81,7 @@ export function BookingGuestFields({
             </Text>
           </View>
         </View>
-        <Text className="ml-3 text-xs font-bold text-[#2563EB]">
+        <Text className="ml-3 text-xs font-ralewayExtraBold text-[#2563EB]">
           {isAddingGuest ? "Cancel" : "Add"}
         </Text>
       </TouchableOpacity>

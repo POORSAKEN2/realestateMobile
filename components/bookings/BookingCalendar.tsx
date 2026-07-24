@@ -56,10 +56,10 @@ export function BookingCalendar({
     <View className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm shadow-slate-900/5">
       <View className="flex-row items-center gap-2 px-4 pb-3 pt-4">
         <View className="min-w-0 flex-1">
-          <Text className="font-soraSemiBold text-lg text-slate-950">
+          <Text className="font-ralewayBold text-lg text-slate-950">
             {monthFormatter.format(currentMonth)}
           </Text>
-          <Text className="mt-0.5 text-xs font-medium text-slate-500">
+          <Text className="mt-0.5 text-xs font-ralewaySemiBold text-slate-500">
             Select a day to see its schedule
           </Text>
         </View>
@@ -71,7 +71,7 @@ export function BookingCalendar({
             className="h-11 justify-center rounded-full bg-blue-50 px-3"
             onPress={onGoToToday}
           >
-            <Text className="text-xs font-bold text-blue-700">Today</Text>
+            <Text className="text-xs font-ralewayExtraBold text-blue-700">Today</Text>
           </TouchableOpacity>
         ) : null}
         <MonthButton
@@ -90,7 +90,7 @@ export function BookingCalendar({
         {weekdayLabels.map((day) => (
           <Text
             key={day}
-            className="flex-1 text-center text-[11px] font-bold uppercase tracking-wide text-slate-400"
+            className="flex-1 text-center text-[11px] font-ralewayExtraBold uppercase tracking-wide text-slate-400"
           >
             {day.slice(0, 1)}
           </Text>
@@ -116,7 +116,7 @@ export function BookingCalendar({
         {BOOKING_CALENDAR_LEGEND.map((item) => (
           <View className="flex-row items-center gap-1.5" key={item.label}>
             <View className={`h-2 w-2 rounded-full ${item.colorClassName}`} />
-            <Text className="text-[11px] font-semibold text-slate-500">
+            <Text className="text-[11px] font-ralewayBold text-slate-500">
               {item.label}
             </Text>
           </View>
@@ -194,7 +194,7 @@ function CalendarDay({
         }`}
       >
         <Text
-          className={`text-[13px] font-bold ${
+          className={`text-[13px] font-ralewayExtraBold ${
             isSelected
               ? "text-white"
               : isCurrentMonth

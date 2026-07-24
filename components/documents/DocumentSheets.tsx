@@ -43,7 +43,7 @@ export function DocumentSortSheet({
               onPress={() => onSelect(option.value)}
             >
               <Text
-                className={`min-w-0 flex-1 font-soraSemiBold text-sm ${
+                className={`min-w-0 flex-1 font-ralewayBold text-sm ${
                   isSelected ? "text-blue-700" : "text-slate-700"
                 }`}
               >
@@ -134,7 +134,7 @@ export function DeleteDocumentSheet({
       title="Delete document?"
       visible={Boolean(document)}
     >
-      <Text className="font-sora text-sm leading-6 text-slate-500">
+      <Text className="font-ralewayMedium text-sm leading-6 text-slate-500">
         “{document?.name ?? "This document"}” will be permanently removed from
         your library. This action can’t be undone.
       </Text>
@@ -146,7 +146,7 @@ export function DeleteDocumentSheet({
           disabled={isDeleting}
           onPress={onCancel}
         >
-          <Text className="font-soraBold text-sm text-slate-700">Cancel</Text>
+          <Text className="font-ralewayExtraBold text-sm text-slate-700">Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
           accessibilityRole="button"
@@ -158,7 +158,7 @@ export function DeleteDocumentSheet({
           {isDeleting ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text className="font-soraBold text-sm text-white">Delete</Text>
+            <Text className="font-ralewayExtraBold text-sm text-white">Delete</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -194,7 +194,7 @@ function ActionRow({
     >
       <MaterialCommunityIcons name={icon} color={color} size={21} />
       <Text
-        className={`font-soraSemiBold text-sm ${
+        className={`font-ralewayBold text-sm ${
           destructive ? "text-red-700" : "text-slate-700"
         }`}
       >
@@ -240,13 +240,13 @@ function BottomSheet({
             <View className="min-w-0 flex-1">
               <Text
                 accessibilityRole="header"
-                className="font-soraBold text-xl text-slate-950"
+                className="font-ralewayExtraBold text-xl text-slate-950"
               >
                 {title}
               </Text>
               {subtitle ? (
                 <Text
-                  className="mt-1 font-sora text-xs text-slate-500"
+                  className="mt-1 font-ralewayMedium text-xs text-slate-500"
                   numberOfLines={1}
                 >
                   {subtitle}

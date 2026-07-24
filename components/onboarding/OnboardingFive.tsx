@@ -57,10 +57,10 @@ export function OnboardingFive() {
 
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-font10 font-soraBold uppercase tracking-widest text-description">
+                <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
                   Workspace
                 </Text>
-                <Text className="mt-2 font-soraSemiBold text-xl text-blackPrimary">
+                <Text className="mt-2 font-ralewayBold text-xl text-blackPrimary">
                   Organized files
                 </Text>
               </View>
@@ -85,10 +85,10 @@ export function OnboardingFive() {
 
                     <View className="flex-1">
                       <View className="flex-row items-center justify-between">
-                        <Text className="font-soraSemiBold text-base text-blackPrimary">
+                        <Text className="font-ralewayBold text-base text-blackPrimary">
                           {row.label}
                         </Text>
-                        <Text className="text-font10 font-soraMedium uppercase tracking-widest text-description">
+                        <Text className="text-font10 font-ralewaySemiBold uppercase tracking-widest text-description">
                           {row.meta}
                         </Text>
                       </View>
@@ -105,7 +105,7 @@ export function OnboardingFive() {
         </View>
 
         {/* <View className="items-center">
-          <Text className="mt-3 text-center text-4xl font-bold leading-tight text-white">
+          <Text className="mt-3 text-center text-4xl font-ralewayExtraBold leading-tight text-white">
             {item.title}
           </Text>
           <Text className="mt-4 text-center text-base leading-7 text-slate-300">
@@ -123,7 +123,7 @@ export function OnboardingFive() {
         <View className="gap-8">
           <View className=' mb-5'>
 
-            <Text className="my-5 text-4xl font-bold leading-tight  text-black">
+            <Text className="my-5 text-4xl font-ralewayExtraBold leading-tight  text-black">
               {item.title}
             </Text>
 

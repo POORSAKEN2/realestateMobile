@@ -20,7 +20,7 @@ export function SelectionField({
 }) {
   return (
     <View className="gap-2">
-      <Text className="font-soraMedium text-sm text-slate-600">{label}</Text>
+      <Text className="font-ralewaySemiBold text-sm text-slate-600">{label}</Text>
       <TouchableOpacity
         accessibilityLabel={`${label}, ${value}`}
         accessibilityRole="button"
@@ -29,7 +29,7 @@ export function SelectionField({
         onPress={onPress}
       >
         <Text
-          className="min-w-0 flex-1 font-soraMedium text-sm text-slate-800"
+          className="min-w-0 flex-1 font-ralewaySemiBold text-sm text-slate-800"
           numberOfLines={1}
         >
           {value}
@@ -83,7 +83,7 @@ export function SearchableOptionSelector({
         </TouchableOpacity>
         <Text
           accessibilityRole="header"
-          className="font-soraSemiBold text-2xl tracking-tight text-slate-950"
+          className="font-ralewayBold text-2xl tracking-tight text-slate-950"
         >
           {title}
         </Text>
@@ -94,7 +94,7 @@ export function SearchableOptionSelector({
           <TextInput
             accessibilityLabel={`Search ${title.toLowerCase()}`}
             autoFocus
-            className="min-w-0 flex-1 py-3 font-soraMedium text-sm text-slate-950"
+            className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-slate-950"
             onChangeText={onChangeQuery}
             placeholder="Search"
             placeholderTextColor="#94A3B8"
@@ -121,7 +121,7 @@ export function SearchableOptionSelector({
           />
         ))}
         {visibleOptions.length === 0 ? (
-          <Text className="py-8 text-center font-sora text-sm text-slate-500">
+          <Text className="py-8 text-center font-ralewayMedium text-sm text-slate-500">
             No matches found
           </Text>
         ) : null}
@@ -150,7 +150,7 @@ function OptionRow({
       onPress={onPress}
     >
       <Text
-        className={`min-w-0 flex-1 font-soraMedium text-sm ${
+        className={`min-w-0 flex-1 font-ralewaySemiBold text-sm ${
           isSelected ? "text-blue-700" : "text-slate-700"
         }`}
         numberOfLines={1}

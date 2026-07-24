@@ -53,7 +53,7 @@ export function PropertyCoreFields({
           color="#2563EB"
           size={20}
         />
-        <Text className="min-w-0 flex-1 font-sora text-sm leading-5 text-[#1E40AF]">
+        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-[#1E40AF]">
           Fields marked with * are required. You can add images and documents
           now or later.
         </Text>
@@ -102,7 +102,7 @@ export function PropertyCoreFields({
 
         {filteredLocationSuggestions.length > 0 ? (
           <View className="gap-2">
-            <Text className="text-xs font-semibold text-slate-600">
+            <Text className="text-xs font-ralewayBold text-slate-600">
               Quick choices
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -114,7 +114,7 @@ export function PropertyCoreFields({
                   className="min-h-11 justify-center rounded-full border border-[#1d1d1f]/10 bg-[#2563EB]/5 px-3.5 py-2.5"
                   onPress={() => selectLocation(location)}
                 >
-                  <Text className="text-xs font-semibold text-[#2563EB]">
+                  <Text className="text-xs font-ralewayBold text-[#2563EB]">
                     {location}
                   </Text>
                 </TouchableOpacity>
@@ -269,7 +269,7 @@ export function PropertyCoreFields({
                 />
               </View>
               <View className="min-w-0 flex-1">
-                <Text className="text-sm font-bold text-[#1d1d1f]">
+                <Text className="text-sm font-ralewayExtraBold text-[#1d1d1f]">
                   Allow short-term bookings
                 </Text>
                 <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">

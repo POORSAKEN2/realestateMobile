@@ -46,8 +46,8 @@ export function DropdownField<T extends string>({
       <Text
         className={
           isFilledVariant
-            ? "font-soraMedium text-sm text-slate-600"
-            : "text-xs font-semibold text-slate-600"
+            ? "font-ralewaySemiBold text-sm text-slate-600"
+            : "text-xs font-ralewayBold text-slate-600"
         }
       >
         {label}
@@ -67,7 +67,7 @@ export function DropdownField<T extends string>({
       >
         <Text
           className={`min-w-0 flex-1 text-base text-[#1d1d1f] ${
-            isFilledVariant ? "font-soraMedium" : "font-semibold"
+            isFilledVariant ? "font-ralewaySemiBold" : "font-ralewayBold"
           }`}
           numberOfLines={1}
         >
@@ -95,11 +95,11 @@ export function DropdownField<T extends string>({
           <View className="max-h-[72%] rounded-t-[28px] bg-[#FFFFFF] px-5 pb-8 pt-5">
             <View className="mb-4 flex-row items-center justify-between">
               <View>
-                <Text className="text-lg font-bold text-[#1d1d1f]">
+                <Text className="text-lg font-ralewayExtraBold text-[#1d1d1f]">
                   Select {label}
                 </Text>
                 {subtitle ? (
-                  <Text className="mt-1 text-xs font-semibold text-[#6F6D6D]">
+                  <Text className="mt-1 text-xs font-ralewayBold text-[#6F6D6D]">
                     {subtitle}
                   </Text>
                 ) : null}
@@ -136,7 +136,7 @@ export function DropdownField<T extends string>({
                       onPress={() => handleSelect(option.value)}
                     >
                       <Text
-                        className={`text-base font-semibold ${
+                        className={`text-base font-ralewayBold ${
                           isSelected ? "text-[#2563EB]" : "text-[#1d1d1f]"
                         }`}
                       >

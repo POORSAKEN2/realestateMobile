@@ -40,7 +40,7 @@ export function MapPropertyPreview({
         )}
         {images.length > 1 ? (
           <View className="absolute bottom-1.5 right-1.5 min-w-5 rounded-full bg-slate-900/75 px-1.5 py-0.5">
-            <Text className="text-center text-[10px] font-extrabold text-white">
+            <Text className="text-center text-[10px] font-ralewayBlack text-white">
               {images.length}
             </Text>
           </View>
@@ -50,7 +50,7 @@ export function MapPropertyPreview({
       <View className="min-w-0 flex-1">
         <View className="flex-row items-center gap-2">
           <Text
-            className="min-w-0 flex-1 text-base font-extrabold text-slate-900"
+            className="min-w-0 flex-1 text-base font-ralewayBlack text-slate-900"
             numberOfLines={1}
           >
             {property.title}
@@ -65,7 +65,7 @@ export function MapPropertyPreview({
           </TouchableOpacity>
         </View>
         <Text
-          className="mt-1 text-xs font-semibold text-slate-500"
+          className="mt-1 text-xs font-ralewayBold text-slate-500"
           numberOfLines={1}
         >
           {property.location}
@@ -73,19 +73,19 @@ export function MapPropertyPreview({
         </Text>
         <View className="mt-2.5 flex-row items-center gap-2">
           <View className="rounded-full bg-blue-100 px-2.5 py-1">
-            <Text className="text-[10px] font-extrabold uppercase text-blue-600">
+            <Text className="text-[10px] font-ralewayBlack uppercase text-blue-600">
               {formatStatus(property.status)}
             </Text>
           </View>
           <Text
-            className="min-w-0 flex-1 text-xs font-extrabold text-slate-900"
+            className="min-w-0 flex-1 text-xs font-ralewayBlack text-slate-900"
             numberOfLines={1}
           >
             {formatPeso(property.value)}
           </Text>
         </View>
         <Text
-          className="mt-1 text-[11px] font-bold text-slate-500"
+          className="mt-1 text-[11px] font-ralewayExtraBold text-slate-500"
           numberOfLines={1}
         >
           {property.type ?? "Property"}
