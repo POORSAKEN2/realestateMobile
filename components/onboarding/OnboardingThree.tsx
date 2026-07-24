@@ -7,7 +7,7 @@ import step3 from '../../assets/images/step3.png';
 
 const leaseCardShadow = {
   elevation: 14,
-  shadowColor: '#0F172A',
+  shadowColor: '#1E1F45',
   shadowOffset: { width: 0, height: 18 },
   shadowOpacity: 0.2,
   shadowRadius: 30,
@@ -37,7 +37,7 @@ export function OnboardingThree() {
                   <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-description">
                     Tenant
                   </Text>
-                  <Text className="text-sm font-ralewayExtraBold text-slate-950">Juan De La Cruz</Text>
+                  <Text className="text-sm font-ralewayExtraBold text-textPrimary">Juan De La Cruz</Text>
                 </View>
                 <View className="rounded-full border border-teal-100 bg-teal-50/90 px-2.5 py-1">
                   <Text className="text-[9px] font-ralewayExtraBold uppercase tracking-widest text-teal-800">
@@ -51,7 +51,7 @@ export function OnboardingThree() {
                   <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-description">
                     Property
                   </Text>
-                  <Text className="text-[11px] font-ralewayExtraBold leading-4 text-slate-950">
+                  <Text className="text-[11px] font-ralewayExtraBold leading-4 text-textPrimary">
                     The Shard (Calapan, Oriental Mindoro)
                   </Text>
                 </View>
@@ -61,7 +61,7 @@ export function OnboardingThree() {
                     <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-description">
                       Room
                     </Text>
-                    <Text className="text-xs font-ralewayExtraBold text-slate-950">21</Text>
+                    <Text className="text-xs font-ralewayExtraBold text-textPrimary">21</Text>
                   </View>
                   <View className="flex-[1.6] rounded-2xl px-2.5 py-2">
                     <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-teal-700">
@@ -75,7 +75,7 @@ export function OnboardingThree() {
                   <Text className="text-[9px] font-ralewayBold uppercase tracking-widest text-sky-700">
                     Lease Term
                   </Text>
-                  <Text className="text-[11px] font-ralewayExtraBold leading-4 text-slate-950">
+                  <Text className="text-[11px] font-ralewayExtraBold leading-4 text-textPrimary">
                     May 7, 2026 - June 30, 2026
                   </Text>
                 </View>

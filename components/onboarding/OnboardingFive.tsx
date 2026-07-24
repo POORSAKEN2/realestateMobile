@@ -8,7 +8,7 @@ import { OnboardingControls, OnboardingProgress } from './OnboardingControls';
 const folderRows = [
   {
     label: 'Properties',
-    iconColor: '#0F766E',
+    iconColor: '#634CE4',
     iconBg: 'bg-teal-50',
     lineClassName: 'bg-teal-700/55',
     meta: '18 files',
@@ -66,7 +66,7 @@ export function OnboardingFive() {
               </View>
 
               <View className="h-10 w-10 items-center justify-center rounded-2xl border border-teal-200 bg-teal-50 shadow-sm">
-                <Feather name="archive" size={18} color="#0F766E" />
+                <Feather name="archive" size={18} color="#634CE4" />
               </View>
             </View>
 

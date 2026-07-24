@@ -119,7 +119,7 @@ export function DocumentFormModal({
       >
         <View
           accessibilityViewIsModal
-          className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-[#F5F7FC]"
+          className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-surface"
         >
           <View className="pt-3">
             <View className="mb-3 h-1 w-10 self-center rounded-full bg-slate-300" />
@@ -157,7 +157,7 @@ export function DocumentFormModal({
                 <View className="min-w-0 flex-1 pr-3">
                   <Text
                     accessibilityRole="header"
-                    className="font-ralewayBold text-[28px] leading-9 tracking-tight text-slate-950"
+                    className="font-ralewayBold text-[28px] leading-9 tracking-tight text-textPrimary"
                   >
                     {editingDocument ? "Edit document" : "Upload document"}
                   </Text>
@@ -221,7 +221,7 @@ export function DocumentFormModal({
                     <FieldLabel label="Name" required />
                     <TextInput
                       accessibilityLabel="Document name, required"
-                      className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-slate-950 ${
+                      className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
                         errors.name ? "border-red-400" : "border-slate-200"
                       }`}
                       onChangeText={(name) => onChangeForm({ ...form, name })}
@@ -252,7 +252,7 @@ export function DocumentFormModal({
                             activeOpacity={0.8}
                             className={`min-h-11 justify-center rounded-2xl border px-4 ${
                               isSelected
-                                ? "border-[#2563EB] bg-[#2563EB]"
+                                ? "border-primary bg-primary"
                                 : "border-slate-200 bg-slate-50"
                             }`}
                             onPress={() => onChangeForm({ ...form, category })}
@@ -286,7 +286,7 @@ export function DocumentFormModal({
                       <FieldLabel label="Version note" />
                       <TextInput
                         accessibilityLabel="Version note"
-                        className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-slate-950"
+                        className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-textPrimary"
                         multiline
                         onChangeText={(revisionComment) =>
                           onChangeForm({ ...form, revisionComment })
@@ -306,13 +306,13 @@ export function DocumentFormModal({
                   accessibilityLabel="Cancel document form"
                   accessibilityRole="button"
                   activeOpacity={0.85}
-                  className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-[#2563EB] bg-white ${
+                  className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white ${
                     isSaving ? "opacity-60" : ""
                   }`}
                   disabled={isSaving}
                   onPress={onClose}
                 >
-                  <Text className="font-ralewayBold text-base text-[#2563EB]">
+                  <Text className="font-ralewayBold text-base text-primary">
                     Cancel
                   </Text>
                 </TouchableOpacity>
@@ -320,7 +320,7 @@ export function DocumentFormModal({
                   accessibilityRole="button"
                   accessibilityState={{ disabled: !canSubmit }}
                   activeOpacity={0.85}
-                  className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-blue-600 ${
+                  className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
                     canSubmit ? "" : "opacity-40"
                   }`}
                   disabled={!canSubmit}

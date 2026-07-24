@@ -39,7 +39,7 @@ export function PropertyPortfolioSummary({
         : formatPeso(portfolioValue);
 
   return (
-    <View className="overflow-hidden rounded-3xl bg-[#1d1d1f] p-5 shadow-lg shadow-slate-900/15">
+    <View className="overflow-hidden rounded-3xl bg-textPrimary p-5 shadow-lg shadow-slate-900/15">
       <View className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-white/5" />
 
       <View className="flex-row items-start justify-between gap-4">
@@ -58,7 +58,7 @@ export function PropertyPortfolioSummary({
         <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white/10">
           <MaterialCommunityIcons
             name="chart-box-outline"
-            color="#93C5FD"
+            color="#BEE3DB"
             size={21}
           />
         </View>

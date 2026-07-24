@@ -38,13 +38,13 @@ export function DocumentSortSheet({
               accessibilityState={{ checked: isSelected }}
               activeOpacity={0.8}
               className={`min-h-14 flex-row items-center rounded-2xl px-4 ${
-                isSelected ? "bg-blue-50" : "bg-slate-50"
+                isSelected ? "bg-secondary/20" : "bg-slate-50"
               }`}
               onPress={() => onSelect(option.value)}
             >
               <Text
                 className={`min-w-0 flex-1 font-ralewayBold text-sm ${
-                  isSelected ? "text-blue-700" : "text-slate-700"
+                  isSelected ? "text-primary" : "text-slate-700"
                 }`}
               >
                 {option.label}
@@ -52,7 +52,7 @@ export function DocumentSortSheet({
               {isSelected ? (
                 <MaterialCommunityIcons
                   name="check-circle"
-                  color="#2563EB"
+                  color="#634CE4"
                   size={21}
                 />
               ) : null}
@@ -146,7 +146,9 @@ export function DeleteDocumentSheet({
           disabled={isDeleting}
           onPress={onCancel}
         >
-          <Text className="font-ralewayExtraBold text-sm text-slate-700">Cancel</Text>
+          <Text className="font-ralewayExtraBold text-sm text-slate-700">
+            Cancel
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           accessibilityRole="button"
@@ -158,7 +160,9 @@ export function DeleteDocumentSheet({
           {isDeleting ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text className="font-ralewayExtraBold text-sm text-white">Delete</Text>
+            <Text className="font-ralewayExtraBold text-sm text-white">
+              Delete
+            </Text>
           )}
         </TouchableOpacity>
       </View>
@@ -240,7 +244,7 @@ function BottomSheet({
             <View className="min-w-0 flex-1">
               <Text
                 accessibilityRole="header"
-                className="font-ralewayExtraBold text-xl text-slate-950"
+                className="font-ralewayExtraBold text-textPrimary text-xl"
               >
                 {title}
               </Text>

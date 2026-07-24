@@ -40,7 +40,7 @@ export function BookingDaySchedule({
           <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
             Day schedule
           </Text>
-          <Text className="mt-1 font-ralewayBold text-lg text-slate-950">
+          <Text className="mt-1 font-ralewayBold text-lg text-textPrimary">
             {dayLabel}
           </Text>
         </View>
@@ -62,12 +62,12 @@ export function BookingDaySchedule({
               className="min-h-[64px] flex-row items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3"
               onPress={() => onOpenBooking(booking)}
             >
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-blue-100">
-                <Ionicons name="bed-outline" color="#2563EB" size={19} />
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/20">
+                <Ionicons name="bed-outline" color="#634CE4" size={19} />
               </View>
               <View className="min-w-0 flex-1">
                 <Text
-                  className="font-ralewayBold text-sm text-slate-900"
+                  className="font-ralewayBold text-sm text-textPrimary"
                   numberOfLines={1}
                 >
                   {booking.guestName}
@@ -103,7 +103,7 @@ export function BookingDaySchedule({
           activeOpacity={0.8}
           accessibilityLabel={`Add booking on ${dayLabel}`}
           accessibilityRole="button"
-          className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-blue-600"
+          className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
           onPress={() => onCreate(date)}
         >
           <Ionicons name="add" color="#FFFFFF" size={20} />

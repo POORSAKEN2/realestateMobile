@@ -39,7 +39,7 @@ export function DocumentsToolbar({
         <MaterialCommunityIcons name="magnify" color="#64748B" size={22} />
         <TextInput
           accessibilityLabel="Search documents, properties, or tenants"
-          className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-slate-950"
+          className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-textPrimary"
           onChangeText={onChangeSearch}
           placeholder="Search documents, properties, tenants"
           placeholderTextColor="#94A3B8"
@@ -115,7 +115,7 @@ export function DocumentsToolbar({
             size={20}
           />
           {activeFilterCount ? (
-            <View className="absolute -right-1.5 -top-1.5 h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1">
+            <View className="absolute -right-1.5 -top-1.5 h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1">
               <Text className="font-ralewayExtraBold text-[10px] text-white">
                 {activeFilterCount}
               </Text>

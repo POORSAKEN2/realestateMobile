@@ -23,7 +23,7 @@ export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
   const totalScreens = onboardingScreens.length;
   const currentStep = activeIndex + 1;
   const progress = (currentStep / totalScreens) * 100;
-  const accentColor = progressAccentColors[activeIndex] ?? '#2563EB';
+  const accentColor = progressAccentColors[activeIndex] ?? '#634CE4';
 
   return (
     <View className="w-full">

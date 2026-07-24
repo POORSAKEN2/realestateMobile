@@ -268,7 +268,7 @@ export function PropertyDetailsModal({
                         onPress={() => openPropertyDocument(document)}
                       >
                         <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
-                          <Feather name="file-text" color="#0f766e" size={17} />
+                          <Feather name="file-text" color="#634CE4" size={17} />
                         </View>
                         <View className="min-w-0 flex-1">
                           <Text
@@ -362,7 +362,7 @@ function CountMetric({
   return (
     <View className="flex-1 rounded-2xl border border-teal-100 bg-teal-50 p-4">
       <View className="flex-row items-center gap-2">
-        <Feather name={icon} color="#0f766e" size={16} />
+        <Feather name={icon} color="#634CE4" size={16} />
         <Text className="font-ralewayBold text-[10px] uppercase text-teal-700">
           {label}
         </Text>

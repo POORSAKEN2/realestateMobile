@@ -1,27 +1,27 @@
-import { ActivityIndicator, Pressable, Text } from 'react-native';
+import { ActivityIndicator, Pressable, Text } from "react-native";
 
-import { colors } from '../../../constants/colors';
+import { colors } from "../../../constants/colors";
 
 type ButtonProps = {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: "primary" | "secondary";
   isLoading?: boolean;
 };
 
 export function Button({
   title,
   onPress,
-  variant = 'primary',
+  variant = "primary",
   isLoading = false,
 }: ButtonProps) {
   const buttonClassName =
-    variant === 'primary'
-      ? 'bg-primary active:opacity-90'
-      : 'border border-description bg-whitePrimary active:bg-slate-100';
+    variant === "primary"
+      ? "bg-primary active:opacity-90"
+      : "border border-description bg-whitePrimary active:bg-secondary/20";
 
   const textClassName =
-    variant === 'primary' ? 'text-whitePrimary' : 'text-primary';
+    variant === "primary" ? "text-whitePrimary" : "text-primary";
 
   return (
     <Pressable
@@ -32,10 +32,12 @@ export function Button({
     >
       {isLoading ? (
         <ActivityIndicator
-          color={variant === 'primary' ? colors.whitePrimary : colors.primary}
+          color={variant === "primary" ? colors.whitePrimary : colors.primary}
         />
       ) : (
-        <Text className={`text-base font-ralewayBold ${textClassName}`}>{title}</Text>
+        <Text className={`font-ralewayBold text-base ${textClassName}`}>
+          {title}
+        </Text>
       )}
     </Pressable>
   );

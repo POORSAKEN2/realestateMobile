@@ -45,7 +45,7 @@ export function RegistrationStepLayout({
   const isButtonDisabled = buttonDisabled || isLoading;
 
   return (
-    <Screen className="bg-[#f8faf9]">
+    <Screen className="bg-surface">
       <Stack.Screen options={{ headerShown: false }} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -60,9 +60,9 @@ export function RegistrationStepLayout({
             hitSlop={8}
             onPress={onBack}
           >
-            <Feather name="arrow-left" size={21} color="#173f3b" />
+            <Feather name="arrow-left" size={21} color="#1E1F45" />
           </Pressable>
-          <Text className="font-ralewayBold text-xs uppercase tracking-[2px] text-[#708080]">
+          <Text className="font-ralewayBold text-xs uppercase tracking-[2px] text-description">
             Step {stepIndex + 1} of {stepCount}
           </Text>
         </View>
@@ -73,7 +73,7 @@ export function RegistrationStepLayout({
               key={step}
               className={`h-1 flex-1 rounded-full ${
                 REGISTRATION_STEPS.indexOf(step) <= stepIndex
-                  ? "bg-[#2563EB]"
+                  ? "bg-primary"
                   : "bg-[#dfe5e5]"
               }`}
             />
@@ -88,10 +88,10 @@ export function RegistrationStepLayout({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text className="font-ralewayExtraBold text-[34px] leading-[40px] text-[#172121]">
+          <Text className="font-ralewayExtraBold text-textPrimary text-[34px] leading-[40px]">
             {title}
           </Text>
-          <Text className="mt-3 font-ralewayMedium text-[15px] leading-6 text-[#647171]">
+          <Text className="mt-3 font-ralewayMedium text-[15px] leading-6 text-description">
             {subtitle}
           </Text>
 
@@ -102,7 +102,7 @@ export function RegistrationStepLayout({
               className={`mt-6 flex-row rounded-[12px] border px-4 py-3 ${
                 feedback.tone === "error"
                   ? "border-rose-200 bg-rose-50"
-                  : "border-[#bfe5df] bg-[#eefaf8]"
+                  : "border-secondary bg-secondary/20"
               }`}
             >
               <Feather
@@ -110,11 +110,11 @@ export function RegistrationStepLayout({
                   feedback.tone === "error" ? "alert-circle" : "check-circle"
                 }
                 size={18}
-                color={feedback.tone === "error" ? "#e11d48" : "#0f766e"}
+                color={feedback.tone === "error" ? "#e11d48" : "#634CE4"}
               />
               <Text
                 className={`ml-3 flex-1 text-sm leading-5 ${
-                  feedback.tone === "error" ? "text-rose-700" : "text-[#0f766e]"
+                  feedback.tone === "error" ? "text-rose-700" : "text-primary"
                 }`}
               >
                 {feedback.message}
@@ -127,9 +127,7 @@ export function RegistrationStepLayout({
           accessibilityLabel={buttonLabel}
           accessibilityRole="button"
           className={`h-14 items-center justify-center rounded-[16px] ${
-            isButtonDisabled
-              ? "bg-[#a9c5ed]"
-              : "bg-[#2563EB] active:bg-[#1d4ed8]"
+            isButtonDisabled ? "bg-accent/60" : "bg-primary active:opacity-90"
           }`}
           disabled={isButtonDisabled}
           onPress={onContinue}

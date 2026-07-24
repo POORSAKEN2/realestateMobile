@@ -50,7 +50,7 @@ export function MapPropertyPreview({
       <View className="min-w-0 flex-1">
         <View className="flex-row items-center gap-2">
           <Text
-            className="min-w-0 flex-1 text-base font-ralewayBlack text-slate-900"
+            className="min-w-0 flex-1 text-base font-ralewayBlack text-textPrimary"
             numberOfLines={1}
           >
             {property.title}
@@ -72,13 +72,13 @@ export function MapPropertyPreview({
           {property.country ? `, ${property.country}` : ""}
         </Text>
         <View className="mt-2.5 flex-row items-center gap-2">
-          <View className="rounded-full bg-blue-100 px-2.5 py-1">
-            <Text className="text-[10px] font-ralewayBlack uppercase text-blue-600">
+          <View className="rounded-full bg-secondary px-2.5 py-1">
+            <Text className="text-[10px] font-ralewayBlack uppercase text-primary">
               {formatStatus(property.status)}
             </Text>
           </View>
           <Text
-            className="min-w-0 flex-1 text-xs font-ralewayBlack text-slate-900"
+            className="min-w-0 flex-1 text-xs font-ralewayBlack text-textPrimary"
             numberOfLines={1}
           >
             {formatPeso(property.value)}

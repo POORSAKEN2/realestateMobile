@@ -60,7 +60,7 @@ export function OnboardingSeven() {
 
               <View className="rounded-2xl border border-slate-200 bg-whitePrimary/80 p-3 shadow-sm">
                 <View className="flex-row items-center gap-2">
-                  <Feather name="navigation" size={14} color="#0f766e" />
+                  <Feather name="navigation" size={14} color="#634CE4" />
                   <Text className="text-xs font-ralewaySemiBold text-description">
                     Pinned asset address
                   </Text>

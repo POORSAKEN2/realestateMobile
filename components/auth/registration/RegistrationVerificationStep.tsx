@@ -35,18 +35,18 @@ export function RegistrationVerificationStep({
 
   return (
     <View>
-      <View className="mb-7 flex-row items-center rounded-[14px] bg-[#eef5ff] px-4 py-3">
+      <View className="bg-secondary/20 mb-7 flex-row items-center rounded-[14px] px-4 py-3">
         {isRequestingCode ? (
-          <ActivityIndicator color="#2563EB" />
+          <ActivityIndicator color="#634CE4" />
         ) : (
-          <Feather name="mail" size={18} color="#2563EB" />
+          <Feather name="mail" size={18} color="#634CE4" />
         )}
         <View className="ml-3 flex-1">
-          <Text className="text-xs text-[#647171]">
+          <Text className="text-xs text-description">
             {isRequestingCode ? "Sending code to" : "Code sent to"}
           </Text>
           <Text
-            className="mt-0.5 font-ralewayBold text-sm text-[#173f3b]"
+            className="text-textPrimary mt-0.5 font-ralewayBold text-sm"
             numberOfLines={1}
           >
             {email.trim()}
@@ -60,7 +60,7 @@ export function RegistrationVerificationStep({
         values={digits}
       />
 
-      <Text className="mt-5 text-center text-sm leading-5 text-[#647171]">
+      <Text className="mt-5 text-center text-sm leading-5 text-description">
         Check your inbox and spam folder. The code expires in 10 minutes.
       </Text>
 
@@ -74,7 +74,7 @@ export function RegistrationVerificationStep({
       >
         <Text
           className={`font-ralewayBold text-sm ${
-            isResendDisabled ? "text-[#9ba7a7]" : "text-[#0f766e]"
+            isResendDisabled ? "text-[#9ba7a7]" : "text-primary"
           }`}
         >
           {isRequestingCode

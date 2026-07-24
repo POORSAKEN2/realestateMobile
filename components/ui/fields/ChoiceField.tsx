@@ -24,7 +24,7 @@ export function ChoiceField<T extends string | number | boolean>({
   onChange,
   emptyText,
   isMultiSelect = false,
-  activeColorClass = "border-[#2563EB] bg-[#2563EB]",
+  activeColorClass = "border-primary bg-primary",
   variant = "pill",
 }: ChoiceFieldProps<T>) {
   const isSegmented = variant === "segmented";
@@ -66,8 +66,8 @@ export function ChoiceField<T extends string | number | boolean>({
         <View
           className={`rounded-2xl border border-dashed p-4 ${
             hasFilledSurface
-              ? "border-slate-300 bg-slate-50"
-              : "border-[#1d1d1f]/20 bg-[#FFFFFF]/90"
+              ? "border-slate-300 bg-surface"
+              : "border-textPrimary/20 bg-[#FFFFFF]/90"
           }`}
         >
           <Text className="text-sm font-ralewaySemiBold text-[#6F6D6D]">
@@ -78,7 +78,7 @@ export function ChoiceField<T extends string | number | boolean>({
         <View
           className={
             isSegmented
-              ? "flex-row overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-0.5"
+              ? "flex-row overflow-hidden rounded-2xl border border-slate-200 bg-surface p-0.5"
               : "flex-row flex-wrap gap-2"
           }
         >
@@ -92,7 +92,7 @@ export function ChoiceField<T extends string | number | boolean>({
                 className={
                   isSegmented
                     ? `h-14 flex-1 items-center justify-center rounded-[14px] ${
-                        selected ? "bg-[#2563EB]" : "bg-transparent"
+                        selected ? "bg-primary" : "bg-transparent"
                       }`
                     : `min-h-11 justify-center border px-3.5 py-2.5 ${
                         hasFilledSurface ? "rounded-2xl" : "rounded-full"
@@ -100,8 +100,8 @@ export function ChoiceField<T extends string | number | boolean>({
                         selected
                           ? activeColorClass
                           : hasFilledSurface
-                            ? "border-slate-200 bg-slate-50"
-                            : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
+                            ? "border-slate-200 bg-surface"
+                            : "border-textPrimary/10 bg-[#FFFFFF]"
                       }`
                 }
                 onPress={() => handlePress(option.value)}
@@ -112,7 +112,7 @@ export function ChoiceField<T extends string | number | boolean>({
                       ? "text-[#FFFFFF]"
                       : hasFilledSurface
                         ? "text-slate-600"
-                        : "text-[#1d1d1f]"
+                        : "text-textPrimary"
                   }`}
                 >
                   {option.label}

@@ -20,7 +20,9 @@ export function SelectionField({
 }) {
   return (
     <View className="gap-2">
-      <Text className="font-ralewaySemiBold text-sm text-slate-600">{label}</Text>
+      <Text className="font-ralewaySemiBold text-sm text-slate-600">
+        {label}
+      </Text>
       <TouchableOpacity
         accessibilityLabel={`${label}, ${value}`}
         accessibilityRole="button"
@@ -70,7 +72,7 @@ export function SearchableOptionSelector({
   );
 
   return (
-    <View className="min-h-[500px] bg-[#F5F7FC]">
+    <View className="bg-surface min-h-[500px]">
       <View className="flex-row items-center gap-3 bg-white px-5 pb-5 pt-2">
         <TouchableOpacity
           accessibilityLabel={backAccessibilityLabel}
@@ -83,7 +85,7 @@ export function SearchableOptionSelector({
         </TouchableOpacity>
         <Text
           accessibilityRole="header"
-          className="font-ralewayBold text-2xl tracking-tight text-slate-950"
+          className="text-textPrimary font-ralewayBold text-2xl tracking-tight"
         >
           {title}
         </Text>
@@ -94,7 +96,7 @@ export function SearchableOptionSelector({
           <TextInput
             accessibilityLabel={`Search ${title.toLowerCase()}`}
             autoFocus
-            className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-slate-950"
+            className="text-textPrimary min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm"
             onChangeText={onChangeQuery}
             placeholder="Search"
             placeholderTextColor="#94A3B8"
@@ -145,20 +147,22 @@ function OptionRow({
       accessibilityState={{ checked: isSelected }}
       activeOpacity={0.8}
       className={`min-h-14 flex-row items-center rounded-2xl border px-4 ${
-        isSelected ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white"
+        isSelected
+          ? "border-secondary bg-secondary/20"
+          : "border-slate-200 bg-white"
       }`}
       onPress={onPress}
     >
       <Text
         className={`min-w-0 flex-1 font-ralewaySemiBold text-sm ${
-          isSelected ? "text-blue-700" : "text-slate-700"
+          isSelected ? "text-primary" : "text-slate-700"
         }`}
         numberOfLines={1}
       >
         {label}
       </Text>
       {isSelected ? (
-        <MaterialCommunityIcons name="check-circle" color="#2563EB" size={21} />
+        <MaterialCommunityIcons name="check-circle" color="#634CE4" size={21} />
       ) : null}
     </TouchableOpacity>
   );

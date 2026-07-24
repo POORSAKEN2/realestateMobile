@@ -56,10 +56,10 @@ export function BookingCalendar({
     <View className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm shadow-slate-900/5">
       <View className="flex-row items-center gap-2 px-4 pb-3 pt-4">
         <View className="min-w-0 flex-1">
-          <Text className="font-ralewayBold text-lg text-slate-950">
+          <Text className="text-textPrimary font-ralewayBold text-lg">
             {monthFormatter.format(currentMonth)}
           </Text>
-          <Text className="mt-0.5 text-xs font-ralewaySemiBold text-slate-500">
+          <Text className="mt-0.5 font-ralewaySemiBold text-xs text-slate-500">
             Select a day to see its schedule
           </Text>
         </View>
@@ -68,10 +68,12 @@ export function BookingCalendar({
             activeOpacity={0.78}
             accessibilityLabel="Return to today"
             accessibilityRole="button"
-            className="h-11 justify-center rounded-full bg-blue-50 px-3"
+            className="bg-secondary/20 h-11 justify-center rounded-full px-3"
             onPress={onGoToToday}
           >
-            <Text className="text-xs font-ralewayExtraBold text-blue-700">Today</Text>
+            <Text className="font-ralewayExtraBold text-xs text-primary">
+              Today
+            </Text>
           </TouchableOpacity>
         ) : null}
         <MonthButton
@@ -90,7 +92,7 @@ export function BookingCalendar({
         {weekdayLabels.map((day) => (
           <Text
             key={day}
-            className="flex-1 text-center text-[11px] font-ralewayExtraBold uppercase tracking-wide text-slate-400"
+            className="font-ralewayExtraBold flex-1 text-center text-[11px] uppercase tracking-wide text-slate-400"
           >
             {day.slice(0, 1)}
           </Text>
@@ -116,7 +118,7 @@ export function BookingCalendar({
         {BOOKING_CALENDAR_LEGEND.map((item) => (
           <View className="flex-row items-center gap-1.5" key={item.label}>
             <View className={`h-2 w-2 rounded-full ${item.colorClassName}`} />
-            <Text className="text-[11px] font-ralewayBold text-slate-500">
+            <Text className="font-ralewayBold text-[11px] text-slate-500">
               {item.label}
             </Text>
           </View>
@@ -187,19 +189,19 @@ function CalendarDay({
       <View
         className={`h-9 w-9 items-center justify-center rounded-full ${
           isSelected
-            ? "bg-blue-600"
+            ? "bg-primary"
             : isToday
-              ? "border border-blue-500 bg-blue-50"
+              ? "bg-secondary/20 border border-primary"
               : "bg-transparent"
         }`}
       >
         <Text
-          className={`text-[13px] font-ralewayExtraBold ${
+          className={`font-ralewayExtraBold text-[13px] ${
             isSelected
               ? "text-white"
               : isCurrentMonth
                 ? isToday
-                  ? "text-blue-700"
+                  ? "text-primary"
                   : "text-slate-800"
                 : "text-slate-300"
           }`}
@@ -215,9 +217,7 @@ function CalendarDay({
               <View
                 key={booking.id}
                 className={`h-1.5 w-1.5 rounded-full ${
-                  booking.status === "Cancelled"
-                    ? "bg-slate-300"
-                    : "bg-blue-500"
+                  booking.status === "Cancelled" ? "bg-slate-300" : "bg-accent"
                 }`}
               />
             ))

@@ -64,7 +64,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
       {/* Explicit style layout string replaces 'modal-container' */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        className={`flex-1 ${isCardAppearance ? "bg-[#F5F7FC]" : "bg-[#F7F8FA]"}`}
+        className="flex-1 bg-surface"
       >
         <View
           className={
@@ -78,8 +78,8 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               <Text
                 className={
                   isCardAppearance
-                    ? "font-ralewayBold text-[28px] leading-9 tracking-tight text-[#1d1d1f]"
-                    : "font-ralewayBold text-2xl text-[#1d1d1f]"
+                    ? "font-ralewayBold text-[28px] leading-9 tracking-tight text-textPrimary"
+                    : "font-ralewayBold text-2xl text-textPrimary"
                 }
                 numberOfLines={2}
               >
@@ -108,7 +108,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               disabled={isPending}
               onPress={handleClose}
             >
-              <Ionicons name="close" color="#3d3d3d" size={22} />
+              <Ionicons name="close" color="#1E1F45" size={22} />
             </TouchableOpacity>
           </View>
         </View>
@@ -141,7 +141,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
         </ScrollView>
 
         <SafeAreaView
-          className="border-t border-[#1d1d1f]/10 bg-white px-5 pb-4 pt-4"
+          className="border-t border-textPrimary/10 bg-white px-5 pb-4 pt-4"
           edges={["bottom"]}
         >
           <View className={`flex-row ${showCancelAction ? "gap-3" : ""}`}>
@@ -150,13 +150,13 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 accessibilityLabel={cancelText}
                 accessibilityRole="button"
                 activeOpacity={0.85}
-                className={`h-14 flex-1 items-center justify-center rounded-2xl border border-[#2563EB] bg-white ${
+                className={`h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white ${
                   isPending ? "opacity-60" : ""
                 }`}
                 disabled={isPending}
                 onPress={onClose}
               >
-                <Text className="font-ralewayBold text-base text-[#2563EB]">
+                <Text className="font-ralewayBold text-base text-primary">
                   {cancelText}
                 </Text>
               </TouchableOpacity>
@@ -165,7 +165,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
               accessibilityLabel={submitText}
               activeOpacity={0.85}
               accessibilityRole="button"
-              className={`h-14 flex-1 items-center justify-center rounded-2xl bg-[#2563EB] ${
+              className={`h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
                 isPending ? "opacity-60" : ""
               }`}
               disabled={isPending}

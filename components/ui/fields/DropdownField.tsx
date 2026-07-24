@@ -47,7 +47,7 @@ export function DropdownField<T extends string>({
         className={
           isFilledVariant
             ? "font-ralewaySemiBold text-sm text-slate-600"
-            : "text-xs font-ralewayBold text-slate-600"
+            : "font-ralewayBold text-xs text-slate-600"
         }
       >
         {label}
@@ -60,13 +60,13 @@ export function DropdownField<T extends string>({
         accessibilityRole="button"
         className={
           isFilledVariant
-            ? "h-14 flex-row items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4"
-            : "h-14 flex-row items-center justify-between rounded-xl border border-[#1d1d1f]/10 bg-[#FFFFFF] px-4 shadow-sm"
+            ? "bg-surface h-14 flex-row items-center justify-between rounded-2xl border border-slate-200 px-4"
+            : "border-textPrimary/10 h-14 flex-row items-center justify-between rounded-xl border bg-[#FFFFFF] px-4 shadow-sm"
         }
         onPress={() => setIsOpen(true)}
       >
         <Text
-          className={`min-w-0 flex-1 text-base text-[#1d1d1f] ${
+          className={`text-textPrimary min-w-0 flex-1 text-base ${
             isFilledVariant ? "font-ralewaySemiBold" : "font-ralewayBold"
           }`}
           numberOfLines={1}
@@ -95,11 +95,11 @@ export function DropdownField<T extends string>({
           <View className="max-h-[72%] rounded-t-[28px] bg-[#FFFFFF] px-5 pb-8 pt-5">
             <View className="mb-4 flex-row items-center justify-between">
               <View>
-                <Text className="text-lg font-ralewayExtraBold text-[#1d1d1f]">
+                <Text className="font-ralewayExtraBold text-textPrimary text-lg">
                   Select {label}
                 </Text>
                 {subtitle ? (
-                  <Text className="mt-1 text-xs font-ralewayBold text-[#6F6D6D]">
+                  <Text className="mt-1 font-ralewayBold text-xs text-[#6F6D6D]">
                     {subtitle}
                   </Text>
                 ) : null}
@@ -113,7 +113,7 @@ export function DropdownField<T extends string>({
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#1d1d1f"
+                  color="#1E1F45"
                   size={20}
                 />
               </TouchableOpacity>
@@ -130,14 +130,14 @@ export function DropdownField<T extends string>({
                       activeOpacity={0.85}
                       className={`min-h-14 flex-row items-center justify-between rounded-lg border px-4 ${
                         isSelected
-                          ? "border-[#2563EB] bg-[#2563EB]/10"
-                          : "border-[#1d1d1f]/10 bg-[#FFFFFF]"
+                          ? "bg-secondary/20 border-primary"
+                          : "border-textPrimary/10 bg-[#FFFFFF]"
                       }`}
                       onPress={() => handleSelect(option.value)}
                     >
                       <Text
-                        className={`text-base font-ralewayBold ${
-                          isSelected ? "text-[#2563EB]" : "text-[#1d1d1f]"
+                        className={`font-ralewayBold text-base ${
+                          isSelected ? "text-primary" : "text-textPrimary"
                         }`}
                       >
                         {option.label}
@@ -145,7 +145,7 @@ export function DropdownField<T extends string>({
                       {isSelected ? (
                         <MaterialCommunityIcons
                           name="check"
-                          color="#2563EB"
+                          color="#634CE4"
                           size={21}
                         />
                       ) : null}

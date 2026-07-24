@@ -32,14 +32,14 @@ export function TenantCard({
         <View className="flex-row items-start justify-between gap-3">
           {/* Avatar & Info */}
           <View className="min-w-0 flex-1 flex-row gap-3.5">
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-[#2563EB]/10">
-              <Ionicons name="person" color="#2563EB" size={20} />
+            <View className="h-12 w-12 items-center justify-center rounded-full bg-secondary/20">
+              <Ionicons name="person" color="#634CE4" size={20} />
             </View>
 
             <View className="min-w-0 flex-1 pt-0.5">
               <View className="flex-row items-center gap-2">
                 <Text
-                  className="font-ralewayBold text-lg tracking-tight text-[#1d1d1f]"
+                  className="font-ralewayBold text-lg tracking-tight text-textPrimary"
                   numberOfLines={1}
                 >
                   {tenant.name}
@@ -97,7 +97,7 @@ export function TenantCard({
               </Text>
             </View>
             <Text
-              className="mt-1.5 font-ralewayBold text-2xl tracking-tight text-[#2563EB]"
+              className="mt-1.5 font-ralewayBold text-2xl tracking-tight text-primary"
               numberOfLines={1}
               adjustsFontSizeToFit
             >
@@ -117,7 +117,7 @@ export function TenantCard({
               </Text>
             </View>
             <Text
-              className="mt-1.5 text-sm font-ralewaySemiBold leading-5 text-[#1d1d1f]"
+              className="mt-1.5 text-sm font-ralewaySemiBold leading-5 text-textPrimary"
               numberOfLines={2}
             >
               {propertyNames.length > 0

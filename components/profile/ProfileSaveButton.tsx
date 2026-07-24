@@ -25,7 +25,7 @@ export function ProfileSaveButton({
       accessibilityState={{ disabled, busy: isSaving }}
       activeOpacity={0.82}
       className={`mt-5 h-14 flex-row items-center justify-center rounded-2xl ${
-        disabled ? "bg-slate-300" : "bg-blue-600"
+        disabled ? "bg-slate-300" : "bg-primary"
       }`}
       disabled={disabled}
       onPress={onPress}

@@ -23,7 +23,7 @@ export function DocumentModuleState({
         accessibilityRole="progressbar"
         className="h-52 items-center justify-center rounded-[24px] border border-slate-200 bg-white"
       >
-        <ActivityIndicator color="#2563EB" />
+        <ActivityIndicator color="#634CE4" />
         <Text className="mt-3 font-ralewaySemiBold text-sm text-slate-500">
           Loading documents
         </Text>
@@ -81,10 +81,10 @@ function StateCard({
 }) {
   return (
     <View className="items-center rounded-[24px] border border-dashed border-slate-300 bg-white p-8">
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
-        <MaterialCommunityIcons name={icon} color="#2563EB" size={28} />
+      <View className="bg-secondary/20 h-14 w-14 items-center justify-center rounded-2xl">
+        <MaterialCommunityIcons name={icon} color="#634CE4" size={28} />
       </View>
-      <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-slate-950">
+      <Text className="font-ralewayExtraBold text-textPrimary mt-4 text-center text-lg">
         {title}
       </Text>
       <Text className="mt-2 text-center font-ralewayMedium text-sm leading-6 text-slate-500">
@@ -93,10 +93,12 @@ function StateCard({
       <TouchableOpacity
         accessibilityRole="button"
         activeOpacity={0.85}
-        className="mt-5 min-h-12 justify-center rounded-2xl bg-blue-600 px-5"
+        className="mt-5 min-h-12 justify-center rounded-2xl bg-primary px-5"
         onPress={onAction}
       >
-        <Text className="font-ralewayExtraBold text-sm text-white">{actionLabel}</Text>
+        <Text className="font-ralewayExtraBold text-sm text-white">
+          {actionLabel}
+        </Text>
       </TouchableOpacity>
     </View>
   );

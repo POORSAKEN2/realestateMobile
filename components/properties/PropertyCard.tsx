@@ -13,10 +13,12 @@ import PropertyImageGallery from "./PropertyImageGallery";
 function PropertyMetric({ label, value }: { label: string; value: string }) {
   return (
     <View className="min-w-0 flex-1">
-      <Text className="text-xs font-ralewaySemiBold text-slate-600">{label}</Text>
+      <Text className="font-ralewaySemiBold text-xs text-slate-600">
+        {label}
+      </Text>
       <Text
         adjustsFontSizeToFit
-        className="mt-1 font-ralewayBold text-sm text-[#1d1d1f]"
+        className="text-textPrimary mt-1 font-ralewayBold text-sm"
         numberOfLines={1}
       >
         {value}
@@ -42,18 +44,18 @@ function PropertyAction({
       accessibilityRole="button"
       activeOpacity={0.8}
       className={`min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl px-3 ${
-        primary ? "bg-[#2563EB]" : "bg-[#2563EB]/10"
+        primary ? "bg-primary" : "bg-secondary/20"
       }`}
       onPress={onPress}
     >
       <MaterialCommunityIcons
         name={icon}
-        color={primary ? "#FFFFFF" : "#2563EB"}
+        color={primary ? "#FFFFFF" : "#634CE4"}
         size={17}
       />
       <Text
-        className={`text-xs font-ralewayExtraBold ${
-          primary ? "text-white" : "text-[#2563EB]"
+        className={`font-ralewayExtraBold text-xs ${
+          primary ? "text-white" : "text-primary"
         }`}
       >
         {label}
@@ -122,21 +124,21 @@ export function PropertyCard({
               color="#64748B"
               size={30}
             />
-            <Text className="mt-2 text-xs font-ralewayBold text-slate-600">
+            <Text className="mt-2 font-ralewayBold text-xs text-slate-600">
               No property image
             </Text>
           </View>
         )}
 
         <View className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1.5 shadow-sm">
-          <Text className="text-xs font-ralewayBold text-slate-800">
+          <Text className="font-ralewayBold text-xs text-slate-800">
             {property.type ?? "Property"}
           </Text>
         </View>
 
         {propertyImages.length > 1 ? (
           <View className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1.5">
-            <Text className="text-xs font-ralewayBold text-white">
+            <Text className="font-ralewayBold text-xs text-white">
               {activeImageIndex + 1} of {propertyImages.length}
             </Text>
           </View>
@@ -154,7 +156,7 @@ export function PropertyCard({
         <View className="flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
             <Text
-              className="font-ralewayBold text-lg text-[#1d1d1f]"
+              className="text-textPrimary font-ralewayBold text-lg"
               numberOfLines={1}
             >
               {property.title}
@@ -166,7 +168,7 @@ export function PropertyCard({
                 size={16}
               />
               <Text
-                className="min-w-0 flex-1 text-sm font-ralewaySemiBold text-slate-600"
+                className="min-w-0 flex-1 font-ralewaySemiBold text-sm text-slate-600"
                 numberOfLines={1}
               >
                 {property.location}
@@ -181,7 +183,7 @@ export function PropertyCard({
               className={`h-2 w-2 rounded-full ${statusTone.dotClassName}`}
             />
             <Text
-              className={`text-xs font-ralewayBold ${statusTone.textClassName}`}
+              className={`font-ralewayBold text-xs ${statusTone.textClassName}`}
               numberOfLines={1}
             >
               {formatStatus(property.status)}
@@ -209,7 +211,7 @@ export function PropertyCard({
                   color="#475569"
                   size={18}
                 />
-                <Text className="text-sm font-ralewayBold text-slate-700">
+                <Text className="font-ralewayBold text-sm text-slate-700">
                   {property.bedrooms}
                 </Text>
               </View>
@@ -224,7 +226,7 @@ export function PropertyCard({
                   color="#475569"
                   size={18}
                 />
-                <Text className="text-sm font-ralewayBold text-slate-700">
+                <Text className="font-ralewayBold text-sm text-slate-700">
                   {property.bathrooms}
                 </Text>
               </View>

@@ -40,7 +40,7 @@ export function ProfileField({
   const borderClassName = error
     ? "border-red-400 bg-red-50/40"
     : isFocused
-      ? "border-blue-500 bg-white"
+      ? "border-primary bg-white"
       : "border-slate-200 bg-slate-50";
 
   return (
@@ -59,12 +59,12 @@ export function ProfileField({
       >
         <Ionicons
           name={icon}
-          color={error ? "#DC2626" : isFocused ? "#2563EB" : "#64748B"}
+          color={error ? "#DC2626" : isFocused ? "#634CE4" : "#64748B"}
           size={20}
         />
         <TextInput
           accessibilityLabel={label}
-          className="ml-3 min-h-14 flex-1 font-ralewaySemiBold text-base text-slate-950"
+          className="ml-3 min-h-14 flex-1 font-ralewaySemiBold text-base text-textPrimary"
           value={value}
           onChangeText={onChangeText}
           onBlur={() => setIsFocused(false)}

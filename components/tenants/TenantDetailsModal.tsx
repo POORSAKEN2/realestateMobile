@@ -19,11 +19,11 @@ export function TenantDetailsModal({
       transparent
       visible={Boolean(tenant)}
     >
-      <View className="flex-1 justify-end bg-[#1d1d1f]/40">
+      <View className="bg-textPrimary/40 flex-1 justify-end">
         <View className="rounded-t-[32px] bg-white p-6">
           <View className="flex-row items-start justify-between gap-4">
             <View className="flex-1">
-              <Text className="text-2xl font-ralewayExtraBold text-[#1d1d1f]">
+              <Text className="font-ralewayExtraBold text-textPrimary text-2xl">
                 {tenant?.name}
               </Text>
               <Text className="mt-1 text-sm text-[#6F6D6D]">
@@ -33,11 +33,11 @@ export function TenantDetailsModal({
                 {tenant?.phone || "No phone on file"}
               </Text>
               {linkedLeaseCount !== undefined ? (
-                <View className="mt-5 rounded-2xl bg-[#2563EB]/5 p-4">
-                  <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wide text-[#6F6D6D]">
+                <View className="bg-secondary/20 mt-5 rounded-2xl p-4">
+                  <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-[#6F6D6D]">
                     Active Records
                   </Text>
-                  <Text className="mt-1 text-base font-ralewayExtraBold text-[#1d1d1f]">
+                  <Text className="font-ralewayExtraBold text-textPrimary mt-1 text-base">
                     {linkedLeaseCount} linked leases
                   </Text>
                 </View>
@@ -45,10 +45,10 @@ export function TenantDetailsModal({
             </View>
             <TouchableOpacity
               accessibilityLabel="Close tenant details"
-              className="h-10 w-10 items-center justify-center rounded-full bg-[#1d1d1f]/5"
+              className="bg-textPrimary/5 h-10 w-10 items-center justify-center rounded-full"
               onPress={onClose}
             >
-              <Ionicons name="close" color="#1d1d1f" size={20} />
+              <Ionicons name="close" color="#1E1F45" size={20} />
             </TouchableOpacity>
           </View>
         </View>

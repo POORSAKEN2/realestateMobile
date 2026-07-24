@@ -55,23 +55,23 @@ export function BookingGuestFields({
         accessibilityRole="button"
         className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 py-3 ${
           isAddingGuest
-            ? "border-[#2563EB]/30 bg-[#2563EB]/10"
+            ? "bg-secondary/20 border-primary/30"
             : "border-slate-200 bg-slate-50"
         }`}
         onPress={onToggleAddingGuest}
       >
         <View className="min-w-0 flex-1 flex-row items-center gap-3">
-          <View className="h-9 w-9 items-center justify-center rounded-xl bg-[#2563EB]/10">
+          <View className="bg-secondary/20 h-9 w-9 items-center justify-center rounded-xl">
             <MaterialCommunityIcons
               name={
                 isAddingGuest ? "account-check-outline" : "account-plus-outline"
               }
-              color="#2563EB"
+              color="#634CE4"
               size={19}
             />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="text-sm font-ralewayExtraBold text-[#1d1d1f]">
+            <Text className="font-ralewayExtraBold text-textPrimary text-sm">
               {isAddingGuest ? "Entering a new guest" : "Guest not listed?"}
             </Text>
             <Text className="mt-0.5 text-xs leading-4 text-slate-600">
@@ -81,7 +81,7 @@ export function BookingGuestFields({
             </Text>
           </View>
         </View>
-        <Text className="ml-3 text-xs font-ralewayExtraBold text-[#2563EB]">
+        <Text className="font-ralewayExtraBold ml-3 text-xs text-primary">
           {isAddingGuest ? "Cancel" : "Add"}
         </Text>
       </TouchableOpacity>
