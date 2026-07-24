@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 
+import { REGISTRATION_STEPS } from "../../../constants/registration";
 import { Screen } from "../../ui/Screen";
 
 type RegistrationStepLayoutProps = PropsWithChildren<{
@@ -28,8 +29,6 @@ type RegistrationStepLayoutProps = PropsWithChildren<{
   title: string;
 }>;
 
-const STEP_COUNT = 4;
-
 export function RegistrationStepLayout({
   buttonDisabled = false,
   buttonLabel,
@@ -42,6 +41,7 @@ export function RegistrationStepLayout({
   subtitle,
   title,
 }: RegistrationStepLayoutProps) {
+  const stepCount = REGISTRATION_STEPS.length;
   const isButtonDisabled = buttonDisabled || isLoading;
 
   return (
@@ -63,16 +63,18 @@ export function RegistrationStepLayout({
             <Feather name="arrow-left" size={21} color="#173f3b" />
           </Pressable>
           <Text className="font-ralewayBold text-xs uppercase tracking-[2px] text-[#708080]">
-            Step {stepIndex + 1} of {STEP_COUNT}
+            Step {stepIndex + 1} of {stepCount}
           </Text>
         </View>
 
         <View className="mt-6 flex-row gap-2">
-          {Array.from({ length: STEP_COUNT }, (_, index) => (
+          {REGISTRATION_STEPS.map((step) => (
             <View
-              key={index}
+              key={step}
               className={`h-1 flex-1 rounded-full ${
-                index <= stepIndex ? "bg-[#2563EB]" : "bg-[#dfe5e5]"
+                REGISTRATION_STEPS.indexOf(step) <= stepIndex
+                  ? "bg-[#2563EB]"
+                  : "bg-[#dfe5e5]"
               }`}
             />
           ))}
@@ -146,7 +148,7 @@ export function RegistrationStepLayout({
               </Text>
               <Feather
                 className="ml-2"
-                name={stepIndex === STEP_COUNT - 1 ? "check" : "arrow-right"}
+                name={stepIndex === stepCount - 1 ? "check" : "arrow-right"}
                 size={19}
                 color="#ffffff"
               />

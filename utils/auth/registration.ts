@@ -3,6 +3,13 @@ import type { RegisterFormData, RegistrationDraft } from "../../types";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VERIFICATION_CODE_PATTERN = /^\d{6}$/;
 
+export function getRegistrationErrorMessage(
+  error: unknown,
+  fallback = "Registration failed. Please try again.",
+) {
+  return error instanceof Error ? error.message : fallback;
+}
+
 export function validateRegistrationCredentials(
   email: string,
   password: string,
