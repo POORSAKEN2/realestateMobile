@@ -1,6 +1,6 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import { Link, router, Stack } from "expo-router";
+import { Link, router, Stack, type Href } from "expo-router";
 import { useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -253,6 +253,23 @@ export default function RegisterScreen() {
                   Create Account
                 </Text>
               )}
+            </Pressable>
+
+            <Pressable
+              accessibilityHint="Opens the temporary email verification preview"
+              accessibilityLabel="Preview email verification"
+              accessibilityRole="button"
+              className="mt-3 h-[48px] items-center justify-center rounded-[12px] border border-dashed border-[#2563EB] bg-[#eff6ff] active:bg-[#dbeafe]"
+              onPress={() =>
+                router.push({
+                  pathname: "/(auth)/email-verification",
+                  params: { email: formData.email },
+                } as Href)
+              }
+            >
+              <Text className="font-ralewayBold text-sm text-[#2563EB]">
+                Preview Email Verification
+              </Text>
             </Pressable>
 
             <View className="my-5 flex flex-row items-center justify-between">
