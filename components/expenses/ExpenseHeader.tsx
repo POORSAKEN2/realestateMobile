@@ -17,9 +17,9 @@ export function ExpenseHeader({ onAddExpense }: ExpenseHeaderProps) {
       </Text>
       <AddButton
         onPress={onAddExpense}
-        title="New Expense"
+        title="Record"
         className="min-h-11 flex-row items-center gap-2 rounded-[15px] bg-primary px-4 py-3 shadow-lg shadow-primary/30"
-        textClassName="font-ralewayBold text-[12px] uppercase text-white"
+        textClassName="font-ralewayBold text-[12px] text-white"
       />
     </View>
   );

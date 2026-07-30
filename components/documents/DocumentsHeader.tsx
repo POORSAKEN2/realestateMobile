@@ -30,7 +30,9 @@ export function DocumentsHeader({
         onPress={onUpload}
       >
         <MaterialCommunityIcons name="plus" color="#FFFFFF" size={21} />
-        <Text className="font-ralewayExtraBold text-sm text-white">Upload</Text>
+        <Text className="font-ralewayExtraBold text-xs uppercase text-white">
+          Upload
+        </Text>
       </TouchableOpacity>
     </View>
   );

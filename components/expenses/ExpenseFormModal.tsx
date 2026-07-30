@@ -92,13 +92,13 @@ export function ExpenseFormModal({
       formError={formError}
       showCancelAction
     >
-      <View className="flex-row items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3.5">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-primary bg-secondary/10 px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
-          color="#2563EB"
+          color="#634CE4"
           size={20}
         />
-        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-[#1E40AF]">
+        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-primary">
           Link each expense to a property for accurate reporting.
         </Text>
       </View>
