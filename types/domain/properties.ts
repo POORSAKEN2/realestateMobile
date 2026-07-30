@@ -1,3 +1,5 @@
+import type { FloorPlan } from "./floorplans";
+
 export const PROPERTY_TAXONOMY = {
   Residential: [
     "Single Family Home",
@@ -42,6 +44,8 @@ export type Property = {
   images?: string[];
   parentId?: string;
   isTransientBookable?: boolean;
+  totalUnits?: number;
+  floorplans?: FloorPlan[];
 };
 
 export type PropertyImageUpload = {
@@ -73,7 +77,10 @@ export type CreatePropertyPayload = {
   images?: PropertyImageUpload[];
 };
 
-export type UpdatePropertyPayload = Omit<CreatePropertyPayload, "image" | "images"> & {
+export type UpdatePropertyPayload = Omit<
+  CreatePropertyPayload,
+  "image" | "images"
+> & {
   image?: PropertyImageUpload | string;
   images?: Array<PropertyImageUpload | string>;
   retained_images?: string[];

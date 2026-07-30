@@ -1,0 +1,114 @@
+import Feather from "@expo/vector-icons/Feather";
+import { Text, TouchableOpacity, View } from "react-native";
+
+import type { FloorPlan, PropertyRoom } from "../../types";
+
+export function PropertyFloorSummary({
+  floorPlans,
+  isLoading,
+  onManage,
+  rooms,
+}: {
+  floorPlans: FloorPlan[];
+  isLoading: boolean;
+  onManage: () => void;
+  rooms: PropertyRoom[];
+}) {
+  const totalAreas = floorPlans.reduce(
+    (total, floor) => total + floor.areas.length,
+    0,
+  );
+
+  return (
+    <View className="mt-6 border-t border-zinc-100 pt-5">
+      <View className="flex-row items-center justify-between gap-3">
+        <View className="min-w-0 flex-1">
+          <Text className="font-ralewayBold text-xs uppercase text-zinc-400">
+            Floor Summary
+          </Text>
+          <Text className="mt-1 text-xs text-zinc-500">
+            {floorPlans.length} {floorPlans.length === 1 ? "floor" : "floors"} ·{" "}
+            {totalAreas} areas
+          </Text>
+        </View>
+        <TouchableOpacity
+          accessibilityLabel="Manage property floor plans"
+          accessibilityRole="button"
+          activeOpacity={0.8}
+          className="h-10 flex-row items-center gap-1.5 rounded-xl bg-secondary/20 px-3"
+          onPress={onManage}
+        >
+          <Feather name="grid" color="#634CE4" size={15} />
+          <Text className="font-ralewayBold text-[10px] text-primary">
+            Manage
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View className="mt-3 gap-2">
+        {isLoading ? (
+          <View className="h-20 rounded-2xl bg-zinc-50" />
+        ) : floorPlans.length ? (
+          floorPlans.map((floor) => {
+            const areaIds = new Set(floor.areas.map((area) => area.id));
+            const floorRooms = rooms.filter(
+              (room) =>
+                room.floor === floor.name ||
+                (room.areaId ? areaIds.has(room.areaId) : false),
+            );
+            const occupied = floorRooms.filter(
+              (room) => room.status === "Occupied",
+            ).length;
+            const vacant = floorRooms.filter(
+              (room) => room.status === "Vacant",
+            ).length;
+
+            return (
+              <View
+                className="rounded-2xl border border-secondary/20 bg-secondary/10 p-3"
+                key={floor.id}
+              >
+                <View className="flex-row items-center gap-3">
+                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+                    <Feather name="layers" color="#634CE4" size={17} />
+                  </View>
+                  <View className="min-w-0 flex-1">
+                    <Text
+                      className="font-ralewayBold text-sm text-zinc-950"
+                      numberOfLines={1}
+                    >
+                      {floor.name}
+                    </Text>
+                    <Text className="mt-0.5 text-[11px] text-zinc-500">
+                      {floor.areas.length}{" "}
+                      {floor.areas.length === 1 ? "area" : "areas"} ·{" "}
+                      {floorRooms.length} rooms
+                    </Text>
+                  </View>
+                  <View className="items-end">
+                    <Text className="font-ralewayBold text-[9px] text-teal-700">
+                      {vacant} vacant
+                    </Text>
+                    <Text className="mt-1 font-ralewayBold text-[9px] text-primary">
+                      {occupied} occupied
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            );
+          })
+        ) : (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5"
+            onPress={onManage}
+          >
+            <Text className="font-ralewayBold text-xs text-zinc-600">
+              No floors yet. Add first floor plan.
+            </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+}

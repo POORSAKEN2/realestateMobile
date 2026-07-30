@@ -1,4 +1,5 @@
 import { API_BASE_URL, apiClient, authHeaders, unwrapData } from "./client";
+import { normalizeFloorPlan } from "./floorplans";
 import type {
   ApiEnvelope,
   CreatePropertyPayload,
@@ -167,6 +168,17 @@ function normalizeProperty(property: Record<string, any>): Property {
         property?.transient_bookable ??
         false,
     ),
+    totalUnits:
+      property?.totalUnits !== undefined && property?.totalUnits !== null
+        ? Number(property.totalUnits)
+        : property?.total_units !== undefined && property?.total_units !== null
+          ? Number(property.total_units)
+          : undefined,
+    floorplans: Array.isArray(property?.floorplans)
+      ? property.floorplans.map((floorPlan: Record<string, any>) =>
+          normalizeFloorPlan(floorPlan),
+        )
+      : [],
   };
 }
 

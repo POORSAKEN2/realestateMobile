@@ -14,6 +14,18 @@ export type {
 } from "./auth";
 export type { PortfolioSnapshot, PortfolioStats } from "./domain/analytics";
 export type {
+  FloorArea,
+  FloorAreaPayload,
+  FloorPlan,
+  FloorPlanDrawingMode,
+  FloorPlanImageUpload,
+  FloorPlanPayload,
+  FloorPlanPoint,
+  PropertyRoom,
+  PropertyRoomPayload,
+  PropertyRoomStatus,
+} from "./domain/floorplans";
+export type {
   CreatePropertyPayload,
   Property,
   PropertyClassification,

@@ -18,7 +18,7 @@ function PropertyMetric({ label, value }: { label: string; value: string }) {
       </Text>
       <Text
         adjustsFontSizeToFit
-        className="text-textPrimary mt-1 font-ralewayBold text-sm"
+        className="mt-1 font-ralewayBold text-sm text-textPrimary"
         numberOfLines={1}
       >
         {value}
@@ -67,10 +67,12 @@ function PropertyAction({
 export function PropertyCard({
   property,
   onEdit,
+  onOpenFloorPlans,
   onOpenBookings,
 }: {
   property: Property;
   onEdit: () => void;
+  onOpenFloorPlans: () => void;
   onOpenBookings?: () => void;
 }) {
   const occupancy = property.occupancy ?? 0;
@@ -79,6 +81,11 @@ export function PropertyCard({
   const [imageWidth, setImageWidth] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
+  const floorPlans = property.floorplans ?? [];
+  const floorAreaCount = floorPlans.reduce(
+    (total, floor) => total + floor.areas.length,
+    0,
+  );
 
   return (
     <View className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -156,7 +163,7 @@ export function PropertyCard({
         <View className="flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
             <Text
-              className="text-textPrimary font-ralewayBold text-lg"
+              className="font-ralewayBold text-lg text-textPrimary"
               numberOfLines={1}
             >
               {property.title}
@@ -198,6 +205,37 @@ export function PropertyCard({
           <View className="w-px bg-slate-200" />
           <PropertyMetric label="Occupancy" value={`${occupancy}%`} />
         </View>
+
+        <TouchableOpacity
+          accessibilityLabel={`Manage floor plans for ${property.title}`}
+          accessibilityRole="button"
+          activeOpacity={0.82}
+          className="mt-4 flex-row items-center gap-3 rounded-2xl border border-secondary/25 bg-secondary/10 p-3.5"
+          onPress={onOpenFloorPlans}
+        >
+          <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+            <MaterialCommunityIcons
+              name="floor-plan"
+              color="#634CE4"
+              size={21}
+            />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="font-ralewayBold text-xs uppercase text-primary">
+              Floor summary
+            </Text>
+            <Text className="mt-1 text-xs text-slate-600">
+              {floorPlans.length
+                ? `${floorPlans.length} ${floorPlans.length === 1 ? "floor" : "floors"} · ${floorAreaCount} ${floorAreaCount === 1 ? "area" : "areas"}`
+                : "No floors added yet"}
+            </Text>
+          </View>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            color="#634CE4"
+            size={21}
+          />
+        </TouchableOpacity>
 
         <View className="mt-4 flex-row items-center gap-2">
           <View className="min-w-0 flex-1 flex-row items-center gap-3">

@@ -1,5 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useMemo } from "react";
 import {
   Dimensions,
@@ -17,6 +18,7 @@ import {
   fetchLeases,
   fetchLessees,
 } from "../../api/propertyDetails";
+import { useFloorPlanQueries } from "../../hooks/api/useFloorPlans";
 import type { Property } from "../../types";
 import {
   formatPesoValue,
@@ -25,6 +27,7 @@ import {
   openPropertyDocument,
 } from "../../utils/dashboard/dashboardHelpers";
 import { getPropertyImages } from "../../utils/properties/propertyPresentation";
+import { PropertyFloorSummary } from "./PropertyFloorSummary";
 
 export function PropertyDetailsModal({
   accessToken,
@@ -36,6 +39,7 @@ export function PropertyDetailsModal({
   property: Property | null;
 }) {
   const { height, width } = Dimensions.get("window");
+  const router = useRouter();
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),
@@ -51,6 +55,9 @@ export function PropertyDetailsModal({
     queryFn: () => fetchDocuments(accessToken, { propertyId: property?.id }),
     enabled: Boolean(property),
   });
+  const floorPlanQueries = useFloorPlanQueries(property?.id ?? "", accessToken);
+  const floorPlans = floorPlanQueries.floorPlans.data ?? [];
+  const rooms = floorPlanQueries.rooms.data ?? [];
 
   const propertyLeases = useMemo(
     () =>
@@ -215,6 +222,25 @@ export function PropertyDetailsModal({
                   />
                 </View>
 
+                <PropertyFloorSummary
+                  floorPlans={floorPlans}
+                  isLoading={
+                    floorPlanQueries.floorPlans.isLoading ||
+                    floorPlanQueries.rooms.isLoading
+                  }
+                  onManage={() => {
+                    onClose();
+                    router.push({
+                      pathname: "/(tabs)/floorplans",
+                      params: {
+                        propertyId: property.id,
+                        propertyTitle: property.title,
+                      },
+                    });
+                  }}
+                  rooms={rooms}
+                />
+
                 <DetailsSection title="Current Tenants">
                   {isLoading ? (
                     <View className="h-16 rounded-2xl bg-zinc-50" />
@@ -338,7 +364,7 @@ function DetailMetric({
         </Text>
         <Text
           adjustsFontSizeToFit
-          className={`mt-1 text-lg font-ralewayExtraBold ${accent ? "text-emerald-700" : "text-zinc-950"}`}
+          className={`mt-1 font-ralewayExtraBold text-lg ${accent ? "text-emerald-700" : "text-zinc-950"}`}
           numberOfLines={1}
         >
           {value}
@@ -367,7 +393,7 @@ function CountMetric({
           {label}
         </Text>
       </View>
-      <Text className="mt-2 text-2xl font-ralewayExtraBold text-zinc-950">
+      <Text className="mt-2 font-ralewayExtraBold text-2xl text-zinc-950">
         {loading ? "..." : value}
       </Text>
     </View>

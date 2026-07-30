@@ -141,6 +141,10 @@ export default function TabsLayout() {
           name="notificationScreen"
           options={{ href: null, title: "Notifications" }}
         />
+        <Tabs.Screen
+          name="floorplans"
+          options={{ href: null, title: "Floor Plans" }}
+        />
       </Tabs>
 
       <MoreBottomSheet
