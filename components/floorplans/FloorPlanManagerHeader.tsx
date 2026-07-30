@@ -1,6 +1,9 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
+import { BackButton } from "../ui/buttons/BackButton";
+import { ModuleHeader } from "../ui/ModuleHeader";
+
 export function FloorPlanManagerHeader({
   floorCount,
   notice,
@@ -22,31 +25,29 @@ export function FloorPlanManagerHeader({
 }) {
   return (
     <>
-      <View className="flex-row items-center gap-3">
-        <TouchableOpacity
-          accessibilityLabel="Back to properties"
-          className="h-11 w-11 items-center justify-center rounded-2xl bg-white"
-          onPress={onBack}
-        >
-          <Feather name="arrow-left" color="#1E1F45" size={20} />
-        </TouchableOpacity>
-        <View className="min-w-0 flex-1">
-          <Text className="font-ralewayBold text-2xl text-textPrimary">
-            Floor Plan Manager
-          </Text>
-          <Text className="mt-0.5 text-xs text-slate-500" numberOfLines={1}>
-            {propertyTitle}
-          </Text>
-        </View>
-        <TouchableOpacity
-          accessibilityLabel="Add floor"
-          className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary px-4"
-          onPress={onAddFloor}
-        >
-          <Feather name="plus" color="#FFFFFF" size={17} />
-          <Text className="font-ralewayBold text-xs text-white">Floor</Text>
-        </TouchableOpacity>
-      </View>
+      <ModuleHeader
+        action={
+          <TouchableOpacity
+            accessibilityLabel="Add floor"
+            accessibilityRole="button"
+            className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary px-3.5"
+            onPress={onAddFloor}
+          >
+            <Feather name="plus" color="#FFFFFF" size={17} />
+            <Text className="font-ralewayBold text-xs text-white">Floor</Text>
+          </TouchableOpacity>
+        }
+        eyebrow="Property Layout"
+        leading={
+          <BackButton
+            accessibilityLabel="Back to properties"
+            onPress={onBack}
+            variant="secondary"
+          />
+        }
+        supportingText={propertyTitle}
+        title="Floor Plans"
+      />
 
       <View className="mt-4 flex-row gap-2">
         <SummaryPill

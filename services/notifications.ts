@@ -9,6 +9,7 @@ import type {
   PushTokenPlatform,
   RegisterPushTokenPayload,
 } from "../types";
+import { resolveModuleRoute } from "../constants/navigation";
 
 type NotificationsModule = typeof import("expo-notifications");
 
@@ -91,10 +92,11 @@ function getNotificationRoute(data?: PushNotificationData) {
 
 export function openNotificationTarget(data?: PushNotificationData) {
   const route = getNotificationRoute(data);
+  const targetRoute = resolveModuleRoute(route);
 
-  if (!route) return;
+  if (!targetRoute) return;
 
-  router.push(route as never);
+  router.push(targetRoute);
 }
 
 export async function getRegisterPushTokenPayload(): Promise<RegisterPushTokenPayload | null> {

@@ -21,6 +21,7 @@ import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
 import { useAuth } from "../../hooks/useAuth";
 import type { Property } from "../../types";
 import { router } from "expo-router";
+import { appRoutes } from "../../constants/navigation";
 import PropertyImageGallery from "../../components/properties/PropertyImageGallery";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import {
@@ -206,7 +207,7 @@ export default function DashboardScreen() {
             accessibilityLabel="Open notifications"
             hitSlop={10}
             className="relative overflow-hidden rounded-full border border-white/45 bg-white/10"
-            onPress={() => router.push("/(tabs)/notificationScreen")}
+            onPress={() => router.push(appRoutes.secondary.notifications)}
             style={{
               width: 45,
               height: 45,
@@ -363,7 +364,7 @@ export default function DashboardScreen() {
         <View>
           <TouchableOpacity
             className="bg-teal-50"
-            onPress={() => router.navigate("/(tabs)/mapCanvas")}
+            onPress={() => router.navigate(appRoutes.secondary.map)}
           >
             <Feather name="map" color="teal-500" />
           </TouchableOpacity>

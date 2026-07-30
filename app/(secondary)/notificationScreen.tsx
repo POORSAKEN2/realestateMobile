@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type Href, router } from "expo-router";
+import { router } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
@@ -16,7 +16,10 @@ import {
   markNotificationRead,
 } from "../../api/notifications";
 import { Screen } from "../../components/ui/Screen";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { colors } from "../../constants/colors";
+import { resolveModuleRoute } from "../../constants/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import type { AppNotification } from "../../types";
 
@@ -71,14 +74,6 @@ function formatTimestamp(value?: string | null) {
     month: "short",
     day: "numeric",
   }).format(date);
-}
-
-function normalizeRoute(route?: string | null) {
-  if (!route) return null;
-
-  if (route.startsWith("/(tabs)/")) return route as Href;
-
-  return `/(tabs)${route.startsWith("/") ? route : `/${route}`}` as Href;
 }
 
 function EmptyState({ onRefresh }: { onRefresh: () => void }) {
@@ -209,7 +204,7 @@ export default function NotificationScreen() {
       markReadMutation.mutate(notification.id);
     }
 
-    const targetRoute = normalizeRoute(notification.actionUrl);
+    const targetRoute = resolveModuleRoute(notification.actionUrl);
 
     if (targetRoute) {
       router.push(targetRoute);
@@ -220,48 +215,45 @@ export default function NotificationScreen() {
 
   return (
     <Screen className="bg-[#F8FAFC]">
-      <View className="mb-5 flex-row items-center justify-between gap-4">
-        <TouchableOpacity
-          activeOpacity={0.8}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          className="h-11 w-11 items-center justify-center rounded-full border border-[#E2E8F0] bg-white"
-          onPress={() => router.back()}
-        >
-          <Ionicons name="chevron-back" size={22} color="#1d1d1f" />
-        </TouchableOpacity>
-
-        <View className="min-w-0 flex-1">
-          <Text className="text-2xl font-ralewayBold text-[#1d1d1f]">
-            Notifications
-          </Text>
-          <Text className="mt-1 text-sm text-[#6F6D6D]">
-            {unreadCount > 0 ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}` : "You're all caught up"}
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          activeOpacity={0.82}
-          accessibilityRole="button"
-          accessibilityLabel="Mark all notifications as read"
-          className={`h-11 w-11 items-center justify-center rounded-full border ${
+      <View className="mb-5">
+        <ModuleHeader
+          action={
+            <TouchableOpacity
+              activeOpacity={0.82}
+              accessibilityRole="button"
+              accessibilityLabel="Mark all notifications as read"
+              className={`h-11 w-11 items-center justify-center rounded-full border ${
+                unreadCount > 0
+                  ? "border-primary/25 bg-primary/10"
+                  : "border-accent bg-whitePrimary"
+              }`}
+              disabled={unreadCount === 0 || markAllReadMutation.isPending}
+              onPress={() => markAllReadMutation.mutate()}
+            >
+              {markAllReadMutation.isPending ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <Ionicons
+                  name="checkmark-done"
+                  size={21}
+                  color={
+                    unreadCount > 0 ? colors.primary : colors.description
+                  }
+                />
+              )}
+            </TouchableOpacity>
+          }
+          eyebrow="Activity Center"
+          leading={
+            <SecondaryBackButton accessibilityLabel="Back from notifications" />
+          }
+          supportingText={
             unreadCount > 0
-              ? "border-[#BFDBFE] bg-[#EFF6FF]"
-              : "border-[#E2E8F0] bg-white"
-          }`}
-          disabled={unreadCount === 0 || markAllReadMutation.isPending}
-          onPress={() => markAllReadMutation.mutate()}
-        >
-          {markAllReadMutation.isPending ? (
-            <ActivityIndicator size="small" color={colors.primary} />
-          ) : (
-            <Ionicons
-              name="checkmark-done"
-              size={21}
-              color={unreadCount > 0 ? colors.primary : "#94A3B8"}
-            />
-          )}
-        </TouchableOpacity>
+              ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}`
+              : "You're all caught up"
+          }
+          title="Notifications"
+        />
       </View>
 
       {notificationsQuery.isError ? (

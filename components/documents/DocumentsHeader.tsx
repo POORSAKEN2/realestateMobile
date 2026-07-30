@@ -1,5 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
+
+import { SecondaryBackButton } from "../navigation/SecondaryBackButton";
+import { ModuleHeader } from "../ui/ModuleHeader";
 
 export function DocumentsHeader({
   documentCount,
@@ -9,31 +12,29 @@ export function DocumentsHeader({
   onUpload: () => void;
 }) {
   return (
-    <View className="flex-row items-start justify-between gap-4">
-      <View className="min-w-0 flex-1">
-        <Text
-          accessibilityRole="header"
-          className="font-ralewayExtraBold text-[30px] leading-10 text-textPrimary"
+    <ModuleHeader
+      action={
+        <TouchableOpacity
+          accessibilityLabel="Upload document"
+          accessibilityRole="button"
+          activeOpacity={0.85}
+          className="min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl bg-primary px-3.5"
+          onPress={onUpload}
         >
-          Documents
-        </Text>
-        <Text className="mt-1 font-ralewayMedium text-sm text-slate-500">
-          {documentCount} {documentCount === 1 ? "document" : "documents"}
-        </Text>
-      </View>
-
-      <TouchableOpacity
-        accessibilityLabel="Upload document"
-        accessibilityRole="button"
-        activeOpacity={0.85}
-        className="min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary px-4"
-        onPress={onUpload}
-      >
-        <MaterialCommunityIcons name="plus" color="#FFFFFF" size={21} />
-        <Text className="font-ralewayExtraBold text-xs uppercase text-white">
-          Upload
-        </Text>
-      </TouchableOpacity>
-    </View>
+          <MaterialCommunityIcons name="plus" color="#FFFFFF" size={20} />
+          <Text className="font-ralewayExtraBold text-xs text-white">
+            Upload
+          </Text>
+        </TouchableOpacity>
+      }
+      eyebrow="Portfolio Library"
+      leading={
+        <SecondaryBackButton accessibilityLabel="Back from documents" />
+      }
+      supportingText={`${documentCount} ${
+        documentCount === 1 ? "document" : "documents"
+      }`}
+      title="Documents"
+    />
   );
 }

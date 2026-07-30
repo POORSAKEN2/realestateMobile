@@ -112,39 +112,6 @@ export default function TabsLayout() {
             ),
           }}
         />
-        <Tabs.Screen
-          name="analytics"
-          options={{ href: null, title: "Analytics" }}
-        />
-        <Tabs.Screen name="leases" options={{ href: null, title: "Leases" }} />
-        <Tabs.Screen
-          name="tenants"
-          options={{ href: null, title: "Tenants" }}
-        />
-        <Tabs.Screen
-          name="documents"
-          options={{ href: null, title: "Documents" }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{ href: null, title: "Settings" }}
-        />
-        <Tabs.Screen
-          name="profile"
-          options={{ href: null, title: "Profile" }}
-        />
-        <Tabs.Screen
-          name="mapCanvas"
-          options={{ href: null, title: "mapcanvas" }}
-        />
-        <Tabs.Screen
-          name="notificationScreen"
-          options={{ href: null, title: "Notifications" }}
-        />
-        <Tabs.Screen
-          name="floorplans"
-          options={{ href: null, title: "Floor Plans" }}
-        />
       </Tabs>
 
       <MoreBottomSheet

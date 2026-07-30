@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { appRoutes } from "../../constants/navigation";
 
 import {
   fetchDocuments,
@@ -231,7 +232,7 @@ export function PropertyDetailsModal({
                   onManage={() => {
                     onClose();
                     router.push({
-                      pathname: "/(tabs)/floorplans",
+                      pathname: appRoutes.secondary.floorPlans,
                       params: {
                         propertyId: property.id,
                         propertyTitle: property.title,

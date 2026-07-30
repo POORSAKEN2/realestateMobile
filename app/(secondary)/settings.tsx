@@ -12,6 +12,8 @@ import {
 } from "react-native";
 
 import { Screen } from "../../components/ui/Screen";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { useAuth } from "../../hooks/useAuth";
 
 type PasswordFieldProps = {
@@ -133,12 +135,13 @@ export default function SettingsScreen() {
           contentContainerClassName="px-6 pb-10"
           showsVerticalScrollIndicator={false}
         >
-          <Text className="text-xs font-ralewayExtraBold uppercase tracking-widest text-slate-500">
-            Account
-          </Text>
-          <Text className="mt-2 text-3xl font-ralewayExtraBold text-slate-950">
-            Settings
-          </Text>
+          <ModuleHeader
+            eyebrow="Account"
+            leading={
+              <SecondaryBackButton accessibilityLabel="Back from settings" />
+            }
+            title="Settings"
+          />
           <Text className="mt-2 text-base leading-6 text-slate-500">
             Manage your password, account security, and secure access.
           </Text>

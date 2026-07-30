@@ -13,6 +13,8 @@ import Svg, {
 
 import { useProperties } from "../../hooks/api/useProperties";
 import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
@@ -363,19 +365,21 @@ export default function AnalyticsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
       >
-        <View className="flex-row items-center justify-between">
-          <View>
-            <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-slate-400">
-              Portfolio Intelligence
-            </Text>
-            <Text className="font-ralewayBold text-3xl text-[#1d1d1f]">
-              Analytics
-            </Text>
-          </View>
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#2563EB] shadow-md shadow-blue-200">
-            <Feather name="bar-chart-2" size={22} color="#FFFFFF" />
-          </View>
-        </View>
+        <ModuleHeader
+          action={
+            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-md shadow-primary/20">
+              <Feather name="bar-chart-2" size={22} color="#FFFFFF" />
+            </View>
+          }
+          eyebrow="Portfolio Intelligence"
+          leading={
+            <SecondaryBackButton
+              accessibilityLabel="Back from analytics"
+              variant="primary"
+            />
+          }
+          title="Analytics"
+        />
 
         <View className="mt-6 flex-row flex-wrap">
           {metricCards.map((card) => (
