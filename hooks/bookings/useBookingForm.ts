@@ -10,6 +10,7 @@ import {
   isBookingRangeValid,
   updateTransientBooking,
 } from "../../api/bookings";
+import { clientKeys } from "../api/useClients";
 import type {
   Lessee,
   Property,
@@ -101,7 +102,7 @@ export function useBookingForm({
     onSuccess: async (_, payload) => {
       await queryClient.invalidateQueries({ queryKey: ["transientBookings"] });
       await queryClient.invalidateQueries({ queryKey: ["leases"] });
-      await queryClient.invalidateQueries({ queryKey: ["lessees"] });
+      await queryClient.invalidateQueries({ queryKey: clientKeys.all });
       onSaved(payload);
       close();
     },

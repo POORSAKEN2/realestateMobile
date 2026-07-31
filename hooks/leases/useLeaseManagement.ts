@@ -8,7 +8,6 @@ import {
   createLease,
   deleteLease,
   fetchLeases,
-  fetchLessees,
   updateLease,
 } from "../../api/propertyDetails";
 import type { Lease, LeasePayload, Lessee } from "../../types";
@@ -21,6 +20,7 @@ import {
   type LeaseFormState,
 } from "../../utils/leases/leaseForm";
 import { useProperties } from "../api/useProperties";
+import { useClients } from "../api/useClients";
 import { useAuth } from "../useAuth";
 
 export function useLeaseManagement() {
@@ -44,11 +44,8 @@ export function useLeaseManagement() {
     queryFn: () => fetchLeases(accessToken),
     enabled: Boolean(accessToken),
   });
-  const { data: lessees = [], isLoading: isLoadingLessees } = useQuery({
-    queryKey: ["lessees", accessToken],
-    queryFn: () => fetchLessees(accessToken),
-    enabled: Boolean(accessToken),
-  });
+  const { data: lessees = [], isLoading: isLoadingLessees } =
+    useClients(accessToken);
   const { useList } = useProperties();
   const { data: properties = [], isLoading: isLoadingProperties } = useList();
 

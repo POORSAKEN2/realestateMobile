@@ -17,8 +17,15 @@ import { FloorPlanWorkspace } from "../../components/floorplans/FloorPlanWorkspa
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { Screen } from "../../components/ui/Screen";
 import { useFloorPlanManagerController } from "../../hooks/floorplans/useFloorPlanManagerController";
+import { useProperties } from "../../hooks/api/useProperties";
 import { useAuth } from "../../hooks/useAuth";
 import { deviceFloorPlanDependencies } from "../../services/floorplans/deviceFloorPlanServices";
+import {
+  getFloorManagerGuidance,
+  getRoomManagementGuidance,
+  isPropertyType,
+  resolveFloorManagerPolicy,
+} from "../../utils/properties/floorManagerPolicy";
 
 function firstParam(value?: string | string[]) {
   return Array.isArray(value) ? value[0] : (value ?? "");
@@ -53,14 +60,28 @@ export default function FloorPlansScreen() {
   const params = useLocalSearchParams<{
     propertyId?: string | string[];
     propertyTitle?: string | string[];
+    propertyType?: string | string[];
   }>();
   const propertyId = firstParam(params.propertyId);
-  const propertyTitle = firstParam(params.propertyTitle) || "Property";
+  const propertyTypeParam = firstParam(params.propertyType);
+  const fallbackPropertyType = isPropertyType(propertyTypeParam)
+    ? propertyTypeParam
+    : undefined;
   const { session } = useAuth();
+  const accessToken = session?.accessToken;
+  const { useDetail } = useProperties(accessToken);
+  const propertyQuery = useDetail(propertyId);
+  const property = propertyQuery.data;
+  const basePolicy = resolveFloorManagerPolicy({
+    backendCapabilities: property?.spatialCapabilities,
+    propertyType: property?.type ?? fallbackPropertyType,
+  });
   const controller = useFloorPlanManagerController({
-    accessToken: session?.accessToken,
+    accessToken,
     dependencies: deviceFloorPlanDependencies,
+    floorPlanCapability: basePolicy.floorPlans,
     propertyId,
+    roomCapability: basePolicy.rooms,
   });
 
   if (!propertyId) {
@@ -72,6 +93,14 @@ export default function FloorPlansScreen() {
   }
 
   const { actions, roomBatch } = controller;
+  const policy = resolveFloorManagerPolicy({
+    backendCapabilities: property?.spatialCapabilities,
+    hasFloorPlans: controller.floorPlans.length > 0,
+    hasRooms: controller.rooms.length > 0,
+    propertyType: property?.type ?? fallbackPropertyType,
+  });
+  const propertyTitle =
+    property?.title || firstParam(params.propertyTitle) || "Property";
   const isLoading =
     controller.queries.floorPlans.isLoading ||
     controller.queries.rooms.isLoading;
@@ -82,13 +111,16 @@ export default function FloorPlansScreen() {
     <Screen className="bg-[#F5F7FC]">
       <View className="flex-1">
         <FloorPlanManagerHeader
+          canAddFloor={policy.canCreateFloorPlans}
           floorCount={controller.floorPlans.length}
+          guidance={getFloorManagerGuidance(policy)}
           notice={controller.notice}
           onAddFloor={actions.openFloorCreate}
           onBack={() => router.back()}
           onClearNotice={actions.clearNotice}
           propertyTitle={propertyTitle}
           roomCount={controller.rooms.length}
+          showRoomSummary={policy.showRoomActions}
           totalAreas={controller.totalAreas}
         />
 
@@ -102,7 +134,11 @@ export default function FloorPlansScreen() {
             }}
           />
         ) : !controller.activeFloor ? (
-          <EmptyFloorPlanState onCreate={actions.openFloorCreate} />
+          <EmptyFloorPlanState
+            canCreate={policy.canCreateFloorPlans}
+            mode={policy.mode}
+            onCreate={actions.openFloorCreate}
+          />
         ) : (
           <FloorPlanWorkspace
             activeFloor={controller.activeFloor}
@@ -123,7 +159,9 @@ export default function FloorPlansScreen() {
             onSaveShape={actions.saveShape}
             onSelectFloor={actions.selectFloor}
             onToggleAreaVisibility={controller.visibility.toggle}
+            roomGuidance={getRoomManagementGuidance(policy)}
             rooms={controller.rooms}
+            showRoomActions={policy.showRoomActions}
           />
         )}
       </View>
@@ -149,6 +187,7 @@ export default function FloorPlansScreen() {
       <RoomBatchModal
         area={roomBatch.area}
         assignedRooms={roomBatch.assignedRooms}
+        canCreateRooms={roomBatch.canCreateRooms}
         count={roomBatch.count}
         floor={roomBatch.floor}
         isBusy={controller.isBusy}

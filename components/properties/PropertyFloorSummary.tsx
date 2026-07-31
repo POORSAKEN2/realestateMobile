@@ -2,16 +2,19 @@ import Feather from "@expo/vector-icons/Feather";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import type { FloorPlan, PropertyRoom } from "../../types";
+import type { FloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 
 export function PropertyFloorSummary({
   floorPlans,
   isLoading,
   onManage,
+  policy,
   rooms,
 }: {
   floorPlans: FloorPlan[];
   isLoading: boolean;
   onManage: () => void;
+  policy: FloorManagerPolicy;
   rooms: PropertyRoom[];
 }) {
   const totalAreas = floorPlans.reduce(
@@ -24,11 +27,16 @@ export function PropertyFloorSummary({
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
           <Text className="font-ralewayBold text-xs uppercase text-zinc-400">
-            Floor Summary
+            {policy.floorSummaryProminence === "primary"
+              ? "Floor Summary"
+              : "Optional Layout"}
           </Text>
           <Text className="mt-1 text-xs text-zinc-500">
-            {floorPlans.length} {floorPlans.length === 1 ? "floor" : "floors"} ·{" "}
-            {totalAreas} areas
+            {policy.floorSummaryProminence === "secondary" && !floorPlans.length
+              ? "Usually not needed for this property type"
+              : `${floorPlans.length} ${
+                  floorPlans.length === 1 ? "floor" : "floors"
+                } · ${totalAreas} areas`}
           </Text>
         </View>
         <TouchableOpacity
@@ -40,7 +48,9 @@ export function PropertyFloorSummary({
         >
           <Feather name="grid" color="#634CE4" size={15} />
           <Text className="font-ralewayBold text-[10px] text-primary">
-            Manage
+            {policy.floorSummaryProminence === "primary"
+              ? "Manage"
+              : "Add anyway"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -104,7 +114,9 @@ export function PropertyFloorSummary({
             onPress={onManage}
           >
             <Text className="font-ralewayBold text-xs text-zinc-600">
-              No floors yet. Add first floor plan.
+              {policy.floorSummaryProminence === "primary"
+                ? "No floors yet. Add first floor plan."
+                : "Floor plan optional. Add one when a visual layout helps."}
             </Text>
           </TouchableOpacity>
         )}

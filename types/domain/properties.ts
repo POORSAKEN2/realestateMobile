@@ -18,6 +18,17 @@ export type PropertyClassification = keyof typeof PROPERTY_TAXONOMY;
 export type PropertyType =
   (typeof PROPERTY_TAXONOMY)[PropertyClassification][number];
 
+export type SpatialCapabilityLevel =
+  | "recommended"
+  | "optional"
+  | "discouraged"
+  | "unsupported";
+
+export type PropertySpatialCapabilities = {
+  floorplans?: SpatialCapabilityLevel;
+  rooms?: SpatialCapabilityLevel;
+};
+
 export type Property = {
   id: string;
   title: string;
@@ -46,6 +57,7 @@ export type Property = {
   isTransientBookable?: boolean;
   totalUnits?: number;
   floorplans?: FloorPlan[];
+  spatialCapabilities?: PropertySpatialCapabilities;
 };
 
 export type PropertyImageUpload = {

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useProperties } from "../api/useProperties";
+import { clientKeys } from "../api/useClients";
 import { useAuth } from "../useAuth";
 import {
   apiDocumentRepository,
@@ -28,10 +29,10 @@ export function useDocumentLibrary(
     queryFn: () => repository.list(accessToken),
     queryKey: ["documents", accessToken],
   });
-  const lesseesQuery = useQuery({
+  const clientsQuery = useQuery({
     enabled: Boolean(accessToken),
-    queryFn: () => repository.listLessees(accessToken),
-    queryKey: ["lessees", accessToken],
+    queryFn: () => repository.listClients(accessToken),
+    queryKey: clientKeys.list(accessToken),
   });
 
   const saveMutation = useMutation({
@@ -89,7 +90,7 @@ export function useDocumentLibrary(
     isLoading: documentsQuery.isLoading,
     isRefreshing: documentsQuery.isRefetching,
     isSaving: saveMutation.isPending,
-    lessees: lesseesQuery.data ?? [],
+    lessees: clientsQuery.data ?? [],
     properties: propertiesQuery.data ?? [],
     refresh: documentsQuery.refetch,
     saveDocument: saveMutation.mutateAsync,

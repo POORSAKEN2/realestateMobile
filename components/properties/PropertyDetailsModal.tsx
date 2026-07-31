@@ -14,12 +14,9 @@ import {
 } from "react-native";
 import { appRoutes } from "../../constants/navigation";
 
-import {
-  fetchDocuments,
-  fetchLeases,
-  fetchLessees,
-} from "../../api/propertyDetails";
+import { fetchDocuments, fetchLeases } from "../../api/propertyDetails";
 import { useFloorPlanQueries } from "../../hooks/api/useFloorPlans";
+import { useClients } from "../../hooks/api/useClients";
 import type { Property } from "../../types";
 import {
   formatPesoValue,
@@ -28,6 +25,7 @@ import {
   openPropertyDocument,
 } from "../../utils/dashboard/dashboardHelpers";
 import { getPropertyImages } from "../../utils/properties/propertyPresentation";
+import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 import { PropertyFloorSummary } from "./PropertyFloorSummary";
 
 export function PropertyDetailsModal({
@@ -46,11 +44,10 @@ export function PropertyDetailsModal({
     queryFn: () => fetchLeases(accessToken),
     enabled: Boolean(property),
   });
-  const { data: lessees = [], isLoading: isLoadingLessees } = useQuery({
-    queryKey: ["lessees", accessToken],
-    queryFn: () => fetchLessees(accessToken),
-    enabled: Boolean(property),
-  });
+  const { data: lessees = [], isLoading: isLoadingLessees } = useClients(
+    accessToken,
+    Boolean(property),
+  );
   const { data: documents = [], isLoading: isLoadingDocuments } = useQuery({
     queryKey: ["documents", accessToken, property?.id],
     queryFn: () => fetchDocuments(accessToken, { propertyId: property?.id }),
@@ -59,6 +56,12 @@ export function PropertyDetailsModal({
   const floorPlanQueries = useFloorPlanQueries(property?.id ?? "", accessToken);
   const floorPlans = floorPlanQueries.floorPlans.data ?? [];
   const rooms = floorPlanQueries.rooms.data ?? [];
+  const floorManagerPolicy = resolveFloorManagerPolicy({
+    backendCapabilities: property?.spatialCapabilities,
+    hasFloorPlans: floorPlans.length > 0,
+    hasRooms: rooms.length > 0,
+    propertyType: property?.type,
+  });
 
   const propertyLeases = useMemo(
     () =>
@@ -236,9 +239,11 @@ export function PropertyDetailsModal({
                       params: {
                         propertyId: property.id,
                         propertyTitle: property.title,
+                        propertyType: property.type,
                       },
                     });
                   }}
+                  policy={floorManagerPolicy}
                   rooms={rooms}
                 />
 

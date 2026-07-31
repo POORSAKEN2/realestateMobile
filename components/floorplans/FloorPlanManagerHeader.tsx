@@ -5,22 +5,28 @@ import { BackButton } from "../ui/buttons/BackButton";
 import { ModuleHeader } from "../ui/ModuleHeader";
 
 export function FloorPlanManagerHeader({
+  canAddFloor,
   floorCount,
+  guidance,
   notice,
   onAddFloor,
   onBack,
   onClearNotice,
   propertyTitle,
   roomCount,
+  showRoomSummary,
   totalAreas,
 }: {
+  canAddFloor: boolean;
   floorCount: number;
+  guidance: string;
   notice: string;
   onAddFloor: () => void;
   onBack: () => void;
   onClearNotice: () => void;
   propertyTitle: string;
   roomCount: number;
+  showRoomSummary: boolean;
   totalAreas: number;
 }) {
   return (
@@ -30,11 +36,24 @@ export function FloorPlanManagerHeader({
           <TouchableOpacity
             accessibilityLabel="Add floor"
             accessibilityRole="button"
-            className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary px-3.5"
+            className={`h-11 flex-row items-center gap-1.5 rounded-2xl px-3.5 ${
+              canAddFloor ? "bg-primary" : "bg-slate-200"
+            }`}
+            disabled={!canAddFloor}
             onPress={onAddFloor}
           >
-            <Feather name="plus" color="#FFFFFF" size={17} />
-            <Text className="font-ralewayBold text-xs text-white">Floor</Text>
+            <Feather
+              name="plus"
+              color={canAddFloor ? "#FFFFFF" : "#94A3B8"}
+              size={17}
+            />
+            <Text
+              className={`font-ralewayBold text-xs ${
+                canAddFloor ? "text-white" : "text-slate-400"
+              }`}
+            >
+              Floor
+            </Text>
           </TouchableOpacity>
         }
         eyebrow="Property Layout"
@@ -58,11 +77,17 @@ export function FloorPlanManagerHeader({
           icon="vector-polygon"
           label={`${totalAreas} ${totalAreas === 1 ? "area" : "areas"}`}
         />
-        <SummaryPill
-          icon="door"
-          label={`${roomCount} ${roomCount === 1 ? "room" : "rooms"}`}
-        />
+        {showRoomSummary ? (
+          <SummaryPill
+            icon="door"
+            label={`${roomCount} ${roomCount === 1 ? "room" : "rooms"}`}
+          />
+        ) : null}
       </View>
+
+      <Text className="mt-2 px-1 text-xs leading-5 text-slate-500">
+        {guidance}
+      </Text>
 
       {notice ? (
         <TouchableOpacity

@@ -1,10 +1,10 @@
 export { createLease, deleteLease, fetchLeases, updateLease } from "./leases";
 export {
-  createLessee,
-  deleteLessee,
-  fetchLessees,
-  updateLessee,
-} from "./lessees";
+  createClient,
+  deleteClient,
+  fetchClients,
+  updateClient,
+} from "./clients";
 export {
   deleteDocument,
   fetchDocuments,

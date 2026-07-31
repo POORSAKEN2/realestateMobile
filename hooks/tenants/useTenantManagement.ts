@@ -3,11 +3,10 @@ import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 
 import {
-  createLessee,
-  deleteLessee,
+  createClient,
+  deleteClient,
   fetchLeases,
-  fetchLessees,
-  updateLessee,
+  updateClient,
 } from "../../api/propertyDetails";
 import type { Lessee, LesseePayload, Property } from "../../types";
 import {
@@ -17,6 +16,7 @@ import {
   type TenantFormState,
 } from "../../utils/tenants/tenantForm";
 import { useProperties } from "../api/useProperties";
+import { clientKeys, useClients } from "../api/useClients";
 import { useAuth } from "../useAuth";
 
 export function useTenantManagement() {
@@ -32,11 +32,8 @@ export function useTenantManagement() {
   const [deleteTarget, setDeleteTarget] = useState<Lessee | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const { data: tenants = [], isLoading: isLoadingTenants } = useQuery({
-    queryKey: ["lessees", accessToken],
-    queryFn: () => fetchLessees(accessToken),
-    enabled: Boolean(accessToken),
-  });
+  const { data: tenants = [], isLoading: isLoadingTenants } =
+    useClients(accessToken);
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),
@@ -48,10 +45,10 @@ export function useTenantManagement() {
   const saveMutation = useMutation({
     mutationFn: (payload: LesseePayload) =>
       editingTenant
-        ? updateLessee(editingTenant.id, payload, accessToken)
-        : createLessee(payload, accessToken),
+        ? updateClient(editingTenant.id, payload, accessToken)
+        : createClient(payload, accessToken),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["lessees"] });
+      await queryClient.invalidateQueries({ queryKey: clientKeys.all });
       closeForm();
     },
     onError: (error) =>
@@ -60,10 +57,10 @@ export function useTenantManagement() {
       ),
   });
   const deleteMutation = useMutation({
-    mutationFn: (tenantId: string) => deleteLessee(tenantId, accessToken),
+    mutationFn: (tenantId: string) => deleteClient(tenantId, accessToken),
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["lessees"] }),
+        queryClient.invalidateQueries({ queryKey: clientKeys.all }),
         queryClient.invalidateQueries({ queryKey: ["leases"] }),
       ]);
       setDeleteTarget(null);

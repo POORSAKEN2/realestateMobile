@@ -24,6 +24,7 @@ interface AddEditModalProps {
   onSubmit: () => void;
   formError?: string | null;
   showCancelAction?: boolean;
+  showSubmitAction?: boolean;
   children: React.ReactNode;
 }
 
@@ -39,6 +40,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
   onSubmit,
   formError,
   showCancelAction = false,
+  showSubmitAction = true,
   children,
 }) => {
   const scrollRef = useRef<ScrollView | null>(null);
@@ -161,30 +163,32 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 </Text>
               </TouchableOpacity>
             ) : null}
-            <TouchableOpacity
-              accessibilityLabel={submitText}
-              activeOpacity={0.85}
-              accessibilityRole="button"
-              className={`h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
-                isPending ? "opacity-60" : ""
-              }`}
-              disabled={isPending}
-              onPress={onSubmit}
-            >
-              {isPending ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text
-                  className={
-                    isCardAppearance
-                      ? "font-ralewayBold text-base text-white"
-                      : "text-lg font-ralewayBold text-white"
-                  }
-                >
-                  {submitText}
-                </Text>
-              )}
-            </TouchableOpacity>
+            {showSubmitAction ? (
+              <TouchableOpacity
+                accessibilityLabel={submitText}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                className={`h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
+                  isPending ? "opacity-60" : ""
+                }`}
+                disabled={isPending}
+                onPress={onSubmit}
+              >
+                {isPending ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text
+                    className={
+                      isCardAppearance
+                        ? "font-ralewayBold text-base text-white"
+                        : "text-lg font-ralewayBold text-white"
+                    }
+                  >
+                    {submitText}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            ) : null}
           </View>
         </SafeAreaView>
       </KeyboardAvoidingView>

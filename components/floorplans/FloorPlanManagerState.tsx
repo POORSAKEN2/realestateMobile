@@ -1,5 +1,6 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import type { FloorManagerMode } from "../../utils/properties/floorManagerPolicy";
 
 export function MissingPropertyState({ onBack }: { onBack: () => void }) {
   return (
@@ -48,24 +49,48 @@ export function FloorPlanErrorState({ onRetry }: { onRetry: () => void }) {
   );
 }
 
-export function EmptyFloorPlanState({ onCreate }: { onCreate: () => void }) {
+export function EmptyFloorPlanState({
+  canCreate,
+  mode,
+  onCreate,
+}: {
+  canCreate: boolean;
+  mode: FloorManagerMode;
+  onCreate: () => void;
+}) {
+  const isMinimal = mode === "minimal";
+
   return (
     <View className="flex-1 items-center justify-center px-8">
       <View className="h-20 w-20 items-center justify-center rounded-[28px] bg-secondary/20">
         <MaterialCommunityIcons name="layers-plus" color="#634CE4" size={36} />
       </View>
       <Text className="mt-5 text-center font-ralewayBold text-xl text-textPrimary">
-        Add first floor
+        {canCreate
+          ? isMinimal
+            ? "Floor plan optional"
+            : "Add first floor"
+          : "Floor plans unavailable"}
       </Text>
       <Text className="mt-2 text-center text-sm leading-6 text-slate-500">
-        Create floor, upload plan image, map areas, then add rooms.
+        {canCreate
+          ? isMinimal
+            ? "This property usually needs no mapped layout. Add one when a visual plan still helps."
+            : mode === "full"
+              ? "Create a floor, upload its plan, map areas, then connect rooms."
+              : "Create a floor, upload its plan, and map the internal layout."
+          : "Current property settings do not support new floor plans."}
       </Text>
-      <TouchableOpacity
-        className="mt-5 h-12 items-center justify-center rounded-2xl bg-primary px-6"
-        onPress={onCreate}
-      >
-        <Text className="font-ralewayBold text-white">Create Floor 1</Text>
-      </TouchableOpacity>
+      {canCreate ? (
+        <TouchableOpacity
+          className="mt-5 h-12 items-center justify-center rounded-2xl bg-primary px-6"
+          onPress={onCreate}
+        >
+          <Text className="font-ralewayBold text-white">
+            {isMinimal ? "Add layout anyway" : "Create Floor 1"}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 }

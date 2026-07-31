@@ -11,6 +11,7 @@ import type {
   FloorPlan,
   FloorPlanDrawingMode,
   PropertyRoom,
+  SpatialCapabilityLevel,
 } from "../../types";
 import { getErrorMessage } from "../../utils/floorplans/floorPlanPresentation";
 import {
@@ -38,11 +39,15 @@ export type FloorPlanDeleteTarget =
 export function useFloorPlanManagerController({
   accessToken,
   dependencies,
+  floorPlanCapability = "optional",
   propertyId,
+  roomCapability = "optional",
 }: {
   accessToken?: string;
   dependencies: FloorPlanManagerDependencies;
+  floorPlanCapability?: SpatialCapabilityLevel;
   propertyId: string;
+  roomCapability?: SpatialCapabilityLevel;
 }) {
   const queries = useFloorPlanQueries(propertyId, accessToken);
   const floorCommands = useFloorCommands(propertyId, accessToken);
@@ -60,8 +65,14 @@ export function useFloorPlanManagerController({
     propertyId,
     dependencies.visibilityRepository,
   );
+  const canManageRooms = roomCapability !== "unsupported" || rooms.length > 0;
+  const canCreateRooms =
+    roomCapability !== "unsupported" &&
+    (roomCapability !== "discouraged" || rooms.length > 0);
   const roomBatch = useRoomBatchController({
     accessToken,
+    canCreateRooms,
+    canManageRooms,
     feedback: dependencies.feedback,
     floorPlans,
     onNotice: setNotice,
@@ -100,6 +111,13 @@ export function useFloorPlanManagerController({
 
   async function submitFloorForm() {
     if (!floorForm) return;
+    if (!floorForm.id && floorPlanCapability === "unsupported") {
+      dependencies.feedback.showError(
+        "Floor creation unavailable",
+        "New floor plans are not supported for this property.",
+      );
+      return;
+    }
     const validation = validateFloorName(floorForm.value);
     if (!reportValidation(validation) || !validation.ok) return;
 
@@ -249,8 +267,16 @@ export function useFloorPlanManagerController({
         setAreaForm({ id: item.id, value: item.label }),
       openDrawing: (areaId: string, mode: FloorPlanDrawingMode) =>
         setDrawing({ areaId, mode }),
-      openFloorCreate: () =>
-        setFloorForm({ value: `Floor ${floorPlans.length + 1}` }),
+      openFloorCreate: () => {
+        if (floorPlanCapability === "unsupported") {
+          dependencies.feedback.showError(
+            "Floor creation unavailable",
+            "New floor plans are not supported for this property.",
+          );
+          return;
+        }
+        setFloorForm({ value: `Floor ${floorPlans.length + 1}` });
+      },
       openFloorDelete: (item: FloorPlan) =>
         setDeleteTarget({ kind: "floor", item }),
       openFloorEdit: (item: FloorPlan) =>

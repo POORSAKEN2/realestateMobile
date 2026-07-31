@@ -8,6 +8,8 @@ import { validateRoomBatch } from "../../utils/floorplans/floorPlanValidation";
 
 export function useRoomBatchController({
   accessToken,
+  canCreateRooms,
+  canManageRooms,
   feedback,
   floorPlans,
   onNotice,
@@ -15,6 +17,8 @@ export function useRoomBatchController({
   rooms,
 }: {
   accessToken?: string;
+  canCreateRooms: boolean;
+  canManageRooms: boolean;
   feedback: FloorPlanFeedback;
   floorPlans: FloorPlan[];
   onNotice: (message: string) => void;
@@ -38,6 +42,13 @@ export function useRoomBatchController({
   );
 
   function open(nextArea: FloorArea) {
+    if (!canManageRooms) {
+      feedback.showError(
+        "Room management unavailable",
+        "Rooms are not supported for this property.",
+      );
+      return;
+    }
     setAreaId(nextArea.id);
     setPrefix("");
     setStart("101");
@@ -50,6 +61,13 @@ export function useRoomBatchController({
 
   async function generate() {
     if (!area || !floor) return;
+    if (!canCreateRooms) {
+      feedback.showError(
+        "Room creation unavailable",
+        "Existing room assignments can still be managed.",
+      );
+      return;
+    }
     const validation = validateRoomBatch(prefix, start, count, rooms);
     if (!validation.ok) {
       feedback.showError(validation.title, validation.message);
@@ -99,6 +117,8 @@ export function useRoomBatchController({
   return {
     area,
     assignedRooms,
+    canCreateRooms,
+    canManageRooms,
     close,
     count,
     floor,

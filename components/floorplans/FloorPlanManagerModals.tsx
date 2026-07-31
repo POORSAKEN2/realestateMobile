@@ -95,6 +95,7 @@ export function AreaNameModal({
 export function RoomBatchModal({
   area,
   assignedRooms,
+  canCreateRooms,
   count,
   floor,
   isBusy,
@@ -111,6 +112,7 @@ export function RoomBatchModal({
 }: {
   area?: FloorArea;
   assignedRooms: PropertyRoom[];
+  canCreateRooms: boolean;
   count: string;
   floor?: FloorPlan;
   isBusy: boolean;
@@ -134,40 +136,60 @@ export function RoomBatchModal({
       onClose={onClose}
       onSubmit={onGenerate}
       showCancelAction
+      showSubmitAction={canCreateRooms}
       submitText="Generate rooms"
       subtitle={`${floor?.name ?? ""} · ${area?.label ?? ""}`}
-      title="Batch add rooms"
+      title="Manage rooms"
     >
-      <Text className="text-sm leading-6 text-slate-500">
-        Create sequential room numbers and assign them directly to this area.
-      </Text>
-      <BaseField
-        label="Room number prefix (optional)"
-        onChangeText={onChangePrefix}
-        placeholder="e.g. Unit-, 10-, Office-"
-        value={prefix}
-        variant="filled"
-      />
-      <View className="flex-row gap-3">
-        <BaseField
-          keyboardType="number-pad"
-          label="Start number"
-          onChangeText={(value) => onChangeStart(value.replace(/[^0-9]/g, ""))}
-          required
-          value={start}
-          variant="filled"
-          wrapperClassName="flex-1"
-        />
-        <BaseField
-          keyboardType="number-pad"
-          label="Room count"
-          onChangeText={(value) => onChangeCount(value.replace(/[^0-9]/g, ""))}
-          required
-          value={count}
-          variant="filled"
-          wrapperClassName="flex-1"
-        />
-      </View>
+      {canCreateRooms ? (
+        <>
+          <Text className="text-sm leading-6 text-slate-500">
+            Create sequential room numbers and assign them directly to this
+            area.
+          </Text>
+          <BaseField
+            label="Room number prefix (optional)"
+            onChangeText={onChangePrefix}
+            placeholder="e.g. Unit-, 10-, Office-"
+            value={prefix}
+            variant="filled"
+          />
+          <View className="flex-row gap-3">
+            <BaseField
+              keyboardType="number-pad"
+              label="Start number"
+              onChangeText={(value) =>
+                onChangeStart(value.replace(/[^0-9]/g, ""))
+              }
+              required
+              value={start}
+              variant="filled"
+              wrapperClassName="flex-1"
+            />
+            <BaseField
+              keyboardType="number-pad"
+              label="Room count"
+              onChangeText={(value) =>
+                onChangeCount(value.replace(/[^0-9]/g, ""))
+              }
+              required
+              value={count}
+              variant="filled"
+              wrapperClassName="flex-1"
+            />
+          </View>
+        </>
+      ) : (
+        <View className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+          <Text className="font-ralewayBold text-sm text-amber-800">
+            New rooms unavailable
+          </Text>
+          <Text className="mt-1 text-xs leading-5 text-amber-700">
+            Existing room assignments remain available to review, unassign, or
+            delete.
+          </Text>
+        </View>
+      )}
 
       <View className="mt-2 border-t border-slate-200 pt-5">
         <Text className="font-ralewayBold text-base text-textPrimary">

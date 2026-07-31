@@ -17,7 +17,7 @@ export function FloorAreaCard({
   hidden: boolean;
   onDelete: () => void;
   onDraw: (mode: FloorPlanDrawingMode) => void;
-  onManageRooms: () => void;
+  onManageRooms?: () => void;
   onRename: () => void;
   onToggleVisibility: () => void;
   roomCount: number;
@@ -49,7 +49,9 @@ export function FloorAreaCard({
             </View>
           </View>
           <Text className="mt-1 text-xs text-slate-500">
-            {roomCount} {roomCount === 1 ? "room" : "rooms"} ·{" "}
+            {onManageRooms
+              ? `${roomCount} ${roomCount === 1 ? "room" : "rooms"} · `
+              : ""}
             {hidden ? "shape hidden" : "shape visible"}
           </Text>
         </View>
@@ -71,7 +73,9 @@ export function FloorAreaCard({
           label="Polygon"
           onPress={() => onDraw("polygon")}
         />
-        <AreaAction icon="door-open" label="Rooms" onPress={onManageRooms} />
+        {onManageRooms ? (
+          <AreaAction icon="door-open" label="Rooms" onPress={onManageRooms} />
+        ) : null}
         <AreaAction icon="pencil-outline" label="Rename" onPress={onRename} />
         <AreaAction
           danger
@@ -99,7 +103,7 @@ export function IconButton({
     <TouchableOpacity
       accessibilityLabel={label}
       accessibilityRole="button"
-      className={`h-10 w-10 items-center justify-center rounded-xl ${
+      className={`h-11 w-11 items-center justify-center rounded-xl ${
         danger ? "bg-red-50" : "bg-slate-100"
       }`}
       onPress={onPress}
@@ -127,7 +131,7 @@ function AreaAction({
   return (
     <TouchableOpacity
       accessibilityRole="button"
-      className={`h-9 flex-row items-center gap-1.5 rounded-xl px-3 ${
+      className={`h-11 flex-row items-center gap-1.5 rounded-xl px-3 ${
         danger ? "bg-red-50" : "bg-secondary/15"
       }`}
       onPress={onPress}
@@ -138,7 +142,7 @@ function AreaAction({
         size={15}
       />
       <Text
-        className={`font-ralewayBold text-[10px] ${
+        className={`font-ralewayBold text-xs ${
           danger ? "text-red-600" : "text-primary"
         }`}
       >

@@ -31,7 +31,9 @@ export function FloorPlanWorkspace({
   onSaveShape,
   onSelectFloor,
   onToggleAreaVisibility,
+  roomGuidance,
   rooms,
+  showRoomActions,
 }: {
   activeFloor: FloorPlan;
   drawingArea: FloorArea | null;
@@ -51,7 +53,9 @@ export function FloorPlanWorkspace({
   onSaveShape: (points: FloorPlanPoint[]) => void;
   onSelectFloor: (id: string) => void;
   onToggleAreaVisibility: (areaId: string) => void;
+  roomGuidance?: string;
   rooms: PropertyRoom[];
+  showRoomActions: boolean;
 }) {
   return (
     <>
@@ -158,6 +162,19 @@ export function FloorPlanWorkspace({
           </TouchableOpacity>
         </View>
 
+        {roomGuidance ? (
+          <View className="flex-row items-start gap-2 rounded-2xl border border-secondary/20 bg-secondary/10 p-3">
+            <MaterialCommunityIcons
+              name="information-outline"
+              color="#634CE4"
+              size={18}
+            />
+            <Text className="min-w-0 flex-1 text-xs leading-5 text-slate-600">
+              {roomGuidance}
+            </Text>
+          </View>
+        ) : null}
+
         {activeFloor.areas.length ? (
           activeFloor.areas.map((area) => (
             <FloorAreaCard
@@ -166,7 +183,9 @@ export function FloorPlanWorkspace({
               key={area.id}
               onDelete={() => onDeleteArea(area)}
               onDraw={(mode) => onDrawArea(area.id, mode)}
-              onManageRooms={() => onManageRooms(area)}
+              onManageRooms={
+                showRoomActions ? () => onManageRooms(area) : undefined
+              }
               onRename={() => onRenameArea(area)}
               onToggleVisibility={() => onToggleAreaVisibility(area.id)}
               roomCount={rooms.filter((room) => room.areaId === area.id).length}

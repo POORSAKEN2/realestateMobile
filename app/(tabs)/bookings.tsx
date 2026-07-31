@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 
 import { fetchTransientBookings } from "../../api/bookings";
-import { fetchLessees } from "../../api/propertyDetails";
 import {
   BookingCalendar,
   BookingCalendarEmpty,
@@ -18,6 +17,7 @@ import AddButton from "../../components/ui/buttons/AddButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
 import { useProperties } from "../../hooks/api/useProperties";
+import { useClients } from "../../hooks/api/useClients";
 import { useBookingCalendar, useBookingForm } from "../../hooks/bookings";
 import { useAuth } from "../../hooks/useAuth";
 import {
@@ -49,11 +49,7 @@ export default function BookingsScreen() {
     queryFn: () => fetchTransientBookings(accessToken),
     enabled: Boolean(accessToken),
   });
-  const { data: guests = [] } = useQuery({
-    queryKey: ["lessees", accessToken],
-    queryFn: () => fetchLessees(accessToken),
-    enabled: Boolean(accessToken),
-  });
+  const { data: guests = [] } = useClients(accessToken);
 
   const buildingOptions = useMemo(
     () =>

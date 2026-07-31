@@ -1,5 +1,5 @@
 import { apiClient, authHeaders, unwrapCollection, unwrapData } from "./client";
-import { normalizeLessee } from "./lessees";
+import { normalizeClient } from "./clients";
 import type { ApiEnvelope, Lease, LeasePayload } from "../types";
 
 function normalizeLease(lease: Record<string, any>): Lease {
@@ -7,13 +7,23 @@ function normalizeLease(lease: Record<string, any>): Lease {
     ...lease,
     id: String(lease?.id ?? ""),
     propertyId: String(lease?.propertyId ?? lease?.property_id ?? ""),
-    lesseeId: String(lease?.lesseeId ?? lease?.lessee_id ?? ""),
+    lesseeId: String(
+      lease?.clientId ??
+        lease?.client_id ??
+        lease?.lesseeId ??
+        lease?.lessee_id ??
+        "",
+    ),
     roomNumber: lease?.roomNumber ?? lease?.room_number ?? null,
     startDate: String(lease?.startDate ?? lease?.start_date ?? "").slice(0, 10),
     endDate: String(lease?.endDate ?? lease?.end_date ?? "").slice(0, 10),
     monthlyRent: Number(lease?.monthlyRent ?? lease?.monthly_rent ?? 0),
     status: lease?.status ?? "Active",
-    lessee: lease?.lessee ? normalizeLessee(lease.lessee) : undefined,
+    lessee: lease?.client
+      ? normalizeClient(lease.client)
+      : lease?.lessee
+        ? normalizeClient(lease.lessee)
+        : undefined,
   };
 }
 
@@ -27,7 +37,7 @@ export async function fetchLeases(accessToken?: string) {
 function toApiPayload(payload: LeasePayload) {
   return {
     property_id: payload.propertyId,
-    lessee_id: payload.lesseeId,
+    client_id: payload.lesseeId,
     start_date: payload.startDate,
     end_date: payload.endDate,
     monthly_rent: payload.monthlyRent,

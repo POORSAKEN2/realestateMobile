@@ -8,6 +8,7 @@ import {
   getPropertyImages,
   getPropertyStatusTone,
 } from "../../utils/properties/propertyPresentation";
+import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 import PropertyImageGallery from "./PropertyImageGallery";
 
 function PropertyMetric({ label, value }: { label: string; value: string }) {
@@ -86,6 +87,11 @@ export function PropertyCard({
     (total, floor) => total + floor.areas.length,
     0,
   );
+  const floorManagerPolicy = resolveFloorManagerPolicy({
+    backendCapabilities: property.spatialCapabilities,
+    hasFloorPlans: floorPlans.length > 0,
+    propertyType: property.type,
+  });
 
   return (
     <View className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -210,29 +216,51 @@ export function PropertyCard({
           accessibilityLabel={`Manage floor plans for ${property.title}`}
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="mt-4 flex-row items-center gap-3 rounded-2xl border border-secondary/25 bg-secondary/10 p-3.5"
+          className={`mt-4 flex-row items-center gap-3 rounded-2xl border p-3.5 ${
+            floorManagerPolicy.floorSummaryProminence === "primary"
+              ? "border-secondary/25 bg-secondary/10"
+              : "border-slate-200 bg-slate-50"
+          }`}
           onPress={onOpenFloorPlans}
         >
-          <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+          <View className="h-11 w-11 items-center justify-center rounded-xl bg-white">
             <MaterialCommunityIcons
               name="floor-plan"
-              color="#634CE4"
+              color={
+                floorManagerPolicy.floorSummaryProminence === "primary"
+                  ? "#634CE4"
+                  : "#64748B"
+              }
               size={21}
             />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="font-ralewayBold text-xs uppercase text-primary">
-              Floor summary
+            <Text
+              className={`font-ralewayBold text-xs uppercase ${
+                floorManagerPolicy.floorSummaryProminence === "primary"
+                  ? "text-primary"
+                  : "text-slate-600"
+              }`}
+            >
+              {floorManagerPolicy.floorSummaryProminence === "primary"
+                ? "Floor summary"
+                : "Optional layout"}
             </Text>
             <Text className="mt-1 text-xs text-slate-600">
               {floorPlans.length
                 ? `${floorPlans.length} ${floorPlans.length === 1 ? "floor" : "floors"} · ${floorAreaCount} ${floorAreaCount === 1 ? "area" : "areas"}`
-                : "No floors added yet"}
+                : floorManagerPolicy.floorSummaryProminence === "primary"
+                  ? "No floors added yet"
+                  : "Usually not needed · Add anyway"}
             </Text>
           </View>
           <MaterialCommunityIcons
             name="chevron-right"
-            color="#634CE4"
+            color={
+              floorManagerPolicy.floorSummaryProminence === "primary"
+                ? "#634CE4"
+                : "#64748B"
+            }
             size={21}
           />
         </TouchableOpacity>

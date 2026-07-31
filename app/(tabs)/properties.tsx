@@ -42,7 +42,7 @@ export default function PropertiesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
-  const { useList } = useProperties();
+  const { useList } = useProperties(accessToken);
   const { data: properties = [], isError, isLoading, refetch } = useList();
   const propertyForm = usePropertyFormController(accessToken);
   const {
@@ -248,6 +248,7 @@ export default function PropertiesScreen() {
                     params: {
                       propertyId: item.property.id,
                       propertyTitle: item.property.title,
+                      propertyType: item.property.type,
                     },
                   })
                 }

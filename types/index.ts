@@ -30,7 +30,9 @@ export type {
   Property,
   PropertyClassification,
   PropertyImageUpload,
+  PropertySpatialCapabilities,
   PropertyType,
+  SpatialCapabilityLevel,
   UpdatePropertyPayload,
 } from "./domain/properties";
 export { PROPERTY_TAXONOMY } from "./domain/properties";
