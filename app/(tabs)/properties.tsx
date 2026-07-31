@@ -4,6 +4,7 @@ import { FlatList, View } from "react-native";
 
 import { PropertyCard } from "../../components/properties/PropertyCard";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
+import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import { PropertyDocumentsField } from "../../components/properties/PropertyDocumentsField";
 import { PropertyImagesField } from "../../components/properties/PropertyImagesField";
 import {
@@ -41,6 +42,9 @@ export default function PropertiesScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
+    null,
+  );
 
   const { useList } = useProperties(accessToken);
   const { data: properties = [], isError, isLoading, refetch } = useList();
@@ -242,6 +246,7 @@ export default function PropertiesScreen() {
               <PropertyCard
                 property={item.property}
                 onEdit={() => openEditForm(item.property)}
+                onOpenDetails={() => setSelectedProperty(item.property)}
                 onOpenFloorPlans={() =>
                   router.push({
                     pathname: appRoutes.secondary.floorPlans,
@@ -268,6 +273,12 @@ export default function PropertiesScreen() {
           stickyHeaderIndices={[1]}
         />
       </View>
+
+      <PropertyDetailsModal
+        accessToken={accessToken}
+        onClose={() => setSelectedProperty(null)}
+        property={selectedProperty}
+      />
 
       <AddEditModal
         appearance="card"

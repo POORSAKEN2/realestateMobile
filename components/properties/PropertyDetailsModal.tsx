@@ -1,11 +1,13 @@
 import Feather from "@expo/vector-icons/Feather";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import {
+  Animated,
   Dimensions,
   Image,
   Modal,
+  PanResponder,
   Pressable,
   ScrollView,
   Text,
@@ -39,6 +41,46 @@ export function PropertyDetailsModal({
 }) {
   const { height, width } = Dimensions.get("window");
   const router = useRouter();
+  const sheetTranslateY = useRef(new Animated.Value(0)).current;
+  const swipeDownResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gesture) =>
+          gesture.dy > 6 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+        onPanResponderMove: (_, gesture) => {
+          sheetTranslateY.setValue(Math.max(0, gesture.dy));
+        },
+        onPanResponderRelease: (_, gesture) => {
+          if (gesture.dy > 72 || gesture.vy > 0.9) {
+            Animated.timing(sheetTranslateY, {
+              duration: 180,
+              toValue: height,
+              useNativeDriver: true,
+            }).start(() => {
+              onClose();
+              sheetTranslateY.setValue(0);
+            });
+            return;
+          }
+
+          Animated.spring(sheetTranslateY, {
+            bounciness: 4,
+            speed: 20,
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        },
+        onPanResponderTerminate: () => {
+          Animated.spring(sheetTranslateY, {
+            bounciness: 4,
+            speed: 20,
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        },
+      }),
+    [height, onClose, sheetTranslateY],
+  );
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),
@@ -109,11 +151,21 @@ export function PropertyDetailsModal({
         />
 
         {property ? (
-          <View
+          <Animated.View
             className="overflow-hidden rounded-t-[30px] bg-white"
-            style={{ maxHeight: height * 0.86 }}
+            style={{
+              maxHeight: height * 0.86,
+              transform: [{ translateY: sheetTranslateY }],
+            }}
           >
-            <View className="mt-3 h-1.5 w-12 self-center rounded-full bg-zinc-200" />
+            <View
+              accessible
+              accessibilityLabel="Swipe down to close property details"
+              className="h-10 items-center justify-center"
+              {...swipeDownResponder.panHandlers}
+            >
+              <View className="h-1.5 w-12 rounded-full bg-zinc-200" />
+            </View>
             <ScrollView
               bounces={false}
               contentContainerStyle={{ paddingBottom: 28 }}
@@ -342,7 +394,7 @@ export function PropertyDetailsModal({
                 </View>
               </View>
             </ScrollView>
-          </View>
+          </Animated.View>
         ) : null}
       </View>
     </Modal>

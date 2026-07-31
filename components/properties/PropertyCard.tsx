@@ -1,6 +1,13 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  type GestureResponderEvent,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import type { Property } from "../../types";
 import { formatPeso, formatStatus } from "../../utils/properties/propertyForm";
@@ -47,7 +54,10 @@ function PropertyAction({
       className={`min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl px-3 ${
         primary ? "bg-primary" : "bg-secondary/20"
       }`}
-      onPress={onPress}
+      onPress={(event) => {
+        event.stopPropagation();
+        onPress();
+      }}
     >
       <MaterialCommunityIcons
         name={icon}
@@ -68,11 +78,13 @@ function PropertyAction({
 export function PropertyCard({
   property,
   onEdit,
+  onOpenDetails,
   onOpenFloorPlans,
   onOpenBookings,
 }: {
   property: Property;
   onEdit: () => void;
+  onOpenDetails: () => void;
   onOpenFloorPlans: () => void;
   onOpenBookings?: () => void;
 }) {
@@ -94,7 +106,13 @@ export function PropertyCard({
   });
 
   return (
-    <View className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <TouchableOpacity
+      accessibilityLabel={`View overview for ${property.title}`}
+      accessibilityRole="button"
+      activeOpacity={0.9}
+      className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+      onPress={onOpenDetails}
+    >
       <TouchableOpacity
         accessibilityLabel={
           propertyImages.length
@@ -106,7 +124,10 @@ export function PropertyCard({
         className="relative h-40 w-full bg-slate-100"
         disabled={!propertyImages.length}
         onLayout={(event) => setImageWidth(event.nativeEvent.layout.width)}
-        onPress={() => setIsGalleryVisible(true)}
+        onPress={(event: GestureResponderEvent) => {
+          event.stopPropagation();
+          setIsGalleryVisible(true);
+        }}
       >
         {propertyImages.length ? (
           <ScrollView
@@ -221,7 +242,10 @@ export function PropertyCard({
               ? "border-secondary/25 bg-secondary/10"
               : "border-slate-200 bg-slate-50"
           }`}
-          onPress={onOpenFloorPlans}
+          onPress={(event) => {
+            event.stopPropagation();
+            onOpenFloorPlans();
+          }}
         >
           <View className="h-11 w-11 items-center justify-center rounded-xl bg-white">
             <MaterialCommunityIcons
@@ -314,6 +338,6 @@ export function PropertyCard({
           />
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
