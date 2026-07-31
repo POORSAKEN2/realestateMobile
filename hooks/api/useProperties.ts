@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import {
   createProperty,
+  fetchProperty,
   fetchProperties,
   updateProperty,
 } from "../../api/properties";
@@ -25,11 +26,11 @@ export const propertyKeys = {
 };
 
 export const propertyFetchers = {
-  getList: async (filters?: any) => {
+  getList: async (filters?: any, accessToken?: string) => {
     // Note: The backend may not support all filters yet, but we pass them down.
     // fetchProperties in api/properties.ts currently doesn't take filters natively,
     // so we just call it. In the future, it should accept filters.
-    const results = await fetchProperties();
+    const results = await fetchProperties(accessToken);
     // We mock the PaginatedApiData format for now since fetchProperties returns Property[] directly
     // based on unwrapList.
     return {
@@ -38,45 +39,47 @@ export const propertyFetchers = {
       last_page: 1,
     };
   },
-  getDetail: async (id: string) => {
-    // Currently, there isn't a fetchProperty(id) in api/properties.ts,
-    // we would need to implement it. For now, this is a placeholder.
-    throw new Error("getDetail not implemented in api/properties.ts");
+  getDetail: async (id: string, accessToken?: string) => {
+    return await fetchProperty(id, accessToken);
   },
-  create: async (payload: CreatePropertyPayload) => {
-    return await createProperty(payload);
+  create: async (payload: CreatePropertyPayload, accessToken?: string) => {
+    return await createProperty(payload, accessToken);
   },
-  update: async ({
-    id,
-    payload,
-  }: {
-    id: string;
-    payload: UpdatePropertyPayload;
-  }) => {
-    return await updateProperty(id, payload);
+  update: async (
+    {
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: UpdatePropertyPayload;
+    },
+    accessToken?: string,
+  ) => {
+    return await updateProperty(id, payload, accessToken);
   },
 };
 
-export function useProperties() {
+export function useProperties(accessToken?: string) {
   const queryClient = useQueryClient();
 
   return {
     useList: (filters?: any) => {
-      return usePaginatedQuery(
-        propertyKeys.list(filters),
-        () => propertyFetchers.getList(filters),
+      return usePaginatedQuery(propertyKeys.list(filters), () =>
+        propertyFetchers.getList(filters, accessToken),
       );
     },
     useDetail: (id: string, options?: UseQueryOptions<Property, Error>) => {
       return useQuery({
         queryKey: propertyKeys.detail(id),
-        queryFn: () => propertyFetchers.getDetail(id),
+        queryFn: () => propertyFetchers.getDetail(id, accessToken),
         ...options,
+        enabled: Boolean(id) && (options?.enabled ?? true),
       });
     },
     useCreate: () => {
       return useMutation({
-        mutationFn: propertyFetchers.create,
+        mutationFn: (payload: CreatePropertyPayload) =>
+          propertyFetchers.create(payload, accessToken),
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
         },
@@ -84,7 +87,8 @@ export function useProperties() {
     },
     useUpdate: () => {
       return useMutation({
-        mutationFn: propertyFetchers.update,
+        mutationFn: (input: { id: string; payload: UpdatePropertyPayload }) =>
+          propertyFetchers.update(input, accessToken),
         onSuccess: (data, variables) => {
           queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
           queryClient.invalidateQueries({

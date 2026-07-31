@@ -1,10 +1,13 @@
 import { API_BASE_URL, apiClient, authHeaders, unwrapData } from "./client";
+import { normalizeFloorPlan } from "./floorplans";
 import type {
   ApiEnvelope,
   CreatePropertyPayload,
   PaginatedApiData,
   Property,
   PropertyImageUpload,
+  PropertySpatialCapabilities,
+  SpatialCapabilityLevel,
   UpdatePropertyPayload,
 } from "../types";
 
@@ -74,6 +77,33 @@ function normalizeBoolean(value: unknown) {
   return normalized === "1" || normalized === "true" || normalized === "yes";
 }
 
+const SPATIAL_CAPABILITY_LEVELS = new Set<SpatialCapabilityLevel>([
+  "recommended",
+  "optional",
+  "discouraged",
+  "unsupported",
+]);
+
+function normalizeSpatialCapabilities(
+  value: unknown,
+): PropertySpatialCapabilities | undefined {
+  if (!value || typeof value !== "object") return undefined;
+
+  const source = value as Record<string, unknown>;
+  const floorplans = String(source.floorplans ?? "").toLowerCase();
+  const rooms = String(source.rooms ?? "").toLowerCase();
+  const normalized: PropertySpatialCapabilities = {};
+
+  if (SPATIAL_CAPABILITY_LEVELS.has(floorplans as SpatialCapabilityLevel)) {
+    normalized.floorplans = floorplans as SpatialCapabilityLevel;
+  }
+  if (SPATIAL_CAPABILITY_LEVELS.has(rooms as SpatialCapabilityLevel)) {
+    normalized.rooms = rooms as SpatialCapabilityLevel;
+  }
+
+  return normalized.floorplans || normalized.rooms ? normalized : undefined;
+}
+
 function getImageUrl(imagePath?: string | null) {
   if (!imagePath) return "";
 
@@ -90,7 +120,7 @@ function getImageUrl(imagePath?: string | null) {
   return `${backendOrigin}/storage/${raw.replace(/^\/+/, "")}`;
 }
 
-function normalizeProperty(property: Record<string, any>): Property {
+export function normalizeProperty(property: Record<string, any>): Property {
   const mediaItems = Array.isArray(property?.media) ? property.media : [];
   const media = mediaItems[0];
   const images = Array.isArray(property?.images) ? property.images : [];
@@ -167,6 +197,20 @@ function normalizeProperty(property: Record<string, any>): Property {
         property?.transient_bookable ??
         false,
     ),
+    totalUnits:
+      property?.totalUnits !== undefined && property?.totalUnits !== null
+        ? Number(property.totalUnits)
+        : property?.total_units !== undefined && property?.total_units !== null
+          ? Number(property.total_units)
+          : undefined,
+    floorplans: Array.isArray(property?.floorplans)
+      ? property.floorplans.map((floorPlan: Record<string, any>) =>
+          normalizeFloorPlan(floorPlan),
+        )
+      : [],
+    spatialCapabilities: normalizeSpatialCapabilities(
+      property?.spatialCapabilities ?? property?.spatial_capabilities,
+    ),
   };
 }
 
@@ -179,6 +223,17 @@ export async function fetchProperties(accessToken?: string) {
   const properties = unwrapList(response);
 
   return properties.map((property) => normalizeProperty(property));
+}
+
+export async function fetchProperty(id: string, accessToken?: string) {
+  const response = await apiClient.get<ApiEnvelope<Property> | Property>(
+    `/properties/${id}`,
+    { headers: authHeaders(accessToken) },
+  );
+
+  return normalizeProperty(
+    unwrapData(response) as unknown as Record<string, any>,
+  );
 }
 
 export async function createProperty(

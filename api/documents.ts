@@ -87,7 +87,12 @@ function normalizeDocument(document: Record<string, any>): PropertyDocument {
     url: getStorageUrl(rawUrl),
     mimeType: mimeType || undefined,
     propertyId: document?.propertyId ?? document?.property_id ?? undefined,
-    lesseeId: document?.lesseeId ?? document?.lessee_id ?? undefined,
+    lesseeId:
+      document?.clientId ??
+      document?.client_id ??
+      document?.lesseeId ??
+      document?.lessee_id ??
+      undefined,
   };
 }
 
@@ -127,7 +132,7 @@ function toCreateFormData(payload: {
   formData.append("name", payload.name);
   formData.append("category", payload.category);
   appendOptional(formData, "property_id", payload.propertyId);
-  appendOptional(formData, "lessee_id", payload.lesseeId);
+  appendOptional(formData, "client_id", payload.lesseeId);
   appendFile(formData, payload.file);
   return formData;
 }
@@ -138,7 +143,7 @@ function toUpdateFormData(payload: DocumentUpdatePayload) {
   appendOptional(formData, "name", payload.name);
   appendOptional(formData, "category", payload.category);
   appendOptional(formData, "property_id", payload.propertyId);
-  appendOptional(formData, "lessee_id", payload.lesseeId);
+  appendOptional(formData, "client_id", payload.lesseeId);
   appendOptional(formData, "revision_comment", payload.revisionComment);
   if (payload.file) appendFile(formData, payload.file);
   return formData;

@@ -1,3 +1,5 @@
+import type { FloorPlan } from "./floorplans";
+
 export const PROPERTY_TAXONOMY = {
   Residential: [
     "Single Family Home",
@@ -15,6 +17,17 @@ export const PROPERTY_TAXONOMY = {
 export type PropertyClassification = keyof typeof PROPERTY_TAXONOMY;
 export type PropertyType =
   (typeof PROPERTY_TAXONOMY)[PropertyClassification][number];
+
+export type SpatialCapabilityLevel =
+  | "recommended"
+  | "optional"
+  | "discouraged"
+  | "unsupported";
+
+export type PropertySpatialCapabilities = {
+  floorplans?: SpatialCapabilityLevel;
+  rooms?: SpatialCapabilityLevel;
+};
 
 export type Property = {
   id: string;
@@ -42,6 +55,9 @@ export type Property = {
   images?: string[];
   parentId?: string;
   isTransientBookable?: boolean;
+  totalUnits?: number;
+  floorplans?: FloorPlan[];
+  spatialCapabilities?: PropertySpatialCapabilities;
 };
 
 export type PropertyImageUpload = {
@@ -73,7 +89,10 @@ export type CreatePropertyPayload = {
   images?: PropertyImageUpload[];
 };
 
-export type UpdatePropertyPayload = Omit<CreatePropertyPayload, "image" | "images"> & {
+export type UpdatePropertyPayload = Omit<
+  CreatePropertyPayload,
+  "image" | "images"
+> & {
   image?: PropertyImageUpload | string;
   images?: Array<PropertyImageUpload | string>;
   retained_images?: string[];

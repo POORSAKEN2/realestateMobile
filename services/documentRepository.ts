@@ -1,7 +1,7 @@
 import {
   deleteDocument,
   fetchDocuments,
-  fetchLessees,
+  fetchClients,
   updateDocument,
   uploadDocument,
 } from "../api/propertyDetails";
@@ -27,7 +27,7 @@ export interface DocumentRepository {
     accessToken?: string,
   ): Promise<PropertyDocument>;
   list(accessToken?: string): Promise<PropertyDocument[]>;
-  listLessees(accessToken?: string): Promise<Lessee[]>;
+  listClients(accessToken?: string): Promise<Lessee[]>;
   remove(id: string, accessToken?: string): Promise<void>;
   update(
     id: string,
@@ -39,7 +39,7 @@ export interface DocumentRepository {
 export const apiDocumentRepository: DocumentRepository = {
   create: uploadDocument,
   list: fetchDocuments,
-  listLessees: fetchLessees,
+  listClients: fetchClients,
   remove: deleteDocument,
   update: updateDocument,
 };

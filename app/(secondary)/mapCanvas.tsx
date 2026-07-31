@@ -1,5 +1,4 @@
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -16,13 +15,13 @@ import {
   usePropertyMap,
 } from "../../hooks/properties/usePropertyMap";
 import { Screen } from "../../components/ui/Screen";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import {
   getPropertyCoordinate,
   getPropertyMarkerColor,
 } from "../../utils/properties/propertyPresentation";
 
 export default function MapCanvasScreen() {
-  const router = useRouter();
   const { useList } = useProperties();
   const { data: properties = [], isError, isLoading, refetch } = useList();
   const {
@@ -71,13 +70,10 @@ export default function MapCanvasScreen() {
         </MapView>
 
         <View style={styles.topBar}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => router.back()}
-            style={styles.iconButton}
-          >
-            <AntDesign name="arrow-left" size={22} color="#0F172A" />
-          </TouchableOpacity>
+          <SecondaryBackButton
+            accessibilityLabel="Back from portfolio map"
+            variant="overlay"
+          />
 
           <View style={styles.summaryCard}>
             <View style={styles.summaryIcon}>

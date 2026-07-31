@@ -19,6 +19,8 @@ import {
 } from "../../components/ui/fields/PickerField";
 import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import {
   calculateLeaseEndDate,
   formatLeaseDateLabel,
@@ -81,17 +83,18 @@ export default function LeasesScreen() {
     <Screen className="bg-[#2563EB]/5">
       <View className="flex-1 gap-5">
         {/* --- TOP HEADER: Title & Primary Action --- */}
-        <View className="flex-row items-center justify-between px-1">
-          <View>
-            <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-slate-400">
-              Contract Management
-            </Text>
-            <Text className="font-ralewayBold text-3xl tracking-tight text-[#1d1d1f]">
-              Leases
-            </Text>
-          </View>
-
-          <AddButton onPress={openCreateForm} />
+        <View className="px-1">
+          <ModuleHeader
+            action={<AddButton onPress={openCreateForm} />}
+            eyebrow="Contract Management"
+            leading={
+              <SecondaryBackButton
+                accessibilityLabel="Back from leases"
+                variant="primary"
+              />
+            }
+            title="Leases"
+          />
         </View>
 
         {/* --- THE HERO: REVENUE SNAPSHOT --- */}

@@ -8,6 +8,7 @@ import {
   getPropertyImages,
   getPropertyStatusTone,
 } from "../../utils/properties/propertyPresentation";
+import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 import PropertyImageGallery from "./PropertyImageGallery";
 
 function PropertyMetric({ label, value }: { label: string; value: string }) {
@@ -18,7 +19,7 @@ function PropertyMetric({ label, value }: { label: string; value: string }) {
       </Text>
       <Text
         adjustsFontSizeToFit
-        className="text-textPrimary mt-1 font-ralewayBold text-sm"
+        className="mt-1 font-ralewayBold text-sm text-textPrimary"
         numberOfLines={1}
       >
         {value}
@@ -67,10 +68,12 @@ function PropertyAction({
 export function PropertyCard({
   property,
   onEdit,
+  onOpenFloorPlans,
   onOpenBookings,
 }: {
   property: Property;
   onEdit: () => void;
+  onOpenFloorPlans: () => void;
   onOpenBookings?: () => void;
 }) {
   const occupancy = property.occupancy ?? 0;
@@ -79,6 +82,16 @@ export function PropertyCard({
   const [imageWidth, setImageWidth] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
+  const floorPlans = property.floorplans ?? [];
+  const floorAreaCount = floorPlans.reduce(
+    (total, floor) => total + floor.areas.length,
+    0,
+  );
+  const floorManagerPolicy = resolveFloorManagerPolicy({
+    backendCapabilities: property.spatialCapabilities,
+    hasFloorPlans: floorPlans.length > 0,
+    propertyType: property.type,
+  });
 
   return (
     <View className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -156,7 +169,7 @@ export function PropertyCard({
         <View className="flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
             <Text
-              className="text-textPrimary font-ralewayBold text-lg"
+              className="font-ralewayBold text-lg text-textPrimary"
               numberOfLines={1}
             >
               {property.title}
@@ -198,6 +211,59 @@ export function PropertyCard({
           <View className="w-px bg-slate-200" />
           <PropertyMetric label="Occupancy" value={`${occupancy}%`} />
         </View>
+
+        <TouchableOpacity
+          accessibilityLabel={`Manage floor plans for ${property.title}`}
+          accessibilityRole="button"
+          activeOpacity={0.82}
+          className={`mt-4 flex-row items-center gap-3 rounded-2xl border p-3.5 ${
+            floorManagerPolicy.floorSummaryProminence === "primary"
+              ? "border-secondary/25 bg-secondary/10"
+              : "border-slate-200 bg-slate-50"
+          }`}
+          onPress={onOpenFloorPlans}
+        >
+          <View className="h-11 w-11 items-center justify-center rounded-xl bg-white">
+            <MaterialCommunityIcons
+              name="floor-plan"
+              color={
+                floorManagerPolicy.floorSummaryProminence === "primary"
+                  ? "#634CE4"
+                  : "#64748B"
+              }
+              size={21}
+            />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text
+              className={`font-ralewayBold text-xs uppercase ${
+                floorManagerPolicy.floorSummaryProminence === "primary"
+                  ? "text-primary"
+                  : "text-slate-600"
+              }`}
+            >
+              {floorManagerPolicy.floorSummaryProminence === "primary"
+                ? "Floor summary"
+                : "Optional layout"}
+            </Text>
+            <Text className="mt-1 text-xs text-slate-600">
+              {floorPlans.length
+                ? `${floorPlans.length} ${floorPlans.length === 1 ? "floor" : "floors"} · ${floorAreaCount} ${floorAreaCount === 1 ? "area" : "areas"}`
+                : floorManagerPolicy.floorSummaryProminence === "primary"
+                  ? "No floors added yet"
+                  : "Usually not needed · Add anyway"}
+            </Text>
+          </View>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            color={
+              floorManagerPolicy.floorSummaryProminence === "primary"
+                ? "#634CE4"
+                : "#64748B"
+            }
+            size={21}
+          />
+        </TouchableOpacity>
 
         <View className="mt-4 flex-row items-center gap-2">
           <View className="min-w-0 flex-1 flex-row items-center gap-3">

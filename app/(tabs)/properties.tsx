@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, View } from "react-native";
 
 import { PropertyCard } from "../../components/properties/PropertyCard";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
@@ -14,6 +14,7 @@ import { PropertyListToolbar } from "../../components/properties/PropertyListToo
 import { PropertyPortfolioSummary } from "../../components/properties/PropertyPortfolioSummary";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { Screen } from "../../components/ui/Screen";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { useProperties } from "../../hooks/api/useProperties";
 import { usePropertyFormController } from "../../hooks/properties/usePropertyFormController";
 import { useAuth } from "../../hooks/useAuth";
@@ -25,6 +26,7 @@ import {
   suggestedLocations,
 } from "../../utils/properties/propertyForm";
 import AddButton from "../../components/ui/buttons/AddButton";
+import { appRoutes } from "../../constants/navigation";
 
 type PropertyListItem =
   | { kind: "search" }
@@ -40,7 +42,7 @@ export default function PropertiesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
 
-  const { useList } = useProperties();
+  const { useList } = useProperties(accessToken);
   const { data: properties = [], isError, isLoading, refetch } = useList();
   const propertyForm = usePropertyFormController(accessToken);
   const {
@@ -143,17 +145,12 @@ export default function PropertiesScreen() {
           }
           ListHeaderComponent={
             <View className="gap-5 pb-5">
-              <View className="flex-row items-center justify-between px-1">
-                <View className="min-w-0 flex-1 pr-4">
-                  <Text className="text-xs font-ralewayBold text-slate-600">
-                    Asset management
-                  </Text>
-                  <Text className="font-ralewayBold text-3xl tracking-tight text-[#1d1d1f]">
-                    Properties
-                  </Text>
-                </View>
-
-                <AddButton title="Add" onPress={openForm} />
+              <View className="px-1">
+                <ModuleHeader
+                  action={<AddButton title="Add" onPress={openForm} />}
+                  eyebrow="Asset Management"
+                  title="Properties"
+                />
               </View>
 
               <PropertyPortfolioSummary
@@ -245,11 +242,21 @@ export default function PropertiesScreen() {
               <PropertyCard
                 property={item.property}
                 onEdit={() => openEditForm(item.property)}
+                onOpenFloorPlans={() =>
+                  router.push({
+                    pathname: appRoutes.secondary.floorPlans,
+                    params: {
+                      propertyId: item.property.id,
+                      propertyTitle: item.property.title,
+                      propertyType: item.property.type,
+                    },
+                  })
+                }
                 onOpenBookings={
                   item.property.isTransientBookable
                     ? () =>
                         router.push({
-                          pathname: "/(tabs)/bookings",
+                          pathname: appRoutes.primary.bookings,
                           params: { propertyId: item.property.id },
                         })
                     : undefined

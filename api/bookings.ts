@@ -1,5 +1,5 @@
 import { apiClient, authHeaders, unwrapCollection, unwrapData } from "./client";
-import { createLessee, fetchLessees } from "./propertyDetails";
+import { createClient, fetchClients } from "./propertyDetails";
 import { fetchProperties } from "./properties";
 import type {
   ApiEnvelope,
@@ -18,17 +18,17 @@ export const DEFAULT_CHECK_IN_TIME = "14:00";
 export const DEFAULT_CHECK_OUT_TIME = "11:00";
 
 function normalizeBooking(lease: Record<string, any>): TransientBooking {
-  const lessee = lease?.lessee ?? {};
+  const client = lease?.client ?? lease?.lessee ?? {};
 
   return {
     id: String(lease?.id ?? ""),
     propertyId: String(lease?.propertyId ?? lease?.property_id ?? ""),
     roomNumber: String(lease?.roomNumber ?? lease?.room_number ?? ""),
-    guestName: String(lessee?.name ?? lease?.guestName ?? "Unknown"),
+    guestName: String(client?.name ?? lease?.guestName ?? "Unknown"),
     guestEmail: String(
-      lessee?.contactEmail ?? lessee?.contact_email ?? lease?.guestEmail ?? "",
+      client?.contactEmail ?? client?.contact_email ?? lease?.guestEmail ?? "",
     ),
-    guestPhone: String(lessee?.phone ?? lease?.guestPhone ?? ""),
+    guestPhone: String(client?.phone ?? lease?.guestPhone ?? ""),
     startDate: String(lease?.startDate ?? lease?.start_date ?? "").slice(0, 10),
     checkInTime: String(
       lease?.checkInTime ?? lease?.check_in_time ?? DEFAULT_CHECK_IN_TIME,
@@ -45,11 +45,11 @@ function normalizeBooking(lease: Record<string, any>): TransientBooking {
 
 function toBookingApiPayload(
   payload: TransientBookingPayload,
-  lesseeId: string,
+  clientId: string,
 ) {
   return {
     property_id: payload.propertyId,
-    lessee_id: lesseeId,
+    client_id: clientId,
     room_number: payload.roomNumber,
     type: "Transient",
     start_date: payload.startDate,
@@ -154,16 +154,16 @@ export async function createTransientBooking(
   accessToken?: string,
 ) {
   const trimmedEmail = payload.guestEmail.trim().toLowerCase();
-  const lessees = await fetchLessees(accessToken);
-  const existingLessee = trimmedEmail
-    ? lessees.find(
-        (lessee: Lessee) =>
-          lessee.contactEmail.trim().toLowerCase() === trimmedEmail,
+  const clients = await fetchClients(accessToken);
+  const existingClient = trimmedEmail
+    ? clients.find(
+        (client: Lessee) =>
+          client.contactEmail.trim().toLowerCase() === trimmedEmail,
       )
     : undefined;
-  const lessee =
-    existingLessee ??
-    (await createLessee(
+  const client =
+    existingClient ??
+    (await createClient(
       {
         name: payload.guestName,
         contactEmail: payload.guestEmail,
@@ -174,7 +174,7 @@ export async function createTransientBooking(
 
   const response = await apiClient.post<
     ApiEnvelope<Record<string, any>> | Record<string, any>
-  >("/leases", toBookingApiPayload(payload, lessee.id), {
+  >("/leases", toBookingApiPayload(payload, client.id), {
     headers: authHeaders(accessToken),
   });
 

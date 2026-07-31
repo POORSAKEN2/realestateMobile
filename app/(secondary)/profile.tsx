@@ -13,6 +13,7 @@ import { ProfileSaveButton } from "../../components/profile/ProfileSaveButton";
 import { ProfileSummaryCard } from "../../components/profile/ProfileSummaryCard";
 import { Screen } from "../../components/ui/Screen";
 import { useProfileController } from "../../hooks/profile/useProfileController";
+import { appRoutes } from "../../constants/navigation";
 
 export default function ProfileScreen() {
   const profile = useProfileController();
@@ -23,7 +24,7 @@ export default function ProfileScreen() {
       return;
     }
 
-    router.replace("/(tabs)/dashboard");
+    router.replace(appRoutes.primary.dashboard);
   }
 
   async function handleChangePhoto() {
@@ -109,7 +110,7 @@ export default function ProfileScreen() {
             onPress={handleSave}
           />
           <ProfileAccountActions
-            onOpenSecurity={() => router.push("/(tabs)/settings")}
+            onOpenSecurity={() => router.push(appRoutes.secondary.settings)}
             onSignOut={handleSignOut}
           />
         </ScrollView>

@@ -23,10 +23,11 @@ import Svg, {
 } from "react-native-svg";
 
 import { colors } from "../../constants/colors";
+import { appRoutes } from "../../constants/navigation";
 
 type MenuItem = {
   label: string;
-  href: string;
+  href: Href;
   icon:
     | { family: "Ionicons"; name: keyof typeof Ionicons.glyphMap }
     | {
@@ -43,22 +44,22 @@ type MoreBottomSheetProps = {
 const menuItems: MenuItem[] = [
   {
     label: "Analytics",
-    href: "/(tabs)/analytics",
+    href: appRoutes.secondary.analytics,
     icon: { family: "Ionicons", name: "analytics-outline" },
   },
   {
     label: "Leases",
-    href: "/(tabs)/leases",
+    href: appRoutes.secondary.leases,
     icon: { family: "Ionicons", name: "document-text-outline" },
   },
   {
     label: "Tenants",
-    href: "/(tabs)/tenants",
+    href: appRoutes.secondary.tenants,
     icon: { family: "Ionicons", name: "people-outline" },
   },
   {
     label: "Documents",
-    href: "/(tabs)/documents",
+    href: appRoutes.secondary.documents,
     icon: {
       family: "MaterialCommunityIcons",
       name: "file-document-outline",
@@ -66,12 +67,12 @@ const menuItems: MenuItem[] = [
   },
   {
     label: "Profile",
-    href: "/(tabs)/profile",
+    href: appRoutes.secondary.profile,
     icon: { family: "Ionicons", name: "person-outline" },
   },
   {
     label: "Settings",
-    href: "/(tabs)/settings",
+    href: appRoutes.secondary.settings,
     icon: { family: "Ionicons", name: "settings-outline" },
   },
 ];
@@ -314,10 +315,10 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
     return () => animation.stop();
   }, [backdropOpacity, height, sheetOpacity, translateY, visible]);
 
-  function handleItemPress(href: string) {
+  function handleItemPress(href: Href) {
     onClose();
     setTimeout(() => {
-      router.push(href as Href);
+      router.push(href);
     }, 190);
   }
 

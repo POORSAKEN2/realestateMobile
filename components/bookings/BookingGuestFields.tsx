@@ -55,13 +55,13 @@ export function BookingGuestFields({
         accessibilityRole="button"
         className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 py-3 ${
           isAddingGuest
-            ? "bg-secondary/20 border-primary/30"
+            ? "border-primary/30 bg-secondary/20"
             : "border-slate-200 bg-slate-50"
         }`}
         onPress={onToggleAddingGuest}
       >
         <View className="min-w-0 flex-1 flex-row items-center gap-3">
-          <View className="bg-secondary/20 h-9 w-9 items-center justify-center rounded-xl">
+          <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/20">
             <MaterialCommunityIcons
               name={
                 isAddingGuest ? "account-check-outline" : "account-plus-outline"
@@ -71,7 +71,7 @@ export function BookingGuestFields({
             />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="font-ralewayExtraBold text-textPrimary text-sm">
+            <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               {isAddingGuest ? "Entering a new guest" : "Guest not listed?"}
             </Text>
             <Text className="mt-0.5 text-xs leading-4 text-slate-600">
@@ -81,7 +81,7 @@ export function BookingGuestFields({
             </Text>
           </View>
         </View>
-        <Text className="font-ralewayExtraBold ml-3 text-xs text-primary">
+        <Text className="ml-3 font-ralewayExtraBold text-xs text-primary">
           {isAddingGuest ? "Cancel" : "Add"}
         </Text>
       </TouchableOpacity>
@@ -102,6 +102,7 @@ export function BookingGuestFields({
             onChangeText={(value) => onUpdateForm("guestPhone", value)}
             placeholder="e.g. 0917 123 4567"
             value={form.guestPhone}
+            required
             variant="filled"
           />
           <BaseField

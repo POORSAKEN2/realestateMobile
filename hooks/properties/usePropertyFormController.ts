@@ -58,8 +58,11 @@ export function usePropertyFormController(accessToken?: string) {
   const saveMutation = useMutation({
     mutationFn: async (payload: PropertyFormPayload) => {
       const property = editingProperty
-        ? await propertyFetchers.update({ id: editingProperty.id, payload })
-        : await propertyFetchers.create(payload as any);
+        ? await propertyFetchers.update(
+            { id: editingProperty.id, payload },
+            accessToken,
+          )
+        : await propertyFetchers.create(payload as any, accessToken);
 
       if (selectedDocuments.length > 0) {
         await uploadPropertyDocuments(

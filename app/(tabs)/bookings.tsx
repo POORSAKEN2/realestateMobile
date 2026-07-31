@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 import { fetchTransientBookings } from "../../api/bookings";
-import { fetchLessees } from "../../api/propertyDetails";
 import {
   BookingCalendar,
   BookingCalendarEmpty,
@@ -15,8 +14,10 @@ import {
   BookingReservationList,
 } from "../../components/bookings";
 import AddButton from "../../components/ui/buttons/AddButton";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
 import { useProperties } from "../../hooks/api/useProperties";
+import { useClients } from "../../hooks/api/useClients";
 import { useBookingCalendar, useBookingForm } from "../../hooks/bookings";
 import { useAuth } from "../../hooks/useAuth";
 import {
@@ -48,11 +49,7 @@ export default function BookingsScreen() {
     queryFn: () => fetchTransientBookings(accessToken),
     enabled: Boolean(accessToken),
   });
-  const { data: guests = [] } = useQuery({
-    queryKey: ["lessees", accessToken],
-    queryFn: () => fetchLessees(accessToken),
-    enabled: Boolean(accessToken),
-  });
+  const { data: guests = [] } = useClients(accessToken);
 
   const buildingOptions = useMemo(
     () =>
@@ -124,20 +121,21 @@ export default function BookingsScreen() {
   return (
     <Screen className="bg-slate-50">
       <View className="flex-1 gap-5">
-        <View className="flex-row items-center justify-between px-1">
-          <View>
-            <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-slate-400">
-              Short Stay
-            </Text>
-            <Text className="font-ralewayBold text-3xl tracking-tight text-slate-950">
-              Bookings
-            </Text>
-          </View>
-          <AddButton
-            disabled={!selectedBuilding}
-            onPress={() =>
-              bookingForm.openCreate(selectedPropertyId, calendar.selectedDate)
+        <View className="px-1">
+          <ModuleHeader
+            action={
+              <AddButton
+                disabled={!selectedBuilding}
+                onPress={() =>
+                  bookingForm.openCreate(
+                    selectedPropertyId,
+                    calendar.selectedDate,
+                  )
+                }
+              />
             }
+            eyebrow="Short Stay"
+            title="Bookings"
           />
         </View>
 

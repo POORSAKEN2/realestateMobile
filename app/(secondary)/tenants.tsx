@@ -13,6 +13,8 @@ import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { formatCurrency } from "../../utils/formatters";
 import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
 
@@ -49,17 +51,18 @@ export default function TenantsScreen() {
     <Screen className="bg-[#2563EB]/5">
       <View className="flex-1 gap-6">
         {/* --- TOP HEADER: Title & Global Action --- */}
-        <View className="flex-row items-center justify-between px-1">
-          <View>
-            <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-slate-400">
-              CRM Dashboard
-            </Text>
-            <Text className="font-ralewayBold text-3xl tracking-tight text-[#1d1d1f]">
-              Tenants
-            </Text>
-          </View>
-
-          <AddButton onPress={openCreateForm} />
+        <View className="px-1">
+          <ModuleHeader
+            action={<AddButton onPress={openCreateForm} />}
+            eyebrow="CRM Dashboard"
+            leading={
+              <SecondaryBackButton
+                accessibilityLabel="Back from tenants"
+                variant="primary"
+              />
+            }
+            title="Tenants"
+          />
         </View>
 
         {/* --- THE HERO: REVENUE SNAPSHOT --- */}
