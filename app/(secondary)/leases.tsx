@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import Feather from "@expo/vector-icons/Feather";
-import { Platform, ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, Text, TextInput, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import {
@@ -13,10 +12,8 @@ import { LeaseCard } from "../../components/leases/LeaseCard";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { ChoiceField } from "../../components/ui/fields/ChoiceField";
-import {
-  PickerField,
-  PickerModalShell,
-} from "../../components/ui/fields/PickerField";
+import { DateTimePickerModal } from "../../components/ui/fields/DateTimePickerModal";
+import { PickerField } from "../../components/ui/fields/PickerField";
 import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
@@ -347,17 +344,13 @@ export default function LeasesScreen() {
         </FormSection>
 
         {isStartDatePickerOpen ? (
-          <PickerModalShell
+          <DateTimePickerModal
+            mode="date"
+            onChange={handleDateChange}
             onClose={confirmDatePicker}
             title="Select Start Date"
-          >
-            <DateTimePicker
-              display={Platform.OS === "ios" ? "inline" : "default"}
-              mode="date"
-              onChange={handleDateChange}
-              value={datePickerValue}
-            />
-          </PickerModalShell>
+            value={datePickerValue}
+          />
         ) : null}
       </AddEditModal>
 

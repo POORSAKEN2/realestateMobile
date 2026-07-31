@@ -1,6 +1,4 @@
-import DateTimePicker, {
-  type DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
+import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 
@@ -14,7 +12,8 @@ import {
   type BookingFormUpdater,
   type BookingPickerField,
 } from "../../utils/bookings/bookingCalendar";
-import { PickerField, PickerModalShell } from "../ui/fields/PickerField";
+import { DateTimePickerModal } from "../ui/fields/DateTimePickerModal";
+import { PickerField } from "../ui/fields/PickerField";
 
 type BookingStayFieldsProps = {
   form: BookingFormState;
@@ -119,25 +118,13 @@ function BookingDateTimePicker({
   }
 
   return (
-    <PickerModalShell onClose={onClose} title={getBookingPickerTitle(field)}>
-      {isDateField ? (
-        <DateTimePicker
-          key={`booking-date-${field}`}
-          display={Platform.OS === "ios" ? "inline" : "default"}
-          {...(minimumDate ? { minimumDate } : {})}
-          mode="date"
-          onChange={handleChange}
-          value={pickerValue}
-        />
-      ) : (
-        <DateTimePicker
-          key={`booking-time-${field}`}
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          mode="time"
-          onChange={handleChange}
-          value={pickerValue}
-        />
-      )}
-    </PickerModalShell>
+    <DateTimePickerModal
+      minimumDate={minimumDate}
+      mode={isDateField ? "date" : "time"}
+      onChange={handleChange}
+      onClose={onClose}
+      title={getBookingPickerTitle(field)}
+      value={pickerValue}
+    />
   );
 }
