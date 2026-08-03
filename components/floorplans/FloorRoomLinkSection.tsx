@@ -33,7 +33,7 @@ export function FloorRoomLinkSection({
   );
 
   return (
-    <View className="mt-2 border-t border-slate-200 pt-5">
+    <View className="pt-1">
       <View className="flex-row items-center gap-2">
         <MaterialCommunityIcons name="link-variant" color="#8A77F4" size={21} />
         <Text className="font-ralewayBold text-base text-textPrimary">

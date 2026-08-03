@@ -1,8 +1,9 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { FloorAreaCard, IconButton } from "./FloorAreaCard";
+import { FloorAreaCard } from "./FloorAreaCard";
 import { FloorPlanCanvas } from "./FloorPlanCanvas";
+import { FloorPlanIconButton } from "./FloorPlanIconButton";
 import type {
   FloorArea,
   FloorPlan,
@@ -112,7 +113,7 @@ export function FloorPlanWorkspace({
             </Text>
           </View>
           <View className="flex-row gap-1">
-            <IconButton
+            <FloorPlanIconButton
               icon="image-outline"
               label={
                 activeFloor.image
@@ -121,12 +122,12 @@ export function FloorPlanWorkspace({
               }
               onPress={onPickImage}
             />
-            <IconButton
+            <FloorPlanIconButton
               icon="pencil-outline"
               label="Rename floor"
               onPress={() => onRenameFloor(activeFloor)}
             />
-            <IconButton
+            <FloorPlanIconButton
               danger
               icon="trash-can-outline"
               label="Delete floor"

@@ -40,20 +40,13 @@ function deleteDescription(
   if (target?.kind === "area") {
     return `Delete ${target.item.label}? Assigned rooms remain but become unassigned.`;
   }
-  if (target?.kind === "room") {
-    return `Delete room ${target.item.roomNumber}? This cannot be undone.`;
-  }
   return "";
 }
 
 function deleteTitle(
   target: ReturnType<typeof useFloorPlanManagerController>["deleteTarget"],
 ) {
-  return target?.kind === "floor"
-    ? "Delete floor?"
-    : target?.kind === "area"
-      ? "Delete area?"
-      : "Delete room?";
+  return target?.kind === "floor" ? "Delete floor?" : "Delete area?";
 }
 
 export default function FloorPlansScreen() {
@@ -189,6 +182,7 @@ export default function FloorPlansScreen() {
         assignedRooms={roomBatch.assignedRooms}
         availableRooms={roomBatch.availableRooms}
         canCreateRooms={roomBatch.canCreateRooms}
+        canGenerate={roomBatch.canGenerate}
         count={roomBatch.count}
         floor={roomBatch.floor}
         isBusy={controller.isBusy}
@@ -198,10 +192,10 @@ export default function FloorPlansScreen() {
         onChangePrefix={roomBatch.setPrefix}
         onChangeStart={roomBatch.setStart}
         onClose={roomBatch.close}
-        onDeleteRoom={actions.openRoomDelete}
         onGenerate={roomBatch.generate}
         onLinkRoom={roomBatch.linkSelectedRoom}
         onSelectRoom={roomBatch.setSelectedRoomId}
+        onUpdateRoomStatus={roomBatch.updateStatus}
         onUnassignRoom={roomBatch.unassign}
         prefix={roomBatch.prefix}
         start={roomBatch.start}

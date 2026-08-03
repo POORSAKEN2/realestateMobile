@@ -45,7 +45,6 @@ export function validateAreaName(
 
 export type RoomBatch = {
   numbers: string[];
-  nextStart: number;
 };
 
 export function validateRoomBatch(
@@ -54,6 +53,21 @@ export function validateRoomBatch(
   countValue: string,
   rooms: PropertyRoom[],
 ): ValidationResult<RoomBatch> {
+  if (!startValue.trim()) {
+    return {
+      ok: false,
+      title: "Start number required",
+      message: "Enter the first room number in the sequence.",
+    };
+  }
+  if (!countValue.trim()) {
+    return {
+      ok: false,
+      title: "Room count required",
+      message: "Enter how many rooms to generate.",
+    };
+  }
+
   const start = Number(startValue);
   const count = Number(countValue);
 
@@ -89,5 +103,5 @@ export function validateRoomBatch(
         title: "Room number already exists",
         message: `${duplicate} is already used in this property.`,
       }
-    : { ok: true, value: { nextStart: start + count, numbers } };
+    : { ok: true, value: { numbers } };
 }

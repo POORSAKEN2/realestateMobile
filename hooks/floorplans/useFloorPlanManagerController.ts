@@ -10,7 +10,6 @@ import type {
   FloorArea,
   FloorPlan,
   FloorPlanDrawingMode,
-  PropertyRoom,
   SpatialCapabilityLevel,
 } from "../../types";
 import { getErrorMessage } from "../../utils/floorplans/floorPlanPresentation";
@@ -33,8 +32,7 @@ export type FloorPlanDrawingState = {
 
 export type FloorPlanDeleteTarget =
   | { kind: "floor"; item: FloorPlan }
-  | { kind: "area"; item: FloorArea }
-  | { kind: "room"; item: PropertyRoom };
+  | { kind: "area"; item: FloorArea };
 
 export function useFloorPlanManagerController({
   accessToken,
@@ -239,12 +237,10 @@ export function useFloorPlanManagerController({
       if (deleteTarget.kind === "floor") {
         await floorCommands.remove.mutateAsync(deleteTarget.item.id);
         setNotice("Floor and its areas deleted.");
-      } else if (deleteTarget.kind === "area") {
+      } else {
         await areaCommands.remove.mutateAsync(deleteTarget.item.id);
         visibility.forget(deleteTarget.item.id);
         setNotice("Area deleted. Assigned rooms kept and unassigned.");
-      } else {
-        await roomBatch.remove(deleteTarget.item);
       }
       setDeleteTarget(null);
     } catch (error) {
@@ -300,8 +296,6 @@ export function useFloorPlanManagerController({
         setDeleteTarget({ kind: "floor", item }),
       openFloorEdit: (item: FloorPlan) =>
         setFloorForm({ id: item.id, value: item.name }),
-      openRoomDelete: (item: PropertyRoom) =>
-        setDeleteTarget({ kind: "room", item }),
       pickFloorPlanImage,
       saveShape,
       selectFloor: (id: string) => {
@@ -327,10 +321,7 @@ export function useFloorPlanManagerController({
     notice,
     pending: {
       areaForm: areaCommands.create.isPending || areaCommands.update.isPending,
-      delete:
-        floorCommands.remove.isPending ||
-        areaCommands.remove.isPending ||
-        roomBatch.isRemoving,
+      delete: floorCommands.remove.isPending || areaCommands.remove.isPending,
       floorForm:
         floorCommands.create.isPending || floorCommands.update.isPending,
       shape: areaCommands.update.isPending,

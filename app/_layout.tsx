@@ -1,3 +1,5 @@
+import "react-native-gesture-handler";
+
 import {
   Raleway_400Regular,
   Raleway_500Medium,
@@ -11,10 +13,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useState } from "react";
 import { Text, TextInput, LogBox } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-LogBox.ignoreLogs([
-  "Unable to activate keep awake",
-]);
+LogBox.ignoreLogs(["Unable to activate keep awake"]);
 
 import "../global.css";
 import { NotificationBootstrap } from "../components/notifications/NotificationBootstrap";
@@ -72,17 +73,22 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <DefaultLocationProvider>
-          <NotificationBootstrap />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(secondary)" options={{ headerShown: false }} />
-          </Stack>
-        </DefaultLocationProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <DefaultLocationProvider>
+            <NotificationBootstrap />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(secondary)"
+                options={{ headerShown: false }}
+              />
+            </Stack>
+          </DefaultLocationProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

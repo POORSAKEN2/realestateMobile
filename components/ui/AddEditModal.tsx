@@ -7,41 +7,53 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { BackButton } from "./buttons/BackButton";
+import { FormActionRow } from "./forms/FormActionRow";
+
 interface AddEditModalProps {
   appearance?: "default" | "card";
+  backAccessibilityLabel?: string;
   cancelText?: string;
+  compactHeader?: boolean;
   isVisible: boolean;
   onClose: () => void;
   title: string;
   subtitle?: string;
   isPending: boolean;
+  onBack?: () => void;
   submitText: string;
   onSubmit: () => void;
   formError?: string | null;
+  headerAccessory?: React.ReactNode;
   showCancelAction?: boolean;
   showSubmitAction?: boolean;
   children: React.ReactNode;
+  footer?: React.ReactNode;
 }
 
 export const AddEditModal: React.FC<AddEditModalProps> = ({
   appearance = "default",
+  backAccessibilityLabel,
   cancelText = "Cancel",
+  compactHeader = false,
   isVisible,
   onClose,
   title,
   subtitle,
   isPending,
+  onBack,
   submitText,
   onSubmit,
   formError,
+  headerAccessory,
   showCancelAction = false,
   showSubmitAction = true,
   children,
+  footer,
 }) => {
   const scrollRef = useRef<ScrollView | null>(null);
   const isCardAppearance = appearance === "card";
@@ -71,16 +83,30 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
         <View
           className={
             isCardAppearance
-              ? "bg-white px-6 pb-5 pt-6"
+              ? compactHeader
+                ? "border-b border-slate-100 bg-white px-5 py-3"
+                : "bg-white px-6 pb-5 pt-6"
               : "border-b border-slate-200 bg-white px-5 py-4"
           }
         >
           <View className="flex-row items-center">
+            {onBack ? (
+              <View className="mr-3 items-center justify-center">
+                <BackButton
+                  accessibilityLabel={backAccessibilityLabel}
+                  disabled={isPending}
+                  onPress={onBack}
+                  variant="primary"
+                />
+              </View>
+            ) : null}
             <View className="flex-1 pr-4">
               <Text
                 className={
                   isCardAppearance
-                    ? "font-ralewayBold text-[28px] leading-9 tracking-tight text-textPrimary"
+                    ? compactHeader
+                      ? "font-ralewayBold text-xl leading-7 text-textPrimary"
+                      : "font-ralewayBold text-[28px] leading-9 tracking-tight text-textPrimary"
                     : "font-ralewayBold text-2xl text-textPrimary"
                 }
                 numberOfLines={2}
@@ -91,7 +117,9 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 <Text
                   className={
                     isCardAppearance
-                      ? "mt-2 font-ralewayMedium text-base leading-6 text-slate-500"
+                      ? compactHeader
+                        ? "mt-0.5 font-ralewayMedium text-sm leading-5 text-slate-500"
+                        : "mt-2 font-ralewayMedium text-base leading-6 text-slate-500"
                       : "mt-1 font-ralewayMedium text-sm text-[#6F6D6D]"
                   }
                   numberOfLines={2}
@@ -100,6 +128,9 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 </Text>
               ) : null}
             </View>
+            {headerAccessory ? (
+              <View className="mr-2">{headerAccessory}</View>
+            ) : null}
             <TouchableOpacity
               accessibilityLabel={`Close ${title}`}
               accessibilityRole="button"
@@ -129,7 +160,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
             <View className="flex-row items-start gap-3 rounded-2xl border border-[#B42318]/20 bg-[#FEF3F2] p-4">
               <Ionicons name="alert-circle-outline" color="#B42318" size={20} />
               <View className="min-w-0 flex-1">
-                <Text className="text-sm font-ralewayBold text-[#B42318]">
+                <Text className="font-ralewayBold text-sm text-[#B42318]">
                   Please review the form
                 </Text>
                 <Text className="mt-1 text-xs leading-5 text-[#7A271A]">
@@ -142,55 +173,26 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
           {children}
         </ScrollView>
 
-        <SafeAreaView
-          className="border-t border-textPrimary/10 bg-white px-5 pb-4 pt-4"
-          edges={["bottom"]}
-        >
-          <View className={`flex-row ${showCancelAction ? "gap-3" : ""}`}>
-            {showCancelAction ? (
-              <TouchableOpacity
-                accessibilityLabel={cancelText}
-                accessibilityRole="button"
-                activeOpacity={0.85}
-                className={`h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white ${
-                  isPending ? "opacity-60" : ""
-                }`}
+        {footer || showCancelAction || showSubmitAction ? (
+          <SafeAreaView
+            className="border-t border-textPrimary/10 bg-white px-5 pb-4 pt-4"
+            edges={["bottom"]}
+          >
+            {footer ?? (
+              <FormActionRow
+                appearance={appearance}
+                cancelText={cancelText}
                 disabled={isPending}
-                onPress={onClose}
-              >
-                <Text className="font-ralewayBold text-base text-primary">
-                  {cancelText}
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-            {showSubmitAction ? (
-              <TouchableOpacity
-                accessibilityLabel={submitText}
-                activeOpacity={0.85}
-                accessibilityRole="button"
-                className={`h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
-                  isPending ? "opacity-60" : ""
-                }`}
-                disabled={isPending}
-                onPress={onSubmit}
-              >
-                {isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text
-                    className={
-                      isCardAppearance
-                        ? "font-ralewayBold text-base text-white"
-                        : "text-lg font-ralewayBold text-white"
-                    }
-                  >
-                    {submitText}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            ) : null}
-          </View>
-        </SafeAreaView>
+                isPending={isPending}
+                onCancel={onClose}
+                onSubmit={onSubmit}
+                showCancelAction={showCancelAction}
+                showSubmitAction={showSubmitAction}
+                submitText={submitText}
+              />
+            )}
+          </SafeAreaView>
+        ) : null}
       </KeyboardAvoidingView>
     </Modal>
   );
