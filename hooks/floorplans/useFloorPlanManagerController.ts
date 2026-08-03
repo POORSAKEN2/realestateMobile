@@ -99,6 +99,16 @@ export function useFloorPlanManagerController({
     0,
   );
 
+  function verifyFloorPlanImage() {
+    if (activeFloor?.image) return true;
+
+    dependencies.feedback.showError(
+      "Floor plan image required",
+      `Upload an image for ${activeFloor?.name ?? "this floor"} before drawing area shapes.`,
+    );
+    return false;
+  }
+
   function reportValidation(
     validation: { ok: false; title: string; message: string } | { ok: true },
   ) {
@@ -178,6 +188,10 @@ export function useFloorPlanManagerController({
 
   async function saveShape(points: FloorArea["points"]) {
     if (!drawingArea) return;
+    if (!verifyFloorPlanImage()) {
+      setDrawing(null);
+      return;
+    }
     try {
       await areaCommands.update.mutateAsync({
         id: drawingArea.id,
@@ -241,6 +255,12 @@ export function useFloorPlanManagerController({
     }
   }
 
+  function openDrawing(areaId: string, mode: FloorPlanDrawingMode) {
+    if (!verifyFloorPlanImage()) return;
+
+    setDrawing({ areaId, mode });
+  }
+
   const isBusy =
     floorCommands.create.isPending ||
     floorCommands.update.isPending ||
@@ -265,8 +285,7 @@ export function useFloorPlanManagerController({
         setDeleteTarget({ kind: "area", item }),
       openAreaEdit: (item: FloorArea) =>
         setAreaForm({ id: item.id, value: item.label }),
-      openDrawing: (areaId: string, mode: FloorPlanDrawingMode) =>
-        setDrawing({ areaId, mode }),
+      openDrawing,
       openFloorCreate: () => {
         if (floorPlanCapability === "unsupported") {
           dependencies.feedback.showError(

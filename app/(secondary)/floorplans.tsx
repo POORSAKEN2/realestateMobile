@@ -187,20 +187,25 @@ export default function FloorPlansScreen() {
       <RoomBatchModal
         area={roomBatch.area}
         assignedRooms={roomBatch.assignedRooms}
+        availableRooms={roomBatch.availableRooms}
         canCreateRooms={roomBatch.canCreateRooms}
         count={roomBatch.count}
         floor={roomBatch.floor}
         isBusy={controller.isBusy}
         isCreating={roomBatch.isCreating}
+        isLinking={roomBatch.isLinking}
         onChangeCount={roomBatch.setCount}
         onChangePrefix={roomBatch.setPrefix}
         onChangeStart={roomBatch.setStart}
         onClose={roomBatch.close}
         onDeleteRoom={actions.openRoomDelete}
         onGenerate={roomBatch.generate}
+        onLinkRoom={roomBatch.linkSelectedRoom}
+        onSelectRoom={roomBatch.setSelectedRoomId}
         onUnassignRoom={roomBatch.unassign}
         prefix={roomBatch.prefix}
         start={roomBatch.start}
+        selectedRoomId={roomBatch.selectedRoomId}
       />
       <ConfirmationModal
         confirmLabel="Delete"

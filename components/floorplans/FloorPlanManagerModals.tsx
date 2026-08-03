@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import { IconButton } from "./FloorAreaCard";
+import { FloorRoomLinkSection } from "./FloorRoomLinkSection";
 import { AddEditModal } from "../ui/AddEditModal";
 import { BaseField } from "../ui/fields/BaseField";
 import type { FloorArea, FloorPlan, PropertyRoom } from "../../types";
@@ -95,37 +96,47 @@ export function AreaNameModal({
 export function RoomBatchModal({
   area,
   assignedRooms,
+  availableRooms,
   canCreateRooms,
   count,
   floor,
   isBusy,
   isCreating,
+  isLinking,
   onChangeCount,
   onChangePrefix,
   onChangeStart,
   onClose,
   onDeleteRoom,
   onGenerate,
+  onLinkRoom,
+  onSelectRoom,
   onUnassignRoom,
   prefix,
   start,
+  selectedRoomId,
 }: {
   area?: FloorArea;
   assignedRooms: PropertyRoom[];
+  availableRooms: PropertyRoom[];
   canCreateRooms: boolean;
   count: string;
   floor?: FloorPlan;
   isBusy: boolean;
   isCreating: boolean;
+  isLinking: boolean;
   onChangeCount: (value: string) => void;
   onChangePrefix: (value: string) => void;
   onChangeStart: (value: string) => void;
   onClose: () => void;
   onDeleteRoom: (room: PropertyRoom) => void;
   onGenerate: () => void;
+  onLinkRoom: () => void;
+  onSelectRoom: (roomId: string) => void;
   onUnassignRoom: (room: PropertyRoom) => void;
   prefix: string;
   start: string;
+  selectedRoomId: string;
 }) {
   return (
     <AddEditModal
@@ -185,11 +196,21 @@ export function RoomBatchModal({
             New rooms unavailable
           </Text>
           <Text className="mt-1 text-xs leading-5 text-amber-700">
-            Existing room assignments remain available to review, unassign, or
+            Existing rooms remain available to link, review, unassign, or
             delete.
           </Text>
         </View>
       )}
+
+      <FloorRoomLinkSection
+        availableRooms={availableRooms}
+        floorName={floor?.name}
+        isBusy={isBusy}
+        isLinking={isLinking}
+        onLink={onLinkRoom}
+        onSelect={onSelectRoom}
+        selectedRoomId={selectedRoomId}
+      />
 
       <View className="mt-2 border-t border-slate-200 pt-5">
         <Text className="font-ralewayBold text-base text-textPrimary">
@@ -240,7 +261,7 @@ export function RoomBatchModal({
                 No rooms assigned
               </Text>
               <Text className="mt-1 text-center text-xs text-slate-500">
-                Use batch generator above.
+                Generate or link a room above.
               </Text>
             </View>
           )}

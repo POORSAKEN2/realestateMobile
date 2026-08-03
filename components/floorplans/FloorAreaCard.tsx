@@ -5,6 +5,7 @@ import type { FloorArea, FloorPlanDrawingMode } from "../../types";
 
 export function FloorAreaCard({
   area,
+  canDraw,
   hidden,
   onDelete,
   onDraw,
@@ -14,6 +15,7 @@ export function FloorAreaCard({
   roomCount,
 }: {
   area: FloorArea;
+  canDraw: boolean;
   hidden: boolean;
   onDelete: () => void;
   onDraw: (mode: FloorPlanDrawingMode) => void;
@@ -64,11 +66,13 @@ export function FloorAreaCard({
 
       <View className="mt-4 flex-row flex-wrap gap-2 border-t border-slate-100 pt-3">
         <AreaAction
+          disabled={!canDraw}
           icon="vector-square"
           label="Rectangle"
           onPress={() => onDraw("rectangle")}
         />
         <AreaAction
+          disabled={!canDraw}
           icon="vector-polygon"
           label="Polygon"
           onPress={() => onDraw("polygon")}
@@ -119,11 +123,13 @@ export function IconButton({
 
 function AreaAction({
   danger = false,
+  disabled = false,
   icon,
   label,
   onPress,
 }: {
   danger?: boolean;
+  disabled?: boolean;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   label: string;
   onPress: () => void;
@@ -131,9 +137,11 @@ function AreaAction({
   return (
     <TouchableOpacity
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
       className={`h-11 flex-row items-center gap-1.5 rounded-xl px-3 ${
         danger ? "bg-red-50" : "bg-secondary/15"
-      }`}
+      } ${disabled ? "opacity-40" : ""}`}
+      disabled={disabled}
       onPress={onPress}
     >
       <MaterialCommunityIcons
