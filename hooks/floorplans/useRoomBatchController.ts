@@ -2,16 +2,10 @@ import { useMemo, useState } from "react";
 
 import { usePropertyRoomCommands } from "../api/useFloorPlans";
 import type { FloorPlanFeedback } from "../../services/floorplans/contracts";
-import type {
-  FloorArea,
-  FloorPlan,
-  PropertyRoom,
-  PropertyRoomStatus,
-} from "../../types";
+import type { FloorArea, FloorPlan, PropertyRoom } from "../../types";
 import {
   getErrorMessage,
   getLinkableFloorRooms,
-  getRoomStatusLabel,
 } from "../../utils/floorplans/floorPlanPresentation";
 import { validateRoomBatch } from "../../utils/floorplans/floorPlanValidation";
 
@@ -116,40 +110,6 @@ export function useRoomBatchController({
     }
   }
 
-  async function unassign(room: PropertyRoom) {
-    try {
-      await commands.update.mutateAsync({
-        id: room.id,
-        payload: { areaId: null },
-      });
-      onNotice(`Room ${room.roomNumber} unassigned.`);
-    } catch (error) {
-      feedback.showError(
-        "Room could not be unassigned",
-        getErrorMessage(error),
-      );
-    }
-  }
-
-  async function updateStatus(room: PropertyRoom, status: PropertyRoomStatus) {
-    if (room.status === status) return;
-
-    try {
-      await commands.update.mutateAsync({
-        id: room.id,
-        payload: { status },
-      });
-      onNotice(
-        `Room ${room.roomNumber} status updated to ${getRoomStatusLabel(status)}.`,
-      );
-    } catch (error) {
-      feedback.showError(
-        "Room status could not be updated",
-        getErrorMessage(error),
-      );
-    }
-  }
-
   async function linkSelectedRoom() {
     if (!area || !selectedRoomId) return;
     const room = availableRooms.find((item) => item.id === selectedRoomId);
@@ -199,7 +159,5 @@ export function useRoomBatchController({
     setStart,
     start,
     linkSelectedRoom,
-    unassign,
-    updateStatus,
   };
 }

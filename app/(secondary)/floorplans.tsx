@@ -16,6 +16,7 @@ import {
 import { FloorPlanWorkspace } from "../../components/floorplans/FloorPlanWorkspace";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { Screen } from "../../components/ui/Screen";
+import { appRoutes } from "../../constants/navigation";
 import { useFloorPlanManagerController } from "../../hooks/floorplans/useFloorPlanManagerController";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useAuth } from "../../hooks/useAuth";
@@ -179,7 +180,7 @@ export default function FloorPlansScreen() {
       />
       <RoomBatchModal
         area={roomBatch.area}
-        assignedRooms={roomBatch.assignedRooms}
+        assignedRoomCount={roomBatch.assignedRooms.length}
         availableRooms={roomBatch.availableRooms}
         canCreateRooms={roomBatch.canCreateRooms}
         canGenerate={roomBatch.canGenerate}
@@ -194,9 +195,24 @@ export default function FloorPlansScreen() {
         onClose={roomBatch.close}
         onGenerate={roomBatch.generate}
         onLinkRoom={roomBatch.linkSelectedRoom}
+        onOpenAssignedRooms={() => {
+          if (!roomBatch.area || !roomBatch.floor) return;
+
+          const area = roomBatch.area;
+          const floor = roomBatch.floor;
+          roomBatch.close();
+          router.push({
+            pathname: appRoutes.secondary.assignedRooms,
+            params: {
+              areaId: area.id,
+              areaLabel: area.label,
+              floorName: floor.name,
+              propertyId,
+              propertyTitle,
+            },
+          });
+        }}
         onSelectRoom={roomBatch.setSelectedRoomId}
-        onUpdateRoomStatus={roomBatch.updateStatus}
-        onUnassignRoom={roomBatch.unassign}
         prefix={roomBatch.prefix}
         start={roomBatch.start}
         selectedRoomId={roomBatch.selectedRoomId}
