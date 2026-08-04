@@ -20,6 +20,7 @@ interface PickerFieldProps {
 interface PickerModalShellProps {
   children: React.ReactNode;
   onClose: () => void;
+  onConfirm: () => void;
   title: string;
 }
 
@@ -86,6 +87,7 @@ export function PickerField({
 export function PickerModalShell({
   children,
   onClose,
+  onConfirm,
   title,
 }: PickerModalShellProps) {
   return (
@@ -96,17 +98,30 @@ export function PickerModalShell({
             <Text className="font-ralewayExtraBold text-textPrimary text-sm">
               {title}
             </Text>
-            <TouchableOpacity
-              accessibilityLabel={`Close ${title}`}
-              accessibilityRole="button"
-              activeOpacity={0.8}
-              className="bg-secondary/20 rounded-full px-3 py-1.5"
-              onPress={onClose}
-            >
-              <Text className="font-ralewayExtraBold text-xs text-primary">
-                Done
-              </Text>
-            </TouchableOpacity>
+            <View className="flex-row items-center gap-2">
+              <TouchableOpacity
+                accessibilityLabel={`Cancel ${title}`}
+                accessibilityRole="button"
+                activeOpacity={0.8}
+                className="rounded-full bg-slate-100 px-3 py-1.5"
+                onPress={onClose}
+              >
+                <Text className="font-ralewayExtraBold text-xs text-slate-600">
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                accessibilityLabel={`Confirm ${title}`}
+                accessibilityRole="button"
+                activeOpacity={0.8}
+                className="rounded-full bg-secondary/20 px-3 py-1.5"
+                onPress={onConfirm}
+              >
+                <Text className="font-ralewayExtraBold text-xs text-primary">
+                  Done
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
           {children}
         </View>

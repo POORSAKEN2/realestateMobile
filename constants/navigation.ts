@@ -20,6 +20,7 @@ export const appRoutes = {
     map: "/(secondary)/mapCanvas",
     notifications: "/(secondary)/notificationScreen",
     floorPlans: "/(secondary)/floorplans",
+    assignedRooms: "/(secondary)/assigned-rooms",
   },
 } as const;
 

@@ -40,7 +40,6 @@ export default function ChoiceChips<T extends string | number | boolean>({
   className = "flex-row flex-wrap gap-2",
   style,
 }: ChoiceChipsProps<T>) {
-  
   // Clean checks for checking selection state safely
   const isSelected = (optionValue: T): boolean => {
     if (isMultiSelect && Array.isArray(value)) {
@@ -68,14 +67,17 @@ export default function ChoiceChips<T extends string | number | boolean>({
         return (
           <TouchableOpacity
             key={String(option.value)}
+            accessibilityLabel={option.label}
+            accessibilityRole={isMultiSelect ? "checkbox" : "radio"}
+            accessibilityState={{ checked: selected }}
             activeOpacity={0.8}
-            className={`rounded-full border px-3.5 py-2.5 ${
+            className={`min-h-11 justify-center rounded-full border px-3.5 py-2.5 ${
               selected ? activeClassName : inactiveClassName
             }`}
             onPress={() => handlePress(option.value)}
           >
             <Text
-              className={`text-xs font-ralewayExtraBold ${
+              className={`font-ralewayExtraBold text-xs ${
                 selected ? activeTextClassName : inactiveTextClassName
               }`}
             >

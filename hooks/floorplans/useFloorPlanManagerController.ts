@@ -10,7 +10,6 @@ import type {
   FloorArea,
   FloorPlan,
   FloorPlanDrawingMode,
-  PropertyRoom,
   SpatialCapabilityLevel,
 } from "../../types";
 import { getErrorMessage } from "../../utils/floorplans/floorPlanPresentation";
@@ -33,8 +32,7 @@ export type FloorPlanDrawingState = {
 
 export type FloorPlanDeleteTarget =
   | { kind: "floor"; item: FloorPlan }
-  | { kind: "area"; item: FloorArea }
-  | { kind: "room"; item: PropertyRoom };
+  | { kind: "area"; item: FloorArea };
 
 export function useFloorPlanManagerController({
   accessToken,
@@ -98,6 +96,16 @@ export function useFloorPlanManagerController({
     (total, floor) => total + floor.areas.length,
     0,
   );
+
+  function verifyFloorPlanImage() {
+    if (activeFloor?.image) return true;
+
+    dependencies.feedback.showError(
+      "Floor plan image required",
+      `Upload an image for ${activeFloor?.name ?? "this floor"} before drawing area shapes.`,
+    );
+    return false;
+  }
 
   function reportValidation(
     validation: { ok: false; title: string; message: string } | { ok: true },
@@ -178,6 +186,10 @@ export function useFloorPlanManagerController({
 
   async function saveShape(points: FloorArea["points"]) {
     if (!drawingArea) return;
+    if (!verifyFloorPlanImage()) {
+      setDrawing(null);
+      return;
+    }
     try {
       await areaCommands.update.mutateAsync({
         id: drawingArea.id,
@@ -225,12 +237,10 @@ export function useFloorPlanManagerController({
       if (deleteTarget.kind === "floor") {
         await floorCommands.remove.mutateAsync(deleteTarget.item.id);
         setNotice("Floor and its areas deleted.");
-      } else if (deleteTarget.kind === "area") {
+      } else {
         await areaCommands.remove.mutateAsync(deleteTarget.item.id);
         visibility.forget(deleteTarget.item.id);
         setNotice("Area deleted. Assigned rooms kept and unassigned.");
-      } else {
-        await roomBatch.remove(deleteTarget.item);
       }
       setDeleteTarget(null);
     } catch (error) {
@@ -239,6 +249,12 @@ export function useFloorPlanManagerController({
         getErrorMessage(error),
       );
     }
+  }
+
+  function openDrawing(areaId: string, mode: FloorPlanDrawingMode) {
+    if (!verifyFloorPlanImage()) return;
+
+    setDrawing({ areaId, mode });
   }
 
   const isBusy =
@@ -265,8 +281,7 @@ export function useFloorPlanManagerController({
         setDeleteTarget({ kind: "area", item }),
       openAreaEdit: (item: FloorArea) =>
         setAreaForm({ id: item.id, value: item.label }),
-      openDrawing: (areaId: string, mode: FloorPlanDrawingMode) =>
-        setDrawing({ areaId, mode }),
+      openDrawing,
       openFloorCreate: () => {
         if (floorPlanCapability === "unsupported") {
           dependencies.feedback.showError(
@@ -281,8 +296,6 @@ export function useFloorPlanManagerController({
         setDeleteTarget({ kind: "floor", item }),
       openFloorEdit: (item: FloorPlan) =>
         setFloorForm({ id: item.id, value: item.name }),
-      openRoomDelete: (item: PropertyRoom) =>
-        setDeleteTarget({ kind: "room", item }),
       pickFloorPlanImage,
       saveShape,
       selectFloor: (id: string) => {
@@ -308,10 +321,7 @@ export function useFloorPlanManagerController({
     notice,
     pending: {
       areaForm: areaCommands.create.isPending || areaCommands.update.isPending,
-      delete:
-        floorCommands.remove.isPending ||
-        areaCommands.remove.isPending ||
-        roomBatch.isRemoving,
+      delete: floorCommands.remove.isPending || areaCommands.remove.isPending,
       floorForm:
         floorCommands.create.isPending || floorCommands.update.isPending,
       shape: areaCommands.update.isPending,

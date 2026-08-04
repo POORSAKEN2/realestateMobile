@@ -72,7 +72,15 @@ export function FloorPlanCanvas({
   }
 
   function handlePress(event: GestureResponderEvent) {
-    if (!drawingArea || !drawingMode || !canvas.width || !canvas.height) return;
+    if (
+      !image ||
+      !drawingArea ||
+      !drawingMode ||
+      !canvas.width ||
+      !canvas.height
+    ) {
+      return;
+    }
 
     const nextPoint = {
       x: Math.min(1, Math.max(0, event.nativeEvent.locationX / canvas.width)),
@@ -113,7 +121,7 @@ export function FloorPlanCanvas({
               Add floor plan image
             </Text>
             <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
-              Shapes can still be drawn without image.
+              Upload this floor's plan image before drawing area shapes.
             </Text>
           </View>
         )}

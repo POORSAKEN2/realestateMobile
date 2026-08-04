@@ -1,14 +1,12 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import DateTimePicker, {
-  type DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
-import { Platform, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import type { DropdownOption } from "../ui/fields/DropdownField";
 import { AddEditModal } from "../ui/AddEditModal";
 import { BaseField } from "../ui/fields/BaseField";
 import { DropdownField } from "../ui/fields/DropdownField";
-import { PickerField, PickerModalShell } from "../ui/fields/PickerField";
+import { DateTimePickerModal } from "../ui/fields/DateTimePickerModal";
+import { PickerField } from "../ui/fields/PickerField";
 import { FormSection } from "../ui/forms/FormSection";
 import { ChoiceGroup } from "../ui/groups/ChoiceGroup";
 import type { Expense } from "../../types/domain/expenses";
@@ -55,7 +53,7 @@ type ExpenseFormModalProps = {
   isVisible: boolean;
   propertyOptions: readonly DropdownOption[];
   onClose: () => void;
-  onDateChange: (event: DateTimePickerEvent, selectedDate?: Date) => void;
+  onDateConfirm: (selectedDate: Date) => void;
   onSetDatePickerVisible: (visible: boolean) => void;
   onSubmit: () => void;
   onUpdateForm: ExpenseFormUpdater;
@@ -70,7 +68,7 @@ export function ExpenseFormModal({
   isVisible,
   propertyOptions,
   onClose,
-  onDateChange,
+  onDateConfirm,
   onSetDatePickerVisible,
   onSubmit,
   onUpdateForm,
@@ -164,17 +162,13 @@ export function ExpenseFormModal({
         </View>
 
         {isDatePickerVisible ? (
-          <PickerModalShell
+          <DateTimePickerModal
+            mode="date"
             onClose={() => onSetDatePickerVisible(false)}
+            onConfirm={onDateConfirm}
             title="Select transaction date"
-          >
-            <DateTimePicker
-              display={Platform.OS === "ios" ? "inline" : "default"}
-              mode="date"
-              onChange={onDateChange}
-              value={parseDateValue(form.date)}
-            />
-          </PickerModalShell>
+            value={parseDateValue(form.date)}
+          />
         ) : null}
       </FormSection>
 

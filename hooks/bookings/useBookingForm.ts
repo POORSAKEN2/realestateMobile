@@ -27,12 +27,17 @@ import {
   type BookingFormUpdater,
 } from "../../utils/bookings/bookingCalendar";
 
+export type BookingSaveOperation = "created" | "updated";
+
 type UseBookingFormOptions = {
   accessToken?: string;
   bookings: TransientBooking[];
   buildings: Property[];
   guests: Lessee[];
-  onSaved: (booking: TransientBookingPayload) => void;
+  onSaved: (
+    booking: TransientBookingPayload,
+    operation: BookingSaveOperation,
+  ) => void;
 };
 
 export function useBookingForm({
@@ -100,10 +105,12 @@ export function useBookingForm({
           ? updateTransientBooking(editingBooking.id, payload, accessToken)
           : Promise.reject(new Error("No booking selected.")),
     onSuccess: async (_, payload) => {
+      const operation: BookingSaveOperation =
+        mode === "create" ? "created" : "updated";
       await queryClient.invalidateQueries({ queryKey: ["transientBookings"] });
       await queryClient.invalidateQueries({ queryKey: ["leases"] });
       await queryClient.invalidateQueries({ queryKey: clientKeys.all });
-      onSaved(payload);
+      onSaved(payload, operation);
       close();
     },
     onError: (error) => {

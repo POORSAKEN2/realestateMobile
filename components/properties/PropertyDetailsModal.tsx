@@ -1,12 +1,12 @@
 import Feather from "@expo/vector-icons/Feather";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import {
+  Animated,
   Dimensions,
   Image,
-  Modal,
-  Pressable,
+  PanResponder,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -26,6 +26,7 @@ import {
 } from "../../utils/dashboard/dashboardHelpers";
 import { getPropertyImages } from "../../utils/properties/propertyPresentation";
 import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
+import { BottomSheetModal } from "../ui/BottomSheetModal";
 import { PropertyFloorSummary } from "./PropertyFloorSummary";
 
 export function PropertyDetailsModal({
@@ -39,6 +40,46 @@ export function PropertyDetailsModal({
 }) {
   const { height, width } = Dimensions.get("window");
   const router = useRouter();
+  const sheetTranslateY = useRef(new Animated.Value(0)).current;
+  const swipeDownResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_, gesture) =>
+          gesture.dy > 6 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+        onPanResponderMove: (_, gesture) => {
+          sheetTranslateY.setValue(Math.max(0, gesture.dy));
+        },
+        onPanResponderRelease: (_, gesture) => {
+          if (gesture.dy > 72 || gesture.vy > 0.9) {
+            Animated.timing(sheetTranslateY, {
+              duration: 180,
+              toValue: height,
+              useNativeDriver: true,
+            }).start(() => {
+              onClose();
+              sheetTranslateY.setValue(0);
+            });
+            return;
+          }
+
+          Animated.spring(sheetTranslateY, {
+            bounciness: 4,
+            speed: 20,
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        },
+        onPanResponderTerminate: () => {
+          Animated.spring(sheetTranslateY, {
+            bounciness: 4,
+            speed: 20,
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        },
+      }),
+    [height, onClose, sheetTranslateY],
+  );
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),
@@ -93,259 +134,260 @@ export function PropertyDetailsModal({
   const images = property ? getPropertyImages(property) : [];
 
   return (
-    <Modal
-      animationType="slide"
-      onRequestClose={onClose}
+    <BottomSheetModal
+      backdropAccessibilityLabel="Close property details"
+      backdropClassName="bg-black/45"
+      onClose={onClose}
       statusBarTranslucent
-      transparent
       visible={Boolean(property)}
     >
-      <View className="flex-1 justify-end bg-black/45">
-        <Pressable
-          accessibilityLabel="Close property details"
-          accessibilityRole="button"
-          className="flex-1"
-          onPress={onClose}
-        />
-
-        {property ? (
+      {property ? (
+        <Animated.View
+          className="overflow-hidden rounded-t-[30px] bg-white"
+          style={{
+            maxHeight: height * 0.86,
+            transform: [{ translateY: sheetTranslateY }],
+          }}
+        >
           <View
-            className="overflow-hidden rounded-t-[30px] bg-white"
-            style={{ maxHeight: height * 0.86 }}
+            accessible
+            accessibilityLabel="Swipe down to close property details"
+            className="h-10 items-center justify-center"
+            {...swipeDownResponder.panHandlers}
           >
-            <View className="mt-3 h-1.5 w-12 self-center rounded-full bg-zinc-200" />
-            <ScrollView
-              bounces={false}
-              contentContainerStyle={{ paddingBottom: 28 }}
-              showsVerticalScrollIndicator={false}
-            >
-              <View className="relative mt-4 h-56 overflow-hidden">
-                <ScrollView
-                  horizontal
-                  pagingEnabled
-                  showsHorizontalScrollIndicator={false}
-                >
-                  {images.map((image, index) => (
-                    <Image
-                      className="h-full bg-zinc-100"
-                      key={`${image}:${index}`}
-                      resizeMode="cover"
-                      source={{ uri: image }}
-                      style={{ width }}
-                    />
-                  ))}
-                </ScrollView>
-                <View className="absolute inset-0 bg-black/35" />
-                <TouchableOpacity
-                  accessibilityLabel="Close property details"
-                  accessibilityRole="button"
-                  activeOpacity={0.78}
-                  className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-black/35"
-                  onPress={onClose}
-                >
-                  <Feather name="x" color="#ffffff" size={20} />
-                </TouchableOpacity>
-                <View className="absolute bottom-5 left-5 right-5">
-                  {images.length > 1 ? (
-                    <View className="mb-3 flex-row gap-1.5">
-                      {images.map((image, index) => (
-                        <View
-                          className="h-1.5 w-1.5 rounded-full bg-white/85"
-                          key={`${image}:dot:${index}`}
-                        />
-                      ))}
-                    </View>
-                  ) : null}
-                  <Text className="self-start rounded-md bg-teal-600 px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
-                    {formatPropertyStatus(property.status)}
-                  </Text>
-                  <Text
-                    className="mt-2 font-ralewayBold text-2xl text-white"
-                    numberOfLines={2}
-                  >
-                    {property.title}
-                  </Text>
-                  <View className="mt-1 flex-row items-center gap-1">
-                    <Feather name="map-pin" color="#ffffff" size={13} />
-                    <Text
-                      className="min-w-0 flex-1 text-xs text-white/80"
-                      numberOfLines={1}
-                    >
-                      {property.location}
-                      {property.country ? `, ${property.country}` : ""}
-                    </Text>
+            <View className="h-1.5 w-12 rounded-full bg-zinc-200" />
+          </View>
+          <ScrollView
+            bounces={false}
+            contentContainerStyle={{ paddingBottom: 28 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <View className="relative mt-4 h-56 overflow-hidden">
+              <ScrollView
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+              >
+                {images.map((image, index) => (
+                  <Image
+                    className="h-full bg-zinc-100"
+                    key={`${image}:${index}`}
+                    resizeMode="cover"
+                    source={{ uri: image }}
+                    style={{ width }}
+                  />
+                ))}
+              </ScrollView>
+              <View className="absolute inset-0 bg-black/35" />
+              <TouchableOpacity
+                accessibilityLabel="Close property details"
+                accessibilityRole="button"
+                activeOpacity={0.78}
+                className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-black/35"
+                onPress={onClose}
+              >
+                <Feather name="x" color="#ffffff" size={20} />
+              </TouchableOpacity>
+              <View className="absolute bottom-5 left-5 right-5">
+                {images.length > 1 ? (
+                  <View className="mb-3 flex-row gap-1.5">
+                    {images.map((image, index) => (
+                      <View
+                        className="h-1.5 w-1.5 rounded-full bg-white/85"
+                        key={`${image}:dot:${index}`}
+                      />
+                    ))}
                   </View>
+                ) : null}
+                <Text className="self-start rounded-md bg-teal-600 px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
+                  {formatPropertyStatus(property.status)}
+                </Text>
+                <Text
+                  className="mt-2 font-ralewayBold text-2xl text-white"
+                  numberOfLines={2}
+                >
+                  {property.title}
+                </Text>
+                <View className="mt-1 flex-row items-center gap-1">
+                  <Feather name="map-pin" color="#ffffff" size={13} />
+                  <Text
+                    className="min-w-0 flex-1 text-xs text-white/80"
+                    numberOfLines={1}
+                  >
+                    {property.location}
+                    {property.country ? `, ${property.country}` : ""}
+                  </Text>
                 </View>
               </View>
+            </View>
 
-              <View className="px-5 pt-5">
-                <View className="flex-row flex-wrap">
-                  <DetailMetric
-                    label="Market Value"
-                    value={formatPesoValue(property.value)}
-                  />
-                  <DetailMetric
-                    accent
-                    label="Annual ROI"
-                    value={`${property.roi}%`}
-                  />
-                  <DetailMetric
-                    label={
-                      property.occupancy !== undefined
-                        ? "Occupancy"
-                        : property.bedrooms
-                          ? "Configuration"
-                          : "Asset Type"
-                    }
-                    value={
-                      property.occupancy !== undefined
-                        ? `${property.occupancy}%`
-                        : property.bedrooms
-                          ? `${property.bedrooms} BR / ${property.bathrooms ?? 0} BA`
-                          : (property.type ?? "N/A")
-                    }
-                  />
-                  <DetailMetric
-                    label="Status"
-                    value={formatPropertyStatus(property.status)}
-                  />
-                </View>
-
-                <View className="mt-4 flex-row gap-3">
-                  <CountMetric
-                    icon="users"
-                    label="Tenants"
-                    loading={isLoading}
-                    value={tenantCount}
-                  />
-                  <CountMetric
-                    icon="file-text"
-                    label="Documents"
-                    loading={isLoading}
-                    value={propertyDocuments.length}
-                  />
-                </View>
-
-                <PropertyFloorSummary
-                  floorPlans={floorPlans}
-                  isLoading={
-                    floorPlanQueries.floorPlans.isLoading ||
-                    floorPlanQueries.rooms.isLoading
-                  }
-                  onManage={() => {
-                    onClose();
-                    router.push({
-                      pathname: appRoutes.secondary.floorPlans,
-                      params: {
-                        propertyId: property.id,
-                        propertyTitle: property.title,
-                        propertyType: property.type,
-                      },
-                    });
-                  }}
-                  policy={floorManagerPolicy}
-                  rooms={rooms}
+            <View className="px-5 pt-5">
+              <View className="flex-row flex-wrap">
+                <DetailMetric
+                  label="Market Value"
+                  value={formatPesoValue(property.value)}
                 />
+                <DetailMetric
+                  accent
+                  label="Annual ROI"
+                  value={`${property.roi}%`}
+                />
+                <DetailMetric
+                  label={
+                    property.occupancy !== undefined
+                      ? "Occupancy"
+                      : property.bedrooms
+                        ? "Configuration"
+                        : "Asset Type"
+                  }
+                  value={
+                    property.occupancy !== undefined
+                      ? `${property.occupancy}%`
+                      : property.bedrooms
+                        ? `${property.bedrooms} BR / ${property.bathrooms ?? 0} BA`
+                        : (property.type ?? "N/A")
+                  }
+                />
+                <DetailMetric
+                  label="Status"
+                  value={formatPropertyStatus(property.status)}
+                />
+              </View>
 
-                <DetailsSection title="Current Tenants">
-                  {isLoading ? (
-                    <View className="h-16 rounded-2xl bg-zinc-50" />
-                  ) : propertyLeases.length ? (
-                    propertyLeases.map((lease) => {
-                      const lessee =
-                        lease.lessee ??
-                        lessees.find((item) => item.id === lease.lesseeId);
-                      return (
-                        <View
-                          className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
-                          key={lease.id}
-                        >
-                          <View className="flex-row items-start justify-between gap-2">
-                            <View className="min-w-0 flex-1">
-                              <Text
-                                className="font-ralewayBold text-sm text-zinc-950"
-                                numberOfLines={1}
-                              >
-                                {lessee?.name ?? "Linked tenant"}
-                              </Text>
-                              <Text
-                                className="mt-0.5 text-[11px] text-zinc-500"
-                                numberOfLines={1}
-                              >
-                                {getLeaseRoomNumber(lease.roomNumber)} |{" "}
-                                {lease.startDate} to {lease.endDate}
-                              </Text>
-                            </View>
-                            <Text className="rounded-full bg-white px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-zinc-500">
-                              {lease.status}
+              <View className="mt-4 flex-row gap-3">
+                <CountMetric
+                  icon="users"
+                  label="Tenants"
+                  loading={isLoading}
+                  value={tenantCount}
+                />
+                <CountMetric
+                  icon="file-text"
+                  label="Documents"
+                  loading={isLoading}
+                  value={propertyDocuments.length}
+                />
+              </View>
+
+              <PropertyFloorSummary
+                floorPlans={floorPlans}
+                isLoading={
+                  floorPlanQueries.floorPlans.isLoading ||
+                  floorPlanQueries.rooms.isLoading
+                }
+                onManage={() => {
+                  onClose();
+                  router.push({
+                    pathname: appRoutes.secondary.floorPlans,
+                    params: {
+                      propertyId: property.id,
+                      propertyTitle: property.title,
+                      propertyType: property.type,
+                    },
+                  });
+                }}
+                policy={floorManagerPolicy}
+                rooms={rooms}
+              />
+
+              <DetailsSection title="Current Tenants">
+                {isLoading ? (
+                  <View className="h-16 rounded-2xl bg-zinc-50" />
+                ) : propertyLeases.length ? (
+                  propertyLeases.map((lease) => {
+                    const lessee =
+                      lease.lessee ??
+                      lessees.find((item) => item.id === lease.lesseeId);
+                    return (
+                      <View
+                        className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
+                        key={lease.id}
+                      >
+                        <View className="flex-row items-start justify-between gap-2">
+                          <View className="min-w-0 flex-1">
+                            <Text
+                              className="font-ralewayBold text-sm text-zinc-950"
+                              numberOfLines={1}
+                            >
+                              {lessee?.name ?? "Linked tenant"}
+                            </Text>
+                            <Text
+                              className="mt-0.5 text-[11px] text-zinc-500"
+                              numberOfLines={1}
+                            >
+                              {getLeaseRoomNumber(lease.roomNumber)} |{" "}
+                              {lease.startDate} to {lease.endDate}
                             </Text>
                           </View>
-                        </View>
-                      );
-                    })
-                  ) : (
-                    <EmptyDetail text="No tenants linked to this property." />
-                  )}
-                </DetailsSection>
-
-                <DetailsSection title="Property Documents">
-                  {isLoading ? (
-                    <View className="h-16 rounded-2xl bg-zinc-50" />
-                  ) : propertyDocuments.length ? (
-                    propertyDocuments.map((document) => (
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        className="flex-row items-center gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
-                        key={document.id}
-                        onPress={() => openPropertyDocument(document)}
-                      >
-                        <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
-                          <Feather name="file-text" color="#634CE4" size={17} />
-                        </View>
-                        <View className="min-w-0 flex-1">
-                          <Text
-                            className="font-ralewayBold text-sm text-zinc-950"
-                            numberOfLines={1}
-                          >
-                            {document.name}
-                          </Text>
-                          <Text
-                            className="mt-0.5 text-[11px] text-zinc-500"
-                            numberOfLines={1}
-                          >
-                            {document.category} | {document.size}
+                          <Text className="rounded-full bg-white px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-zinc-500">
+                            {lease.status}
                           </Text>
                         </View>
-                        <Feather
-                          name="external-link"
-                          color={document.url ? "#71717a" : "#d4d4d8"}
-                          size={15}
-                        />
-                      </TouchableOpacity>
-                    ))
-                  ) : (
-                    <EmptyDetail text="No documents attached to this property." />
-                  )}
-                </DetailsSection>
+                      </View>
+                    );
+                  })
+                ) : (
+                  <EmptyDetail text="No tenants linked to this property." />
+                )}
+              </DetailsSection>
 
-                <View className="mt-6 flex-row gap-3 border-t border-zinc-100 pt-5">
-                  <Attribute
-                    icon="maximize-2"
-                    label="Total Area"
-                    value={property.area || "N/A"}
-                  />
-                  <Attribute
-                    icon="zap"
-                    label="Utility Score"
-                    value={property.utilityScore || "A+"}
-                  />
-                </View>
+              <DetailsSection title="Property Documents">
+                {isLoading ? (
+                  <View className="h-16 rounded-2xl bg-zinc-50" />
+                ) : propertyDocuments.length ? (
+                  propertyDocuments.map((document) => (
+                    <TouchableOpacity
+                      activeOpacity={0.8}
+                      className="flex-row items-center gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
+                      key={document.id}
+                      onPress={() => openPropertyDocument(document)}
+                    >
+                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+                        <Feather name="file-text" color="#634CE4" size={17} />
+                      </View>
+                      <View className="min-w-0 flex-1">
+                        <Text
+                          className="font-ralewayBold text-sm text-zinc-950"
+                          numberOfLines={1}
+                        >
+                          {document.name}
+                        </Text>
+                        <Text
+                          className="mt-0.5 text-[11px] text-zinc-500"
+                          numberOfLines={1}
+                        >
+                          {document.category} | {document.size}
+                        </Text>
+                      </View>
+                      <Feather
+                        name="external-link"
+                        color={document.url ? "#71717a" : "#d4d4d8"}
+                        size={15}
+                      />
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <EmptyDetail text="No documents attached to this property." />
+                )}
+              </DetailsSection>
+
+              <View className="mt-6 flex-row gap-3 border-t border-zinc-100 pt-5">
+                <Attribute
+                  icon="maximize-2"
+                  label="Total Area"
+                  value={property.area || "N/A"}
+                />
+                <Attribute
+                  icon="zap"
+                  label="Utility Score"
+                  value={property.utilityScore || "A+"}
+                />
               </View>
-            </ScrollView>
-          </View>
-        ) : null}
-      </View>
-    </Modal>
+            </View>
+          </ScrollView>
+        </Animated.View>
+      ) : null}
+    </BottomSheetModal>
   );
 }
 

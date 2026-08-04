@@ -4,6 +4,7 @@ import { FlatList, View } from "react-native";
 
 import { PropertyCard } from "../../components/properties/PropertyCard";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
+import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import { PropertyDocumentsField } from "../../components/properties/PropertyDocumentsField";
 import { PropertyImagesField } from "../../components/properties/PropertyImagesField";
 import {
@@ -15,9 +16,11 @@ import { PropertyPortfolioSummary } from "../../components/properties/PropertyPo
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { Screen } from "../../components/ui/Screen";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProperties } from "../../hooks/api/useProperties";
 import { usePropertyFormController } from "../../hooks/properties/usePropertyFormController";
 import { useAuth } from "../../hooks/useAuth";
+import { useSnackbar } from "../../hooks/useSnackbar";
 import type { Property } from "../../types";
 import {
   getPropertyTypeChoices,
@@ -41,10 +44,19 @@ export default function PropertiesScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
+    null,
+  );
 
   const { useList } = useProperties(accessToken);
   const { data: properties = [], isError, isLoading, refetch } = useList();
-  const propertyForm = usePropertyFormController(accessToken);
+  const propertySnackbar = useSnackbar();
+  const propertyForm = usePropertyFormController(accessToken, {
+    onSaved: (_property, operation) =>
+      propertySnackbar.show(
+        operation === "created" ? "Property added." : "Property updated.",
+      ),
+  });
   const {
     closeForm,
     editingProperty,
@@ -242,6 +254,7 @@ export default function PropertiesScreen() {
               <PropertyCard
                 property={item.property}
                 onEdit={() => openEditForm(item.property)}
+                onOpenDetails={() => setSelectedProperty(item.property)}
                 onOpenFloorPlans={() =>
                   router.push({
                     pathname: appRoutes.secondary.floorPlans,
@@ -268,6 +281,12 @@ export default function PropertiesScreen() {
           stickyHeaderIndices={[1]}
         />
       </View>
+
+      <PropertyDetailsModal
+        accessToken={accessToken}
+        onClose={() => setSelectedProperty(null)}
+        property={selectedProperty}
+      />
 
       <AddEditModal
         appearance="card"
@@ -311,6 +330,11 @@ export default function PropertiesScreen() {
           onRemove={removeDocument}
         />
       </AddEditModal>
+
+      <ScreenSnackbar
+        message={propertySnackbar.message}
+        onDismiss={propertySnackbar.dismiss}
+      />
     </Screen>
   );
 }

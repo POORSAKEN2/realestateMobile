@@ -16,6 +16,7 @@ import {
 import { FloorPlanWorkspace } from "../../components/floorplans/FloorPlanWorkspace";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { Screen } from "../../components/ui/Screen";
+import { appRoutes } from "../../constants/navigation";
 import { useFloorPlanManagerController } from "../../hooks/floorplans/useFloorPlanManagerController";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useAuth } from "../../hooks/useAuth";
@@ -40,20 +41,13 @@ function deleteDescription(
   if (target?.kind === "area") {
     return `Delete ${target.item.label}? Assigned rooms remain but become unassigned.`;
   }
-  if (target?.kind === "room") {
-    return `Delete room ${target.item.roomNumber}? This cannot be undone.`;
-  }
   return "";
 }
 
 function deleteTitle(
   target: ReturnType<typeof useFloorPlanManagerController>["deleteTarget"],
 ) {
-  return target?.kind === "floor"
-    ? "Delete floor?"
-    : target?.kind === "area"
-      ? "Delete area?"
-      : "Delete room?";
+  return target?.kind === "floor" ? "Delete floor?" : "Delete area?";
 }
 
 export default function FloorPlansScreen() {
@@ -186,21 +180,44 @@ export default function FloorPlansScreen() {
       />
       <RoomBatchModal
         area={roomBatch.area}
-        assignedRooms={roomBatch.assignedRooms}
+        assignedRoomCount={roomBatch.assignedRooms.length}
+        availableRooms={roomBatch.availableRooms}
         canCreateRooms={roomBatch.canCreateRooms}
+        canGenerate={roomBatch.canGenerate}
         count={roomBatch.count}
         floor={roomBatch.floor}
         isBusy={controller.isBusy}
         isCreating={roomBatch.isCreating}
+        isLinking={roomBatch.isLinking}
         onChangeCount={roomBatch.setCount}
         onChangePrefix={roomBatch.setPrefix}
         onChangeStart={roomBatch.setStart}
         onClose={roomBatch.close}
-        onDeleteRoom={actions.openRoomDelete}
         onGenerate={roomBatch.generate}
-        onUnassignRoom={roomBatch.unassign}
+        onLinkRoom={roomBatch.linkSelectedRoom}
+        onOpenAssignedRooms={() => {
+          if (!roomBatch.area || !roomBatch.floor) return;
+
+          const area = roomBatch.area;
+          const floor = roomBatch.floor;
+          roomBatch.close();
+          router.push({
+            pathname: appRoutes.secondary.assignedRooms,
+            params: {
+              areaId: area.id,
+              areaLabel: area.label,
+              floorName: floor.name,
+              propertyId,
+              propertyTitle,
+            },
+          });
+        }}
+        onSelectRoom={roomBatch.setSelectedRoomId}
+        onSnackbarDismiss={roomBatch.batchSnackbar.dismiss}
         prefix={roomBatch.prefix}
         start={roomBatch.start}
+        selectedRoomId={roomBatch.selectedRoomId}
+        snackbarMessage={roomBatch.batchSnackbar.message}
       />
       <ConfirmationModal
         confirmLabel="Delete"

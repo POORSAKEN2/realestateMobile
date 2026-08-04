@@ -1,7 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 
+import { BottomSheetModal } from "../ui/BottomSheetModal";
+import { SearchField } from "../ui/fields/SearchField";
 import {
   formatStatus,
   statusFilterChoices,
@@ -31,33 +33,14 @@ export function PropertyListToolbar({
   return (
     <View className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
       <View className="flex-row gap-2">
-        <View className="h-12 min-w-0 flex-1 flex-row items-center rounded-2xl bg-slate-100 px-3.5">
-          <MaterialCommunityIcons name="magnify" color="#475569" size={20} />
-          <TextInput
-            accessibilityLabel="Search properties by name or location"
-            className="text-textPrimary ml-2 min-w-0 flex-1 text-base"
-            onChangeText={onChangeSearch}
-            placeholder="Search name or location"
-            placeholderTextColor="#64748B"
-            returnKeyType="search"
-            value={searchQuery}
-          />
-          {searchQuery ? (
-            <TouchableOpacity
-              accessibilityLabel="Clear property search"
-              accessibilityRole="button"
-              activeOpacity={0.75}
-              className="h-11 w-11 items-center justify-center"
-              onPress={() => onChangeSearch("")}
-            >
-              <MaterialCommunityIcons
-                name="close-circle"
-                color="#64748B"
-                size={19}
-              />
-            </TouchableOpacity>
-          ) : null}
-        </View>
+        <SearchField
+          accessibilityLabel="Search properties by name or location"
+          clearAccessibilityLabel="Clear property search"
+          onChangeText={onChangeSearch}
+          placeholder="Search name or location"
+          value={searchQuery}
+          wrapperClassName="flex-1"
+        />
 
         <TouchableOpacity
           accessibilityLabel={`Filter properties, ${getFilterLabel(statusFilter)}`}
@@ -88,86 +71,73 @@ export function PropertyListToolbar({
         </Text>
       </View>
 
-      <Modal
-        animationType="fade"
-        onRequestClose={() => setIsFilterVisible(false)}
-        transparent
+      <BottomSheetModal
+        backdropAccessibilityLabel="Close property filters"
+        backdropClassName="bg-black/35"
+        onClose={() => setIsFilterVisible(false)}
         visible={isFilterVisible}
       >
-        <View className="flex-1 justify-end bg-black/35">
-          <TouchableOpacity
-            accessibilityLabel="Close property filters"
-            accessibilityRole="button"
-            activeOpacity={1}
-            className="flex-1"
-            onPress={() => setIsFilterVisible(false)}
-          />
-          <View className="rounded-t-[28px] bg-white px-5 pb-9 pt-5">
-            <View className="mb-4 flex-row items-center justify-between">
-              <View>
-                <Text className="text-textPrimary font-ralewayBold text-xl">
-                  Filter properties
-                </Text>
-                <Text className="mt-1 text-sm text-slate-600">
-                  Choose one portfolio status.
-                </Text>
-              </View>
-              <TouchableOpacity
-                accessibilityLabel="Close property filters"
-                accessibilityRole="button"
-                activeOpacity={0.8}
-                className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
-                onPress={() => setIsFilterVisible(false)}
-              >
-                <MaterialCommunityIcons
-                  name="close"
-                  color="#1E1F45"
-                  size={21}
-                />
-              </TouchableOpacity>
+        <View className="rounded-t-[28px] bg-white px-5 pb-9 pt-5">
+          <View className="mb-4 flex-row items-center justify-between">
+            <View>
+              <Text className="font-ralewayBold text-xl text-textPrimary">
+                Filter properties
+              </Text>
+              <Text className="mt-1 text-sm text-slate-600">
+                Choose one portfolio status.
+              </Text>
             </View>
+            <TouchableOpacity
+              accessibilityLabel="Close property filters"
+              accessibilityRole="button"
+              activeOpacity={0.8}
+              className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+              onPress={() => setIsFilterVisible(false)}
+            >
+              <MaterialCommunityIcons name="close" color="#1E1F45" size={21} />
+            </TouchableOpacity>
+          </View>
 
-            <View className="gap-2">
-              {statusFilterChoices.map((choice) => {
-                const selected = choice.value === statusFilter;
+          <View className="gap-2">
+            {statusFilterChoices.map((choice) => {
+              const selected = choice.value === statusFilter;
 
-                return (
-                  <TouchableOpacity
-                    key={choice.value}
-                    accessibilityRole="radio"
-                    accessibilityState={{ checked: selected }}
-                    activeOpacity={0.8}
-                    className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
-                      selected
-                        ? "bg-secondary/20 border-primary"
-                        : "border-slate-200 bg-white"
+              return (
+                <TouchableOpacity
+                  key={choice.value}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: selected }}
+                  activeOpacity={0.8}
+                  className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
+                    selected
+                      ? "border-primary bg-secondary/20"
+                      : "border-slate-200 bg-white"
+                  }`}
+                  onPress={() => {
+                    onChangeStatus(choice.value);
+                    setIsFilterVisible(false);
+                  }}
+                >
+                  <Text
+                    className={`font-ralewayBold text-base ${
+                      selected ? "text-primary" : "text-textPrimary"
                     }`}
-                    onPress={() => {
-                      onChangeStatus(choice.value);
-                      setIsFilterVisible(false);
-                    }}
                   >
-                    <Text
-                      className={`font-ralewayBold text-base ${
-                        selected ? "text-primary" : "text-textPrimary"
-                      }`}
-                    >
-                      {choice.label}
-                    </Text>
-                    {selected ? (
-                      <MaterialCommunityIcons
-                        name="check-circle"
-                        color="#634CE4"
-                        size={21}
-                      />
-                    ) : null}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+                    {choice.label}
+                  </Text>
+                  {selected ? (
+                    <MaterialCommunityIcons
+                      name="check-circle"
+                      color="#634CE4"
+                      size={21}
+                    />
+                  ) : null}
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
-      </Modal>
+      </BottomSheetModal>
     </View>
   );
 }

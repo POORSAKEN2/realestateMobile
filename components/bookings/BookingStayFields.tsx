@@ -1,12 +1,9 @@
-import DateTimePicker, {
-  type DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
 import { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 
 import {
-  getBookingPickerChange,
   getBookingPickerMinimumDate,
+  getBookingPickerSelection,
   getBookingPickerTitle,
   getBookingPickerValue,
   isDatePickerField,
@@ -14,7 +11,8 @@ import {
   type BookingFormUpdater,
   type BookingPickerField,
 } from "../../utils/bookings/bookingCalendar";
-import { PickerField, PickerModalShell } from "../ui/fields/PickerField";
+import { DateTimePickerModal } from "../ui/fields/DateTimePickerModal";
+import { PickerField } from "../ui/fields/PickerField";
 
 type BookingStayFieldsProps = {
   form: BookingFormState;
@@ -112,32 +110,19 @@ function BookingDateTimePicker({
   const minimumDate = getBookingPickerMinimumDate(form, field);
   const pickerValue = getBookingPickerValue(form, field);
 
-  function handleChange(event: DateTimePickerEvent, selectedValue?: Date) {
-    if (Platform.OS === "android") onClose();
-    const selection = getBookingPickerChange(event.type, field, selectedValue);
-    if (selection) onUpdateForm(selection.field, selection.value);
+  function handleConfirm(selectedValue: Date) {
+    const selection = getBookingPickerSelection(field, selectedValue);
+    onUpdateForm(selection.field, selection.value);
   }
 
   return (
-    <PickerModalShell onClose={onClose} title={getBookingPickerTitle(field)}>
-      {isDateField ? (
-        <DateTimePicker
-          key={`booking-date-${field}`}
-          display={Platform.OS === "ios" ? "inline" : "default"}
-          {...(minimumDate ? { minimumDate } : {})}
-          mode="date"
-          onChange={handleChange}
-          value={pickerValue}
-        />
-      ) : (
-        <DateTimePicker
-          key={`booking-time-${field}`}
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          mode="time"
-          onChange={handleChange}
-          value={pickerValue}
-        />
-      )}
-    </PickerModalShell>
+    <DateTimePickerModal
+      minimumDate={minimumDate}
+      mode={isDateField ? "date" : "time"}
+      onClose={onClose}
+      onConfirm={handleConfirm}
+      title={getBookingPickerTitle(field)}
+      value={pickerValue}
+    />
   );
 }

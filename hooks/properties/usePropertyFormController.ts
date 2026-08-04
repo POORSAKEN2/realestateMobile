@@ -22,7 +22,16 @@ import {
   type PropertyFormPayload,
 } from "../../utils/properties/propertyPayload";
 
-export function usePropertyFormController(accessToken?: string) {
+export type PropertySaveOperation = "created" | "updated";
+
+export function usePropertyFormController(
+  accessToken?: string,
+  {
+    onSaved,
+  }: {
+    onSaved?: (property: Property, operation: PropertySaveOperation) => void;
+  } = {},
+) {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<FormState>(emptyForm);
   const formRef = useRef(form);
@@ -74,7 +83,10 @@ export function usePropertyFormController(accessToken?: string) {
 
       return property;
     },
-    onSuccess: async () => {
+    onSuccess: async (property) => {
+      const operation: PropertySaveOperation = editingProperty
+        ? "updated"
+        : "created";
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["properties"] }),
         queryClient.invalidateQueries({ queryKey: ["documents"] }),
@@ -84,6 +96,7 @@ export function usePropertyFormController(accessToken?: string) {
         queryClient.invalidateQueries({ queryKey: ["analytics"] }),
       ]);
       closeForm();
+      onSaved?.(property, operation);
     },
     onError: (error) => {
       setFormError(

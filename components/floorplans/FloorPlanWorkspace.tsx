@@ -1,8 +1,9 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { FloorAreaCard, IconButton } from "./FloorAreaCard";
+import { FloorAreaCard } from "./FloorAreaCard";
 import { FloorPlanCanvas } from "./FloorPlanCanvas";
+import { FloorPlanIconButton } from "./FloorPlanIconButton";
 import type {
   FloorArea,
   FloorPlan,
@@ -112,17 +113,21 @@ export function FloorPlanWorkspace({
             </Text>
           </View>
           <View className="flex-row gap-1">
-            <IconButton
+            <FloorPlanIconButton
               icon="image-outline"
-              label="Change floor plan image"
+              label={
+                activeFloor.image
+                  ? "Change floor plan image"
+                  : "Upload floor plan image"
+              }
               onPress={onPickImage}
             />
-            <IconButton
+            <FloorPlanIconButton
               icon="pencil-outline"
               label="Rename floor"
               onPress={() => onRenameFloor(activeFloor)}
             />
-            <IconButton
+            <FloorPlanIconButton
               danger
               icon="trash-can-outline"
               label="Delete floor"
@@ -148,7 +153,9 @@ export function FloorPlanWorkspace({
               Floor areas
             </Text>
             <Text className="mt-0.5 text-xs text-slate-500">
-              One saved shape per area.
+              {activeFloor.image
+                ? "One saved shape per area."
+                : "Upload this floor's plan image before mapping areas."}
             </Text>
           </View>
           <TouchableOpacity
@@ -179,6 +186,7 @@ export function FloorPlanWorkspace({
           activeFloor.areas.map((area) => (
             <FloorAreaCard
               area={area}
+              canDraw={Boolean(activeFloor.image)}
               hidden={hiddenAreaIds.has(area.id)}
               key={area.id}
               onDelete={() => onDeleteArea(area)}

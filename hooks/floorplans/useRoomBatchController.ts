@@ -1,9 +1,13 @@
 import { useMemo, useState } from "react";
 
 import { usePropertyRoomCommands } from "../api/useFloorPlans";
+import { useSnackbar } from "../useSnackbar";
 import type { FloorPlanFeedback } from "../../services/floorplans/contracts";
 import type { FloorArea, FloorPlan, PropertyRoom } from "../../types";
-import { getErrorMessage } from "../../utils/floorplans/floorPlanPresentation";
+import {
+  getErrorMessage,
+  getLinkableFloorRooms,
+} from "../../utils/floorplans/floorPlanPresentation";
 import { validateRoomBatch } from "../../utils/floorplans/floorPlanValidation";
 
 export function useRoomBatchController({
@@ -28,8 +32,11 @@ export function useRoomBatchController({
   const commands = usePropertyRoomCommands(propertyId, accessToken);
   const [areaId, setAreaId] = useState("");
   const [prefix, setPrefix] = useState("");
-  const [start, setStart] = useState("101");
-  const [count, setCount] = useState("1");
+  const [start, setStart] = useState("");
+  const [count, setCount] = useState("");
+  const [selectedRoomId, setSelectedRoomId] = useState("");
+  const [isLinking, setIsLinking] = useState(false);
+  const batchSnackbar = useSnackbar();
   const area = floorPlans
     .flatMap((floor) => floor.areas)
     .find((item) => item.id === areaId);
@@ -40,6 +47,15 @@ export function useRoomBatchController({
     () => rooms.filter((room) => room.areaId === areaId),
     [areaId, rooms],
   );
+  const availableRooms = useMemo(
+    () => getLinkableFloorRooms(floor, rooms),
+    [floor, rooms],
+  );
+  const batchValidation = useMemo(
+    () => validateRoomBatch(prefix, start, count, rooms),
+    [count, prefix, rooms, start],
+  );
+  const canGenerate = canCreateRooms && batchValidation.ok;
 
   function open(nextArea: FloorArea) {
     if (!canManageRooms) {
@@ -51,12 +67,16 @@ export function useRoomBatchController({
     }
     setAreaId(nextArea.id);
     setPrefix("");
-    setStart("101");
-    setCount("1");
+    setStart("");
+    setCount("");
+    setSelectedRoomId("");
+    batchSnackbar.dismiss();
   }
 
   function close() {
     setAreaId("");
+    setSelectedRoomId("");
+    batchSnackbar.dismiss();
   }
 
   async function generate() {
@@ -68,14 +88,13 @@ export function useRoomBatchController({
       );
       return;
     }
-    const validation = validateRoomBatch(prefix, start, count, rooms);
-    if (!validation.ok) {
-      feedback.showError(validation.title, validation.message);
+    if (!batchValidation.ok) {
+      feedback.showError(batchValidation.title, batchValidation.message);
       return;
     }
 
     try {
-      for (const roomNumber of validation.value.numbers) {
+      for (const roomNumber of batchValidation.value.numbers) {
         await commands.create.mutateAsync({
           roomNumber,
           floor: floor.name,
@@ -83,9 +102,10 @@ export function useRoomBatchController({
           status: "Vacant",
         });
       }
-      const total = validation.value.numbers.length;
-      onNotice(`${total} room${total === 1 ? "" : "s"} added.`);
-      setStart(String(validation.value.nextStart));
+      const total = batchValidation.value.numbers.length;
+      batchSnackbar.show(`${total} room${total === 1 ? "" : "s"} added.`);
+      setStart("");
+      setCount("");
     } catch (error) {
       feedback.showError(
         "Rooms could not be generated",
@@ -94,29 +114,41 @@ export function useRoomBatchController({
     }
   }
 
-  async function unassign(room: PropertyRoom) {
+  async function linkSelectedRoom() {
+    if (!area || !selectedRoomId) return;
+    const room = availableRooms.find((item) => item.id === selectedRoomId);
+    if (!room) {
+      feedback.showError(
+        "Room unavailable",
+        "Select an unassigned room from this floor.",
+      );
+      return;
+    }
+
     try {
+      setIsLinking(true);
       await commands.update.mutateAsync({
         id: room.id,
-        payload: { areaId: null },
+        payload: { areaId: area.id },
       });
-      onNotice(`Room ${room.roomNumber} unassigned.`);
+      setSelectedRoomId("");
+      onNotice(`Room ${room.roomNumber} linked to ${area.label}.`);
     } catch (error) {
-      feedback.showError(
-        "Room could not be unassigned",
-        getErrorMessage(error),
-      );
+      feedback.showError("Room could not be linked", getErrorMessage(error));
+    } finally {
+      setIsLinking(false);
     }
-  }
-
-  async function remove(room: PropertyRoom) {
-    await commands.remove.mutateAsync(room.id);
-    onNotice(`Room ${room.roomNumber} deleted.`);
   }
 
   return {
     area,
     assignedRooms,
+    availableRooms,
+    batchSnackbar: {
+      dismiss: batchSnackbar.dismiss,
+      message: batchSnackbar.message,
+    },
+    canGenerate,
     canCreateRooms,
     canManageRooms,
     close,
@@ -124,18 +156,16 @@ export function useRoomBatchController({
     floor,
     generate,
     isCreating: commands.create.isPending,
-    isPending:
-      commands.create.isPending ||
-      commands.update.isPending ||
-      commands.remove.isPending,
-    isRemoving: commands.remove.isPending,
+    isLinking,
+    isPending: commands.create.isPending || commands.update.isPending,
     open,
     prefix,
-    remove,
+    selectedRoomId,
     setCount,
     setPrefix,
+    setSelectedRoomId,
     setStart,
     start,
-    unassign,
+    linkSelectedRoom,
   };
 }

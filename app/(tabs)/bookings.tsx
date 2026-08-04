@@ -16,10 +16,12 @@ import {
 import AddButton from "../../components/ui/buttons/AddButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useClients } from "../../hooks/api/useClients";
 import { useBookingCalendar, useBookingForm } from "../../hooks/bookings";
 import { useAuth } from "../../hooks/useAuth";
+import { useSnackbar } from "../../hooks/useSnackbar";
 import {
   getParamValue,
   type StatusFilter,
@@ -100,12 +102,18 @@ export default function BookingsScreen() {
     bookings: visibleBookings,
     availabilityBookings: selectedBuildingBookings,
   });
+  const bookingSnackbar = useSnackbar();
   const bookingForm = useBookingForm({
     accessToken,
     bookings,
     buildings: buildingOptions,
     guests,
-    onSaved: (payload) => setSelectedPropertyId(payload.propertyId),
+    onSaved: (payload, operation) => {
+      setSelectedPropertyId(payload.propertyId);
+      bookingSnackbar.show(
+        operation === "created" ? "Booking created." : "Booking updated.",
+      );
+    },
   });
   const isLoading = isLoadingProperties || isLoadingBookings;
 
@@ -218,6 +226,11 @@ export default function BookingsScreen() {
         onUpdateForm={bookingForm.updateForm}
         selectedBuilding={bookingForm.selectedBuilding}
         selectedGuestId={bookingForm.selectedGuestId}
+      />
+
+      <ScreenSnackbar
+        message={bookingSnackbar.message}
+        onDismiss={bookingSnackbar.dismiss}
       />
     </Screen>
   );

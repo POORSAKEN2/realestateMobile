@@ -15,10 +15,13 @@ import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { formatCurrency } from "../../utils/formatters";
 import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 export default function TenantsScreen() {
+  const tenantSnackbar = useSnackbar();
   const {
     closeForm,
     deleteMutation,
@@ -45,7 +48,12 @@ export default function TenantsScreen() {
     tenantMonthlyRent,
     tenants,
     updateForm,
-  } = useTenantManagement();
+  } = useTenantManagement({
+    onSaved: (operation) =>
+      tenantSnackbar.show(
+        operation === "created" ? "Tenant added." : "Tenant updated.",
+      ),
+  });
 
   return (
     <Screen className="bg-[#2563EB]/5">
@@ -271,6 +279,11 @@ export default function TenantsScreen() {
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
         title="Delete Tenant"
         visible={Boolean(deleteTarget)}
+      />
+
+      <ScreenSnackbar
+        message={tenantSnackbar.message}
+        onDismiss={tenantSnackbar.dismiss}
       />
     </Screen>
   );

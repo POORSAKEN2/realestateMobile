@@ -44,13 +44,20 @@ export function useFloorPlanQueries(propertyId: string, accessToken?: string) {
     queryFn: () => fetchFloorPlans(propertyId, accessToken),
     enabled: Boolean(propertyId),
   });
-  const rooms = useQuery({
+  const rooms = usePropertyRoomsQuery(propertyId, accessToken);
+
+  return { floorPlans, rooms };
+}
+
+export function usePropertyRoomsQuery(
+  propertyId: string,
+  accessToken?: string,
+) {
+  return useQuery({
     queryKey: floorPlanKeys.rooms(propertyId),
     queryFn: () => fetchPropertyRooms(propertyId, accessToken),
     enabled: Boolean(propertyId),
   });
-
-  return { floorPlans, rooms };
 }
 
 export function useFloorCommands(propertyId: string, accessToken?: string) {

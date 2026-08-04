@@ -182,15 +182,6 @@ export function getBookingPickerSelection(
   return { field, value };
 }
 
-export function getBookingPickerChange(
-  eventType: string,
-  field: BookingPickerField,
-  selectedValue?: Date,
-) {
-  if (eventType === "dismissed" || !selectedValue) return null;
-  return getBookingPickerSelection(field, selectedValue);
-}
-
 export function getBookingPickerTitle(field: BookingPickerField) {
   switch (field) {
     case "startDate":
