@@ -213,9 +213,11 @@ export default function FloorPlansScreen() {
           });
         }}
         onSelectRoom={roomBatch.setSelectedRoomId}
+        onSnackbarDismiss={roomBatch.batchSnackbar.dismiss}
         prefix={roomBatch.prefix}
         start={roomBatch.start}
         selectedRoomId={roomBatch.selectedRoomId}
+        snackbarMessage={roomBatch.batchSnackbar.message}
       />
       <ConfirmationModal
         confirmLabel="Delete"

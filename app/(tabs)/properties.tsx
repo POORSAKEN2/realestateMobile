@@ -16,9 +16,11 @@ import { PropertyPortfolioSummary } from "../../components/properties/PropertyPo
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { Screen } from "../../components/ui/Screen";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProperties } from "../../hooks/api/useProperties";
 import { usePropertyFormController } from "../../hooks/properties/usePropertyFormController";
 import { useAuth } from "../../hooks/useAuth";
+import { useSnackbar } from "../../hooks/useSnackbar";
 import type { Property } from "../../types";
 import {
   getPropertyTypeChoices,
@@ -48,7 +50,13 @@ export default function PropertiesScreen() {
 
   const { useList } = useProperties(accessToken);
   const { data: properties = [], isError, isLoading, refetch } = useList();
-  const propertyForm = usePropertyFormController(accessToken);
+  const propertySnackbar = useSnackbar();
+  const propertyForm = usePropertyFormController(accessToken, {
+    onSaved: (_property, operation) =>
+      propertySnackbar.show(
+        operation === "created" ? "Property added." : "Property updated.",
+      ),
+  });
   const {
     closeForm,
     editingProperty,
@@ -322,6 +330,11 @@ export default function PropertiesScreen() {
           onRemove={removeDocument}
         />
       </AddEditModal>
+
+      <ScreenSnackbar
+        message={propertySnackbar.message}
+        onDismiss={propertySnackbar.dismiss}
+      />
     </Screen>
   );
 }

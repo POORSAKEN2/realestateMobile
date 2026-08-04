@@ -18,12 +18,15 @@ import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import {
   calculateLeaseEndDate,
   formatLeaseDateLabel,
+  parseLeaseDateValue,
 } from "../../utils/leases/leaseForm";
 import { formatCurrency } from "../../utils/formatters";
 import { useLeaseManagement } from "../../hooks/leases/useLeaseManagement";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 type Option = {
   label: string;
@@ -41,19 +44,19 @@ function cleanNumber(value: string) {
 }
 
 export default function LeasesScreen() {
+  const leaseSnackbar = useSnackbar();
   const {
     activeLeaseCount,
     activeLeasePercentage,
     closeForm,
-    confirmDatePicker,
-    datePickerValue,
+    closeStartDatePicker,
     deleteMutation,
     deleteTarget,
     editingLease,
     filteredLeases,
     form,
     formError,
-    handleDateChange,
+    handleStartDateConfirm,
     isFormOpen,
     isLoading,
     isStartDatePickerOpen,
@@ -74,7 +77,12 @@ export default function LeasesScreen() {
     setSelectedTenant,
     submit,
     updateForm,
-  } = useLeaseManagement();
+  } = useLeaseManagement({
+    onSaved: (operation) =>
+      leaseSnackbar.show(
+        operation === "created" ? "Lease added." : "Lease updated.",
+      ),
+  });
 
   return (
     <Screen className="bg-[#2563EB]/5">
@@ -346,10 +354,10 @@ export default function LeasesScreen() {
         {isStartDatePickerOpen ? (
           <DateTimePickerModal
             mode="date"
-            onChange={handleDateChange}
-            onClose={confirmDatePicker}
+            onClose={closeStartDatePicker}
+            onConfirm={handleStartDateConfirm}
             title="Select Start Date"
-            value={datePickerValue}
+            value={parseLeaseDateValue(form.startDate)}
           />
         ) : null}
       </AddEditModal>
@@ -366,6 +374,11 @@ export default function LeasesScreen() {
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
         title="Delete Lease"
         visible={Boolean(deleteTarget)}
+      />
+
+      <ScreenSnackbar
+        message={leaseSnackbar.message}
+        onDismiss={leaseSnackbar.dismiss}
       />
     </Screen>
   );

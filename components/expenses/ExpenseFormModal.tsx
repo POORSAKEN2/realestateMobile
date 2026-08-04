@@ -1,5 +1,4 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { Text, View } from "react-native";
 
 import type { DropdownOption } from "../ui/fields/DropdownField";
@@ -54,7 +53,7 @@ type ExpenseFormModalProps = {
   isVisible: boolean;
   propertyOptions: readonly DropdownOption[];
   onClose: () => void;
-  onDateChange: (event: DateTimePickerEvent, selectedDate?: Date) => void;
+  onDateConfirm: (selectedDate: Date) => void;
   onSetDatePickerVisible: (visible: boolean) => void;
   onSubmit: () => void;
   onUpdateForm: ExpenseFormUpdater;
@@ -69,7 +68,7 @@ export function ExpenseFormModal({
   isVisible,
   propertyOptions,
   onClose,
-  onDateChange,
+  onDateConfirm,
   onSetDatePickerVisible,
   onSubmit,
   onUpdateForm,
@@ -165,8 +164,8 @@ export function ExpenseFormModal({
         {isDatePickerVisible ? (
           <DateTimePickerModal
             mode="date"
-            onChange={onDateChange}
             onClose={() => onSetDatePickerVisible(false)}
+            onConfirm={onDateConfirm}
             title="Select transaction date"
             value={parseDateValue(form.date)}
           />

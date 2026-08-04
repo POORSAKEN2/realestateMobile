@@ -1,7 +1,5 @@
-import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Platform } from "react-native";
 
 import { expenseFetchers, useExpenses } from "../api/useExpenses";
 import { useProperties } from "../api/useProperties";
@@ -20,7 +18,13 @@ import {
 
 type ExpenseFormPayload = CreateExpensePayload | UpdateExpensePayload;
 
-export function useExpenseForm() {
+export type ExpenseSaveOperation = "created" | "updated";
+
+export function useExpenseForm({
+  onSaved,
+}: {
+  onSaved?: (operation: ExpenseSaveOperation) => void;
+} = {}) {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const tenantId =
@@ -61,9 +65,13 @@ export function useExpenseForm() {
         ? expenseFetchers.update({ id: editingExpense.id, payload })
         : expenseFetchers.create(payload),
     onSuccess: async () => {
+      const operation: ExpenseSaveOperation = editingExpense
+        ? "updated"
+        : "created";
       await queryClient.invalidateQueries({ queryKey: ["expenses"] });
       await queryClient.invalidateQueries({ queryKey: ["analytics"] });
       closeForm();
+      onSaved?.(operation);
     },
     onError: (error) => {
       setFormError(
@@ -108,9 +116,7 @@ export function useExpenseForm() {
     setIsFormVisible(false);
   }
 
-  function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (Platform.OS === "android") setIsDatePickerVisible(false);
-    if (event.type === "dismissed" || !selectedDate) return;
+  function handleDateConfirm(selectedDate: Date) {
     updateForm("date", formatDateValue(selectedDate));
   }
 
@@ -163,7 +169,7 @@ export function useExpenseForm() {
     expenses,
     form,
     formError,
-    handleDateChange,
+    handleDateConfirm,
     isDatePickerVisible,
     isFormVisible,
     isLoading,

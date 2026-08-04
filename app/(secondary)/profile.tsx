@@ -12,11 +12,14 @@ import { ProfileHeader } from "../../components/profile/ProfileHeader";
 import { ProfileSaveButton } from "../../components/profile/ProfileSaveButton";
 import { ProfileSummaryCard } from "../../components/profile/ProfileSummaryCard";
 import { Screen } from "../../components/ui/Screen";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProfileController } from "../../hooks/profile/useProfileController";
+import { useSnackbar } from "../../hooks/useSnackbar";
 import { appRoutes } from "../../constants/navigation";
 
 export default function ProfileScreen() {
   const profile = useProfileController();
+  const profileSnackbar = useSnackbar();
 
   function handleBack() {
     if (router.canGoBack()) {
@@ -42,7 +45,7 @@ export default function ProfileScreen() {
     const result = await profile.saveProfile();
 
     if (result.status === "saved") {
-      Alert.alert("Changes saved", "Your profile is up to date.");
+      profileSnackbar.show("Profile updated.");
       return;
     }
 
@@ -115,6 +118,12 @@ export default function ProfileScreen() {
           />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <ScreenSnackbar
+        message={profileSnackbar.message}
+        onDismiss={profileSnackbar.dismiss}
+        placement="screen-bottom"
+      />
     </Screen>
   );
 }

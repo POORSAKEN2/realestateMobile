@@ -103,24 +103,3 @@ function StateCard({
     </View>
   );
 }
-
-export function DocumentFeedbackToast({ message }: { message: string }) {
-  if (!message) return null;
-
-  return (
-    <View
-      accessibilityLiveRegion="polite"
-      accessibilityRole="alert"
-      className="absolute bottom-28 left-4 right-4 z-50 flex-row items-center gap-3 rounded-2xl bg-slate-950 px-4 py-3 shadow-lg shadow-slate-950/20"
-    >
-      <MaterialCommunityIcons
-        name="check-circle-outline"
-        color="#86EFAC"
-        size={20}
-      />
-      <Text className="min-w-0 flex-1 font-ralewayBold text-sm text-white">
-        {message}
-      </Text>
-    </View>
-  );
-}

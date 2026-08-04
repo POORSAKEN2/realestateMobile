@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { usePropertyRoomCommands } from "../api/useFloorPlans";
+import { useSnackbar } from "../useSnackbar";
 import type { FloorPlanFeedback } from "../../services/floorplans/contracts";
 import type { FloorArea, FloorPlan, PropertyRoom } from "../../types";
 import {
@@ -35,6 +36,7 @@ export function useRoomBatchController({
   const [count, setCount] = useState("");
   const [selectedRoomId, setSelectedRoomId] = useState("");
   const [isLinking, setIsLinking] = useState(false);
+  const batchSnackbar = useSnackbar();
   const area = floorPlans
     .flatMap((floor) => floor.areas)
     .find((item) => item.id === areaId);
@@ -68,11 +70,13 @@ export function useRoomBatchController({
     setStart("");
     setCount("");
     setSelectedRoomId("");
+    batchSnackbar.dismiss();
   }
 
   function close() {
     setAreaId("");
     setSelectedRoomId("");
+    batchSnackbar.dismiss();
   }
 
   async function generate() {
@@ -99,7 +103,7 @@ export function useRoomBatchController({
         });
       }
       const total = batchValidation.value.numbers.length;
-      onNotice(`${total} room${total === 1 ? "" : "s"} added.`);
+      batchSnackbar.show(`${total} room${total === 1 ? "" : "s"} added.`);
       setStart("");
       setCount("");
     } catch (error) {
@@ -140,6 +144,10 @@ export function useRoomBatchController({
     area,
     assignedRooms,
     availableRooms,
+    batchSnackbar: {
+      dismiss: batchSnackbar.dismiss,
+      message: batchSnackbar.message,
+    },
     canGenerate,
     canCreateRooms,
     canManageRooms,

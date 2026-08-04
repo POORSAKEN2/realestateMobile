@@ -1,10 +1,9 @@
-import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 
 import {
-  getBookingPickerChange,
   getBookingPickerMinimumDate,
+  getBookingPickerSelection,
   getBookingPickerTitle,
   getBookingPickerValue,
   isDatePickerField,
@@ -111,18 +110,17 @@ function BookingDateTimePicker({
   const minimumDate = getBookingPickerMinimumDate(form, field);
   const pickerValue = getBookingPickerValue(form, field);
 
-  function handleChange(event: DateTimePickerEvent, selectedValue?: Date) {
-    if (Platform.OS === "android") onClose();
-    const selection = getBookingPickerChange(event.type, field, selectedValue);
-    if (selection) onUpdateForm(selection.field, selection.value);
+  function handleConfirm(selectedValue: Date) {
+    const selection = getBookingPickerSelection(field, selectedValue);
+    onUpdateForm(selection.field, selection.value);
   }
 
   return (
     <DateTimePickerModal
       minimumDate={minimumDate}
       mode={isDateField ? "date" : "time"}
-      onChange={handleChange}
       onClose={onClose}
+      onConfirm={handleConfirm}
       title={getBookingPickerTitle(field)}
       value={pickerValue}
     />

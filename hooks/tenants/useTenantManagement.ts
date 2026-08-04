@@ -19,7 +19,13 @@ import { useProperties } from "../api/useProperties";
 import { clientKeys, useClients } from "../api/useClients";
 import { useAuth } from "../useAuth";
 
-export function useTenantManagement() {
+export type TenantSaveOperation = "created" | "updated";
+
+export function useTenantManagement({
+  onSaved,
+}: {
+  onSaved?: (operation: TenantSaveOperation) => void;
+} = {}) {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
@@ -48,8 +54,12 @@ export function useTenantManagement() {
         ? updateClient(editingTenant.id, payload, accessToken)
         : createClient(payload, accessToken),
     onSuccess: async () => {
+      const operation: TenantSaveOperation = editingTenant
+        ? "updated"
+        : "created";
       await queryClient.invalidateQueries({ queryKey: clientKeys.all });
       closeForm();
+      onSaved?.(operation);
     },
     onError: (error) =>
       setFormError(

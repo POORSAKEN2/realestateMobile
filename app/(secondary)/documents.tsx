@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -14,16 +14,15 @@ import {
   DocumentSortSheet,
 } from "../../components/documents/DocumentSheets";
 import { DocumentCard } from "../../components/documents/DocumentCard";
-import {
-  DocumentFeedbackToast,
-  DocumentModuleState,
-} from "../../components/documents/DocumentModuleState";
+import { DocumentModuleState } from "../../components/documents/DocumentModuleState";
 import { DocumentFilterSheet } from "../../components/documents/DocumentFilterSheet";
 import { DocumentFormModal } from "../../components/documents/DocumentFormModal";
 import { DocumentsHeader } from "../../components/documents/DocumentsHeader";
 import { DocumentsToolbar } from "../../components/documents/DocumentsToolbar";
 import { Screen } from "../../components/ui/Screen";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useDocumentLibrary } from "../../hooks/documents/useDocumentLibrary";
+import { useSnackbar } from "../../hooks/useSnackbar";
 import type { DocumentUpload, PropertyDocument } from "../../types";
 import { chooseDocumentFile } from "../../utils/documents/documentFiles";
 import {
@@ -81,7 +80,7 @@ export default function DocumentsScreen() {
   const [form, setForm] = useState<DocumentFormValues>(EMPTY_DOCUMENT_FORM);
   const [formErrors, setFormErrors] = useState<DocumentFormErrors>({});
   const [formError, setFormError] = useState("");
-  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const feedbackSnackbar = useSnackbar({ autoHideDuration: 3000 });
 
   const propertyLookup = useMemo(
     () => buildDocumentLookup(properties),
@@ -116,12 +115,6 @@ export default function DocumentsScreen() {
   const isFiltered = Boolean(
     searchQuery.trim() || category !== "All" || activeFilterCount,
   );
-
-  useEffect(() => {
-    if (!feedbackMessage) return;
-    const timeout = setTimeout(() => setFeedbackMessage(""), 3000);
-    return () => clearTimeout(timeout);
-  }, [feedbackMessage]);
 
   function openCreateForm() {
     setEditingDocument(null);
@@ -184,8 +177,8 @@ export default function DocumentsScreen() {
 
     try {
       await saveDocument({ editingDocument, file: selectedFile, values: form });
-      setFeedbackMessage(
-        editingDocument ? "Document updated" : "Document uploaded",
+      feedbackSnackbar.show(
+        editingDocument ? "Document updated." : "Document uploaded.",
       );
       closeForm();
     } catch (error) {
@@ -201,7 +194,7 @@ export default function DocumentsScreen() {
     try {
       await deleteDocument(document.id);
       setDeleteTarget(null);
-      setFeedbackMessage("Document deleted");
+      feedbackSnackbar.show("Document deleted.");
     } catch (error) {
       Alert.alert(
         "Cannot delete document",
@@ -345,7 +338,10 @@ export default function DocumentsScreen() {
         selectedFile={selectedFile}
         visible={isFormVisible}
       />
-      <DocumentFeedbackToast message={feedbackMessage} />
+      <ScreenSnackbar
+        message={feedbackSnackbar.message}
+        onDismiss={feedbackSnackbar.dismiss}
+      />
     </Screen>
   );
 }

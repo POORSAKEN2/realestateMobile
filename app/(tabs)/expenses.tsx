@@ -12,16 +12,19 @@ import {
   ExpenseTransactionList,
 } from "../../components/expenses";
 import { Screen } from "../../components/ui/Screen";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useExpenseForm } from "../../hooks/expenses/useExpenseForm";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 export default function ExpensesScreen() {
+  const expenseSnackbar = useSnackbar();
   const {
     closeForm,
     editingExpense,
     expenses,
     form,
     formError,
-    handleDateChange,
+    handleDateConfirm,
     isDatePickerVisible,
     isFormVisible,
     isLoading,
@@ -32,7 +35,12 @@ export default function ExpensesScreen() {
     setIsDatePickerVisible,
     submit,
     updateForm,
-  } = useExpenseForm();
+  } = useExpenseForm({
+    onSaved: (operation) =>
+      expenseSnackbar.show(
+        operation === "created" ? "Expense recorded." : "Expense updated.",
+      ),
+  });
 
   return (
     <Screen className="bg-[#FBFBFC]">
@@ -71,11 +79,16 @@ export default function ExpensesScreen() {
         isSaving={isSaving}
         isVisible={isFormVisible}
         onClose={closeForm}
-        onDateChange={handleDateChange}
+        onDateConfirm={handleDateConfirm}
         onSetDatePickerVisible={setIsDatePickerVisible}
         onSubmit={submit}
         onUpdateForm={updateForm}
         propertyOptions={propertyOptions}
+      />
+
+      <ScreenSnackbar
+        message={expenseSnackbar.message}
+        onDismiss={expenseSnackbar.dismiss}
       />
     </Screen>
   );

@@ -2,9 +2,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
   ScrollView,
   Text,
   TextInput,
@@ -12,6 +9,7 @@ import {
   View,
 } from "react-native";
 
+import { BottomSheetModal } from "../ui/BottomSheetModal";
 import type {
   DocumentUpload,
   Lessee,
@@ -107,239 +105,234 @@ export function DocumentFormModal({
   }
 
   return (
-    <Modal
-      animationType="slide"
-      onRequestClose={handleClose}
-      transparent
+    <BottomSheetModal
+      backdropAccessibilityLabel="Close document form"
+      backdropClassName="bg-slate-950/45"
+      closeOnBackdropPress={false}
+      keyboardAvoiding
+      onClose={handleClose}
       visible={visible}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        className="flex-1 justify-end bg-slate-950/45"
+      <View
+        accessibilityViewIsModal
+        className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-surface"
       >
-        <View
-          accessibilityViewIsModal
-          className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-surface"
-        >
-          <View className="pt-3">
-            <View className="mb-3 h-1 w-10 self-center rounded-full bg-slate-300" />
-          </View>
+        <View className="pt-3">
+          <View className="mb-3 h-1 w-10 self-center rounded-full bg-slate-300" />
+        </View>
 
-          {selectorMode ? (
-            <SearchableOptionSelector
-              backAccessibilityLabel="Back to document form"
-              emptyLabel={
-                selectorMode === "property"
-                  ? "No property link"
-                  : "No tenant link"
-              }
-              onBack={closeSelector}
-              onChangeQuery={setSelectorQuery}
-              onSelect={(id) => {
-                onChangeForm({
-                  ...form,
-                  [selectorMode === "property" ? "propertyId" : "lesseeId"]: id,
-                });
-                closeSelector();
-              }}
-              options={selectorOptions}
-              query={selectorQuery}
-              selectedId={selectedId}
-              title={
-                selectorMode === "property"
-                  ? "Choose property"
-                  : "Choose tenant"
-              }
-            />
-          ) : (
-            <>
-              <View className="flex-row items-center justify-between bg-white px-6 pb-5 pt-2">
-                <View className="min-w-0 flex-1 pr-3">
-                  <Text
-                    accessibilityRole="header"
-                    className="font-ralewayBold text-[28px] leading-9 tracking-tight text-textPrimary"
-                  >
-                    {editingDocument ? "Edit document" : "Upload document"}
-                  </Text>
-                  <Text className="mt-2 font-ralewayMedium text-sm leading-5 text-slate-500">
-                    {editingDocument
-                      ? "Update its details or choose a replacement file."
-                      : "Organize a file by category, property, and tenant."}
+        {selectorMode ? (
+          <SearchableOptionSelector
+            backAccessibilityLabel="Back to document form"
+            emptyLabel={
+              selectorMode === "property"
+                ? "No property link"
+                : "No tenant link"
+            }
+            onBack={closeSelector}
+            onChangeQuery={setSelectorQuery}
+            onSelect={(id) => {
+              onChangeForm({
+                ...form,
+                [selectorMode === "property" ? "propertyId" : "lesseeId"]: id,
+              });
+              closeSelector();
+            }}
+            options={selectorOptions}
+            query={selectorQuery}
+            selectedId={selectedId}
+            title={
+              selectorMode === "property" ? "Choose property" : "Choose tenant"
+            }
+          />
+        ) : (
+          <>
+            <View className="flex-row items-center justify-between bg-white px-6 pb-5 pt-2">
+              <View className="min-w-0 flex-1 pr-3">
+                <Text
+                  accessibilityRole="header"
+                  className="font-ralewayBold text-[28px] leading-9 tracking-tight text-textPrimary"
+                >
+                  {editingDocument ? "Edit document" : "Upload document"}
+                </Text>
+                <Text className="mt-2 font-ralewayMedium text-sm leading-5 text-slate-500">
+                  {editingDocument
+                    ? "Update its details or choose a replacement file."
+                    : "Organize a file by category, property, and tenant."}
+                </Text>
+              </View>
+              <TouchableOpacity
+                accessibilityLabel="Close document form"
+                accessibilityRole="button"
+                activeOpacity={0.75}
+                className="h-11 w-11 items-center justify-center rounded-full bg-transparent"
+                onPress={onClose}
+              >
+                <MaterialCommunityIcons
+                  name="close"
+                  color="#334155"
+                  size={21}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              contentContainerClassName="gap-4 p-5"
+              keyboardShouldPersistTaps="handled"
+            >
+              {formError ? (
+                <View
+                  accessibilityLiveRegion="assertive"
+                  accessibilityRole="alert"
+                  className="rounded-2xl bg-red-50 px-4 py-3"
+                >
+                  <Text className="font-ralewayBold text-sm text-red-700">
+                    {formError}
                   </Text>
                 </View>
-                <TouchableOpacity
-                  accessibilityLabel="Close document form"
-                  accessibilityRole="button"
-                  activeOpacity={0.75}
-                  className="h-11 w-11 items-center justify-center rounded-full bg-transparent"
-                  onPress={onClose}
-                >
-                  <MaterialCommunityIcons
-                    name="close"
-                    color="#334155"
-                    size={21}
-                  />
-                </TouchableOpacity>
-              </View>
+              ) : null}
 
-              <ScrollView
-                contentContainerClassName="gap-4 p-5"
-                keyboardShouldPersistTaps="handled"
+              <FormSection
+                icon="file-upload-outline"
+                title="Document file"
+                variant="card"
               >
-                {formError ? (
-                  <View
-                    accessibilityLiveRegion="assertive"
-                    accessibilityRole="alert"
-                    className="rounded-2xl bg-red-50 px-4 py-3"
-                  >
-                    <Text className="font-ralewayBold text-sm text-red-700">
-                      {formError}
+                <DocumentFileField
+                  editingDocument={editingDocument}
+                  error={errors.file}
+                  onClear={onClearFile}
+                  onPick={onPickFile}
+                  selectedFile={selectedFile}
+                />
+              </FormSection>
+
+              <FormSection
+                icon="file-document-edit-outline"
+                title="Document details"
+                variant="card"
+              >
+                <View className="gap-2">
+                  <FieldLabel label="Name" required />
+                  <TextInput
+                    accessibilityLabel="Document name, required"
+                    className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
+                      errors.name ? "border-red-400" : "border-slate-200"
+                    }`}
+                    onChangeText={(name) => onChangeForm({ ...form, name })}
+                    placeholder="Document name"
+                    placeholderTextColor="#94A3B8"
+                    value={form.name}
+                  />
+                  {errors.name ? (
+                    <Text
+                      accessibilityLiveRegion="assertive"
+                      className="font-ralewaySemiBold text-xs text-red-600"
+                    >
+                      {errors.name}
                     </Text>
+                  ) : null}
+                </View>
+
+                <View className="gap-2">
+                  <FieldLabel label="Category" />
+                  <View className="flex-row flex-wrap gap-2">
+                    {DOCUMENT_CATEGORIES.map((category) => {
+                      const isSelected = form.category === category;
+                      return (
+                        <TouchableOpacity
+                          key={category}
+                          accessibilityRole="radio"
+                          accessibilityState={{ checked: isSelected }}
+                          activeOpacity={0.8}
+                          className={`min-h-11 justify-center rounded-2xl border px-4 ${
+                            isSelected
+                              ? "border-primary bg-primary"
+                              : "border-slate-200 bg-slate-50"
+                          }`}
+                          onPress={() => onChangeForm({ ...form, category })}
+                        >
+                          <Text
+                            className={`font-ralewayBold text-xs ${
+                              isSelected ? "text-white" : "text-slate-600"
+                            }`}
+                          >
+                            {category}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                <SelectionField
+                  label="Property"
+                  onPress={() => setSelectorMode("property")}
+                  value={selectedProperty?.label ?? "No property link"}
+                />
+                <SelectionField
+                  label="Tenant"
+                  onPress={() => setSelectorMode("tenant")}
+                  value={selectedTenant?.label ?? "No tenant link"}
+                />
+
+                {editingDocument && selectedFile ? (
+                  <View className="gap-2">
+                    <FieldLabel label="Version note" />
+                    <TextInput
+                      accessibilityLabel="Version note"
+                      className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-textPrimary"
+                      multiline
+                      onChangeText={(revisionComment) =>
+                        onChangeForm({ ...form, revisionComment })
+                      }
+                      placeholder="For example: Signed copy uploaded"
+                      placeholderTextColor="#94A3B8"
+                      textAlignVertical="top"
+                      value={form.revisionComment}
+                    />
                   </View>
                 ) : null}
+              </FormSection>
+            </ScrollView>
 
-                <FormSection
-                  icon="file-upload-outline"
-                  title="Document file"
-                  variant="card"
-                >
-                  <DocumentFileField
-                    editingDocument={editingDocument}
-                    error={errors.file}
-                    onClear={onClearFile}
-                    onPick={onPickFile}
-                    selectedFile={selectedFile}
-                  />
-                </FormSection>
-
-                <FormSection
-                  icon="file-document-edit-outline"
-                  title="Document details"
-                  variant="card"
-                >
-                  <View className="gap-2">
-                    <FieldLabel label="Name" required />
-                    <TextInput
-                      accessibilityLabel="Document name, required"
-                      className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
-                        errors.name ? "border-red-400" : "border-slate-200"
-                      }`}
-                      onChangeText={(name) => onChangeForm({ ...form, name })}
-                      placeholder="Document name"
-                      placeholderTextColor="#94A3B8"
-                      value={form.name}
-                    />
-                    {errors.name ? (
-                      <Text
-                        accessibilityLiveRegion="assertive"
-                        className="font-ralewaySemiBold text-xs text-red-600"
-                      >
-                        {errors.name}
-                      </Text>
-                    ) : null}
-                  </View>
-
-                  <View className="gap-2">
-                    <FieldLabel label="Category" />
-                    <View className="flex-row flex-wrap gap-2">
-                      {DOCUMENT_CATEGORIES.map((category) => {
-                        const isSelected = form.category === category;
-                        return (
-                          <TouchableOpacity
-                            key={category}
-                            accessibilityRole="radio"
-                            accessibilityState={{ checked: isSelected }}
-                            activeOpacity={0.8}
-                            className={`min-h-11 justify-center rounded-2xl border px-4 ${
-                              isSelected
-                                ? "border-primary bg-primary"
-                                : "border-slate-200 bg-slate-50"
-                            }`}
-                            onPress={() => onChangeForm({ ...form, category })}
-                          >
-                            <Text
-                              className={`font-ralewayBold text-xs ${
-                                isSelected ? "text-white" : "text-slate-600"
-                              }`}
-                            >
-                              {category}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-                  </View>
-
-                  <SelectionField
-                    label="Property"
-                    onPress={() => setSelectorMode("property")}
-                    value={selectedProperty?.label ?? "No property link"}
-                  />
-                  <SelectionField
-                    label="Tenant"
-                    onPress={() => setSelectorMode("tenant")}
-                    value={selectedTenant?.label ?? "No tenant link"}
-                  />
-
-                  {editingDocument && selectedFile ? (
-                    <View className="gap-2">
-                      <FieldLabel label="Version note" />
-                      <TextInput
-                        accessibilityLabel="Version note"
-                        className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-textPrimary"
-                        multiline
-                        onChangeText={(revisionComment) =>
-                          onChangeForm({ ...form, revisionComment })
-                        }
-                        placeholder="For example: Signed copy uploaded"
-                        placeholderTextColor="#94A3B8"
-                        textAlignVertical="top"
-                        value={form.revisionComment}
-                      />
-                    </View>
-                  ) : null}
-                </FormSection>
-              </ScrollView>
-
-              <View className="flex-row gap-3 border-t border-slate-200 bg-white p-5 pb-8">
-                <TouchableOpacity
-                  accessibilityLabel="Cancel document form"
-                  accessibilityRole="button"
-                  activeOpacity={0.85}
-                  className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white ${
-                    isSaving ? "opacity-60" : ""
-                  }`}
-                  disabled={isSaving}
-                  onPress={onClose}
-                >
-                  <Text className="font-ralewayBold text-base text-primary">
-                    Cancel
+            <View className="flex-row gap-3 border-t border-slate-200 bg-white p-5 pb-8">
+              <TouchableOpacity
+                accessibilityLabel="Cancel document form"
+                accessibilityRole="button"
+                activeOpacity={0.85}
+                className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white ${
+                  isSaving ? "opacity-60" : ""
+                }`}
+                disabled={isSaving}
+                onPress={onClose}
+              >
+                <Text className="font-ralewayBold text-base text-primary">
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityState={{ disabled: !canSubmit }}
+                activeOpacity={0.85}
+                className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
+                  canSubmit ? "" : "opacity-40"
+                }`}
+                disabled={!canSubmit}
+                onPress={onSubmit}
+              >
+                {isSaving ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text className="font-ralewayBold text-base text-white">
+                    {editingDocument ? "Save changes" : "Upload document"}
                   </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  accessibilityRole="button"
-                  accessibilityState={{ disabled: !canSubmit }}
-                  activeOpacity={0.85}
-                  className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
-                    canSubmit ? "" : "opacity-40"
-                  }`}
-                  disabled={!canSubmit}
-                  onPress={onSubmit}
-                >
-                  {isSaving ? (
-                    <ActivityIndicator color="#FFFFFF" />
-                  ) : (
-                    <Text className="font-ralewayBold text-base text-white">
-                      {editingDocument ? "Save changes" : "Upload document"}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+                )}
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+      </View>
+    </BottomSheetModal>
   );
 }
 

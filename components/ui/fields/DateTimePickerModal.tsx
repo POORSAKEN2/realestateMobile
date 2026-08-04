@@ -2,7 +2,7 @@ import DateTimePicker, {
   DateTimePickerAndroid,
   type DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 
 import { colors } from "../../../constants/colors";
@@ -12,8 +12,8 @@ type DateTimePickerModalProps = {
   maximumDate?: Date;
   minimumDate?: Date;
   mode: "date" | "time";
-  onChange: (event: DateTimePickerEvent, selectedValue?: Date) => void;
   onClose: () => void;
+  onConfirm: (selectedValue: Date) => void;
   title: string;
   value: Date;
 };
@@ -22,17 +22,18 @@ export function DateTimePickerModal({
   maximumDate,
   minimumDate,
   mode,
-  onChange,
   onClose,
+  onConfirm,
   title,
   value,
 }: DateTimePickerModalProps) {
+  const [draftValue, setDraftValue] = useState(value);
   const initialAndroidPicker = useRef({
     maximumDate,
     minimumDate,
     mode,
-    onChange,
     onClose,
+    onConfirm,
     value,
   });
 
@@ -46,7 +47,12 @@ export function DateTimePickerModal({
       minimumDate: picker.minimumDate,
       mode: picker.mode,
       negativeButton: { textColor: colors.primary },
-      onChange: picker.onChange,
+      onChange: (event: DateTimePickerEvent, selectedValue?: Date) => {
+        if (event.type === "set" && selectedValue) {
+          picker.onConfirm(selectedValue);
+        }
+        picker.onClose();
+      },
       onError: picker.onClose,
       positiveButton: { textColor: colors.primary },
       value: picker.value,
@@ -60,17 +66,28 @@ export function DateTimePickerModal({
   if (Platform.OS === "android") return null;
 
   return (
-    <PickerModalShell onClose={onClose} title={title}>
+    <PickerModalShell
+      onClose={onClose}
+      onConfirm={() => {
+        onConfirm(draftValue);
+        onClose();
+      }}
+      title={title}
+    >
       <DateTimePicker
         accentColor={colors.primary}
-        display={mode === "date" ? "inline" : "spinner"}
+        display="spinner"
         maximumDate={maximumDate}
         minimumDate={minimumDate}
         mode={mode}
-        onChange={onChange}
+        onChange={(event, selectedValue) => {
+          if (event.type === "set" && selectedValue) {
+            setDraftValue(selectedValue);
+          }
+        }}
         textColor={colors.text}
         themeVariant="light"
-        value={value}
+        value={draftValue}
       />
     </PickerModalShell>
   );

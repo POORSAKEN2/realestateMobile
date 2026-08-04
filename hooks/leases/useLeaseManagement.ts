@@ -1,8 +1,6 @@
-import type { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Platform } from "react-native";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   createLease,
@@ -16,14 +14,19 @@ import {
   createLeaseForm,
   formatLeaseDateValue,
   getLeaseFormResult,
-  parseLeaseDateValue,
   type LeaseFormState,
 } from "../../utils/leases/leaseForm";
 import { useProperties } from "../api/useProperties";
 import { useClients } from "../api/useClients";
 import { useAuth } from "../useAuth";
 
-export function useLeaseManagement() {
+export type LeaseSaveOperation = "created" | "updated";
+
+export function useLeaseManagement({
+  onSaved,
+}: {
+  onSaved?: (operation: LeaseSaveOperation) => void;
+} = {}) {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
@@ -36,8 +39,6 @@ export function useLeaseManagement() {
   const [deleteTarget, setDeleteTarget] = useState<Lease | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isStartDatePickerOpen, setIsStartDatePickerOpen] = useState(false);
-  const [datePickerValue, setDatePickerValue] = useState(new Date());
-  const datePickerValueRef = useRef(datePickerValue);
 
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
@@ -55,8 +56,12 @@ export function useLeaseManagement() {
         ? updateLease(editingLease.id, payload, accessToken)
         : createLease(payload, accessToken),
     onSuccess: async () => {
+      const operation: LeaseSaveOperation = editingLease
+        ? "updated"
+        : "created";
       await queryClient.invalidateQueries({ queryKey: ["leases"] });
       closeForm();
+      onSaved?.(operation);
     },
     onError: (error) =>
       setFormError(
@@ -135,29 +140,12 @@ export function useLeaseManagement() {
     setIsStartDatePickerOpen(false);
   }
 
-  function handleDateChange(event: DateTimePickerEvent, selectedDate?: Date) {
-    if (event.type === "dismissed" || !selectedDate) {
-      if (Platform.OS === "android") setIsStartDatePickerOpen(false);
-      return;
-    }
-    datePickerValueRef.current = selectedDate;
-    setDatePickerValue(selectedDate);
-    if (Platform.OS === "android") {
-      updateForm("startDate", formatLeaseDateValue(selectedDate));
-      setIsStartDatePickerOpen(false);
-    }
+  function handleStartDateConfirm(selectedDate: Date) {
+    updateForm("startDate", formatLeaseDateValue(selectedDate));
   }
 
   function openStartDatePicker() {
-    const initialDate = parseLeaseDateValue(form.startDate);
-    datePickerValueRef.current = initialDate;
-    setDatePickerValue(initialDate);
     setIsStartDatePickerOpen(true);
-  }
-
-  function confirmDatePicker() {
-    updateForm("startDate", formatLeaseDateValue(datePickerValueRef.current));
-    setIsStartDatePickerOpen(false);
   }
 
   function submit() {
@@ -182,15 +170,14 @@ export function useLeaseManagement() {
     activeLeaseCount,
     activeLeasePercentage:
       leases.length === 0 ? 0 : (activeLeaseCount / leases.length) * 100,
-    confirmDatePicker,
-    datePickerValue,
+    closeStartDatePicker: () => setIsStartDatePickerOpen(false),
     deleteMutation,
     deleteTarget,
     editingLease,
     filteredLeases,
     form,
     formError,
-    handleDateChange,
+    handleStartDateConfirm,
     isFormOpen,
     isLoading: isLoadingLeases || isLoadingLessees || isLoadingProperties,
     isStartDatePickerOpen,
