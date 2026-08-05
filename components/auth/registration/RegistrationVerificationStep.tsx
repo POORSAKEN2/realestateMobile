@@ -35,7 +35,7 @@ export function RegistrationVerificationStep({
 
   return (
     <View>
-      <View className="bg-secondary/20 mb-7 flex-row items-center rounded-[14px] px-4 py-3">
+      <View className="mb-7 flex-row items-center rounded-[14px] bg-secondary/20 px-4 py-3">
         {isRequestingCode ? (
           <ActivityIndicator color="#634CE4" />
         ) : (
@@ -46,7 +46,7 @@ export function RegistrationVerificationStep({
             {isRequestingCode ? "Sending code to" : "Code sent to"}
           </Text>
           <Text
-            className="text-textPrimary mt-0.5 font-ralewayBold text-sm"
+            className="mt-0.5 font-ralewayBold text-sm text-textPrimary"
             numberOfLines={1}
           >
             {email.trim()}

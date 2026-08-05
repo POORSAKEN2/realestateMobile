@@ -67,12 +67,13 @@ export const EmailVerificationCodeInput = forwardRef<
           }}
           accessibilityLabel={`Email verification code digit ${index + 1}`}
           autoComplete="off"
+          selectionColor={"#634ce4"}
           caretHidden={Boolean(digit)}
-          className={`text-textPrimary h-14 flex-1 rounded-[12px] border-[1.5px] text-center font-ralewayBold text-xl ${
+          className={`h-14 flex-1 rounded-[12px] border-[1.5px] text-center font-ralewayBold text-xl text-textPrimary ${
             focusedIndex === index
-              ? "bg-secondary/20 border-primary"
+              ? "border-primary bg-secondary/20"
               : digit
-                ? "border-accent bg-secondary/20"
+                ? "border-primary bg-secondary/20"
                 : "border-[#dfe3e3] bg-white"
           }`}
           keyboardType="number-pad"

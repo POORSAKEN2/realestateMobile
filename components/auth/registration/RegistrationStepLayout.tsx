@@ -88,7 +88,7 @@ export function RegistrationStepLayout({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text className="font-ralewayExtraBold text-textPrimary text-[34px] leading-[40px]">
+          <Text className="font-ralewayExtraBold text-[34px] leading-[40px] text-textPrimary">
             {title}
           </Text>
           <Text className="mt-3 font-ralewayMedium text-[15px] leading-6 text-description">
@@ -114,7 +114,7 @@ export function RegistrationStepLayout({
               />
               <Text
                 className={`ml-3 flex-1 text-sm leading-5 ${
-                  feedback.tone === "error" ? "text-rose-700" : "text-primary"
+                  feedback.tone === "error" ? "text-rose-700" : "text-secondary"
                 }`}
               >
                 {feedback.message}

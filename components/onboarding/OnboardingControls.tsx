@@ -19,16 +19,12 @@ export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
       <View className="flex-row items-center gap-3">
         <View className="h-2 flex-1 overflow-hidden rounded-full bg-accent/40">
           <View
-            className="h-full rounded-full bg-secondary"
+            className="h-full rounded-full bg-primary"
             style={{
               width: `${progress}%` as `${number}%`,
             }}
           />
         </View>
-
-        <Text className="text-font12 shrink-0 font-ralewayBold text-textPrimary">
-          {currentStep}/{totalScreens}
-        </Text>
       </View>
     </View>
   );
@@ -87,7 +83,7 @@ export function OnboardingControls({
 
         <Pressable
           accessibilityRole="button"
-          className={`h-12 items-center justify-center rounded-full bg-secondary px-6 ${
+          className={`h-12 items-center justify-center rounded-full bg-primary px-6 ${
             fullWidthButton ? "w-full" : "min-w-32"
           }`}
           onPress={handleNext}

@@ -53,14 +53,14 @@ export default function DefaultLocationScreen() {
               size={28}
             />
           </View>
-          <Text className="mt-6 text-xs font-ralewayExtraBold uppercase tracking-widest text-slate-500">
+          <Text className="mt-6 font-ralewayExtraBold text-xs uppercase tracking-widest text-slate-500">
             Default Location
           </Text>
-          <Text className="mt-2 text-3xl font-ralewayExtraBold text-slate-950">
+          <Text className="mt-2 font-ralewayExtraBold text-3xl text-slate-950">
             Choose your portfolio country
           </Text>
           <Text className="mt-3 text-base leading-6 text-slate-500">
-            R.E.M. will use this country for property lists, map defaults, and
+            Terrane will use this country for property lists, map defaults, and
             new property forms.
           </Text>
         </View>
@@ -85,7 +85,7 @@ export default function DefaultLocationScreen() {
               >
                 <View className="min-w-0 flex-1">
                   <Text
-                    className={`text-base font-ralewayExtraBold ${
+                    className={`font-ralewayExtraBold text-base ${
                       selected ? "text-[#0f766e]" : "text-slate-950"
                     }`}
                   >
@@ -130,7 +130,7 @@ export default function DefaultLocationScreen() {
                   color="#FFFFFF"
                   size={20}
                 />
-                <Text className="ml-2 text-base font-ralewayExtraBold text-white">
+                <Text className="ml-2 font-ralewayExtraBold text-base text-white">
                   Continue
                 </Text>
               </>

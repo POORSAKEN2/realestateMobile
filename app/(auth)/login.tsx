@@ -1,10 +1,11 @@
 import { Feather } from "@expo/vector-icons";
 import { Link, Stack } from "expo-router";
-import { useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   BackHandler,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,10 +14,12 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Screen } from "../../components/ui/Screen";
+import BrandCombinationVertical from "../../assets/branding/svg/brand-combination-vertical-white.svg";
 import { useLogin } from "../../hooks/useLogin";
+
+type FocusedField = "email" | "password" | null;
 
 export default function LoginScreen() {
   const {
@@ -28,205 +31,274 @@ export default function LoginScreen() {
     error,
     handleLogin,
   } = useLogin();
+
+  const passwordInputRef = useRef<TextInput>(null);
+
   const [showPassword, setShowPassword] = useState(false);
-  const [focusedField, setFocusedField] = useState<"email" | "password" | null>(
-    null,
-  );
+  const [focusedField, setFocusedField] = useState<FocusedField>(null);
+
+  const canSubmit =
+    email.trim().length > 0 && password.length > 0 && !isLoading;
 
   useEffect(() => {
+    if (Platform.OS !== "android") {
+      return;
+    }
+
     const backAction = () => {
-      Alert.alert("Hold on!", "Are you sure you want to exit the app?", [
+      Alert.alert("Exit Terrane?", "Are you sure you want to close the app?", [
         {
           text: "Cancel",
-          onPress: () => null,
           style: "cancel",
         },
-        { text: "YES", onPress: () => BackHandler.exitApp() },
+        {
+          text: "Exit",
+          style: "destructive",
+          onPress: () => BackHandler.exitApp(),
+        },
       ]);
-      return true; // Prevents default back behavior
+
+      return true;
     };
 
-    const backHandler = BackHandler.addEventListener(
+    const subscription = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction,
     );
 
-    return () => backHandler.remove();
+    return () => subscription.remove();
   }, []);
 
   return (
-    <Screen className="=">
-        <Stack.Screen options={{ headerShown: false }} />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        className="flex-1"
-        keyboardVerticalOffset={Platform.OS === "ios" ? 12 : 0}
-      >
-        <ScrollView
-          automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
-          className="-mx-6 bg-[#ffffff]"
-          contentContainerClassName="flex-grow justify-center px-6 pt-8 pb-40"
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+    <View className="flex-1 bg-primary">
+      <Stack.Screen options={{ headerShown: false }} />
+      <StatusBar style="light" />
+
+      <SafeAreaView className="flex-1" edges={["top", "bottom"]}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          className="flex-1"
+          keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
         >
-          <View className="rounded-[18px]  bg-white px-5 py-6 shadow-lg shadow-slate-900/10">
-            <View className="mb-6 items-center">
-              <View className="mb-4 h-14 w-14 items-center justify-center rounded-[14px] bg-[#0f766e]">
-                <Feather name="home" size={28} color="#FFFFFF" />
-              </View>
-              <Text className="font-ralewayExtraBold text-3xl text-[#151717]">
-                R.E.M
-              </Text>
-              <Text className="mt-1 text-center font-ralewaySemiBold text-sm text-[#5f6b6b]">
-                Enterprise Asset Management
-              </Text>
+          <ScrollView
+            automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
+            bounces={false}
+            contentContainerClassName="flex-grow px-6"
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Branding */}
+            <View className="min-h-[250px] flex-1 items-center justify-center">
+              <BrandCombinationVertical width="100%" height={240} />
             </View>
 
-            <View className="gap-5">
+            {/* Authentication form */}
+            <View className="">
+              {/* Email */}
               <View>
-                <Text className="mb-2 font-ralewayBold text-sm text-[#151717]">
-                  Email Address
+                <Text className="mb-2 font-ralewayBold text-sm text-white">
+                  Email address
                 </Text>
+
                 <View
-                  className={`h-[50px] flex-row items-center rounded-[10px] border-[1.5px] bg-white pl-3 ${
+                  className={`h-14 flex-row items-center rounded-2xl border pl-4 ${
                     focusedField === "email"
-                      ? "border-[#2d79f3]"
-                      : "border-[#ecedec]"
+                      ? "border-accent bg-white/15"
+                      : "border-white/20 bg-white/10"
                   }`}
                 >
-                  <Feather name="mail" size={20} color="#5f6b6b" />
+                  <Feather
+                    color={
+                      focusedField === "email"
+                        ? "#BEE3DB"
+                        : "rgba(255,255,255,0.7)"
+                    }
+                    name="mail"
+                    size={20}
+                  />
+
                   <TextInput
+                    accessibilityLabel="Email address"
                     autoCapitalize="none"
                     autoComplete="email"
-                    className="ml-3 h-full flex-1 pr-3 text-sm text-[#151717]"
+                    autoCorrect={false}
                     keyboardType="email-address"
+                    className="ml-3 h-full flex-1 items-center font-ralewayMedium text-[15px] text-white"
                     onBlur={() => setFocusedField(null)}
                     onChangeText={setEmail}
                     onFocus={() => setFocusedField("email")}
-                    placeholder="name@company.com"
-                    placeholderTextColor="#8a9494"
+                    onSubmitEditing={() => passwordInputRef.current?.focus()}
+                    placeholder="Enter your email"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
                     returnKeyType="next"
+                    selectionColor="#BEE3DB"
+                    spellCheck={false}
                     textContentType="emailAddress"
                     value={email}
                   />
                 </View>
               </View>
 
-              <View>
+              {/* Password */}
+              <View className="mt-5">
                 <View className="mb-2 flex-row items-center justify-between">
-                  <Text className="font-ralewayBold text-sm text-[#151717]">
+                  <Text className="font-ralewayBold text-sm text-white">
                     Password
                   </Text>
-                  <Pressable accessibilityRole="button" hitSlop={8}>
-                    <Text className="font-ralewaySemiBold text-sm text-[#2d79f3]">
+
+                  <Pressable
+                    accessibilityLabel="Forgot password"
+                    accessibilityRole="button"
+                    hitSlop={10}
+                    onPress={() => {
+                      // Navigate to your forgot-password screen.
+                    }}
+                  >
+                    <Text className="font-ralewaySemiBold text-sm text-accent">
                       Forgot password?
                     </Text>
                   </Pressable>
                 </View>
+
                 <View
-                  className={`h-[50px] flex-row items-center rounded-[10px] border-[1.5px] bg-white pl-3 ${
+                  className={`h-14 flex-row items-center rounded-2xl border pl-4 ${
                     focusedField === "password"
-                      ? "border-[#2d79f3]"
-                      : "border-[#ecedec]"
+                      ? "border-accent bg-white/15"
+                      : "border-white/20 bg-white/10"
                   }`}
                 >
-                  <Feather name="lock" size={20} color="#5f6b6b" />
+                  <Feather
+                    color={
+                      focusedField === "password"
+                        ? "#BEE3DB"
+                        : "rgba(255,255,255,0.7)"
+                    }
+                    name="lock"
+                    size={20}
+                  />
+
                   <TextInput
+                    ref={passwordInputRef}
+                    accessibilityLabel="Password"
                     autoCapitalize="none"
                     autoComplete="password"
-                    className="ml-3 h-full flex-1 text-sm text-[#151717]"
+                    autoCorrect={false}
+                    className="ml-3 h-full flex-1 items-center font-ralewayMedium text-[15px] text-white"
                     onBlur={() => setFocusedField(null)}
                     onChangeText={setPassword}
                     onFocus={() => setFocusedField("password")}
-                    placeholder="Password"
-                    placeholderTextColor="#8a9494"
+                    onSubmitEditing={() => {
+                      if (canSubmit) {
+                        handleLogin();
+                      }
+                    }}
+                    placeholder="Enter your password"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
                     returnKeyType="done"
                     secureTextEntry={!showPassword}
+                    selectionColor="#BEE3DB"
                     textContentType="password"
                     value={password}
                   />
+
                   <Pressable
                     accessibilityLabel={
                       showPassword ? "Hide password" : "Show password"
                     }
                     accessibilityRole="button"
-                    className="h-full w-12 items-center justify-center"
-                    onPress={() => setShowPassword((current) => !current)}
+                    className="h-full w-14 items-center justify-center"
+                    onPress={() =>
+                      setShowPassword((currentValue) => !currentValue)
+                    }
                   >
                     <Feather
+                      color="rgba(255,255,255,0.75)"
                       name={showPassword ? "eye" : "eye-off"}
-                      size={20}
-                      color="#5f6b6b"
+                      size={21}
                     />
                   </Pressable>
                 </View>
               </View>
-            </View>
 
-            {error ? (
-              <View className="mt-5 flex-row items-center rounded-[10px] border border-rose-200 bg-rose-50 px-4 py-3">
-                <View className="mr-3 h-1.5 w-1.5 rounded-full bg-rose-500" />
-                <Text className="flex-1 text-sm text-rose-600">{error}</Text>
-              </View>
-            ) : null}
+              {/* Error feedback */}
+              {error ? (
+                <View
+                  accessibilityLiveRegion="polite"
+                  className="mt-5 flex-row items-start rounded-2xl border border-white/20 bg-white/10 px-4 py-3"
+                >
+                  <Feather color="#BEE3DB" name="alert-circle" size={19} />
 
-            <Pressable
-              accessibilityLabel="Sign in to your account"
-              accessibilityRole="button"
-              className={`mt-6 h-[52px] items-center justify-center rounded-[12px] ${
-                isLoading ? "bg-[#93c5fd]" : "bg-[#2563EB] active:bg-[#1d4ed8]"
-              }`}
-              disabled={isLoading}
-              onPress={handleLogin}
-            >
-              {isLoading ? (
-                <ActivityIndicator color="#ffffff" />
-              ) : (
-                <Text className="font-ralewaySemiBold text-[15px] text-white">
-                  Sign In
-                </Text>
-              )}
-            </Pressable>
+                  <Text className="ml-3 flex-1 font-ralewayMedium text-sm leading-5 text-white">
+                    {error}
+                  </Text>
+                </View>
+              ) : null}
 
-            <View className="flex flex-row justify-between items-center my-5">
-              <View>
-                 <Text className="text-center text-sm text-[#476764]">
-              New to R.E.M?
-            </Text>
-
-              </View>
-              <View>
-                <Link href="/(auth)/register" asChild>
+              {/* Sign-in button */}
               <Pressable
-                accessibilityLabel="Create tenant account"
-                accessibilityRole="link"
-                className=" h-12 items-center justify-center  active:bg-[#e6fffb]"
+                accessibilityLabel="Sign in to your account"
+                accessibilityRole="button"
+                accessibilityState={{
+                  busy: isLoading,
+                  disabled: !canSubmit,
+                }}
+                className={`mt-12 h-14 items-center justify-center rounded-2xl ${
+                  canSubmit ? "bg-white active:opacity-90" : "bg-white/50"
+                }`}
+                disabled={!canSubmit}
+                onPress={handleLogin}
               >
-                <Text className="font-ralewayBold text-sm text-[#0f766e]">
-                  Create Tenant Account
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator color="#634CE4" />
+                ) : (
+                  <Text
+                    className={`font-ralewayBold text-base ${
+                      canSubmit ? "text-primary" : "text-primary/50"
+                    }`}
+                  >
+                    Sign In
+                  </Text>
+                )}
               </Pressable>
-            </Link>
+
+              {/* Registration */}
+              <View className="mb-12 mt-8 flex-row items-center justify-center gap-1">
+                <Text className="font-ralewayMedium text-sm text-white/75">
+                  New to Terrane?
+                </Text>
+
+                <Link href="/(auth)/register" asChild>
+                  <Pressable
+                    accessibilityLabel="Create a Terrane account"
+                    accessibilityRole="link"
+                    hitSlop={8}
+                  >
+                    <Text className="font-ralewayBold text-sm text-accent">
+                      Create an account
+                    </Text>
+                  </Pressable>
+                </Link>
               </View>
             </View>
-          </View>
 
-          {/* <View className="mt-5 rounded-[16px] border border-[#cce8e3] bg-white/80 px-4 py-4">
-            <Text className="text-center text-sm text-[#476764]">
-              New to R.E.M?
-            </Text>
-            
-          </View> */}
-
-          <View className="mt-5 flex-row items-center justify-center">
-            <View className="mr-2 h-2 w-2 rounded-full bg-[#14b8a6]" />
-            <Text className="text-center text-xs uppercase tracking-widest text-[#476764]">
-              2026 Real Estate Management - v2.4.0
-            </Text>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </Screen>
+            {/* Legal copy */}
+            <View className="mt-auto items-center px-4 pt-12">
+              <Text className="text-center font-ralewayMedium text-xs leading-5 text-white/60">
+                By signing in, you agree to our{" "}
+                <Text className="font-ralewayBold text-white underline">
+                  Terms of Service
+                </Text>{" "}
+                and acknowledge our{" "}
+                <Text className="font-ralewayBold text-white underline">
+                  Privacy Policy
+                </Text>
+                .
+              </Text>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
