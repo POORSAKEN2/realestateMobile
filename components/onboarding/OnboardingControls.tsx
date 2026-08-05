@@ -1,44 +1,33 @@
-import type { Href } from 'expo-router';
-import { router } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import type { Href } from "expo-router";
+import { router } from "expo-router";
+import { Pressable, Text, View } from "react-native";
 
-import { onboardingScreens } from '../../constants/onboarding';
-import { useAuth } from '../../hooks/useAuth';
+import { onboardingScreens } from "../../constants/onboarding";
+import { useAuth } from "../../hooks/useAuth";
 
 type OnboardingProgressProps = {
   activeIndex: number;
 };
 
-const progressAccentColors = [
-  '#2DD4BF',
-  '#38BDF8',
-  '#FCD34D',
-  '#FDA4AF',
-  '#C4B5FD',
-  '#BEF264',
-  '#67E8F9',
-];
-
 export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
   const totalScreens = onboardingScreens.length;
   const currentStep = activeIndex + 1;
   const progress = (currentStep / totalScreens) * 100;
-  const accentColor = progressAccentColors[activeIndex] ?? '#634CE4';
+  const accentColor = "#634CE4";
 
   return (
     <View className="w-full">
       <View className="flex-row items-center gap-3">
         <View className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200">
           <View
-            className="h-full rounded-full"
+            className="h-full rounded-full bg-primary"
             style={{
-              backgroundColor: accentColor,
               width: `${progress}%` as `${number}%`,
             }}
           />
         </View>
 
-        <Text className="shrink-0 text-font12 font-ralewayBold text-blackPrimary">
+        <Text className="text-font12 shrink-0 font-ralewayBold text-blackPrimary">
           {currentStep}/{totalScreens}
         </Text>
       </View>
@@ -59,7 +48,7 @@ export function OnboardingControls({
   activeIndex,
   nextHref,
   buttonTitle,
-  dotClassName = 'bg-teal-400',
+  dotClassName = "bg-teal-400",
   fullWidthButton = false,
   showSkip = true,
 }: OnboardingControlsProps) {
@@ -68,7 +57,7 @@ export function OnboardingControls({
 
   function finishOnboarding() {
     completeOnboarding();
-    router.replace('/(auth)/login');
+    router.replace("/(auth)/login");
   }
 
   function handleNext() {
@@ -97,10 +86,12 @@ export function OnboardingControls({
         {showSkip && !isLast ? (
           <Pressable
             accessibilityRole="button"
-            className="h-12 min-w-28 items-center justify-center rounded-full border border-description px-6"
+            className="h-12 min-w-28 items-center justify-center rounded-full border border-accent px-6"
             onPress={finishOnboarding}
           >
-            <Text className="text-font14 font-ralewaySemiBold text-description">Skip</Text>
+            <Text className="font-ralewaySemiBold text-font14 text-description">
+              Skip
+            </Text>
           </Pressable>
         ) : fullWidthButton ? null : (
           <View className="min-w-28" />
@@ -109,12 +100,12 @@ export function OnboardingControls({
         <Pressable
           accessibilityRole="button"
           className={`h-12 items-center justify-center rounded-full bg-primary px-6 ${
-            fullWidthButton ? 'w-full' : 'min-w-32'
+            fullWidthButton ? "w-full" : "min-w-32"
           }`}
           onPress={handleNext}
         >
-          <Text className="text-font14 font-ralewaySemiBold text-whitePrimary">
-            {buttonTitle ?? (isLast ? 'Get started' : 'Next')}
+          <Text className="font-ralewaySemiBold text-font14 text-whitePrimary">
+            {buttonTitle ?? (isLast ? "Get started" : "Next")}
           </Text>
         </Pressable>
       </View>
