@@ -55,9 +55,9 @@ export function RegistrationCredentialsStep({
         </Text>
       </View>
 
-      <View className="mt-2 flex-row items-center justify-center">
+      <View className="mt-2 flex-row items-center justify-center gap-1">
         <Text className="text-sm text-description">
-          Already have an account?{" "}
+          Already have an account?
         </Text>
         <Link href="/(auth)/login" asChild>
           <Pressable accessibilityRole="link" hitSlop={8}>

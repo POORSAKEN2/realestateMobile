@@ -263,9 +263,9 @@ export default function LoginScreen() {
               </Pressable>
 
               {/* Registration */}
-              <View className="mb-12 mt-8 flex-row items-center justify-center">
+              <View className="mb-12 mt-8 flex-row items-center justify-center gap-1">
                 <Text className="font-ralewayMedium text-sm text-white/75">
-                  New to Terrane?{" "}
+                  New to Terrane?
                 </Text>
 
                 <Link href="/(auth)/register" asChild>
