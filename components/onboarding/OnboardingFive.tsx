@@ -1,31 +1,31 @@
-import { Feather } from '@expo/vector-icons';
-import { Text, View } from 'react-native';
+import { Feather } from "@expo/vector-icons";
+import { Text, View } from "react-native";
 
-import { onboardingScreens } from '../../constants/onboarding';
-import { Screen } from '../ui/Screen';
-import { OnboardingControls, OnboardingProgress } from './OnboardingControls';
+import { onboardingScreens } from "../../constants/onboarding";
+import { Screen } from "../ui/Screen";
+import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
 
 const folderRows = [
   {
-    label: 'Properties',
-    iconColor: '#634CE4',
-    iconBg: 'bg-teal-50',
-    lineClassName: 'bg-teal-700/55',
-    meta: '18 files',
+    label: "Properties",
+    iconColor: "#634CE4",
+    iconBg: "bg-teal-50",
+    lineClassName: "bg-teal-700/55",
+    meta: "18 files",
   },
   {
-    label: 'Bookings',
-    iconColor: '#0369A1',
-    iconBg: 'bg-sky-50',
-    lineClassName: 'bg-sky-700/50',
-    meta: '6 pending',
+    label: "Bookings",
+    iconColor: "#0369A1",
+    iconBg: "bg-sky-50",
+    lineClassName: "bg-sky-700/50",
+    meta: "6 pending",
   },
   {
-    label: 'Documents',
-    iconColor: '#7C3AED',
-    iconBg: 'bg-violet-50',
-    lineClassName: 'bg-violet-700/45',
-    meta: 'Updated',
+    label: "Documents",
+    iconColor: "#7C3AED",
+    iconBg: "bg-violet-50",
+    lineClassName: "bg-violet-700/45",
+    meta: "Updated",
   },
 ];
 
@@ -33,7 +33,7 @@ export function OnboardingFive() {
   const item = onboardingScreens[4];
 
   return (
-    <Screen className='bg-whitePrimary'>
+    <Screen className="bg-whitePrimary">
       <View className="flex-1 justify-between">
         <OnboardingProgress activeIndex={4} />
 
@@ -57,7 +57,7 @@ export function OnboardingFive() {
 
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
+                <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Workspace
                 </Text>
                 <Text className="mt-2 font-ralewayBold text-xl text-blackPrimary">
@@ -88,12 +88,14 @@ export function OnboardingFive() {
                         <Text className="font-ralewayBold text-base text-blackPrimary">
                           {row.label}
                         </Text>
-                        <Text className="text-font10 font-ralewaySemiBold uppercase tracking-widest text-description">
+                        <Text className="font-ralewaySemiBold text-font10 uppercase tracking-widest text-textPrimary">
                           {row.meta}
                         </Text>
                       </View>
                       <View className="mt-2 gap-1.5">
-                        <View className={`h-2 w-4/5 rounded-full ${row.lineClassName}`} />
+                        <View
+                          className={`h-2 w-4/5 rounded-full ${row.lineClassName}`}
+                        />
                         <View className="h-2 w-3/5 rounded-full bg-slate-300/80" />
                       </View>
                     </View>
@@ -119,25 +121,23 @@ export function OnboardingFive() {
           nextHref="/(onboarding)/screen-6"
         /> */}
 
-
         <View className="gap-8">
-          <View className=' mb-5'>
-
-            <Text className="my-5 text-4xl font-ralewayExtraBold leading-tight  text-black">
+          <View className=" mb-5">
+            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-black">
               {item.title}
             </Text>
 
-            <Text className="text-base leading-7 text-description">{item.description}</Text>
-
+            <Text className="text-base leading-7 text-textPrimary">
+              {item.description}
+            </Text>
           </View>
-         
+
           <OnboardingControls
             activeIndex={4}
             dotClassName="bg-violet-300"
             nextHref="/(onboarding)/screen-6"
-          /> 
+          />
         </View>
-
       </View>
     </Screen>
   );

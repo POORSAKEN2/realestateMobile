@@ -1,13 +1,13 @@
-import { Feather } from '@expo/vector-icons';
-import { Image, Text, View } from 'react-native';
+import { Feather } from "@expo/vector-icons";
+import { Image, Text, View } from "react-native";
 
-import { onboardingScreens } from '../../constants/onboarding';
-import { Screen } from '../ui/Screen';
-import { OnboardingControls, OnboardingProgress } from './OnboardingControls';
-import analytics from '../../assets/images/analytics.png';
+import { onboardingScreens } from "../../constants/onboarding";
+import { Screen } from "../ui/Screen";
+import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
+import analytics from "../../assets/images/analytics.png";
 const analyticsCardShadow = {
   elevation: 10,
-  shadowColor: '#1E1F45',
+  shadowColor: "#1E1F45",
   shadowOffset: { width: 0, height: 18 },
   shadowOpacity: 0.16,
   shadowRadius: 28,
@@ -32,10 +32,10 @@ export function OnboardingFour() {
 
             <View className="flex-row items-start justify-between">
               <View>
-                <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
+                <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Analytics
                 </Text>
-                <Text className="mt-2 font-ralewayBold text-3xl text-blackPrimary">
+                <Text className="text-textPrimaryPrimary mt-2 font-ralewayBold text-3xl">
                   Cash flow
                 </Text>
               </View>
@@ -55,32 +55,36 @@ export function OnboardingFour() {
 
             <View className=" flex-row gap-3">
               <View className="flex-1 rounded-2xl border border-white/80 bg-whitePrimary/85 p-3 shadow-sm">
-                <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
+                <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Return
                 </Text>
-                <Text className="mt-1 font-ralewayBold text-lg text-teal-700">+18%</Text>
+                <Text className="mt-1 font-ralewayBold text-lg text-teal-700">
+                  +18%
+                </Text>
               </View>
               <View className="flex-1 rounded-2xl border border-white/80 bg-whitePrimary/85 p-3 shadow-sm">
-                <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
+                <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Expenses
                 </Text>
-                <Text className="mt-1 font-ralewayBold text-lg text-rose-700">42k</Text>
+                <Text className="mt-1 font-ralewayBold text-lg text-rose-700">
+                  42k
+                </Text>
               </View>
             </View>
           </View>
         </View>
 
         <View className="gap-8">
-          <View className=' mb-5'>
-
-            <Text className="my-5 text-4xl font-ralewayExtraBold leading-tight  text-black">
+          <View className=" mb-5">
+            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-textPrimary">
               {item.title}
             </Text>
 
-            <Text className="text-base leading-7 text-description">{item.description}</Text>
-
+            <Text className="text-base leading-7 text-textPrimary">
+              {item.description}
+            </Text>
           </View>
-         
+
           <OnboardingControls
             activeIndex={3}
             dotClassName="bg-amber-300"

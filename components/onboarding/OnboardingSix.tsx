@@ -1,10 +1,10 @@
-import { Feather } from '@expo/vector-icons';
-import { Image, Text, View } from 'react-native';
+import { Feather } from "@expo/vector-icons";
+import { Image, Text, View } from "react-native";
 
-import { onboardingScreens } from '../../constants/onboarding';
-import { Screen } from '../ui/Screen';
-import { OnboardingControls, OnboardingProgress } from './OnboardingControls';
-import philippinesMap from '../../assets/images/philippines-map.png';
+import { onboardingScreens } from "../../constants/onboarding";
+import { Screen } from "../ui/Screen";
+import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
+import philippinesMap from "../../assets/images/philippines-map.png";
 
 export function OnboardingSix() {
   const item = onboardingScreens[5];
@@ -36,14 +36,14 @@ export function OnboardingSix() {
 
             <View className="absolute inset-y-0 right-0 w-1/2 bg-slate-100/55" />
 
-            <View className="absolute right-30 top-16 h-60 w-60 items-center justify-center">
+            <View className="right-30 absolute top-16 h-60 w-60 items-center justify-center">
               <Image
                 className="h-full w-full opacity-75"
                 resizeMode="contain"
                 source={philippinesMap}
                 tintColor="#E9BF55"
               />
-              <View className="absolute right-50 bottom-20 h-10 w-10 items-center justify-center rounded-full bg-teal-700 shadow-xl">
+              <View className="right-50 absolute bottom-20 h-10 w-10 items-center justify-center rounded-full bg-teal-700 shadow-xl">
                 <Feather name="map-pin" size={18} color="#FFFFFF" />
               </View>
               {/* <View className="absolute bottom-[76px] right-[50px] h-5 w-5 rounded-full border border-white/70 bg-teal-300/50" /> */}
@@ -54,11 +54,11 @@ export function OnboardingSix() {
                 <View className="h-8 w-8 items-center justify-center rounded-2xl bg-teal-50">
                   <Feather name="navigation" size={15} color="#634CE4" />
                 </View>
-                <Text className="flex-1 font-ralewayBold text-sm text-blackPrimary">
+                <Text className="text-textPrimaryPrimary flex-1 font-ralewayBold text-sm">
                   Property Location
                 </Text>
               </View>
-              <Text className="mt-3 text-xs font-ralewaySemiBold leading-5 text-description">
+              <Text className="mt-3 font-ralewaySemiBold text-xs leading-5 text-textPrimary">
                 Calapan, Oriental Mindoro
               </Text>
               <View className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
@@ -67,10 +67,10 @@ export function OnboardingSix() {
             </View>
 
             <View className="absolute bottom-5 left-5 rounded-2xl border border-white/80 bg-whitePrimary/90 px-4 py-3 shadow-sm">
-              <Text className="text-font10 font-ralewayExtraBold uppercase tracking-widest text-description">
+              <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                 Region
               </Text>
-              <Text className="mt-1 font-ralewayBold text-sm text-blackPrimary">
+              <Text className="text-textPrimaryPrimary mt-1 font-ralewayBold text-sm">
                 Philippines
               </Text>
             </View>
@@ -78,24 +78,22 @@ export function OnboardingSix() {
         </View>
 
         <View className="gap-8">
-          <View className=' mb-5'>
-
-            <Text className="my-5 text-4xl font-ralewayExtraBold leading-tight  text-black">
+          <View className=" mb-5">
+            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-textPrimary">
               {item.title}
             </Text>
 
-            <Text className="text-base leading-7 text-description">{item.description}</Text>
-
+            <Text className="text-base text-textPrimary">
+              {item.description}
+            </Text>
           </View>
-         
+
           <OnboardingControls
             activeIndex={5}
             dotClassName="bg-lime-300"
             nextHref="/(onboarding)/screen-7"
           />
         </View>
-
-
       </View>
     </Screen>
   );
