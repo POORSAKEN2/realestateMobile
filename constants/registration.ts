@@ -35,8 +35,7 @@ export const REGISTRATION_STEP_CONTENT: Record<
 > = {
   credentials: {
     buttonLabel: "Continue",
-    subtitle:
-      "Use the email address you want connected to your R.E.M. workspace.",
+    subtitle: "Use the email address you want connected to your workspace.",
     title: "Create your account",
   },
   verification: {

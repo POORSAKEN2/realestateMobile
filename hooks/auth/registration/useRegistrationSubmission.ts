@@ -40,7 +40,7 @@ export function useRegistrationSubmission({
       if (!isMountedRef.current) return;
 
       signIn(session);
-      Alert.alert("Welcome to R.E.M.", "Your account is ready.");
+      Alert.alert("Welcome to Terrane!", "Your account is ready.");
       router.replace("/");
     } catch (error) {
       if (!isMountedRef.current) return;
