@@ -3,7 +3,7 @@ import { Text, View, Image } from "react-native";
 import { onboardingScreens } from "../../constants/onboarding";
 import { Screen } from "../ui/Screen";
 import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
-import BrandLogomark from "../../assets/branding/svg/brand-logomark.svg";
+import BrandLogomark from "../../assets/branding/svg/brand-combination-vertical.svg";
 
 export function OnboardingOne() {
   const item = onboardingScreens[0];
@@ -13,8 +13,8 @@ export function OnboardingOne() {
       <View className="flex-1 justify-between ">
         <OnboardingProgress activeIndex={0} />
 
-        <View className="flex-1 items-center justify-center">
-          <BrandLogomark width="100%" height="100%" />
+        <View className="flex-1 items-center justify-normal">
+          <BrandLogomark width="80%" height="120%" />
         </View>
 
         <View className="gap-8">
