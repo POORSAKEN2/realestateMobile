@@ -13,21 +13,20 @@ export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
   const totalScreens = onboardingScreens.length;
   const currentStep = activeIndex + 1;
   const progress = (currentStep / totalScreens) * 100;
-  const accentColor = "#634CE4";
 
   return (
     <View className="w-full">
       <View className="flex-row items-center gap-3">
-        <View className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200">
+        <View className="h-2 flex-1 overflow-hidden rounded-full bg-accent/50">
           <View
-            className="h-full rounded-full bg-primary"
+            className="h-full rounded-full bg-secondary"
             style={{
               width: `${progress}%` as `${number}%`,
             }}
           />
         </View>
 
-        <Text className="text-font12 shrink-0 font-ralewayBold text-blackPrimary">
+        <Text className="text-font12 shrink-0 font-ralewayBold text-textPrimary">
           {currentStep}/{totalScreens}
         </Text>
       </View>
@@ -89,7 +88,7 @@ export function OnboardingControls({
             className="h-12 min-w-28 items-center justify-center rounded-full border border-accent px-6"
             onPress={finishOnboarding}
           >
-            <Text className="font-ralewaySemiBold text-font14 text-description">
+            <Text className="font-ralewaySemiBold text-font14 text-textPrimary">
               Skip
             </Text>
           </Pressable>
@@ -99,12 +98,12 @@ export function OnboardingControls({
 
         <Pressable
           accessibilityRole="button"
-          className={`h-12 items-center justify-center rounded-full bg-primary px-6 ${
+          className={`h-12 items-center justify-center rounded-full bg-secondary px-6 ${
             fullWidthButton ? "w-full" : "min-w-32"
           }`}
           onPress={handleNext}
         >
-          <Text className="font-ralewaySemiBold text-font14 text-whitePrimary">
+          <Text className="font-ralewaySemiBold text-font14 text-white">
             {buttonTitle ?? (isLast ? "Get started" : "Next")}
           </Text>
         </Pressable>

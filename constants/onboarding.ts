@@ -8,51 +8,49 @@ export type OnboardingContent = {
 export const onboardingScreens: OnboardingContent[] = [
   {
     eyebrow: "Step 1 of 7",
-    title: "Terrane is your Real Estate Manager",
-    description:
-      "Browse homes, units, and lots from a mobile workspace built for real estate searches.",
+    title: "Terrane: Your Real Estate Manager",
+    description: "Search homes, units, and lots—all in one app.",
     accent: "bg-accent",
   },
   {
     eyebrow: "Step 2 of 7",
     title: "Keep Your Properties Organized",
     description:
-      "Add your properties, update their details, and keep important information in one easy-to-access place.",
+      "Add properties, update details, and keep everything organized.",
     accent: "bg-accent",
   },
   {
     eyebrow: "Step 3 of 7",
     title: "Manage Tenants and Leases Easily",
-    description:
-      "You can track who is renting, when leases start or end, and what needs your attention next.",
+    description: "Track tenants, lease dates, and upcoming tasks with ease.",
     accent: "bg-accent",
   },
   {
     eyebrow: "Step 4 of 7",
     title: "Stay on Top of Expenses",
     description:
-      "Terrance helps you understand your expenses, check returns, and make better decisions for your properties.",
+      "Track expenses, monitor returns, and make smarter property decisions.",
     accent: "bg-accent",
   },
   {
     eyebrow: "Step 5 of 7",
     title: "Keep Everything in One Place",
     description:
-      "No more jumping between folders, notes, and spreadsheets. with R.E.M., you can manage documents, bookings, support requests, and updates in one clean workspace.",
+      "Manage documents, bookings, support, and updates—all in one clean workspace.",
     accent: "bg-accent",
   },
   {
     eyebrow: "Step 6 of 7",
     title: "Set Your Dashboard Location",
     description:
-      "This helps Terrane show the right area, property activity, and location-based details when you open your dashboard.",
+      "See nearby properties, local activity, and area-specific insights on your dashboard.",
     accent: "bg-accent",
   },
   {
     eyebrow: "Step 7 of 7",
     title: "You’re All Set",
     description:
-      "Start managing your properties, tenants, leases, expenses, and documents from one simple dashboard.",
+      "Manage properties, tenants, leases, and finances from one dashboard.",
     accent: "bg-accent",
   },
 ];
