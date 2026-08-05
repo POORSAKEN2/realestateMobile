@@ -25,10 +25,6 @@ export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
             }}
           />
         </View>
-
-        <Text className="text-font12 shrink-0 font-ralewayBold text-textPrimary">
-          {currentStep}/{totalScreens}
-        </Text>
       </View>
     </View>
   );
