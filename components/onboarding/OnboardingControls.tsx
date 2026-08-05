@@ -17,7 +17,7 @@ export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
   return (
     <View className="w-full">
       <View className="flex-row items-center gap-3">
-        <View className="h-2 flex-1 overflow-hidden rounded-full bg-accent/50">
+        <View className="h-2 flex-1 overflow-hidden rounded-full bg-accent/40">
           <View
             className="h-full rounded-full bg-secondary"
             style={{
@@ -70,22 +70,11 @@ export function OnboardingControls({
 
   return (
     <View className="w-full gap-5">
-      {/* <View className="flex-row justify-center gap-2">
-        {onboardingScreens.map((screen, index) => (
-          <View
-            key={screen.title}
-            className={`h-2 rounded-full ${
-              index === activeIndex ? `w-8 ${dotClassName}` : 'w-2 bg-description/30'
-            }`}
-          />
-        ))}
-      </View> */}
-
       <View className="flex-row items-center justify-between">
         {showSkip && !isLast ? (
           <Pressable
             accessibilityRole="button"
-            className="h-12 min-w-28 items-center justify-center rounded-full border border-accent px-6"
+            className=" h-12 min-w-28 items-center justify-center rounded-full border border-accent px-6"
             onPress={finishOnboarding}
           >
             <Text className="font-ralewaySemiBold text-font14 text-textPrimary">

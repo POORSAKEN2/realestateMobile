@@ -48,7 +48,7 @@ export const onboardingScreens: OnboardingContent[] = [
   },
   {
     eyebrow: "Step 7 of 7",
-    title: "You’re All Set",
+    title: "You’re All Set!",
     description:
       "Manage properties, tenants, leases, and finances from one dashboard.",
     accent: "bg-accent",

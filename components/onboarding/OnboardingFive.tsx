@@ -57,7 +57,7 @@ export function OnboardingFive() {
 
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-description">
+                <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Workspace
                 </Text>
                 <Text className="mt-2 font-ralewayBold text-xl text-blackPrimary">
@@ -88,7 +88,7 @@ export function OnboardingFive() {
                         <Text className="font-ralewayBold text-base text-blackPrimary">
                           {row.label}
                         </Text>
-                        <Text className="font-ralewaySemiBold text-font10 uppercase tracking-widest text-description">
+                        <Text className="font-ralewaySemiBold text-font10 uppercase tracking-widest text-textPrimary">
                           {row.meta}
                         </Text>
                       </View>
@@ -127,7 +127,7 @@ export function OnboardingFive() {
               {item.title}
             </Text>
 
-            <Text className="text-base leading-7 text-description">
+            <Text className="text-base leading-7 text-textPrimary">
               {item.description}
             </Text>
           </View>
