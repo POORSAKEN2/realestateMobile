@@ -14,6 +14,7 @@ import { clientKeys } from "../api/useClients";
 import type {
   Lessee,
   Property,
+  PropertyRoom,
   TransientBooking,
   TransientBookingPayload,
 } from "../../types";
@@ -33,6 +34,7 @@ type UseBookingFormOptions = {
   accessToken?: string;
   bookings: TransientBooking[];
   buildings: Property[];
+  rooms: PropertyRoom[];
   guests: Lessee[];
   onSaved: (
     booking: TransientBookingPayload,
@@ -45,6 +47,7 @@ export function useBookingForm({
   bookings,
   buildings,
   guests,
+  rooms,
   onSaved,
 }: UseBookingFormOptions) {
   const queryClient = useQueryClient();
@@ -56,6 +59,7 @@ export function useBookingForm({
   const [message, setMessage] = useState("");
   const [form, setForm] = useState<BookingFormState>(() => emptyForm());
   const [selectedGuestId, setSelectedGuestId] = useState("");
+  const [selectedRoomId, setSelectedRoomId] = useState("");
   const [isAddingGuest, setIsAddingGuest] = useState(false);
 
   const selectedBuilding = buildings.find(
@@ -94,6 +98,7 @@ export function useBookingForm({
     setEditingBooking(null);
     setMessage("");
     setSelectedGuestId("");
+    setSelectedRoomId("");
     setIsAddingGuest(false);
   }
 
@@ -145,6 +150,7 @@ export function useBookingForm({
     setForm(emptyForm(propertyId, date));
     setMessage("");
     setSelectedGuestId("");
+    setSelectedRoomId("");
     setIsAddingGuest(false);
     setIsOpen(true);
   }
@@ -170,13 +176,24 @@ export function useBookingForm({
       (guest) =>
         guest.contactEmail.toLowerCase() === booking.guestEmail.toLowerCase(),
     );
+
+    const matchedRoom = rooms.find(
+      (room) => room.roomNumber == booking.roomNumber,
+    );
+
     setSelectedGuestId(matchedGuest?.id ?? "");
+    setSelectedRoomId(matchedRoom?.roomNumber ?? "");
     setIsAddingGuest(!matchedGuest);
     setIsOpen(true);
   }
 
   function selectBuilding(propertyId: string) {
     setForm((current) => ({ ...current, propertyId, roomNumber: "" }));
+  }
+
+  function selectRoom(roomId: string) {
+    setForm((current) => ({ ...current, roomId, roomNumber: "" }));
+    setSelectedRoomId(roomId);
   }
 
   function selectGuest(guestId: string) {
@@ -279,8 +296,10 @@ export function useBookingForm({
     openEdit,
     close,
     selectBuilding,
+    selectRoom,
     selectedBuilding,
     selectedGuestId,
+    selectedRoomId,
     selectGuest,
     submit,
     toggleAddingGuest,

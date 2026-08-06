@@ -1,7 +1,12 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
-import type { Lessee, Property, TransientBooking } from "../../types";
+import type {
+  Lessee,
+  Property,
+  PropertyRoom,
+  TransientBooking,
+} from "../../types";
 import type {
   BookingFormMode,
   BookingFormState,
@@ -17,6 +22,7 @@ import { BookingStayFields } from "./BookingStayFields";
 
 type BookingFormModalProps = {
   buildings: Property[];
+  rooms: PropertyRoom[];
   conflict?: TransientBooking;
   editingBooking: TransientBooking | null;
   form: BookingFormState;
@@ -32,6 +38,7 @@ type BookingFormModalProps = {
   onCancelBooking: () => void;
   onClose: () => void;
   onSelectBuilding: (id: string) => void;
+  onSelectRoom: (id: string) => void;
   onSelectGuest: (id: string) => void;
   onSubmit: () => void;
   onToggleAddingGuest: () => void;
@@ -40,6 +47,7 @@ type BookingFormModalProps = {
 
 export function BookingFormModal({
   buildings,
+  rooms,
   conflict,
   editingBooking,
   form,
@@ -55,6 +63,7 @@ export function BookingFormModal({
   onCancelBooking,
   onClose,
   onSelectBuilding,
+  onSelectRoom,
   onSelectGuest,
   onSubmit,
   onToggleAddingGuest,
@@ -77,7 +86,7 @@ export function BookingFormModal({
       title={mode === "create" ? "Create a booking" : "Edit booking"}
       showCancelAction
     >
-      <View className="border-secondary bg-secondary/20 flex-row items-start gap-3 rounded-2xl border px-4 py-3.5">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-secondary bg-secondary/20 px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
           color="#634CE4"
@@ -110,6 +119,18 @@ export function BookingFormModal({
 
         <View className="flex-row gap-3">
           <View className="flex-1">
+            <DropdownField
+              label="Room"
+              options={rooms.map((room) => ({
+                label: room.roomNumber,
+                value: room.id,
+              }))}
+              onSelect={onSelectRoom}
+              placeholder="Select a room"
+              required
+              value={form.roomNumber}
+              variant="filled"
+            />
             <BaseField
               label="Room number"
               onChangeText={(value) => onUpdateForm("roomNumber", value)}
@@ -134,7 +155,7 @@ export function BookingFormModal({
 
         {selectedBuilding ? (
           <View className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <View className="bg-secondary/20 h-10 w-10 items-center justify-center rounded-xl">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/20">
               <MaterialCommunityIcons
                 name="door-open"
                 color="#634CE4"
@@ -145,7 +166,7 @@ export function BookingFormModal({
               <Text className="font-ralewayBold text-xs text-slate-500">
                 Booking location
               </Text>
-              <Text className="font-ralewayExtraBold text-textPrimary mt-0.5 text-sm">
+              <Text className="mt-0.5 font-ralewayExtraBold text-sm text-textPrimary">
                 {selectedBuilding.title}
                 {form.roomNumber ? ` · Room ${form.roomNumber}` : ""}
               </Text>
