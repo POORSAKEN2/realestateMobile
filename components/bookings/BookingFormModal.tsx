@@ -34,6 +34,7 @@ type BookingFormModalProps = {
   isVisible: boolean;
   mode: BookingFormMode;
   selectedBuilding?: Property;
+  selectedRoom?: PropertyRoom;
   selectedGuestId: string;
   onCancelBooking: () => void;
   onClose: () => void;
@@ -59,6 +60,7 @@ export function BookingFormModal({
   isVisible,
   mode,
   selectedBuilding,
+  selectedRoom,
   selectedGuestId,
   onCancelBooking,
   onClose,
@@ -128,17 +130,17 @@ export function BookingFormModal({
               onSelect={onSelectRoom}
               placeholder="Select a room"
               required
-              value={form.roomNumber}
+              value={form.roomId}
               variant="filled"
             />
-            <BaseField
+            {/* <BaseField
               label="Room number"
               onChangeText={(value) => onUpdateForm("roomNumber", value)}
               placeholder="e.g. 101"
               required
               value={form.roomNumber}
               variant="filled"
-            />
+            /> */}
           </View>
           <View className="flex-1">
             <BaseField
@@ -168,7 +170,8 @@ export function BookingFormModal({
               </Text>
               <Text className="mt-0.5 font-ralewayExtraBold text-sm text-textPrimary">
                 {selectedBuilding.title}
-                {form.roomNumber ? ` · Room ${form.roomNumber}` : ""}
+                {selectedRoom?.roomNumber}
+                {/* {form.roomNumber ? ` · Room ${form.roomNumber}` : ""} */}
               </Text>
             </View>
           </View>
@@ -204,10 +207,7 @@ export function BookingFormModal({
           onUpdateForm={onUpdateForm}
         />
 
-        {form.propertyId &&
-        form.roomNumber &&
-        form.startDate &&
-        form.endDate ? (
+        {form.propertyId && form.roomId && form.startDate && form.endDate ? (
           <BookingAvailabilityMessage conflict={conflict} />
         ) : (
           <View className="rounded-2xl bg-slate-100 p-4">

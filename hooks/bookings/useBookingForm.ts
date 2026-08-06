@@ -68,7 +68,7 @@ export function useBookingForm({
   const conflict = useMemo(() => {
     if (
       !form.propertyId ||
-      !form.roomNumber ||
+      !form.roomId ||
       !form.startDate ||
       !form.endDate ||
       !isBookingRangeValid({
@@ -84,7 +84,7 @@ export function useBookingForm({
     return findTransientBookingConflict({
       bookings,
       propertyId: form.propertyId,
-      roomNumber: form.roomNumber,
+      roomNumber: form.roomId,
       startDate: form.startDate,
       checkInTime: form.checkInTime,
       endDate: form.endDate,
@@ -160,7 +160,7 @@ export function useBookingForm({
     setEditingBooking(booking);
     setForm({
       propertyId: booking.propertyId,
-      roomNumber: booking.roomNumber,
+      roomId: booking.roomId,
       guestName: booking.guestName,
       guestEmail: booking.guestEmail,
       guestPhone: booking.guestPhone,
@@ -177,9 +177,7 @@ export function useBookingForm({
         guest.contactEmail.toLowerCase() === booking.guestEmail.toLowerCase(),
     );
 
-    const matchedRoom = rooms.find(
-      (room) => room.roomNumber == booking.roomNumber,
-    );
+    const matchedRoom = rooms.find((room) => room.roomNumber == booking.roomId);
 
     setSelectedGuestId(matchedGuest?.id ?? "");
     setSelectedRoomId(matchedRoom?.roomNumber ?? "");
@@ -192,8 +190,10 @@ export function useBookingForm({
   }
 
   function selectRoom(roomId: string) {
-    setForm((current) => ({ ...current, roomId, roomNumber: "" }));
-    setSelectedRoomId(roomId);
+    const room = rooms.find((item) => item.id === roomId);
+    setSelectedRoomId(room?.id ?? "");
+
+    setForm((current) => ({ ...current, roomId }));
   }
 
   function selectGuest(guestId: string) {
@@ -228,8 +228,7 @@ export function useBookingForm({
     setMessage("");
 
     if (!form.propertyId) return setMessage("Please select a building.");
-    if (!form.roomNumber.trim())
-      return setMessage("Please enter a room number.");
+    if (!form.roomId) return setMessage("Please enter a room number.");
     if (!isAddingGuest && !selectedGuestId) {
       return setMessage("Please select an existing guest or add a new guest.");
     }
@@ -263,7 +262,7 @@ export function useBookingForm({
 
     saveMutation.mutate({
       propertyId: form.propertyId,
-      roomNumber: form.roomNumber.trim(),
+      roomId: form.roomId,
       guestName: form.guestName.trim(),
       guestEmail: form.guestEmail.trim(),
       guestPhone: form.guestPhone.trim(),

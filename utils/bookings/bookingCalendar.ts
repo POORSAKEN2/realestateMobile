@@ -9,7 +9,7 @@ export type StatusFilter = "Booked" | "All";
 
 export type BookingFormState = {
   propertyId: string;
-  roomNumber: string;
+  roomId: string;
   guestName: string;
   guestEmail: string;
   guestPhone: string;
@@ -116,11 +116,12 @@ export function getParamValue(value?: string | string[]) {
 
 export function emptyForm(
   propertyId = "",
+  roomId = "",
   date = dateKey(new Date()),
 ): BookingFormState {
   return {
     propertyId,
-    roomNumber: "",
+    roomId,
     guestName: "",
     guestEmail: "",
     guestPhone: "",
