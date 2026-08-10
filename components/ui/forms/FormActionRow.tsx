@@ -31,13 +31,13 @@ export function FormActionRow({
           accessibilityRole="button"
           accessibilityState={{ disabled: actionsDisabled }}
           activeOpacity={0.85}
-          className={`h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white ${
+          className={`h-14 flex-1 items-center justify-center rounded-2xl border border-secondary bg-white ${
             actionsDisabled ? "opacity-60" : ""
           }`}
           disabled={actionsDisabled}
           onPress={onCancel}
         >
-          <Text className="font-ralewayBold text-base text-primary">
+          <Text className="font-ralewayBold text-base text-secondary">
             {cancelText}
           </Text>
         </TouchableOpacity>
@@ -48,7 +48,7 @@ export function FormActionRow({
           accessibilityRole="button"
           accessibilityState={{ disabled: actionsDisabled, busy: isPending }}
           activeOpacity={0.85}
-          className={`h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
+          className={`h-14 flex-1 items-center justify-center rounded-2xl bg-secondary ${
             actionsDisabled ? "opacity-60" : ""
           }`}
           disabled={actionsDisabled}

@@ -18,7 +18,7 @@ export function DocumentsHeader({
           accessibilityLabel="Upload document"
           accessibilityRole="button"
           activeOpacity={0.85}
-          className="min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl bg-primary px-3.5"
+          className="min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl bg-secondary px-3.5"
           onPress={onUpload}
         >
           <MaterialCommunityIcons name="plus" color="#FFFFFF" size={20} />
@@ -28,7 +28,12 @@ export function DocumentsHeader({
         </TouchableOpacity>
       }
       eyebrow="Portfolio Library"
-      leading={<SecondaryBackButton accessibilityLabel="Back from documents" />}
+      leading={
+        <SecondaryBackButton
+          accessibilityLabel="Back from documents"
+          variant="secondary"
+        />
+      }
       supportingText={`${documentCount} ${
         documentCount === 1 ? "document" : "documents"
       }`}

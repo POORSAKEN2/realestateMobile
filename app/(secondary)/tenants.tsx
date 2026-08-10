@@ -67,7 +67,7 @@ export default function TenantsScreen() {
             leading={
               <SecondaryBackButton
                 accessibilityLabel="Back from tenants"
-                variant="primary"
+                variant="secondary"
               />
             }
             title="Tenants"
@@ -75,9 +75,9 @@ export default function TenantsScreen() {
         </View>
 
         {/* --- THE HERO: REVENUE SNAPSHOT --- */}
-        <View className="relative overflow-hidden rounded-[32px] bg-textPrimary p-6 shadow-xl shadow-primary/20">
+        <View className="relative overflow-hidden rounded-[32px] bg-secondary p-6 shadow-xl shadow-secondary/20">
           {/* Decorative Background Accent */}
-          <View className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-secondary/10" />
+          <View className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-primary/40" />
 
           <View className="flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
@@ -102,10 +102,10 @@ export default function TenantsScreen() {
         {/* --- METRIC ROW: Clean & Borderless --- */}
         <View className="flex-row gap-4 px-1">
           {/* Total Tenants */}
-          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
+          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
             <View className="flex-row items-center gap-2">
               <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
-                <Ionicons name="people" color={colors.primary} size={16} />
+                <Ionicons name="people" color={colors.secondary} size={16} />
               </View>
               <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
                 Capacity
@@ -122,11 +122,11 @@ export default function TenantsScreen() {
           </View>
 
           {/* Lease Linkage Health */}
-          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
+          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
-                  <Ionicons name="link" color={colors.primary} size={16} />
+                  <Ionicons name="link" color={colors.secondary} size={16} />
                 </View>
                 <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
                   Linkage
@@ -145,7 +145,7 @@ export default function TenantsScreen() {
               {/* Mini Progress Bar for Linkage Health */}
               <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/10">
                 <View
-                  className="h-full bg-primary"
+                  className="h-full bg-secondary"
                   style={{
                     width: `${linkedTenantPercentage}%`,
                   }}
@@ -155,10 +155,10 @@ export default function TenantsScreen() {
           </View>
         </View>
 
-        <View className="rounded-[22px] border border-textPrimary/10 bg-white px-3 py-3 shadow-xl shadow-primary/10">
+        <View className="rounded-[22px] border border-secondary/20 bg-white px-3 py-3 shadow-xl shadow-secondary/10">
           <View className="flex-row items-center gap-3">
             <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
-              <Feather name="search" size={20} color={colors.primary} />
+              <Feather name="search" size={20} color={colors.secondary} />
             </View>
 
             <View className="min-w-0 flex-1">

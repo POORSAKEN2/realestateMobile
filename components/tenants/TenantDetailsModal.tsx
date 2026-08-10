@@ -34,7 +34,7 @@ export function TenantDetailsModal({
               {tenant?.phone || "No phone on file"}
             </Text>
             {linkedLeaseCount !== undefined ? (
-              <View className="mt-5 rounded-2xl bg-secondary/10 p-4">
+              <View className="mt-5 rounded-2xl border border-secondary/20 bg-secondary/10 p-4">
                 <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
                   Active Records
                 </Text>
@@ -46,10 +46,10 @@ export function TenantDetailsModal({
           </View>
           <TouchableOpacity
             accessibilityLabel="Close tenant details"
-            className="h-10 w-10 items-center justify-center rounded-full bg-textPrimary/5"
+            className="h-10 w-10 items-center justify-center rounded-full bg-secondary/10"
             onPress={onClose}
           >
-            <Ionicons name="close" color="#1E1F45" size={20} />
+            <Ionicons name="close" color="#634CE4" size={20} />
           </TouchableOpacity>
         </View>
       </View>

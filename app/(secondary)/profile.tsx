@@ -81,7 +81,7 @@ export default function ProfileScreen() {
   }
 
   return (
-    <Screen className="bg-slate-50">
+    <Screen className="bg-surface">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"

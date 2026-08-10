@@ -24,7 +24,7 @@ export function ChoiceField<T extends string | number | boolean>({
   onChange,
   emptyText,
   isMultiSelect = false,
-  activeColorClass = "border-primary bg-primary",
+  activeColorClass = "border-secondary bg-secondary",
   variant = "pill",
 }: ChoiceFieldProps<T>) {
   const isSegmented = variant === "segmented";
@@ -56,7 +56,7 @@ export function ChoiceField<T extends string | number | boolean>({
         className={
           hasFilledSurface
             ? "font-ralewaySemiBold text-sm text-slate-600"
-            : "text-[11px] font-ralewayExtraBold uppercase tracking-wide text-[#6F6D6D]"
+            : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-[#6F6D6D]"
         }
       >
         {label}
@@ -70,7 +70,7 @@ export function ChoiceField<T extends string | number | boolean>({
               : "border-textPrimary/20 bg-[#FFFFFF]/90"
           }`}
         >
-          <Text className="text-sm font-ralewaySemiBold text-[#6F6D6D]">
+          <Text className="font-ralewaySemiBold text-sm text-[#6F6D6D]">
             {emptyText ?? "No options available."}
           </Text>
         </View>
@@ -78,7 +78,7 @@ export function ChoiceField<T extends string | number | boolean>({
         <View
           className={
             isSegmented
-              ? "flex-row overflow-hidden rounded-2xl border border-slate-200 bg-surface p-0.5"
+              ? "flex-row overflow-hidden rounded-2xl border border-secondary/20 bg-surface p-0.5"
               : "flex-row flex-wrap gap-2"
           }
         >
@@ -92,7 +92,7 @@ export function ChoiceField<T extends string | number | boolean>({
                 className={
                   isSegmented
                     ? `h-14 flex-1 items-center justify-center rounded-[14px] ${
-                        selected ? "bg-primary" : "bg-transparent"
+                        selected ? "bg-secondary" : "bg-transparent"
                       }`
                     : `min-h-11 justify-center border px-3.5 py-2.5 ${
                         hasFilledSurface ? "rounded-2xl" : "rounded-full"
@@ -100,14 +100,14 @@ export function ChoiceField<T extends string | number | boolean>({
                         selected
                           ? activeColorClass
                           : hasFilledSurface
-                            ? "border-slate-200 bg-surface"
-                            : "border-textPrimary/10 bg-[#FFFFFF]"
+                            ? "border-secondary/20 bg-surface"
+                            : "border-secondary/20 bg-[#FFFFFF]"
                       }`
                 }
                 onPress={() => handlePress(option.value)}
               >
                 <Text
-                  className={`${isSegmented ? "font-ralewaySemiBold text-sm" : "text-xs font-ralewayBold"} ${
+                  className={`${isSegmented ? "font-ralewaySemiBold text-sm" : "font-ralewayBold text-xs"} ${
                     selected
                       ? "text-[#FFFFFF]"
                       : hasFilledSurface

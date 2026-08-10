@@ -26,7 +26,7 @@ export function TenantCard({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onOpen}
-      className="w-full overflow-hidden rounded-3xl border border-textPrimary/10 bg-white shadow-sm shadow-primary/10"
+      className="w-full overflow-hidden rounded-3xl border border-secondary/20 bg-white shadow-sm shadow-secondary/10"
     >
       <View className="p-5">
         {/* --- HEADER: Identity & Actions --- */}
@@ -72,7 +72,7 @@ export function TenantCard({
               onPress={onEdit}
               className="rounded-full p-1.5 hover:bg-secondary/10"
             >
-              <Ionicons name="pencil" size={16} color={colors.primary} />
+              <Ionicons name="pencil" size={16} color={colors.secondary} />
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -102,7 +102,7 @@ export function TenantCard({
               </Text>
             </View>
             <Text
-              className="mt-1.5 font-ralewayBold text-2xl tracking-tight text-primary"
+              className="mt-1.5 font-ralewayBold text-2xl tracking-tight text-secondary"
               numberOfLines={1}
               adjustsFontSizeToFit
             >

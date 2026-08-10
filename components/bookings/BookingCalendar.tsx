@@ -53,7 +53,7 @@ export function BookingCalendar({
     currentMonth.getMonth() === today.getMonth();
 
   return (
-    <View className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm shadow-slate-900/5">
+    <View className="overflow-hidden rounded-[24px] border border-secondary/20 bg-white shadow-sm shadow-secondary/10">
       <View className="flex-row items-center gap-2 px-4 pb-3 pt-4">
         <View className="min-w-0 flex-1">
           <Text className="font-ralewayBold text-lg text-textPrimary">
@@ -71,7 +71,7 @@ export function BookingCalendar({
             className="h-11 justify-center rounded-full bg-secondary/10 px-3"
             onPress={onGoToToday}
           >
-            <Text className="font-ralewayExtraBold text-xs text-primary">
+            <Text className="font-ralewayExtraBold text-xs text-secondary">
               Today
             </Text>
           </TouchableOpacity>
@@ -88,7 +88,7 @@ export function BookingCalendar({
         />
       </View>
 
-      <View className="flex-row border-y border-slate-100 bg-slate-50/80 py-2.5">
+      <View className="flex-row border-y border-secondary/10 bg-secondary/5 py-2.5">
         {weekdayLabels.map((day) => (
           <Text
             key={day}
@@ -114,7 +114,7 @@ export function BookingCalendar({
         ))}
       </View>
 
-      <View className="flex-row flex-wrap gap-x-4 gap-y-2 border-t border-slate-100 px-4 py-3">
+      <View className="flex-row flex-wrap gap-x-4 gap-y-2 border-t border-secondary/10 px-4 py-3">
         {BOOKING_CALENDAR_LEGEND.map((item) => (
           <View className="flex-row items-center gap-1.5" key={item.label}>
             <View className={`h-2 w-2 rounded-full ${item.colorClassName}`} />
@@ -142,10 +142,10 @@ function MonthButton({
       activeOpacity={0.78}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
-      className="h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white"
+      className="h-11 w-11 items-center justify-center rounded-full border border-secondary/20 bg-secondary/10"
       onPress={onPress}
     >
-      <Ionicons name={icon} color="#334155" size={19} />
+      <Ionicons name={icon} color="#634CE4" size={19} />
     </TouchableOpacity>
   );
 }
@@ -189,9 +189,9 @@ function CalendarDay({
       <View
         className={`h-9 w-9 items-center justify-center rounded-full ${
           isSelected
-            ? "bg-primary"
+            ? "bg-secondary"
             : isToday
-              ? "border border-primary bg-secondary/10"
+              ? "border border-secondary bg-secondary/10"
               : "bg-transparent"
         }`}
       >
@@ -201,7 +201,7 @@ function CalendarDay({
               ? "text-white"
               : isCurrentMonth
                 ? isToday
-                  ? "text-primary"
+                  ? "text-secondary"
                   : "text-slate-800"
                 : "text-slate-300"
           }`}

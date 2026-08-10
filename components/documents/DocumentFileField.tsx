@@ -22,7 +22,7 @@ export function DocumentFileField({
         File{!editingDocument ? <Text className="text-red-600"> *</Text> : null}
       </Text>
       <View
-        className={`flex-row items-center gap-2 rounded-2xl border border-dashed bg-secondary/10 p-2 ${error ? "border-red-400" : "border-primary/30"}`}
+        className={`flex-row items-center gap-2 rounded-2xl border border-dashed bg-secondary/10 p-2 ${error ? "border-red-400" : "border-secondary/30"}`}
       >
         <TouchableOpacity
           accessibilityLabel={

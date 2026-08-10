@@ -132,7 +132,7 @@ export function DocumentFilterSheet({
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#1E1F45"
+                  color="#634CE4"
                   size={21}
                 />
               </TouchableOpacity>
@@ -168,7 +168,7 @@ export function DocumentFilterSheet({
                         activeOpacity={0.8}
                         className={`min-h-11 justify-center rounded-2xl border px-4 ${
                           isSelected
-                            ? "border-primary bg-primary"
+                            ? "border-secondary bg-secondary"
                             : "border-secondary/20 bg-white"
                         }`}
                         onPress={() =>
@@ -205,7 +205,7 @@ export function DocumentFilterSheet({
               <TouchableOpacity
                 accessibilityRole="button"
                 activeOpacity={0.82}
-                className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-primary"
+                className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-secondary"
                 onPress={() => onApply(draft)}
               >
                 <Text className="font-ralewayExtraBold text-sm text-white">

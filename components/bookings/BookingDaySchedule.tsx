@@ -34,7 +34,7 @@ export function BookingDaySchedule({
   const dayLabel = dayFormatter.format(parseDate(date));
 
   return (
-    <View className="gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+    <View className="gap-3 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
       <View className="flex-row items-start justify-between gap-3">
         <View className="min-w-0 flex-1">
           <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-slate-400">
@@ -61,7 +61,7 @@ export function BookingDaySchedule({
               activeOpacity={0.78}
               accessibilityLabel={`Open booking for ${booking.guestName}, room ${booking.roomNumber}`}
               accessibilityRole="button"
-              className="min-h-[64px] flex-row items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3"
+              className="min-h-[64px] flex-row items-center gap-3 rounded-2xl border border-secondary/10 bg-secondary/5 px-3 py-3"
               onPress={() => onOpenBooking(booking)}
             >
               <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
@@ -85,9 +85,9 @@ export function BookingDaySchedule({
           ))}
         </View>
       ) : (
-        <View className="flex-row items-center gap-3 rounded-2xl bg-slate-50 p-4">
-          <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
-            <Ionicons name="sparkles-outline" color="#64748B" size={18} />
+        <View className="flex-row items-center gap-3 rounded-2xl bg-secondary/5 p-4">
+          <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
+            <Ionicons name="sparkles-outline" color="#634CE4" size={18} />
           </View>
           <View className="min-w-0 flex-1">
             <Text className="font-ralewayExtraBold text-sm text-slate-800">
@@ -105,7 +105,7 @@ export function BookingDaySchedule({
           activeOpacity={0.8}
           accessibilityLabel={`Add booking on ${dayLabel}`}
           accessibilityRole="button"
-          className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
+          className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-secondary"
           onPress={() => onCreate(date)}
         >
           <Ionicons name="add" color="#FFFFFF" size={20} />

@@ -96,7 +96,7 @@ export function BookingFormModal({
           color="#634CE4"
           size={20}
         />
-        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-primary">
+        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-secondary">
           Fields marked with * are required. Availability updates as you enter
           the room and stay dates.
         </Text>
@@ -161,7 +161,7 @@ export function BookingFormModal({
         </View>
 
         {selectedBuilding ? (
-          <View className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <View className="flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-secondary/5 p-4">
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
               <MaterialCommunityIcons
                 name="door-open"
@@ -214,7 +214,7 @@ export function BookingFormModal({
         {form.propertyId && form.roomId && form.startDate && form.endDate ? (
           <BookingAvailabilityMessage conflict={conflict} />
         ) : (
-          <View className="rounded-2xl bg-slate-100 p-4">
+          <View className="rounded-2xl bg-secondary/5 p-4">
             <Text className="text-sm leading-5 text-slate-600">
               Select a room and stay window to check availability.
             </Text>

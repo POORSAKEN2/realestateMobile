@@ -34,8 +34,8 @@ type DistributionSlice = {
 };
 
 const distributionColors = [
-  colors.primary,
   colors.secondary,
+  colors.primary,
   colors.accent,
   colors.text,
   colors.description,
@@ -89,7 +89,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
       : "";
 
   return (
-    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
+    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
       <View className="flex-row items-start justify-between">
         <View>
           <Text className="font-ralewayBold text-base text-textPrimary">
@@ -100,7 +100,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
           </Text>
         </View>
         <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
-          <Feather name="activity" size={18} color={colors.primary} />
+          <Feather name="activity" size={18} color={colors.secondary} />
         </View>
       </View>
 
@@ -122,17 +122,21 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
                 >
                   <Stop
                     offset="0"
-                    stopColor={colors.primary}
+                    stopColor={colors.secondary}
                     stopOpacity="0.24"
                   />
-                  <Stop offset="1" stopColor={colors.primary} stopOpacity="0" />
+                  <Stop
+                    offset="1"
+                    stopColor={colors.secondary}
+                    stopOpacity="0"
+                  />
                 </LinearGradient>
               </Defs>
               <Path d={areaPath} fill="url(#performanceFill)" />
               <Polyline
                 points={linePoints}
                 fill="none"
-                stroke={colors.primary}
+                stroke={colors.secondary}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={4}
@@ -144,7 +148,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
                   cy={point.y}
                   r={5}
                   fill={colors.whitePrimary}
-                  stroke={colors.primary}
+                  stroke={colors.secondary}
                   strokeWidth={3}
                 />
               ))}
@@ -181,7 +185,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
   let cumulativePercent = 0;
 
   return (
-    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
+    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
       <View className="flex-row items-start justify-between">
         <View className="min-w-0 flex-1 pr-4">
           <Text className="font-ralewayBold text-base uppercase text-textPrimary">
@@ -195,7 +199,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
           <MaterialCommunityIcons
             name="chart-donut"
             size={19}
-            color={colors.primary}
+            color={colors.secondary}
           />
         </View>
       </View>
@@ -363,15 +367,15 @@ export default function AnalyticsScreen() {
       >
         <ModuleHeader
           action={
-            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 shadow-md shadow-primary/20">
-              <Feather name="bar-chart-2" size={22} color={colors.primary} />
+            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 shadow-md shadow-secondary/20">
+              <Feather name="bar-chart-2" size={22} color={colors.secondary} />
             </View>
           }
           eyebrow="Portfolio Intelligence"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from analytics"
-              variant="primary"
+              variant="secondary"
             />
           }
           title="Analytics"
@@ -380,9 +384,13 @@ export default function AnalyticsScreen() {
         <View className="mt-6 flex-row flex-wrap">
           {metricCards.map((card) => (
             <View key={card.label} className="w-1/2 p-1.5">
-              <View className="min-h-[132px] rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
+              <View className="min-h-[132px] rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
                 <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
-                  <Feather name={card.icon} size={18} color={colors.primary} />
+                  <Feather
+                    name={card.icon}
+                    size={18}
+                    color={colors.secondary}
+                  />
                 </View>
                 <Text
                   className="mt-4 font-ralewayBold text-lg text-textPrimary"

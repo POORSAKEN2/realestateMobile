@@ -17,7 +17,7 @@ export function ExpenseTransactionList({
 }: ExpenseTransactionListProps) {
   return (
     <View className="mt-4">
-      <Text className="font-ralewayBold text-[13px] uppercase text-[#18181B]">
+      <Text className="font-ralewayBold text-[13px] uppercase text-textPrimary">
         Recent Transactions &amp; Approvals
       </Text>
       <View className="mt-3 gap-3">
@@ -38,16 +38,16 @@ export function ExpenseTransactionList({
             </SwipeActionCard>
           ))
         ) : (
-          <View className="items-center rounded-[20px] border border-dashed border-[#D9D5E8] bg-white px-6 py-10">
+          <View className="items-center rounded-[20px] border border-dashed border-secondary/20 bg-white px-6 py-10">
             <MaterialCommunityIcons
               name="receipt-text-outline"
-              color="#8D82B7"
+              color="#634CE4"
               size={30}
             />
-            <Text className="mt-3 font-ralewayBold text-sm text-[#37333F]">
+            <Text className="mt-3 font-ralewayBold text-sm text-textPrimary">
               No recent transactions
             </Text>
-            <Text className="mt-1 text-center font-ralewayMedium text-xs leading-5 text-[#77727F]">
+            <Text className="mt-1 text-center font-ralewayMedium text-xs leading-5 text-description">
               New expenses and approvals will appear here.
             </Text>
           </View>

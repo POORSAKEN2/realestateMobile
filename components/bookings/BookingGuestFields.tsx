@@ -55,8 +55,8 @@ export function BookingGuestFields({
         accessibilityRole="button"
         className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 py-3 ${
           isAddingGuest
-            ? "border-primary/30 bg-secondary/10"
-            : "border-slate-200 bg-slate-50"
+            ? "border-secondary/30 bg-secondary/10"
+            : "border-secondary/20 bg-secondary/5"
         }`}
         onPress={onToggleAddingGuest}
       >
@@ -81,13 +81,13 @@ export function BookingGuestFields({
             </Text>
           </View>
         </View>
-        <Text className="ml-3 font-ralewayExtraBold text-xs text-primary">
+        <Text className="ml-3 font-ralewayExtraBold text-xs text-secondary">
           {isAddingGuest ? "Cancel" : "Add"}
         </Text>
       </TouchableOpacity>
 
       {isAddingGuest ? (
-        <View className="gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <View className="gap-4 rounded-2xl border border-secondary/20 bg-secondary/5 p-4">
           <BaseField
             label="Guest name"
             onChangeText={(value) => onUpdateForm("guestName", value)}

@@ -37,7 +37,7 @@ function PasswordField({
       <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
         {label}
       </Text>
-      <View className="h-14 flex-row items-center rounded-2xl border border-secondary/20 bg-white px-4 shadow-sm shadow-primary/10">
+      <View className="h-14 flex-row items-center rounded-2xl border border-secondary/20 bg-white px-4 shadow-sm shadow-secondary/10">
         <Ionicons
           name="lock-closed-outline"
           color={colors.description}
@@ -141,7 +141,10 @@ export default function SettingsScreen() {
           <ModuleHeader
             eyebrow="Account"
             leading={
-              <SecondaryBackButton accessibilityLabel="Back from settings" />
+              <SecondaryBackButton
+                accessibilityLabel="Back from settings"
+                variant="secondary"
+              />
             }
             title="Settings"
           />
@@ -149,14 +152,14 @@ export default function SettingsScreen() {
             Manage your password, account security, and secure access.
           </Text>
 
-          <View className="mt-8 rounded-[28px] border border-secondary/20 bg-secondary/10 p-5 shadow-sm shadow-primary/10">
+          <View className="mt-8 rounded-[28px] border border-secondary/20 bg-secondary/10 p-5 shadow-sm shadow-secondary/10">
             <View className="flex-row items-center justify-between gap-4">
               <View className="min-w-0 flex-1">
                 <View className="flex-row items-center gap-2">
                   <View className="h-9 w-9 items-center justify-center rounded-2xl bg-secondary/10">
                     <Ionicons
                       name="construct-outline"
-                      color={colors.primary}
+                      color={colors.secondary}
                       size={19}
                     />
                   </View>
@@ -171,7 +174,10 @@ export default function SettingsScreen() {
               </View>
               <Switch
                 value={shouldShowOnboarding}
-                trackColor={{ false: colors.description, true: colors.primary }}
+                trackColor={{
+                  false: colors.description,
+                  true: colors.secondary,
+                }}
                 thumbColor={colors.whitePrimary}
                 ios_backgroundColor={colors.description}
                 onValueChange={(enabled) => setOnboardingCompleted(!enabled)}
@@ -180,7 +186,7 @@ export default function SettingsScreen() {
 
             <TouchableOpacity
               activeOpacity={0.82}
-              className="mt-4 h-12 flex-row items-center justify-center rounded-2xl bg-primary"
+              className="mt-4 h-12 flex-row items-center justify-center rounded-2xl bg-secondary"
               onPress={() => {
                 setOnboardingCompleted(false);
                 router.replace("/(onboarding)/screen-1");
@@ -197,7 +203,7 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </View>
 
-          <View className="mt-5 rounded-[28px] border border-secondary/20 bg-white p-5 shadow-sm shadow-primary/10">
+          <View className="mt-5 rounded-[28px] border border-secondary/20 bg-white p-5 shadow-sm shadow-secondary/10">
             <View className="flex-row items-center justify-between">
               <View>
                 <Text className="font-ralewayExtraBold text-lg text-textPrimary">
@@ -210,7 +216,7 @@ export default function SettingsScreen() {
               <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
                 <Ionicons
                   name="shield-checkmark-outline"
-                  color={colors.primary}
+                  color={colors.secondary}
                   size={21}
                 />
               </View>
@@ -246,7 +252,7 @@ export default function SettingsScreen() {
             <TouchableOpacity
               activeOpacity={0.82}
               className={`mt-5 h-14 flex-row items-center justify-center rounded-2xl ${
-                isSaving ? "bg-primary/60" : "bg-primary"
+                isSaving ? "bg-secondary/60" : "bg-secondary"
               }`}
               disabled={isSaving}
               onPress={handleChangePassword}

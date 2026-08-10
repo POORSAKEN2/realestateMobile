@@ -113,10 +113,10 @@ export function DropdownField<T extends string>({
               accessibilityLabel={`Close ${label} options`}
               accessibilityRole="button"
               activeOpacity={0.85}
-              className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+              className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
               onPress={() => setIsOpen(false)}
             >
-              <MaterialCommunityIcons name="close" color="#1E1F45" size={20} />
+              <MaterialCommunityIcons name="close" color="#634CE4" size={20} />
             </TouchableOpacity>
           </View>
 
@@ -131,14 +131,14 @@ export function DropdownField<T extends string>({
                     activeOpacity={0.85}
                     className={`min-h-14 flex-row items-center justify-between rounded-lg border px-4 ${
                       isSelected
-                        ? "border-primary bg-secondary/10"
+                        ? "border-secondary bg-secondary/10"
                         : "border-textPrimary/10 bg-[#FFFFFF]"
                     }`}
                     onPress={() => handleSelect(option.value)}
                   >
                     <Text
                       className={`font-ralewayBold text-base ${
-                        isSelected ? "text-primary" : "text-textPrimary"
+                        isSelected ? "text-secondary" : "text-textPrimary"
                       }`}
                     >
                       {option.label}
