@@ -3,7 +3,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 
 export function BookingCalendarLoading() {
   return (
-    <View className="items-center rounded-[24px] border border-slate-200 bg-white p-8 shadow-sm shadow-slate-900/5">
+    <View className="items-center rounded-[24px] border border-secondary/20 bg-white p-8 shadow-sm shadow-secondary/10">
       <ActivityIndicator color="#634CE4" />
       <Text className="mt-3 font-ralewayBold text-sm text-slate-700">
         Loading calendar
@@ -14,7 +14,7 @@ export function BookingCalendarLoading() {
 
 export function BookingCalendarEmpty() {
   return (
-    <View className="items-center rounded-[24px] border border-dashed border-slate-300 bg-white p-8">
+    <View className="items-center rounded-[24px] border border-dashed border-secondary/20 bg-white p-8">
       <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10">
         <Ionicons name="calendar-outline" color="#634CE4" size={28} />
       </View>

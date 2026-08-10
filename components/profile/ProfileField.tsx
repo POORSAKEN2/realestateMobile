@@ -40,13 +40,15 @@ export function ProfileField({
   const borderClassName = error
     ? "border-red-400 bg-red-50/40"
     : isFocused
-      ? "border-primary bg-white"
-      : "border-slate-200 bg-slate-50";
+      ? "border-secondary bg-white"
+      : "border-secondary/20 bg-secondary/5";
 
   return (
     <View>
       <View className="mb-2 flex-row items-center">
-        <Text className="font-ralewaySemiBold text-sm text-slate-700">{label}</Text>
+        <Text className="font-ralewaySemiBold text-sm text-textPrimary">
+          {label}
+        </Text>
         {required ? (
           <Text className="ml-1 text-red-500" accessibilityLabel="required">
             *

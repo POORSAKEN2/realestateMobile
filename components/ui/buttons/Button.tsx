@@ -17,11 +17,11 @@ export function Button({
 }: ButtonProps) {
   const buttonClassName =
     variant === "primary"
-      ? "bg-primary active:opacity-90"
-      : "border border-description bg-whitePrimary active:bg-secondary/10";
+      ? "bg-secondary active:opacity-90"
+      : "border border-secondary bg-whitePrimary active:bg-secondary/10";
 
   const textClassName =
-    variant === "primary" ? "text-whitePrimary" : "text-primary";
+    variant === "primary" ? "text-whitePrimary" : "text-secondary";
 
   return (
     <Pressable
@@ -32,7 +32,7 @@ export function Button({
     >
       {isLoading ? (
         <ActivityIndicator
-          color={variant === "primary" ? colors.whitePrimary : colors.primary}
+          color={variant === "primary" ? colors.whitePrimary : colors.secondary}
         />
       ) : (
         <Text className={`font-ralewayBold text-base ${textClassName}`}>

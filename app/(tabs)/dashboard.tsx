@@ -60,7 +60,7 @@ function AnalyticsMetricCard({
 }) {
   return (
     <View
-      className="justify-between rounded-[24px] border border-secondary/20 bg-white p-3 shadow-sm shadow-primary/10"
+      className="justify-between rounded-[24px] border border-secondary/20 bg-white p-3 shadow-sm shadow-secondary/10"
       style={{ height }}
     >
       <View className="h-9 w-9 items-center justify-center rounded-2xl bg-secondary/10">
@@ -150,22 +150,22 @@ export default function DashboardScreen() {
   const arrears = stats?.total_arrears ?? 0;
   const analyticsMetrics: AnalyticsMetric[] = [
     {
-      icon: <Feather name="briefcase" size={17} color={colors.primary} />,
+      icon: <Feather name="briefcase" size={17} color={colors.secondary} />,
       label: "Portfolio Value",
       value: formatPesoValue(stats?.total_value),
     },
     {
-      icon: <Feather name="home" size={17} color={colors.primary} />,
+      icon: <Feather name="home" size={17} color={colors.secondary} />,
       label: "Occupancy",
       value: `${Number(stats?.occupancy_rate ?? 0).toFixed(0)}%`,
     },
     {
-      icon: <Feather name="trending-up" size={17} color={colors.primary} />,
+      icon: <Feather name="trending-up" size={17} color={colors.secondary} />,
       label: "Net Income",
       value: formatCompactPesoValue(netIncome),
     },
     {
-      icon: <Feather name="clock" size={17} color={colors.primary} />,
+      icon: <Feather name="clock" size={17} color={colors.secondary} />,
       label: "Arrears",
       value: formatCompactPesoValue(arrears),
     },
@@ -343,7 +343,7 @@ export default function DashboardScreen() {
         >
           <View className="min-w-0 flex-1 flex-row items-center gap-2.5 pr-2">
             <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/10">
-              <Feather name="bar-chart-2" size={17} color={colors.primary} />
+              <Feather name="bar-chart-2" size={17} color={colors.secondary} />
             </View>
             <Text
               className="min-w-0 flex-1 font-ralewayBold text-[14px] tracking-tight text-textPrimary"
@@ -362,7 +362,7 @@ export default function DashboardScreen() {
             <Text className="font-ralewayBold text-[10px] text-secondary">
               View analytics
             </Text>
-            <Feather name="chevron-right" size={15} color={colors.primary} />
+            <Feather name="chevron-right" size={15} color={colors.secondary} />
           </TouchableOpacity>
         </View>
 
@@ -398,7 +398,7 @@ export default function DashboardScreen() {
 
         <View>
           <TouchableOpacity
-            className="h-11 w-11 items-center justify-center rounded-2xl bg-primary"
+            className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary"
             onPress={() => router.navigate(appRoutes.secondary.map)}
           >
             <Feather name="map" color={colors.whitePrimary} size={18} />
@@ -406,14 +406,14 @@ export default function DashboardScreen() {
         </View>
       </View>
 
-      <View className="rounded-[22px] border border-secondary/20 bg-white px-3 py-3 shadow-xl shadow-primary/10">
+      <View className="rounded-[22px] border border-secondary/20 bg-white px-3 py-3 shadow-xl shadow-secondary/10">
         <View className="flex-row items-center gap-3">
           <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
-            <Feather name="search" size={20} color={colors.primary} />
+            <Feather name="search" size={20} color={colors.secondary} />
           </View>
 
           <View className="min-w-0 flex-1">
-            <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-primary">
+            <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-secondary">
               Find property
             </Text>
             <TextInput
@@ -444,7 +444,7 @@ export default function DashboardScreen() {
             }
             className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10"
           >
-            <Feather name="sliders" size={18} color={colors.primary} />
+            <Feather name="sliders" size={18} color={colors.secondary} />
           </TouchableOpacity>
         </View>
 
@@ -483,7 +483,7 @@ export default function DashboardScreen() {
                         }
                       }}
                       className={`flex-row items-center gap-1 rounded-full px-3 py-1.5 ${
-                        isActive ? "bg-primary" : "bg-surface"
+                        isActive ? "bg-secondary" : "bg-surface"
                       }`}
                     >
                       <Text
@@ -528,7 +528,7 @@ export default function DashboardScreen() {
                       accessibilityLabel={`Show ${label} assets`}
                       onPress={() => setAssetStatusFilter(status)}
                       className={`rounded-full px-3 py-1.5 ${
-                        isActive ? "bg-primary" : "bg-surface"
+                        isActive ? "bg-secondary" : "bg-surface"
                       }`}
                     >
                       <Text
@@ -639,7 +639,7 @@ export default function DashboardScreen() {
           />
         ) : (
           <View className="items-center justify-center rounded-2xl border border-dashed border-secondary/30 bg-secondary/10 px-4 py-6">
-            <Feather name="search" size={22} color={colors.primary} />
+            <Feather name="search" size={22} color={colors.secondary} />
             <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
               No assets found
             </Text>

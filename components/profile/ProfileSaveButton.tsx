@@ -1,9 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import {
-  ActivityIndicator,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 
 type ProfileSaveButtonProps = {
   disabled: boolean;
@@ -25,7 +21,7 @@ export function ProfileSaveButton({
       accessibilityState={{ disabled, busy: isSaving }}
       activeOpacity={0.82}
       className={`mt-5 h-14 flex-row items-center justify-center rounded-2xl ${
-        disabled ? "bg-slate-300" : "bg-primary"
+        disabled ? "bg-slate-300" : "bg-secondary"
       }`}
       disabled={disabled}
       onPress={onPress}

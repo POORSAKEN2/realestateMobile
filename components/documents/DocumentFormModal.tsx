@@ -170,7 +170,7 @@ export function DocumentFormModal({
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#1E1F45"
+                  color="#634CE4"
                   size={21}
                 />
               </TouchableOpacity>
@@ -246,7 +246,7 @@ export function DocumentFormModal({
                           activeOpacity={0.8}
                           className={`min-h-11 justify-center rounded-2xl border px-4 ${
                             isSelected
-                              ? "border-primary bg-primary"
+                              ? "border-secondary bg-secondary"
                               : "border-secondary/20 bg-secondary/10"
                           }`}
                           onPress={() => onChangeForm({ ...form, category })}
@@ -300,13 +300,13 @@ export function DocumentFormModal({
                 accessibilityLabel="Cancel document form"
                 accessibilityRole="button"
                 activeOpacity={0.85}
-                className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white ${
+                className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-secondary bg-white ${
                   isSaving ? "opacity-60" : ""
                 }`}
                 disabled={isSaving}
                 onPress={onClose}
               >
-                <Text className="font-ralewayBold text-base text-primary">
+                <Text className="font-ralewayBold text-base text-secondary">
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -314,7 +314,7 @@ export function DocumentFormModal({
                 accessibilityRole="button"
                 accessibilityState={{ disabled: !canSubmit }}
                 activeOpacity={0.85}
-                className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-primary ${
+                className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-secondary ${
                   canSubmit ? "" : "opacity-40"
                 }`}
                 disabled={!canSubmit}

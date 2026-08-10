@@ -13,6 +13,7 @@ export function ProfileHeader({ onBack }: ProfileHeaderProps) {
         <BackButton
           accessibilityLabel="Back from profile"
           onPress={onBack}
+          variant="secondary"
         />
       }
       supportingText="Keep your account details current"

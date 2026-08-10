@@ -28,23 +28,23 @@ export function BookingReservationList({
     .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
   return (
-    <View className="mb-16 gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+    <View className="mb-16 gap-3 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
       <View className="flex-row items-end justify-between gap-3">
         <View>
           <Text className="font-ralewayBold text-lg text-textPrimary">
             All reservations
           </Text>
-          <Text className="mt-1 text-xs font-ralewaySemiBold text-slate-500">
+          <Text className="mt-1 font-ralewaySemiBold text-xs text-slate-500">
             {buildingTitle ?? "Select a building"}
           </Text>
         </View>
-        <Text className="text-xs font-ralewayExtraBold text-slate-400">
+        <Text className="font-ralewayExtraBold text-xs text-slate-400">
           {bookings.length} total
         </Text>
       </View>
 
       {isLoading ? (
-        <Text className="text-sm font-ralewaySemiBold text-slate-500">
+        <Text className="font-ralewaySemiBold text-sm text-slate-500">
           Loading reservations...
         </Text>
       ) : sortedBookings.length > 0 ? (
@@ -56,8 +56,8 @@ export function BookingReservationList({
           />
         ))
       ) : (
-        <View className="items-center rounded-2xl border border-dashed border-slate-200 p-6">
-          <Text className="text-center text-sm font-ralewayExtraBold text-slate-800">
+        <View className="items-center rounded-2xl border border-dashed border-secondary/20 p-6">
+          <Text className="text-center font-ralewayExtraBold text-sm text-slate-800">
             No reservations found
           </Text>
           <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
@@ -84,11 +84,11 @@ function ReservationCard({
       activeOpacity={0.78}
       accessibilityLabel={`Open ${status.label} booking for ${booking.guestName}`}
       accessibilityRole="button"
-      className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3"
+      className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
       onPress={() => onPress(booking)}
     >
-      <View className="w-12 items-center rounded-xl bg-slate-50 py-2">
-        <Text className="text-[10px] font-ralewayExtraBold uppercase text-slate-400">
+      <View className="w-12 items-center rounded-xl bg-secondary/10 py-2">
+        <Text className="font-ralewayExtraBold text-[10px] uppercase text-slate-400">
           {monthFormatter.format(startDate)}
         </Text>
         <Text className="font-ralewayBold text-lg text-textPrimary">
@@ -102,14 +102,16 @@ function ReservationCard({
         >
           {booking.guestName}
         </Text>
-        <Text className="mt-1 text-xs font-ralewaySemiBold text-slate-500">
+        <Text className="mt-1 font-ralewaySemiBold text-xs text-slate-500">
           Room {booking.roomNumber} · {formatDisplayDate(booking.startDate)}–
           {formatDisplayDate(booking.endDate)}
         </Text>
         <View
           className={`mt-2 self-start rounded-full px-2 py-1 ${status.backgroundClassName}`}
         >
-          <Text className={`text-[10px] font-ralewayExtraBold ${status.textClassName}`}>
+          <Text
+            className={`font-ralewayExtraBold text-[10px] ${status.textClassName}`}
+          >
             {status.label}
           </Text>
         </View>

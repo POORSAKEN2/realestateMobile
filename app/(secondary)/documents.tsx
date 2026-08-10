@@ -251,10 +251,10 @@ export default function DocumentsScreen() {
         }
         refreshControl={
           <RefreshControl
-            colors={[colors.primary]}
+            colors={[colors.secondary]}
             onRefresh={() => void refresh()}
             refreshing={isRefreshing && !isLoading}
-            tintColor={colors.primary}
+            tintColor={colors.secondary}
           />
         }
         renderItem={({ item: document }) => (

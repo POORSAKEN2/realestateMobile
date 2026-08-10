@@ -80,10 +80,10 @@ export function ExpenseDashboard({ expenses }: { expenses: Expense[] }) {
   return (
     <View>
       <View className="flex-row items-end justify-between gap-3">
-        <Text className="font-ralewayBold text-[13px] uppercase text-[#18181B]">
+        <Text className="font-ralewayBold text-[13px] uppercase text-textPrimary">
           Overview Dashboard
         </Text>
-        <Text className="font-ralewayMedium text-[11px] text-[#77727F]">
+        <Text className="font-ralewayMedium text-[11px] text-description">
           {summary.monthLabel}
         </Text>
       </View>

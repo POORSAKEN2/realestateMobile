@@ -127,7 +127,7 @@ export default function BookingsScreen() {
   }
 
   return (
-    <Screen className="bg-slate-50">
+    <Screen className="bg-surface">
       <View className="flex-1 gap-5">
         <View className="px-1">
           <ModuleHeader
@@ -150,10 +150,10 @@ export default function BookingsScreen() {
         <ScrollView
           refreshControl={
             <RefreshControl
-              colors={["#2563EB"]}
+              colors={["#634CE4"]}
               onRefresh={refreshBookings}
               refreshing={isRefreshing}
-              tintColor="#2563EB"
+              tintColor="#634CE4"
             />
           }
           showsVerticalScrollIndicator={false}

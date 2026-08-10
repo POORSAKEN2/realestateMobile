@@ -45,9 +45,9 @@ export function ExpenseTransactionCard({
   return (
     <Pressable
       accessibilityLabel={`${expense.category}, ${expense.description ?? "Expense"}, ${formattedAmount}, ${expense.status}`}
-      className="min-h-[84px] flex-row items-center rounded-[20px] border border-[#E5E4E8] bg-white px-3.5 py-3"
+      className="min-h-[84px] flex-row items-center rounded-[20px] border border-secondary/20 bg-white px-3.5 py-3"
       style={{
-        shadowColor: "#111827",
+        shadowColor: "#634CE4",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.07,
         shadowRadius: 4,
@@ -57,26 +57,26 @@ export function ExpenseTransactionCard({
       <View className="mr-3 h-11 w-11 items-center justify-center rounded-[14px] bg-secondary/10 ">
         <MaterialCommunityIcons
           name={getExpenseIcon(expense.category)}
-          color="#6547D9"
+          color="#634CE4"
           size={21}
         />
       </View>
 
       <View className="min-w-0 flex-1 pr-2">
         <Text
-          className="font-ralewaySemiBold text-[11px] uppercase tracking-[0.4px] text-[#73717A]"
+          className="font-ralewaySemiBold text-[11px] uppercase tracking-[0.4px] text-description"
           numberOfLines={1}
         >
           {formatExpenseCategory(expense.category)}
         </Text>
         <Text
-          className="mt-0.5 font-ralewayMedium text-[14px] text-[#17171A]"
+          className="mt-0.5 font-ralewayMedium text-[14px] text-textPrimary"
           numberOfLines={1}
         >
           {expense.description || "No description provided"}
         </Text>
         <Text
-          className="mt-1 font-ralewayMedium text-[10px] text-[#66646C]"
+          className="mt-1 font-ralewayMedium text-[10px] text-description"
           numberOfLines={1}
         >
           Ref: {expense.reference_no || "N/A"} • {expense.date}
@@ -85,7 +85,7 @@ export function ExpenseTransactionCard({
 
       <View className="items-end">
         <Text
-          className="max-w-[98px] font-ralewayBold text-[14px] text-[#17171A]"
+          className="max-w-[98px] font-ralewayBold text-[14px] text-textPrimary"
           numberOfLines={1}
           adjustsFontSizeToFit
         >

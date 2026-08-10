@@ -25,10 +25,10 @@ export function BookingFilters({
   onSelectStatus,
 }: BookingFiltersProps) {
   return (
-    <View className="gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+    <View className="gap-3 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
       <View className="flex-row items-start justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
+          <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-slate-400">
             Property calendar
           </Text>
           <Text
@@ -38,7 +38,7 @@ export function BookingFilters({
             {selectedBuilding?.title ?? "No building selected"}
           </Text>
         </View>
-        <View className="flex-row rounded-full bg-slate-100 p-1">
+        <View className="flex-row rounded-full bg-secondary/10 p-1">
           {STATUS_OPTIONS.map((option) => {
             const selected = selectedStatus === option.value;
 
@@ -50,12 +50,12 @@ export function BookingFilters({
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 className={`h-11 justify-center rounded-full px-3 ${
-                  selected ? "bg-primary" : "bg-transparent"
+                  selected ? "bg-secondary" : "bg-transparent"
                 }`}
                 onPress={() => onSelectStatus(option.value)}
               >
                 <Text
-                  className={`text-xs font-ralewayExtraBold ${
+                  className={`font-ralewayExtraBold text-xs ${
                     selected ? "text-white" : "text-slate-600"
                   }`}
                 >

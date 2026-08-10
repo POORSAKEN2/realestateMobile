@@ -81,7 +81,7 @@ export function SearchableOptionSelector({
           className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
           onPress={onBack}
         >
-          <MaterialCommunityIcons name="arrow-left" color="#1E1F45" size={21} />
+          <MaterialCommunityIcons name="arrow-left" color="#634CE4" size={21} />
         </TouchableOpacity>
         <Text
           accessibilityRole="header"
@@ -155,7 +155,7 @@ function OptionRow({
     >
       <Text
         className={`min-w-0 flex-1 font-ralewaySemiBold text-sm ${
-          isSelected ? "text-primary" : "text-textPrimary"
+          isSelected ? "text-secondary" : "text-textPrimary"
         }`}
         numberOfLines={1}
       >

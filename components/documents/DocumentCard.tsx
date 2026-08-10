@@ -31,7 +31,7 @@ export function DocumentCard({
     .join(" · ");
 
   return (
-    <View className="overflow-hidden rounded-[24px] border border-textPrimary/10 bg-white shadow-sm shadow-primary/10">
+    <View className="overflow-hidden rounded-[24px] border border-secondary/20 bg-white shadow-sm shadow-secondary/10">
       <View className="flex-row items-start gap-2 p-4">
         <TouchableOpacity
           accessibilityHint="Opens the document"
@@ -137,7 +137,7 @@ export function DocumentCard({
         >
           <MaterialCommunityIcons
             name="dots-horizontal"
-            color="#1E1F45"
+            color="#634CE4"
             size={21}
           />
         </TouchableOpacity>

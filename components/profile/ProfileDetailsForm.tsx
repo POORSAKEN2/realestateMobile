@@ -67,11 +67,11 @@ export function ProfileDetailsForm({
   values,
 }: ProfileDetailsFormProps) {
   return (
-    <View className="mt-5 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/5">
+    <View className="mt-5 rounded-[28px] border border-secondary/20 bg-white p-5 shadow-sm shadow-secondary/10">
       <Text className="font-ralewayBold text-lg text-textPrimary">
         Professional details
       </Text>
-      <Text className="mt-1 text-sm leading-5 text-slate-500">
+      <Text className="mt-1 text-sm leading-5 text-description">
         Information shown across your account and documents.
       </Text>
 

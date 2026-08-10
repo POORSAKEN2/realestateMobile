@@ -27,7 +27,7 @@ export function LeaseCard({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onOpenTenant}
-      className="w-full overflow-hidden rounded-3xl border border-textPrimary/10 bg-white shadow-sm shadow-primary/10"
+      className="w-full overflow-hidden rounded-3xl border border-secondary/20 bg-white shadow-sm shadow-secondary/10"
     >
       <View className="p-5">
         {/* --- HEADER: Identity, Status & Actions --- */}
@@ -90,7 +90,7 @@ export function LeaseCard({
               onPress={onEdit}
               className="rounded-full p-1.5 hover:bg-secondary/10"
             >
-              <Ionicons name="pencil" size={16} color={colors.primary} />
+              <Ionicons name="pencil" size={16} color={colors.secondary} />
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -120,7 +120,7 @@ export function LeaseCard({
               </Text>
             </View>
             <Text
-              className="mt-1.5 font-ralewayBold text-xl tracking-tight text-primary"
+              className="mt-1.5 font-ralewayBold text-xl tracking-tight text-secondary"
               numberOfLines={1}
               adjustsFontSizeToFit
             >

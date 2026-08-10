@@ -2,6 +2,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 
+import { colors } from "../../constants/colors";
+
 export type ExpenseDashboardVisual =
   | "insurance"
   | "maintenance"
@@ -19,7 +21,7 @@ export type ExpenseDashboardCardProps = {
 };
 
 const cardShadow = {
-  shadowColor: "#4C3DBA",
+  shadowColor: colors.secondary,
   shadowOffset: { width: 0, height: 8 },
   shadowOpacity: 0.17,
   shadowRadius: 14,
@@ -30,7 +32,7 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
   if (type === "maintenance") {
     return (
       <View className="mt-auto h-[5px] overflow-hidden rounded-full bg-[#E5E2EA]">
-        <View className="h-full w-[56%] rounded-full bg-[#6547D9]" />
+        <View className="h-full w-[56%] rounded-full bg-secondary" />
       </View>
     );
   }
@@ -44,7 +46,14 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
           <Rect x="38" y="28" width="16" height="18" rx="1" fill="#E7E2FA" />
           <Rect x="56" y="18" width="16" height="28" rx="1" fill="#E7E2FA" />
           <Rect x="74" y="10" width="16" height="36" rx="1" fill="#CFC6F3" />
-          <Rect x="92" y="7" width="18" height="39" rx="1" fill="#8D77E8" />
+          <Rect
+            x="92"
+            y="7"
+            width="18"
+            height="39"
+            rx="1"
+            fill={colors.secondary}
+          />
           <Path
             d="M4 25 L22 23 L40 17 L58 23 L76 13 L96 8 L108 9"
             fill="none"
@@ -85,7 +94,14 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
             strokeWidth="7"
           />
           <Rect x="52" y="11" width="54" height="5" rx="2.5" fill="#ECE9F5" />
-          <Rect x="52" y="11" width="42" height="5" rx="2.5" fill="#8D77E8" />
+          <Rect
+            x="52"
+            y="11"
+            width="42"
+            height="5"
+            rx="2.5"
+            fill={colors.secondary}
+          />
           <Rect x="52" y="23" width="54" height="5" rx="2.5" fill="#ECE9F5" />
           <Rect x="52" y="23" width="31" height="5" rx="2.5" fill="#B7ABE9" />
           <Rect x="52" y="35" width="54" height="5" rx="2.5" fill="#ECE9F5" />
@@ -102,7 +118,14 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
           <Path d="M3 44 H109" stroke="#ECE9F5" strokeWidth="1" />
           <Rect x="8" y="28" width="18" height="16" rx="3" fill="#D9EEE8" />
           <Rect x="34" y="20" width="18" height="24" rx="3" fill="#CFC6F3" />
-          <Rect x="60" y="11" width="18" height="33" rx="3" fill="#8D77E8" />
+          <Rect
+            x="60"
+            y="11"
+            width="18"
+            height="33"
+            rx="3"
+            fill={colors.secondary}
+          />
           <Rect x="86" y="24" width="18" height="20" rx="3" fill="#B7ABE9" />
           <Circle cx="69" cy="7" r="3" fill="#168A68" />
         </Svg>
@@ -115,7 +138,14 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
       <View className="mt-auto h-[48px]">
         <Svg width="100%" height="48" viewBox="0 0 112 48">
           <Rect x="3" y="6" width="106" height="8" rx="4" fill="#ECE9F5" />
-          <Rect x="3" y="6" width="76" height="8" rx="4" fill="#8D77E8" />
+          <Rect
+            x="3"
+            y="6"
+            width="76"
+            height="8"
+            rx="4"
+            fill={colors.secondary}
+          />
           <Rect x="3" y="20" width="106" height="8" rx="4" fill="#ECE9F5" />
           <Rect x="3" y="20" width="55" height="8" rx="4" fill="#54A98D" />
           <Rect x="3" y="34" width="106" height="8" rx="4" fill="#ECE9F5" />
@@ -130,12 +160,19 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
       <View className="mt-auto h-[48px]">
         <Svg width="100%" height="48" viewBox="0 0 112 48">
           <Rect x="3" y="9" width="106" height="12" rx="6" fill="#ECE9F5" />
-          <Rect x="3" y="9" width="31" height="12" rx="6" fill="#8D77E8" />
+          <Rect
+            x="3"
+            y="9"
+            width="31"
+            height="12"
+            rx="6"
+            fill={colors.secondary}
+          />
           <Rect x="36" y="9" width="24" height="12" rx="6" fill="#54A98D" />
           <Rect x="62" y="9" width="18" height="12" rx="6" fill="#CFC6F3" />
           <Circle cx="12" cy="35" r="5" fill="#D9EEE8" />
           <Circle cx="31" cy="35" r="5" fill="#CFC6F3" />
-          <Circle cx="50" cy="35" r="5" fill="#8D77E8" />
+          <Circle cx="50" cy="35" r="5" fill={colors.secondary} />
           <Path
             d="M59 35 H107"
             stroke="#B7ABE9"
@@ -154,7 +191,7 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
         <Path
           d="M2 39 C9 37 11 24 18 24 C24 24 26 32 32 32 C40 32 42 20 49 20 C56 20 58 26 64 25 C71 23 72 7 79 7 C86 7 87 23 94 23 C101 23 105 16 110 10"
           fill="none"
-          stroke="#7D65D9"
+          stroke={colors.secondary}
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="2"
@@ -180,22 +217,26 @@ export function ExpenseDashboardCard({
   return (
     <Pressable
       accessibilityLabel={`${label}: ${value}`}
-      className="h-[164px] w-[128px] rounded-[20px] border border-[#ECE9F5] bg-white p-3.5"
+      className="h-[164px] w-[128px] rounded-[20px] border border-secondary/20 bg-white p-3.5"
       style={cardShadow}
     >
-      <View className="h-10 w-10 items-center justify-center rounded-[13px] bg-[#F1EEFF]">
-        <MaterialCommunityIcons name={icon} color="#6249CF" size={21} />
+      <View className="h-10 w-10 items-center justify-center rounded-[13px] bg-secondary/10">
+        <MaterialCommunityIcons
+          name={icon}
+          color={colors.secondary}
+          size={21}
+        />
       </View>
       <Text
         adjustsFontSizeToFit
-        className="mt-3 font-ralewayMedium text-[12px] text-[#18181B]"
+        className="mt-3 font-ralewayMedium text-[12px] text-textPrimary"
         minimumFontScale={0.75}
         numberOfLines={1}
       >
         {label}
       </Text>
       <Text
-        className="mt-0.5 font-ralewayExtraBold text-[20px] tracking-tight text-[#111113]"
+        className="mt-0.5 font-ralewayExtraBold text-[20px] tracking-tight text-textPrimary"
         numberOfLines={1}
         adjustsFontSizeToFit
       >

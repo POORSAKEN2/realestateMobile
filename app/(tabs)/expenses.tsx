@@ -48,7 +48,7 @@ export default function ExpensesScreen() {
   });
 
   return (
-    <Screen className="bg-[#FBFBFC]">
+    <Screen className="bg-surface">
       <View className="flex-1">
         <ExpenseHeader onAddExpense={openForm} />
 

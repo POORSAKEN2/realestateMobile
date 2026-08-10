@@ -39,7 +39,7 @@ export function DocumentSortSheet({
             >
               <Text
                 className={`min-w-0 flex-1 font-ralewayBold text-sm ${
-                  isSelected ? "text-primary" : "text-textPrimary"
+                  isSelected ? "text-secondary" : "text-textPrimary"
                 }`}
               >
                 {option.label}
@@ -219,7 +219,7 @@ function BottomSheet({
             className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
             onPress={onClose}
           >
-            <MaterialCommunityIcons name="close" color="#1E1F45" size={21} />
+            <MaterialCommunityIcons name="close" color="#634CE4" size={21} />
           </TouchableOpacity>
         </View>
         {children}

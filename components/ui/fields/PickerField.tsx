@@ -93,7 +93,7 @@ export function PickerModalShell({
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent visible>
       <View className="flex-1 justify-center bg-black/40 px-5">
-        <View className="rounded-3xl border border-textPrimary/10 bg-[#FFFFFF] p-5 shadow-xl">
+        <View className="rounded-3xl border border-secondary/20 bg-[#FFFFFF] p-5 shadow-xl shadow-secondary/10">
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               {title}
@@ -103,10 +103,10 @@ export function PickerModalShell({
                 accessibilityLabel={`Cancel ${title}`}
                 accessibilityRole="button"
                 activeOpacity={0.8}
-                className="rounded-full bg-slate-100 px-3 py-1.5"
+                className="rounded-full bg-secondary/10 px-3 py-1.5"
                 onPress={onClose}
               >
-                <Text className="font-ralewayExtraBold text-xs text-slate-600">
+                <Text className="font-ralewayExtraBold text-xs text-description">
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -117,7 +117,7 @@ export function PickerModalShell({
                 className="rounded-full bg-secondary/10 px-3 py-1.5"
                 onPress={onConfirm}
               >
-                <Text className="font-ralewayExtraBold text-xs text-primary">
+                <Text className="font-ralewayExtraBold text-xs text-secondary">
                   Done
                 </Text>
               </TouchableOpacity>

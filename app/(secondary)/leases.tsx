@@ -96,7 +96,7 @@ export default function LeasesScreen() {
             leading={
               <SecondaryBackButton
                 accessibilityLabel="Back from leases"
-                variant="primary"
+                variant="secondary"
               />
             }
             title="Leases"
@@ -104,9 +104,9 @@ export default function LeasesScreen() {
         </View>
 
         {/* --- THE HERO: REVENUE SNAPSHOT --- */}
-        <View className="relative overflow-hidden rounded-[32px] bg-textPrimary p-6 shadow-xl shadow-primary/20">
+        <View className="relative overflow-hidden rounded-[32px] bg-secondary p-6 shadow-xl shadow-secondary/20">
           {/* Decorative Background Accent */}
-          <View className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-secondary/10" />
+          <View className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-primary/40" />
 
           <View className="flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
@@ -130,12 +130,12 @@ export default function LeasesScreen() {
         {/* --- METRIC GRID: Status & Volume --- */}
         <View className="flex-row gap-4 px-1">
           {/* Total Leases */}
-          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
+          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
             <View className="flex-row items-center gap-2">
               <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
                 <Ionicons
                   name="document-text"
-                  color={colors.primary}
+                  color={colors.secondary}
                   size={16}
                 />
               </View>
@@ -154,13 +154,13 @@ export default function LeasesScreen() {
           </View>
 
           {/* Active Health */}
-          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
+          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
                 <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
                   <Ionicons
                     name="checkmark-circle"
-                    color={colors.primary}
+                    color={colors.secondary}
                     size={16}
                   />
                 </View>
@@ -181,7 +181,7 @@ export default function LeasesScreen() {
               {/* Visual Progress toward 100% active capacity */}
               <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/10">
                 <View
-                  className="h-full bg-primary"
+                  className="h-full bg-secondary"
                   style={{ width: `${activeLeasePercentage}%` }}
                 />
               </View>
@@ -189,10 +189,10 @@ export default function LeasesScreen() {
           </View>
         </View>
 
-        <View className="rounded-[22px] border border-textPrimary/10 bg-white px-3 py-3 shadow-xl shadow-primary/10">
+        <View className="rounded-[22px] border border-secondary/20 bg-white px-3 py-3 shadow-xl shadow-secondary/10">
           <View className="flex-row items-center gap-3">
             <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
-              <Feather name="search" size={20} color={colors.primary} />
+              <Feather name="search" size={20} color={colors.secondary} />
             </View>
 
             <View className="min-w-0 flex-1">
@@ -320,7 +320,7 @@ export default function LeasesScreen() {
 
           {form.startDate && Number(form.durationMonths) >= 1 ? (
             <View className="flex-row items-center justify-between rounded-2xl border border-secondary/20 bg-secondary/10 px-4 py-3.5">
-              <Text className="font-ralewayExtraBold text-xs uppercase tracking-wider text-primary">
+              <Text className="font-ralewayExtraBold text-xs uppercase tracking-wider text-secondary">
                 Calculated End Date
               </Text>
               <Text className="font-ralewayBold text-sm text-textPrimary">

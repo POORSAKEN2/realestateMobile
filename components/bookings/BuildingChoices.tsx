@@ -26,11 +26,11 @@ export function BuildingChoices({
             accessibilityLabel={`Show calendar for ${building.title}`}
             accessibilityRole="button"
             accessibilityState={{ selected }}
-            className={`min-h-11 justify-center rounded-full border px-4 ${selected ? "border-primary bg-primary" : "border-slate-200 bg-[#FFFFFF]"}`}
+            className={`min-h-11 justify-center rounded-full border px-4 ${selected ? "border-secondary bg-secondary" : "border-secondary/20 bg-[#FFFFFF]"}`}
             onPress={() => onSelect(building.id)}
           >
             <Text
-              className={`text-xs font-ralewayExtraBold ${selected ? "text-[#FFFFFF]" : "text-textPrimary"}`}
+              className={`font-ralewayExtraBold text-xs ${selected ? "text-[#FFFFFF]" : "text-textPrimary"}`}
             >
               {building.title}
             </Text>

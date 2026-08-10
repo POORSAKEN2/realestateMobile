@@ -80,7 +80,7 @@ export function DocumentsToolbar({
                   activeOpacity={0.82}
                   className={`min-h-11 justify-center rounded-2xl border px-4 ${
                     isSelected
-                      ? "border-primary bg-primary"
+                      ? "border-secondary bg-secondary"
                       : "border-secondary/20 bg-white"
                   }`}
                   onPress={() => onChangeCategory(option)}
@@ -115,7 +115,7 @@ export function DocumentsToolbar({
             size={20}
           />
           {activeFilterCount ? (
-            <View className="absolute -right-1.5 -top-1.5 h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1">
+            <View className="absolute -right-1.5 -top-1.5 h-5 min-w-5 items-center justify-center rounded-full bg-secondary px-1">
               <Text className="font-ralewayExtraBold text-[10px] text-white">
                 {activeFilterCount}
               </Text>
