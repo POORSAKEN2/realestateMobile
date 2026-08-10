@@ -23,15 +23,15 @@ export function PropertyFloorSummary({
   );
 
   return (
-    <View className="mt-6 border-t border-zinc-100 pt-5">
+    <View className="mt-6 border-t border-secondary/20 pt-5">
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="font-ralewayBold text-xs uppercase text-zinc-400">
+          <Text className="font-ralewayBold text-xs uppercase text-description">
             {policy.floorSummaryProminence === "primary"
               ? "Floor Summary"
               : "Optional Layout"}
           </Text>
-          <Text className="mt-1 text-xs text-zinc-500">
+          <Text className="mt-1 text-xs text-description">
             {policy.floorSummaryProminence === "secondary" && !floorPlans.length
               ? "Usually not needed for this property type"
               : `${floorPlans.length} ${
@@ -43,11 +43,11 @@ export function PropertyFloorSummary({
           accessibilityLabel="Manage property floor plans"
           accessibilityRole="button"
           activeOpacity={0.8}
-          className="h-10 flex-row items-center gap-1.5 rounded-xl bg-secondary/20 px-3"
+          className="h-10 flex-row items-center gap-1.5 rounded-xl bg-secondary/10 px-3"
           onPress={onManage}
         >
           <Feather name="grid" color="#634CE4" size={15} />
-          <Text className="font-ralewayBold text-[10px] text-primary">
+          <Text className="font-ralewayBold text-[10px] text-secondary">
             {policy.floorSummaryProminence === "primary"
               ? "Manage"
               : "Add anyway"}
@@ -79,7 +79,7 @@ export function PropertyFloorSummary({
                 key={floor.id}
               >
                 <View className="flex-row items-center gap-3">
-                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
                     <Feather name="layers" color="#634CE4" size={17} />
                   </View>
                   <View className="min-w-0 flex-1">
@@ -99,7 +99,7 @@ export function PropertyFloorSummary({
                     <Text className="font-ralewayBold text-[9px] text-teal-700">
                       {vacant} vacant
                     </Text>
-                    <Text className="mt-1 font-ralewayBold text-[9px] text-primary">
+                    <Text className="mt-1 font-ralewayBold text-[9px] text-secondary">
                       {occupied} occupied
                     </Text>
                   </View>
@@ -110,7 +110,7 @@ export function PropertyFloorSummary({
         ) : (
           <TouchableOpacity
             activeOpacity={0.8}
-            className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5"
+            className="items-center rounded-2xl border border-dashed border-secondary/20 bg-secondary/5 px-4 py-5"
             onPress={onManage}
           >
             <Text className="font-ralewayBold text-xs text-zinc-600">

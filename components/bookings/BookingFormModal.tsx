@@ -1,7 +1,12 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
-import type { Lessee, Property, TransientBooking } from "../../types";
+import type {
+  Lessee,
+  Property,
+  PropertyRoom,
+  TransientBooking,
+} from "../../types";
 import type {
   BookingFormMode,
   BookingFormState,
@@ -17,6 +22,7 @@ import { BookingStayFields } from "./BookingStayFields";
 
 type BookingFormModalProps = {
   buildings: Property[];
+  rooms: PropertyRoom[];
   conflict?: TransientBooking;
   editingBooking: TransientBooking | null;
   form: BookingFormState;
@@ -24,14 +30,17 @@ type BookingFormModalProps = {
   guests: Lessee[];
   isAddingGuest: boolean;
   isCancelling: boolean;
+  isLoadingRooms: boolean;
   isSaving: boolean;
   isVisible: boolean;
   mode: BookingFormMode;
   selectedBuilding?: Property;
+  selectedRoom?: PropertyRoom;
   selectedGuestId: string;
   onCancelBooking: () => void;
   onClose: () => void;
   onSelectBuilding: (id: string) => void;
+  onSelectRoom: (id: string) => void;
   onSelectGuest: (id: string) => void;
   onSubmit: () => void;
   onToggleAddingGuest: () => void;
@@ -40,6 +49,7 @@ type BookingFormModalProps = {
 
 export function BookingFormModal({
   buildings,
+  rooms,
   conflict,
   editingBooking,
   form,
@@ -47,14 +57,17 @@ export function BookingFormModal({
   guests,
   isAddingGuest,
   isCancelling,
+  isLoadingRooms,
   isSaving,
   isVisible,
   mode,
   selectedBuilding,
+  selectedRoom,
   selectedGuestId,
   onCancelBooking,
   onClose,
   onSelectBuilding,
+  onSelectRoom,
   onSelectGuest,
   onSubmit,
   onToggleAddingGuest,
@@ -77,7 +90,7 @@ export function BookingFormModal({
       title={mode === "create" ? "Create a booking" : "Edit booking"}
       showCancelAction
     >
-      <View className="border-secondary bg-secondary/20 flex-row items-start gap-3 rounded-2xl border px-4 py-3.5">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-secondary bg-secondary/10 px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
           color="#634CE4"
@@ -110,12 +123,27 @@ export function BookingFormModal({
 
         <View className="flex-row gap-3">
           <View className="flex-1">
-            <BaseField
-              label="Room number"
-              onChangeText={(value) => onUpdateForm("roomNumber", value)}
-              placeholder="e.g. 101"
+            <DropdownField
+              label="Room"
+              options={rooms.map((room) => ({
+                label: room.roomNumber,
+                value: room.id,
+              }))}
+              disabled={
+                !form.propertyId || isLoadingRooms || rooms.length === 0
+              }
+              onSelect={onSelectRoom}
+              placeholder={
+                !form.propertyId
+                  ? "Select a building first"
+                  : isLoadingRooms
+                    ? "Loading rooms..."
+                    : rooms.length === 0
+                      ? "No rooms available"
+                      : "Select a room"
+              }
               required
-              value={form.roomNumber}
+              value={form.roomId}
               variant="filled"
             />
           </View>
@@ -134,7 +162,7 @@ export function BookingFormModal({
 
         {selectedBuilding ? (
           <View className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <View className="bg-secondary/20 h-10 w-10 items-center justify-center rounded-xl">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
               <MaterialCommunityIcons
                 name="door-open"
                 color="#634CE4"
@@ -145,9 +173,9 @@ export function BookingFormModal({
               <Text className="font-ralewayBold text-xs text-slate-500">
                 Booking location
               </Text>
-              <Text className="font-ralewayExtraBold text-textPrimary mt-0.5 text-sm">
+              <Text className="mt-0.5 font-ralewayExtraBold text-sm text-textPrimary">
                 {selectedBuilding.title}
-                {form.roomNumber ? ` · Room ${form.roomNumber}` : ""}
+                {selectedRoom ? ` · Room ${selectedRoom.roomNumber}` : ""}
               </Text>
             </View>
           </View>
@@ -183,15 +211,12 @@ export function BookingFormModal({
           onUpdateForm={onUpdateForm}
         />
 
-        {form.propertyId &&
-        form.roomNumber &&
-        form.startDate &&
-        form.endDate ? (
+        {form.propertyId && form.roomId && form.startDate && form.endDate ? (
           <BookingAvailabilityMessage conflict={conflict} />
         ) : (
           <View className="rounded-2xl bg-slate-100 p-4">
             <Text className="text-sm leading-5 text-slate-600">
-              Add a room number and stay window to check availability.
+              Select a room and stay window to check availability.
             </Text>
           </View>
         )}

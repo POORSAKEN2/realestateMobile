@@ -159,7 +159,7 @@ export function FloorPlanWorkspace({
             </Text>
           </View>
           <TouchableOpacity
-            className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-secondary/20 px-4"
+            className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-secondary/10 px-4"
             onPress={onAddArea}
           >
             <Feather name="plus" color="#634CE4" size={17} />

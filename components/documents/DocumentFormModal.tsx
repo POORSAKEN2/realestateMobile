@@ -107,7 +107,7 @@ export function DocumentFormModal({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close document form"
-      backdropClassName="bg-slate-950/45"
+      backdropClassName="bg-textPrimary/45"
       closeOnBackdropPress={false}
       keyboardAvoiding
       onClose={handleClose}
@@ -118,7 +118,7 @@ export function DocumentFormModal({
         className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-surface"
       >
         <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-slate-300" />
+          <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
         </View>
 
         {selectorMode ? (
@@ -155,7 +155,7 @@ export function DocumentFormModal({
                 >
                   {editingDocument ? "Edit document" : "Upload document"}
                 </Text>
-                <Text className="mt-2 font-ralewayMedium text-sm leading-5 text-slate-500">
+                <Text className="mt-2 font-ralewayMedium text-sm leading-5 text-description">
                   {editingDocument
                     ? "Update its details or choose a replacement file."
                     : "Organize a file by category, property, and tenant."}
@@ -170,7 +170,7 @@ export function DocumentFormModal({
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#334155"
+                  color="#1E1F45"
                   size={21}
                 />
               </TouchableOpacity>
@@ -215,12 +215,12 @@ export function DocumentFormModal({
                   <FieldLabel label="Name" required />
                   <TextInput
                     accessibilityLabel="Document name, required"
-                    className={`min-h-14 rounded-2xl border bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
-                      errors.name ? "border-red-400" : "border-slate-200"
+                    className={`min-h-14 rounded-2xl border bg-secondary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
+                      errors.name ? "border-red-400" : "border-secondary/20"
                     }`}
                     onChangeText={(name) => onChangeForm({ ...form, name })}
                     placeholder="Document name"
-                    placeholderTextColor="#94A3B8"
+                    placeholderTextColor="#6F6D6D"
                     value={form.name}
                   />
                   {errors.name ? (
@@ -247,13 +247,13 @@ export function DocumentFormModal({
                           className={`min-h-11 justify-center rounded-2xl border px-4 ${
                             isSelected
                               ? "border-primary bg-primary"
-                              : "border-slate-200 bg-slate-50"
+                              : "border-secondary/20 bg-secondary/10"
                           }`}
                           onPress={() => onChangeForm({ ...form, category })}
                         >
                           <Text
                             className={`font-ralewayBold text-xs ${
-                              isSelected ? "text-white" : "text-slate-600"
+                              isSelected ? "text-white" : "text-textPrimary"
                             }`}
                           >
                             {category}
@@ -280,13 +280,13 @@ export function DocumentFormModal({
                     <FieldLabel label="Version note" />
                     <TextInput
                       accessibilityLabel="Version note"
-                      className="min-h-24 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-ralewayMedium text-base text-textPrimary"
+                      className="min-h-24 rounded-2xl border border-secondary/20 bg-secondary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary"
                       multiline
                       onChangeText={(revisionComment) =>
                         onChangeForm({ ...form, revisionComment })
                       }
                       placeholder="For example: Signed copy uploaded"
-                      placeholderTextColor="#94A3B8"
+                      placeholderTextColor="#6F6D6D"
                       textAlignVertical="top"
                       value={form.revisionComment}
                     />
@@ -295,7 +295,7 @@ export function DocumentFormModal({
               </FormSection>
             </ScrollView>
 
-            <View className="flex-row gap-3 border-t border-slate-200 bg-white p-5 pb-8">
+            <View className="flex-row gap-3 border-t border-secondary/20 bg-white p-5 pb-8">
               <TouchableOpacity
                 accessibilityLabel="Cancel document form"
                 accessibilityRole="button"
@@ -344,7 +344,7 @@ function FieldLabel({
   required?: boolean;
 }) {
   return (
-    <Text className="font-ralewaySemiBold text-sm text-slate-600">
+    <Text className="font-ralewaySemiBold text-sm text-description">
       {label}
       {required ? <Text className="text-red-600"> *</Text> : null}
     </Text>

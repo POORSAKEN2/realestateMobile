@@ -2,7 +2,14 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 
-export type ExpenseDashboardVisual = "spend" | "maintenance" | "utilities";
+export type ExpenseDashboardVisual =
+  | "insurance"
+  | "maintenance"
+  | "management"
+  | "other"
+  | "spend"
+  | "taxes"
+  | "utilities";
 
 export type ExpenseDashboardCardProps = {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -53,6 +60,94 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
     );
   }
 
+  if (type === "insurance") {
+    return (
+      <View className="mt-auto h-[48px]">
+        <Svg width="100%" height="48" viewBox="0 0 112 48">
+          <Circle
+            cx="24"
+            cy="24"
+            r="15"
+            fill="none"
+            stroke="#ECE9F5"
+            strokeWidth="7"
+          />
+          <Circle
+            cx="24"
+            cy="24"
+            r="15"
+            fill="none"
+            rotation="-90"
+            origin="24, 24"
+            stroke="#54A98D"
+            strokeDasharray="68 27"
+            strokeLinecap="round"
+            strokeWidth="7"
+          />
+          <Rect x="52" y="11" width="54" height="5" rx="2.5" fill="#ECE9F5" />
+          <Rect x="52" y="11" width="42" height="5" rx="2.5" fill="#8D77E8" />
+          <Rect x="52" y="23" width="54" height="5" rx="2.5" fill="#ECE9F5" />
+          <Rect x="52" y="23" width="31" height="5" rx="2.5" fill="#B7ABE9" />
+          <Rect x="52" y="35" width="54" height="5" rx="2.5" fill="#ECE9F5" />
+          <Rect x="52" y="35" width="47" height="5" rx="2.5" fill="#D3CCF2" />
+        </Svg>
+      </View>
+    );
+  }
+
+  if (type === "taxes") {
+    return (
+      <View className="mt-auto h-[48px]">
+        <Svg width="100%" height="48" viewBox="0 0 112 48">
+          <Path d="M3 44 H109" stroke="#ECE9F5" strokeWidth="1" />
+          <Rect x="8" y="28" width="18" height="16" rx="3" fill="#D9EEE8" />
+          <Rect x="34" y="20" width="18" height="24" rx="3" fill="#CFC6F3" />
+          <Rect x="60" y="11" width="18" height="33" rx="3" fill="#8D77E8" />
+          <Rect x="86" y="24" width="18" height="20" rx="3" fill="#B7ABE9" />
+          <Circle cx="69" cy="7" r="3" fill="#168A68" />
+        </Svg>
+      </View>
+    );
+  }
+
+  if (type === "management") {
+    return (
+      <View className="mt-auto h-[48px]">
+        <Svg width="100%" height="48" viewBox="0 0 112 48">
+          <Rect x="3" y="6" width="106" height="8" rx="4" fill="#ECE9F5" />
+          <Rect x="3" y="6" width="76" height="8" rx="4" fill="#8D77E8" />
+          <Rect x="3" y="20" width="106" height="8" rx="4" fill="#ECE9F5" />
+          <Rect x="3" y="20" width="55" height="8" rx="4" fill="#54A98D" />
+          <Rect x="3" y="34" width="106" height="8" rx="4" fill="#ECE9F5" />
+          <Rect x="3" y="34" width="89" height="8" rx="4" fill="#CFC6F3" />
+        </Svg>
+      </View>
+    );
+  }
+
+  if (type === "other") {
+    return (
+      <View className="mt-auto h-[48px]">
+        <Svg width="100%" height="48" viewBox="0 0 112 48">
+          <Rect x="3" y="9" width="106" height="12" rx="6" fill="#ECE9F5" />
+          <Rect x="3" y="9" width="31" height="12" rx="6" fill="#8D77E8" />
+          <Rect x="36" y="9" width="24" height="12" rx="6" fill="#54A98D" />
+          <Rect x="62" y="9" width="18" height="12" rx="6" fill="#CFC6F3" />
+          <Circle cx="12" cy="35" r="5" fill="#D9EEE8" />
+          <Circle cx="31" cy="35" r="5" fill="#CFC6F3" />
+          <Circle cx="50" cy="35" r="5" fill="#8D77E8" />
+          <Path
+            d="M59 35 H107"
+            stroke="#B7ABE9"
+            strokeDasharray="5 5"
+            strokeLinecap="round"
+            strokeWidth="3"
+          />
+        </Svg>
+      </View>
+    );
+  }
+
   return (
     <View className="mt-auto h-[48px]">
       <Svg width="100%" height="48" viewBox="0 0 112 48">
@@ -91,7 +186,12 @@ export function ExpenseDashboardCard({
       <View className="h-10 w-10 items-center justify-center rounded-[13px] bg-[#F1EEFF]">
         <MaterialCommunityIcons name={icon} color="#6249CF" size={21} />
       </View>
-      <Text className="mt-3 font-ralewayMedium text-[12px] text-[#18181B]">
+      <Text
+        adjustsFontSizeToFit
+        className="mt-3 font-ralewayMedium text-[12px] text-[#18181B]"
+        minimumFontScale={0.75}
+        numberOfLines={1}
+      >
         {label}
       </Text>
       <Text

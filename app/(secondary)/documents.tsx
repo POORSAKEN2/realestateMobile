@@ -25,6 +25,7 @@ import { useDocumentLibrary } from "../../hooks/documents/useDocumentLibrary";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import type { DocumentUpload, PropertyDocument } from "../../types";
 import { chooseDocumentFile } from "../../utils/documents/documentFiles";
+import { colors } from "../../constants/colors";
 import {
   createDocumentFormValues,
   EMPTY_DOCUMENT_FORM,
@@ -212,7 +213,7 @@ export default function DocumentsScreen() {
   }
 
   return (
-    <Screen className="bg-slate-50">
+    <Screen className="bg-surface">
       <FlatList
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
@@ -250,10 +251,10 @@ export default function DocumentsScreen() {
         }
         refreshControl={
           <RefreshControl
-            colors={["#2563EB"]}
+            colors={[colors.primary]}
             onRefresh={() => void refresh()}
             refreshing={isRefreshing && !isLoading}
-            tintColor="#2563EB"
+            tintColor={colors.primary}
           />
         }
         renderItem={({ item: document }) => (

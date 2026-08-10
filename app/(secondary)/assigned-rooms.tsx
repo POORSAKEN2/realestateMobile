@@ -109,7 +109,7 @@ export default function AssignedRoomsScreen() {
       <View className="flex-1">
         <ModuleHeader
           action={
-            <View className="min-w-11 items-center justify-center rounded-full bg-secondary/20 px-3 py-2">
+            <View className="min-w-11 items-center justify-center rounded-full bg-secondary/10 px-3 py-2">
               <Text className="font-ralewayBold text-sm text-primary">
                 {rooms.length}
               </Text>

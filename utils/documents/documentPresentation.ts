@@ -45,23 +45,23 @@ type CategoryPresentation = {
 
 const categoryPresentation: Record<DocumentCategory, CategoryPresentation> = {
   Leases: {
-    backgroundColor: "#EFF6FF",
-    color: "#1D4ED8",
+    backgroundColor: "#FAF9F9",
+    color: "#634CE4",
     label: "LEASE",
   },
   Compliance: {
-    backgroundColor: "#F0FDF4",
-    color: "#15803D",
+    backgroundColor: "#BEE3DB",
+    color: "#1E1F45",
     label: "COMPLIANCE",
   },
   Maintenance: {
-    backgroundColor: "#FFF7ED",
-    color: "#C2410C",
+    backgroundColor: "#8A77F4",
+    color: "#FFFFFF",
     label: "MAINTENANCE",
   },
   Contracts: {
-    backgroundColor: "#F5F3FF",
-    color: "#7C3AED",
+    backgroundColor: "#634CE4",
+    color: "#FFFFFF",
     label: "CONTRACT",
   },
 };
@@ -69,17 +69,41 @@ const categoryPresentation: Record<DocumentCategory, CategoryPresentation> = {
 export function getCategoryPresentation(category: string) {
   return (
     categoryPresentation[category as DocumentCategory] ?? {
-      backgroundColor: "#F1F5F9",
-      color: "#475569",
+      backgroundColor: "#FAF9F9",
+      color: "#1E1F45",
       label: category.toUpperCase(),
     }
   );
 }
 
-export function getDocumentIcon(type: PropertyDocument["type"]) {
-  if (type === "DOCX") return "file-word-outline" as const;
-  if (type === "JPG" || type === "PNG") return "file-image-outline" as const;
-  return "file-pdf-box" as const;
+const documentTypePresentation = {
+  PDF: {
+    backgroundColor: "#FDECEC",
+    color: "#D32F2F",
+    icon: "file-pdf-box",
+  },
+  DOCX: {
+    backgroundColor: "#E8F0FB",
+    color: "#2B579A",
+    icon: "file-word-outline",
+  },
+  JPG: {
+    backgroundColor: "#FEF3C7",
+    color: "#B45309",
+    icon: "file-jpg-box",
+  },
+  PNG: {
+    backgroundColor: "#D1FAE5",
+    color: "#047857",
+    icon: "file-png-box",
+  },
+} as const satisfies Record<
+  PropertyDocument["type"],
+  { backgroundColor: string; color: string; icon: string }
+>;
+
+export function getDocumentTypePresentation(type: PropertyDocument["type"]) {
+  return documentTypePresentation[type];
 }
 
 export function formatDocumentDate(value: string) {

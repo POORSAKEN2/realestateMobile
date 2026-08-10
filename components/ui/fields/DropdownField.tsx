@@ -97,7 +97,7 @@ export function DropdownField<T extends string>({
         onClose={() => setIsOpen(false)}
         visible={isOpen}
       >
-        <View className="max-h-[72%] rounded-t-[28px] bg-[#FFFFFF] px-5 pb-8 pt-5">
+        <View className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-[#FFFFFF] px-5 pb-8 pt-5">
           <View className="mb-4 flex-row items-center justify-between">
             <View>
               <Text className="font-ralewayExtraBold text-lg text-textPrimary">
@@ -131,7 +131,7 @@ export function DropdownField<T extends string>({
                     activeOpacity={0.85}
                     className={`min-h-14 flex-row items-center justify-between rounded-lg border px-4 ${
                       isSelected
-                        ? "border-primary bg-secondary/20"
+                        ? "border-primary bg-secondary/10"
                         : "border-textPrimary/10 bg-[#FFFFFF]"
                     }`}
                     onPress={() => handleSelect(option.value)}

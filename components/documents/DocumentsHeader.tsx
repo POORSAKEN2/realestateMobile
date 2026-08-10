@@ -28,9 +28,7 @@ export function DocumentsHeader({
         </TouchableOpacity>
       }
       eyebrow="Portfolio Library"
-      leading={
-        <SecondaryBackButton accessibilityLabel="Back from documents" />
-      }
+      leading={<SecondaryBackButton accessibilityLabel="Back from documents" />}
       supportingText={`${documentCount} ${
         documentCount === 1 ? "document" : "documents"
       }`}

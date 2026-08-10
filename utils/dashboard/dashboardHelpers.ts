@@ -26,9 +26,18 @@ export function calculateTrend(current: number, previous?: number) {
 }
 
 export function formatPesoValue(value = 0) {
-  if (value >= 1_000_000_000) return `₱${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `₱${(value / 1_000_000).toFixed(1)}M`;
-  return value === 0 ? "₱0" : `₱${value.toLocaleString()}`;
+  const absoluteValue = Math.abs(value);
+  const prefix = value < 0 ? "-₱" : "₱";
+
+  if (absoluteValue >= 1_000_000_000) {
+    return `${prefix}${(absoluteValue / 1_000_000_000).toFixed(1)}B`;
+  }
+  if (absoluteValue >= 1_000_000) {
+    return `${prefix}${(absoluteValue / 1_000_000).toFixed(1)}M`;
+  }
+  return absoluteValue === 0
+    ? "₱0"
+    : `${prefix}${absoluteValue.toLocaleString()}`;
 }
 
 export function formatPropertyStatus(status: string) {

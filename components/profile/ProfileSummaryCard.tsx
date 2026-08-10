@@ -32,7 +32,7 @@ export function ProfileSummaryCard({
           onPress={onChangePhoto}
           className="relative"
         >
-          <View className="bg-secondary/20 h-24 w-24 items-center justify-center overflow-hidden rounded-full">
+          <View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-secondary/10">
             {imageUri ? (
               <Image
                 source={{ uri: imageUri }}
@@ -62,7 +62,7 @@ export function ProfileSummaryCard({
         </TouchableOpacity>
 
         <Text
-          className="text-textPrimary mt-1 font-ralewayBold text-xl"
+          className="mt-1 font-ralewayBold text-xl text-textPrimary"
           numberOfLines={1}
         >
           {name.trim() || "Your name"}

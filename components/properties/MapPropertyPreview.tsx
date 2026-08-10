@@ -15,7 +15,7 @@ export function MapPropertyPreview({
   const images = getPropertyImages(property);
 
   return (
-    <View className="absolute bottom-6 left-4 right-4 flex-row items-center gap-3 rounded-3xl bg-white p-3 shadow-xl shadow-slate-900/20">
+    <View className="absolute bottom-6 left-4 right-4 flex-row items-center gap-3 rounded-3xl border border-secondary/20 bg-white p-3 shadow-xl shadow-secondary/20">
       <View className="h-[74px] w-[74px] items-center justify-center overflow-hidden rounded-[18px] bg-slate-200">
         {images.length ? (
           <ScrollView
@@ -40,7 +40,7 @@ export function MapPropertyPreview({
         )}
         {images.length > 1 ? (
           <View className="absolute bottom-1.5 right-1.5 min-w-5 rounded-full bg-slate-900/75 px-1.5 py-0.5">
-            <Text className="text-center text-[10px] font-ralewayBlack text-white">
+            <Text className="text-center font-ralewayBlack text-[10px] text-white">
               {images.length}
             </Text>
           </View>
@@ -50,7 +50,7 @@ export function MapPropertyPreview({
       <View className="min-w-0 flex-1">
         <View className="flex-row items-center gap-2">
           <Text
-            className="min-w-0 flex-1 text-base font-ralewayBlack text-textPrimary"
+            className="min-w-0 flex-1 font-ralewayBlack text-base text-textPrimary"
             numberOfLines={1}
           >
             {property.title}
@@ -58,14 +58,14 @@ export function MapPropertyPreview({
           <TouchableOpacity
             accessibilityLabel="Close selected property"
             activeOpacity={0.8}
-            className="h-7 w-7 items-center justify-center rounded-full bg-slate-100"
+            className="h-7 w-7 items-center justify-center rounded-full bg-secondary/10"
             onPress={onClose}
           >
-            <MaterialCommunityIcons name="close" color="#64748B" size={18} />
+            <MaterialCommunityIcons name="close" color="#634CE4" size={18} />
           </TouchableOpacity>
         </View>
         <Text
-          className="mt-1 text-xs font-ralewayBold text-slate-500"
+          className="mt-1 font-ralewayBold text-xs text-slate-500"
           numberOfLines={1}
         >
           {property.location}
@@ -73,19 +73,19 @@ export function MapPropertyPreview({
         </Text>
         <View className="mt-2.5 flex-row items-center gap-2">
           <View className="rounded-full bg-secondary px-2.5 py-1">
-            <Text className="text-[10px] font-ralewayBlack uppercase text-primary">
+            <Text className="font-ralewayBlack text-[10px] uppercase text-white">
               {formatStatus(property.status)}
             </Text>
           </View>
           <Text
-            className="min-w-0 flex-1 text-xs font-ralewayBlack text-textPrimary"
+            className="min-w-0 flex-1 font-ralewayBlack text-xs text-textPrimary"
             numberOfLines={1}
           >
             {formatPeso(property.value)}
           </Text>
         </View>
         <Text
-          className="mt-1 text-[11px] font-ralewayExtraBold text-slate-500"
+          className="mt-1 font-ralewayExtraBold text-[11px] text-slate-500"
           numberOfLines={1}
         >
           {property.type ?? "Property"}

@@ -47,13 +47,13 @@ export function PropertyCoreFields({
 
   return (
     <>
-      <View className="border-secondary bg-secondary/20 flex-row items-start gap-3 rounded-2xl border px-4 py-3.5">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-secondary bg-secondary/10 px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
           color="#634CE4"
           size={20}
         />
-        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-primary">
+        <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-secondary">
           Fields marked with * are required. You can add images and documents
           now or later.
         </Text>
@@ -111,10 +111,10 @@ export function PropertyCoreFields({
                   key={location}
                   activeOpacity={0.8}
                   accessibilityRole="button"
-                  className="border-textPrimary/10 bg-secondary/20 min-h-11 justify-center rounded-full border px-3.5 py-2.5"
+                  className="min-h-11 justify-center rounded-full border border-secondary/20 bg-secondary/10 px-3.5 py-2.5"
                   onPress={() => selectLocation(location)}
                 >
-                  <Text className="font-ralewayBold text-xs text-primary">
+                  <Text className="font-ralewayBold text-xs text-secondary">
                     {location}
                   </Text>
                 </TouchableOpacity>
@@ -258,10 +258,10 @@ export function PropertyCoreFields({
           variant="filled"
         />
 
-        <View className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <View className="rounded-2xl border border-secondary/20 bg-secondary/5 p-4">
           <View className="flex-row items-center justify-between gap-4">
             <View className="min-w-0 flex-1 flex-row items-center gap-3">
-              <View className="bg-secondary/20 h-10 w-10 items-center justify-center rounded-2xl">
+              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
                 <MaterialCommunityIcons
                   name="calendar-clock"
                   color="#634CE4"
@@ -269,7 +269,7 @@ export function PropertyCoreFields({
                 />
               </View>
               <View className="min-w-0 flex-1">
-                <Text className="font-ralewayExtraBold text-textPrimary text-sm">
+                <Text className="font-ralewayExtraBold text-sm text-textPrimary">
                   Allow short-term bookings
                 </Text>
                 <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">

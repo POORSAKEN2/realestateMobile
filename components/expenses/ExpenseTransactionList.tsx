@@ -1,16 +1,19 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
+import { SwipeActionCard } from "../ui/SwipeActionCard";
 import type { Expense } from "../../types/domain/expenses";
 import { formatPeso } from "../../utils/expenses/expenseForm";
 import { ExpenseTransactionCard } from "./ExpenseTransactionCard";
 
 type ExpenseTransactionListProps = {
   expenses: Expense[];
+  onOpenActions: (expense: Expense) => void;
 };
 
 export function ExpenseTransactionList({
   expenses,
+  onOpenActions,
 }: ExpenseTransactionListProps) {
   return (
     <View className="mt-4">
@@ -20,11 +23,19 @@ export function ExpenseTransactionList({
       <View className="mt-3 gap-3">
         {expenses.length > 0 ? (
           expenses.map((expense) => (
-            <ExpenseTransactionCard
+            <SwipeActionCard
+              actionAccessibilityLabel={`More actions for ${expense.description || expense.category}`}
+              actionIcon="dots-horizontal"
+              actionLabel="More"
+              borderRadius={20}
               key={expense.id}
-              expense={expense}
-              formattedAmount={formatPeso(expense.amount)}
-            />
+              onAction={() => onOpenActions(expense)}
+            >
+              <ExpenseTransactionCard
+                expense={expense}
+                formattedAmount={formatPeso(expense.amount)}
+              />
+            </SwipeActionCard>
           ))
         ) : (
           <View className="items-center rounded-[20px] border border-dashed border-[#D9D5E8] bg-white px-6 py-10">

@@ -31,7 +31,7 @@ export function PropertyListToolbar({
   const hasActiveFilter = statusFilter !== "ALL";
 
   return (
-    <View className="rounded-3xl border border-slate-200 bg-white p-3 shadow-sm">
+    <View className="rounded-3xl border border-secondary/20 bg-white p-3 shadow-sm shadow-secondary/10">
       <View className="flex-row gap-2">
         <SearchField
           accessibilityLabel="Search properties by name or location"
@@ -47,7 +47,7 @@ export function PropertyListToolbar({
           accessibilityRole="button"
           activeOpacity={0.8}
           className={`h-12 min-w-12 flex-row items-center justify-center gap-2 rounded-2xl px-3.5 ${
-            hasActiveFilter ? "bg-primary" : "bg-secondary/20"
+            hasActiveFilter ? "bg-secondary" : "bg-secondary/10"
           }`}
           onPress={() => setIsFilterVisible(true)}
         >
@@ -91,10 +91,10 @@ export function PropertyListToolbar({
               accessibilityLabel="Close property filters"
               accessibilityRole="button"
               activeOpacity={0.8}
-              className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+              className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
               onPress={() => setIsFilterVisible(false)}
             >
-              <MaterialCommunityIcons name="close" color="#1E1F45" size={21} />
+              <MaterialCommunityIcons name="close" color="#634CE4" size={21} />
             </TouchableOpacity>
           </View>
 
@@ -110,7 +110,7 @@ export function PropertyListToolbar({
                   activeOpacity={0.8}
                   className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
                     selected
-                      ? "border-primary bg-secondary/20"
+                      ? "border-secondary bg-secondary/10"
                       : "border-slate-200 bg-white"
                   }`}
                   onPress={() => {
@@ -120,7 +120,7 @@ export function PropertyListToolbar({
                 >
                   <Text
                     className={`font-ralewayBold text-base ${
-                      selected ? "text-primary" : "text-textPrimary"
+                      selected ? "text-secondary" : "text-textPrimary"
                     }`}
                   >
                     {choice.label}

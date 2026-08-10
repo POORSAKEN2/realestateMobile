@@ -100,21 +100,21 @@ function AnalyticsCard({
       accessibilityLabel="Open analytics"
       activeOpacity={0.82}
       onPress={onPress}
-      className="border-secondary/50 overflow-hidden rounded-[22px] border bg-white px-4 pt-4"
+      className="overflow-hidden rounded-[22px] border border-secondary/50 bg-white px-4 pt-4"
     >
       <View className="flex-row items-center">
-        <View className="bg-secondary/20 h-[46px] w-[46px] items-center justify-center rounded-2xl">
+        <View className="h-[46px] w-[46px] items-center justify-center rounded-2xl bg-secondary/10">
           <MenuIcon icon={item.icon} />
         </View>
         <View className="ml-3 flex-1">
-          <Text className="font-ralewayExtraBold text-textPrimary text-lg">
+          <Text className="font-ralewayExtraBold text-lg text-textPrimary">
             {item.label}
           </Text>
           <Text className="mt-0.5 font-ralewayBold text-[13px] text-slate-500">
             View insights
           </Text>
         </View>
-        <View className="bg-secondary/20 h-[38px] w-[38px] items-center justify-center rounded-2xl">
+        <View className="h-[38px] w-[38px] items-center justify-center rounded-2xl bg-secondary/10">
           <Ionicons name="arrow-forward" color={colors.primary} size={18} />
         </View>
       </View>
@@ -182,11 +182,11 @@ function CompactBentoCard({
       onPress={onPress}
       className="min-h-[122px] flex-1 justify-between rounded-[22px] border border-slate-200 bg-white p-4"
     >
-      <View className="bg-secondary/20 h-11 w-11 items-center justify-center rounded-2xl">
+      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
         <MenuIcon icon={item.icon} />
       </View>
       <View className="flex-row items-center">
-        <Text className="text-textPrimary flex-1 font-ralewayBold text-[15px]">
+        <Text className="flex-1 font-ralewayBold text-[15px] text-textPrimary">
           {item.label}
         </Text>
         <Ionicons name="chevron-forward" color={colors.primary} size={18} />
@@ -210,10 +210,10 @@ function WideBentoCard({
       onPress={onPress}
       className="min-h-[78px] flex-row items-center rounded-[22px] border border-slate-200 bg-white px-4"
     >
-      <View className="bg-secondary/20 mr-3 h-11 w-11 items-center justify-center rounded-2xl">
+      <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
         <MenuIcon icon={item.icon} />
       </View>
-      <Text className="text-textPrimary flex-1 font-ralewayBold text-[15px]">
+      <Text className="flex-1 font-ralewayBold text-[15px] text-textPrimary">
         {item.label}
       </Text>
       <Ionicons name="chevron-forward" color={colors.primary} size={19} />
@@ -236,10 +236,10 @@ function UtilityBentoCard({
       onPress={onPress}
       className="min-h-[70px] flex-1 flex-row items-center rounded-[20px] border border-slate-200 bg-slate-50 px-3.5"
     >
-      <View className="bg-secondary/20 mr-2.5 h-10 w-10 items-center justify-center rounded-2xl">
+      <View className="mr-2.5 h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
         <MenuIcon icon={item.icon} />
       </View>
-      <Text className="text-textPrimary flex-1 font-ralewayBold text-sm">
+      <Text className="flex-1 font-ralewayBold text-sm text-textPrimary">
         {item.label}
       </Text>
       <Ionicons name="chevron-forward" color="#94A3B8" size={17} />
@@ -355,7 +355,7 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
               <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-[0.8px] text-slate-500">
                 Menu
               </Text>
-              <Text className="font-ralewayExtraBold mt-1 text-[22px] text-blackPrimary">
+              <Text className="mt-1 font-ralewayExtraBold text-[22px] text-blackPrimary">
                 Manage Portfolio
               </Text>
             </View>

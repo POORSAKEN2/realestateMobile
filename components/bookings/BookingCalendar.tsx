@@ -56,7 +56,7 @@ export function BookingCalendar({
     <View className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm shadow-slate-900/5">
       <View className="flex-row items-center gap-2 px-4 pb-3 pt-4">
         <View className="min-w-0 flex-1">
-          <Text className="text-textPrimary font-ralewayBold text-lg">
+          <Text className="font-ralewayBold text-lg text-textPrimary">
             {monthFormatter.format(currentMonth)}
           </Text>
           <Text className="mt-0.5 font-ralewaySemiBold text-xs text-slate-500">
@@ -68,7 +68,7 @@ export function BookingCalendar({
             activeOpacity={0.78}
             accessibilityLabel="Return to today"
             accessibilityRole="button"
-            className="bg-secondary/20 h-11 justify-center rounded-full px-3"
+            className="h-11 justify-center rounded-full bg-secondary/10 px-3"
             onPress={onGoToToday}
           >
             <Text className="font-ralewayExtraBold text-xs text-primary">
@@ -92,7 +92,7 @@ export function BookingCalendar({
         {weekdayLabels.map((day) => (
           <Text
             key={day}
-            className="font-ralewayExtraBold flex-1 text-center text-[11px] uppercase tracking-wide text-slate-400"
+            className="flex-1 text-center font-ralewayExtraBold text-[11px] uppercase tracking-wide text-slate-400"
           >
             {day.slice(0, 1)}
           </Text>
@@ -191,7 +191,7 @@ function CalendarDay({
           isSelected
             ? "bg-primary"
             : isToday
-              ? "bg-secondary/20 border border-primary"
+              ? "border border-primary bg-secondary/10"
               : "bg-transparent"
         }`}
       >

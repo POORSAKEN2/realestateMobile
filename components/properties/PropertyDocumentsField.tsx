@@ -24,10 +24,10 @@ export function PropertyDocumentsField({
   onRemove: (index: number) => void;
 }) {
   return (
-    <View className="gap-4 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+    <View className="gap-4 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
-          <View className="bg-secondary/20 h-12 w-12 items-center justify-center rounded-2xl">
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/20">
             <MaterialCommunityIcons
               name="file-document-outline"
               color="#634CE4"
@@ -35,10 +35,10 @@ export function PropertyDocumentsField({
             />
           </View>
           <View className="flex-1">
-            <Text className="font-ralewayExtraBold text-textPrimary text-sm">
+            <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               Property documents
             </Text>
-            <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+            <Text className="mt-1 text-xs leading-4 text-description">
               PDF, DOC, DOCX, JPG, or PNG files.
             </Text>
           </View>
@@ -51,7 +51,7 @@ export function PropertyDocumentsField({
               : "Choose property documents"
           }
           accessibilityRole="button"
-          className="min-h-11 justify-center rounded-2xl bg-primary px-4 py-2.5"
+          className="min-h-11 justify-center rounded-2xl bg-secondary px-4 py-2.5"
           onPress={onPick}
         >
           <Text className="font-ralewayExtraBold text-xs text-[#FFFFFF]">
@@ -61,21 +61,12 @@ export function PropertyDocumentsField({
       </View>
 
       {isEditing ? (
-        <View className="bg-secondary/20 rounded-2xl px-3 py-2">
-          <Text className="text-xs leading-5 text-[#6F6D6D]">
-            Existing documents stay attached. Add files here to upload more
-            documents to this property.
-          </Text>
-        </View>
-      ) : null}
-
-      {isEditing ? (
         <View className="gap-2">
-          <Text className="font-ralewayBold text-xs text-slate-600">
+          <Text className="font-ralewayBold text-xs text-description">
             Attached documents
           </Text>
           {isLoadingExistingDocuments ? (
-            <View className="bg-secondary/20 h-14 justify-center rounded-2xl px-3">
+            <View className="h-14 justify-center rounded-2xl border border-secondary/20 bg-white px-3">
               <ActivityIndicator color="#634CE4" />
             </View>
           ) : existingDocuments.length > 0 ? (
@@ -83,10 +74,10 @@ export function PropertyDocumentsField({
               <TouchableOpacity
                 key={document.id}
                 activeOpacity={0.8}
-                className="border-textPrimary/10 bg-secondary/20 flex-row items-center gap-3 rounded-2xl border p-3"
+                className="flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
                 onPress={() => openPropertyDocument(document)}
               >
-                <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
+                <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
                   <MaterialCommunityIcons
                     name="file-eye-outline"
                     color="#634CE4"
@@ -95,25 +86,25 @@ export function PropertyDocumentsField({
                 </View>
                 <View className="min-w-0 flex-1">
                   <Text
-                    className="font-ralewayExtraBold text-textPrimary text-xs"
+                    className="font-ralewayBold text-sm text-textPrimary"
                     numberOfLines={1}
                   >
                     {document.name}
                   </Text>
-                  <Text className="mt-0.5 text-xs text-slate-600">
+                  <Text className="mt-0.5 text-[11px] text-description">
                     {document.category} | {document.size}
                   </Text>
                 </View>
                 <MaterialCommunityIcons
                   name="open-in-new"
-                  color={document.url ? "#6F6D6D" : "#C8C8C8"}
+                  color={document.url ? "#634CE4" : "#BEE3DB"}
                   size={17}
                 />
               </TouchableOpacity>
             ))
           ) : (
-            <View className="border-textPrimary/15 bg-secondary/20 rounded-2xl border border-dashed px-3 py-4">
-              <Text className="text-center font-ralewayBold text-xs text-[#6F6D6D]">
+            <View className="rounded-2xl border border-dashed border-secondary/20 bg-white px-3 py-4">
+              <Text className="text-center font-ralewayBold text-xs text-description">
                 No documents attached yet.
               </Text>
             </View>
@@ -123,15 +114,15 @@ export function PropertyDocumentsField({
 
       {documents.length > 0 ? (
         <View className="gap-2">
-          <Text className="font-ralewayBold text-xs text-slate-600">
+          <Text className="font-ralewayBold text-xs text-description">
             New uploads
           </Text>
           {documents.map((document, index) => (
             <View
               key={`${document.name}-${document.size ?? index}`}
-              className="border-textPrimary/10 bg-secondary/20 flex-row items-center gap-3 rounded-2xl border p-3"
+              className="flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
             >
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-[#FFFFFF]">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
                 <MaterialCommunityIcons
                   name="file-document-outline"
                   color="#634CE4"
@@ -140,12 +131,12 @@ export function PropertyDocumentsField({
               </View>
               <View className="min-w-0 flex-1">
                 <Text
-                  className="font-ralewayExtraBold text-textPrimary text-xs"
+                  className="font-ralewayBold text-sm text-textPrimary"
                   numberOfLines={1}
                 >
                   {document.name}
                 </Text>
-                <Text className="mt-0.5 text-xs text-slate-600">
+                <Text className="mt-0.5 text-[11px] text-description">
                   {formatSelectedDocumentSize(document.size)}
                 </Text>
               </View>

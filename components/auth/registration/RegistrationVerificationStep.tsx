@@ -35,7 +35,7 @@ export function RegistrationVerificationStep({
 
   return (
     <View>
-      <View className="mb-7 flex-row items-center rounded-[14px] bg-secondary/20 px-4 py-3">
+      <View className="mb-7 flex-row items-center rounded-[14px] bg-secondary/10 px-4 py-3">
         {isRequestingCode ? (
           <ActivityIndicator color="#634CE4" />
         ) : (

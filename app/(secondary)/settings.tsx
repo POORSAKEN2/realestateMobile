@@ -15,6 +15,7 @@ import { Screen } from "../../components/ui/Screen";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { useAuth } from "../../hooks/useAuth";
+import { colors } from "../../constants/colors";
 
 type PasswordFieldProps = {
   label: string;
@@ -33,18 +34,22 @@ function PasswordField({
 
   return (
     <View className="gap-2">
-      <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wide text-slate-500">
+      <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
         {label}
       </Text>
-      <View className="h-14 flex-row items-center rounded-2xl border border-slate-200 bg-white px-4 shadow-sm shadow-slate-900/5">
-        <Ionicons name="lock-closed-outline" color="#64748B" size={18} />
+      <View className="h-14 flex-row items-center rounded-2xl border border-secondary/20 bg-white px-4 shadow-sm shadow-primary/10">
+        <Ionicons
+          name="lock-closed-outline"
+          color={colors.description}
+          size={18}
+        />
         <TextInput
-          className="ml-3 flex-1 text-base font-ralewayBold text-slate-950"
+          className="ml-3 flex-1 font-ralewayBold text-base text-textPrimary"
           autoCapitalize="none"
           autoCorrect={false}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor={colors.description}
           secureTextEntry={!isVisible}
           value={value}
         />
@@ -56,7 +61,7 @@ function PasswordField({
         >
           <Ionicons
             name={isVisible ? "eye-outline" : "eye-off-outline"}
-            color="#64748B"
+            color={colors.description}
             size={20}
           />
         </TouchableOpacity>
@@ -66,21 +71,19 @@ function PasswordField({
 }
 
 export default function SettingsScreen() {
-  const { hasCompletedOnboarding, setOnboardingCompleted, signOut } = useAuth();
+  const { hasCompletedOnboarding, setOnboardingCompleted } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const shouldShowOnboarding = !hasCompletedOnboarding;
 
-  function handleSignOut() {
-    signOut();
-    router.replace("/(auth)/login");
-  }
-
   function handleChangePassword() {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert("Missing details", "Complete all password fields to continue.");
+      Alert.alert(
+        "Missing details",
+        "Complete all password fields to continue.",
+      );
       return;
     }
 
@@ -128,7 +131,7 @@ export default function SettingsScreen() {
   }
 
   return (
-    <Screen className="bg-slate-50">
+    <Screen className="bg-surface">
       <View className="flex-1">
         <ScrollView
           className="-mx-6"
@@ -142,60 +145,74 @@ export default function SettingsScreen() {
             }
             title="Settings"
           />
-          <Text className="mt-2 text-base leading-6 text-slate-500">
+          <Text className="mt-2 text-base leading-6 text-description">
             Manage your password, account security, and secure access.
           </Text>
 
-          <View className="mt-8 rounded-[28px] border border-amber-200 bg-amber-50 p-5 shadow-sm shadow-amber-900/5">
+          <View className="mt-8 rounded-[28px] border border-secondary/20 bg-secondary/10 p-5 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between gap-4">
               <View className="min-w-0 flex-1">
                 <View className="flex-row items-center gap-2">
-                  <View className="h-9 w-9 items-center justify-center rounded-2xl bg-white">
-                    <Ionicons name="construct-outline" color="#D97706" size={19} />
+                  <View className="h-9 w-9 items-center justify-center rounded-2xl bg-secondary/10">
+                    <Ionicons
+                      name="construct-outline"
+                      color={colors.primary}
+                      size={19}
+                    />
                   </View>
-                  <Text className="text-lg font-ralewayExtraBold text-slate-950">
+                  <Text className="font-ralewayExtraBold text-lg text-textPrimary">
                     Onboarding Preview
                   </Text>
                 </View>
-                <Text className="mt-3 text-sm leading-6 text-slate-600">
+                <Text className="mt-3 text-sm leading-6 text-description">
                   Temporarily show onboarding on launch while this flow is being
                   worked on.
                 </Text>
               </View>
               <Switch
                 value={shouldShowOnboarding}
-                trackColor={{ false: "#CBD5E1", true: "#F59E0B" }}
-                thumbColor="#FFFFFF"
-                ios_backgroundColor="#CBD5E1"
+                trackColor={{ false: colors.description, true: colors.primary }}
+                thumbColor={colors.whitePrimary}
+                ios_backgroundColor={colors.description}
                 onValueChange={(enabled) => setOnboardingCompleted(!enabled)}
               />
             </View>
 
             <TouchableOpacity
               activeOpacity={0.82}
-              className="mt-4 h-12 flex-row items-center justify-center rounded-2xl bg-slate-950"
+              className="mt-4 h-12 flex-row items-center justify-center rounded-2xl bg-primary"
               onPress={() => {
                 setOnboardingCompleted(false);
                 router.replace("/(onboarding)/screen-1");
               }}
             >
-              <Ionicons name="play-outline" color="#FFFFFF" size={19} />
-              <Text className="ml-2 font-ralewayExtraBold text-white">Open Onboarding</Text>
+              <Ionicons
+                name="play-outline"
+                color={colors.whitePrimary}
+                size={19}
+              />
+              <Text className="ml-2 font-ralewayExtraBold text-white">
+                Open Onboarding
+              </Text>
             </TouchableOpacity>
           </View>
 
-          <View className="mt-5 rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/10">
+          <View className="mt-5 rounded-[28px] border border-secondary/20 bg-white p-5 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-lg font-ralewayExtraBold text-slate-950">
+                <Text className="font-ralewayExtraBold text-lg text-textPrimary">
                   Change Password
                 </Text>
-                <Text className="mt-1 text-sm text-slate-500">
+                <Text className="mt-1 text-sm text-description">
                   Keep your real estate account protected.
                 </Text>
               </View>
-              <View className="h-11 w-11 items-center justify-center rounded-2xl bg-blue-50">
-                <Ionicons name="shield-checkmark-outline" color="#2563EB" size={21} />
+              <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  color={colors.primary}
+                  size={21}
+                />
               </View>
             </View>
 
@@ -220,8 +237,8 @@ export default function SettingsScreen() {
               />
             </View>
 
-            <View className="mt-4 rounded-2xl bg-slate-50 px-4 py-3">
-              <Text className="text-sm leading-6 text-slate-600">
+            <View className="mt-4 rounded-2xl bg-secondary/10 px-4 py-3">
+              <Text className="text-sm leading-6 text-description">
                 Use at least 8 characters with both letters and numbers.
               </Text>
             </View>
@@ -229,31 +246,22 @@ export default function SettingsScreen() {
             <TouchableOpacity
               activeOpacity={0.82}
               className={`mt-5 h-14 flex-row items-center justify-center rounded-2xl ${
-                isSaving ? "bg-blue-400" : "bg-blue-600"
+                isSaving ? "bg-primary/60" : "bg-primary"
               }`}
               disabled={isSaving}
               onPress={handleChangePassword}
             >
               <Ionicons
                 name={isSaving ? "sync-outline" : "key-outline"}
-                color="#FFFFFF"
+                color={colors.whitePrimary}
                 size={20}
               />
-              <Text className="ml-2 text-base font-ralewayExtraBold text-white">
+              <Text className="ml-2 font-ralewayExtraBold text-base text-white">
                 {isSaving ? "Updating Password" : "Update Password"}
               </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
-
-        {/* <TouchableOpacity
-          activeOpacity={0.82}
-          onPress={handleSignOut}
-          className="mb-2 mt-4 flex-row items-center justify-center rounded-2xl bg-slate-950 px-5 py-4"
-        >
-          <Ionicons name="log-out-outline" color="#FFFFFF" size={20} />
-          <Text className="ml-2 font-ralewayExtraBold text-white">Sign out</Text>
-        </TouchableOpacity> */}
       </View>
     </Screen>
   );

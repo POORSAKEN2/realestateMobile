@@ -18,11 +18,11 @@ export function DocumentFileField({
 }) {
   return (
     <View className="gap-2">
-      <Text className="font-ralewaySemiBold text-sm text-slate-600">
+      <Text className="font-ralewaySemiBold text-sm text-description">
         File{!editingDocument ? <Text className="text-red-600"> *</Text> : null}
       </Text>
       <View
-        className={`bg-secondary/20 flex-row items-center gap-2 rounded-2xl border border-dashed p-2 ${error ? "border-red-400" : "border-primary/30"}`}
+        className={`flex-row items-center gap-2 rounded-2xl border border-dashed bg-secondary/10 p-2 ${error ? "border-red-400" : "border-primary/30"}`}
       >
         <TouchableOpacity
           accessibilityLabel={
@@ -35,7 +35,7 @@ export function DocumentFileField({
           className="min-h-14 min-w-0 flex-1 flex-row items-center gap-3 px-2"
           onPress={onPick}
         >
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white">
+          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
             <MaterialCommunityIcons
               name={
                 selectedFile ? "file-check-outline" : "cloud-upload-outline"
@@ -46,7 +46,7 @@ export function DocumentFileField({
           </View>
           <View className="min-w-0 flex-1">
             <Text
-              className="font-ralewayExtraBold text-textPrimary text-sm"
+              className="font-ralewayExtraBold text-sm text-textPrimary"
               numberOfLines={1}
             >
               {selectedFile
@@ -55,7 +55,7 @@ export function DocumentFileField({
                   ? "Choose replacement file"
                   : "Choose file"}
             </Text>
-            <Text className="mt-1 font-ralewayMedium text-xs text-slate-500">
+            <Text className="mt-1 font-ralewayMedium text-xs text-description">
               {selectedFile
                 ? formatFileSize(selectedFile.size)
                 : editingDocument
@@ -72,7 +72,7 @@ export function DocumentFileField({
             className="h-11 w-11 items-center justify-center rounded-full bg-white"
             onPress={onClear}
           >
-            <MaterialCommunityIcons name="close" color="#64748B" size={19} />
+            <MaterialCommunityIcons name="close" color="#6F6D6D" size={19} />
           </TouchableOpacity>
         ) : null}
       </View>

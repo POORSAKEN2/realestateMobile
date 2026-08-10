@@ -35,14 +35,14 @@ export function DocumentsToolbar({
 }) {
   return (
     <View className="gap-4">
-      <View className="min-h-14 flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4">
-        <MaterialCommunityIcons name="magnify" color="#64748B" size={22} />
+      <View className="min-h-14 flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white px-4">
+        <MaterialCommunityIcons name="magnify" color="#634CE4" size={22} />
         <TextInput
           accessibilityLabel="Search documents, properties, or tenants"
           className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-textPrimary"
           onChangeText={onChangeSearch}
           placeholder="Search documents, properties, tenants"
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor="#6F6D6D"
           returnKeyType="search"
           value={searchQuery}
         />
@@ -55,7 +55,7 @@ export function DocumentsToolbar({
             hitSlop={4}
             onPress={() => onChangeSearch("")}
           >
-            <MaterialCommunityIcons name="close" color="#64748B" size={20} />
+            <MaterialCommunityIcons name="close" color="#6F6D6D" size={20} />
           </TouchableOpacity>
         ) : null}
       </View>
@@ -80,14 +80,14 @@ export function DocumentsToolbar({
                   activeOpacity={0.82}
                   className={`min-h-11 justify-center rounded-2xl border px-4 ${
                     isSelected
-                      ? "border-slate-950 bg-slate-950"
-                      : "border-slate-200 bg-white"
+                      ? "border-primary bg-primary"
+                      : "border-secondary/20 bg-white"
                   }`}
                   onPress={() => onChangeCategory(option)}
                 >
                   <Text
                     className={`font-ralewayBold text-xs ${
-                      isSelected ? "text-white" : "text-slate-700"
+                      isSelected ? "text-white" : "text-textPrimary"
                     }`}
                   >
                     {option}
@@ -106,12 +106,12 @@ export function DocumentsToolbar({
           }
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="relative h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white"
+          className="relative h-11 w-11 items-center justify-center rounded-2xl border border-secondary/20 bg-secondary/10"
           onPress={onOpenFilters}
         >
           <MaterialCommunityIcons
             name="tune-variant"
-            color="#334155"
+            color="#634CE4"
             size={20}
           />
           {activeFilterCount ? (
@@ -127,7 +127,7 @@ export function DocumentsToolbar({
       <View className="flex-row items-center justify-between">
         <Text
           accessibilityLiveRegion="polite"
-          className="font-ralewaySemiBold text-sm text-slate-500"
+          className="font-ralewaySemiBold text-sm text-description"
         >
           {resultCount} {resultCount === 1 ? "document" : "documents"}
         </Text>
@@ -138,12 +138,12 @@ export function DocumentsToolbar({
           className="min-h-11 flex-row items-center gap-1 rounded-xl px-2"
           onPress={onOpenSort}
         >
-          <Text className="font-ralewayBold text-sm text-slate-800">
+          <Text className="font-ralewayBold text-sm text-textPrimary">
             {sortLabel}
           </Text>
           <MaterialCommunityIcons
             name="chevron-down"
-            color="#475569"
+            color="#634CE4"
             size={20}
           />
         </TouchableOpacity>

@@ -55,13 +55,13 @@ export function BookingGuestFields({
         accessibilityRole="button"
         className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 py-3 ${
           isAddingGuest
-            ? "border-primary/30 bg-secondary/20"
+            ? "border-primary/30 bg-secondary/10"
             : "border-slate-200 bg-slate-50"
         }`}
         onPress={onToggleAddingGuest}
       >
         <View className="min-w-0 flex-1 flex-row items-center gap-3">
-          <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/20">
+          <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/10">
             <MaterialCommunityIcons
               name={
                 isAddingGuest ? "account-check-outline" : "account-plus-outline"

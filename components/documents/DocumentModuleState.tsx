@@ -21,10 +21,10 @@ export function DocumentModuleState({
       <View
         accessibilityLabel="Loading documents"
         accessibilityRole="progressbar"
-        className="h-52 items-center justify-center rounded-[24px] border border-slate-200 bg-white"
+        className="h-52 items-center justify-center rounded-[24px] border border-secondary/20 bg-white"
       >
         <ActivityIndicator color="#634CE4" />
-        <Text className="mt-3 font-ralewaySemiBold text-sm text-slate-500">
+        <Text className="mt-3 font-ralewaySemiBold text-sm text-description">
           Loading documents
         </Text>
       </View>
@@ -80,14 +80,14 @@ function StateCard({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-[24px] border border-dashed border-slate-300 bg-white p-8">
-      <View className="bg-secondary/20 h-14 w-14 items-center justify-center rounded-2xl">
+    <View className="items-center rounded-[24px] border border-dashed border-secondary/30 bg-white p-8">
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10">
         <MaterialCommunityIcons name={icon} color="#634CE4" size={28} />
       </View>
-      <Text className="font-ralewayExtraBold text-textPrimary mt-4 text-center text-lg">
+      <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-textPrimary">
         {title}
       </Text>
-      <Text className="mt-2 text-center font-ralewayMedium text-sm leading-6 text-slate-500">
+      <Text className="mt-2 text-center font-ralewayMedium text-sm leading-6 text-description">
         {description}
       </Text>
       <TouchableOpacity

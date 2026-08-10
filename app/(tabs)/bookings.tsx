@@ -207,6 +207,7 @@ export default function BookingsScreen() {
 
       <BookingFormModal
         buildings={buildingOptions}
+        rooms={bookingForm.rooms}
         conflict={bookingForm.conflict}
         editingBooking={bookingForm.editingBooking}
         form={bookingForm.form}
@@ -214,18 +215,21 @@ export default function BookingsScreen() {
         guests={guests}
         isAddingGuest={bookingForm.isAddingGuest}
         isCancelling={bookingForm.isCancelling}
+        isLoadingRooms={bookingForm.isLoadingRooms}
         isSaving={bookingForm.isSaving}
         isVisible={bookingForm.isOpen}
         mode={bookingForm.mode}
         onCancelBooking={bookingForm.cancel}
         onClose={bookingForm.close}
         onSelectBuilding={bookingForm.selectBuilding}
+        onSelectRoom={bookingForm.selectRoom}
         onSelectGuest={bookingForm.selectGuest}
         onSubmit={bookingForm.submit}
         onToggleAddingGuest={bookingForm.toggleAddingGuest}
         onUpdateForm={bookingForm.updateForm}
         selectedBuilding={bookingForm.selectedBuilding}
         selectedGuestId={bookingForm.selectedGuestId}
+        selectedRoom={bookingForm.selectedRoom}
       />
 
       <ScreenSnackbar

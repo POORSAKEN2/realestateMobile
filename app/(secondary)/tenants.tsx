@@ -19,6 +19,7 @@ import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { formatCurrency } from "../../utils/formatters";
 import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { colors } from "../../constants/colors";
 
 export default function TenantsScreen() {
   const tenantSnackbar = useSnackbar();
@@ -56,7 +57,7 @@ export default function TenantsScreen() {
   });
 
   return (
-    <Screen className="bg-[#2563EB]/5">
+    <Screen className="bg-surface">
       <View className="flex-1 gap-6">
         {/* --- TOP HEADER: Title & Global Action --- */}
         <View className="px-1">
@@ -74,15 +75,15 @@ export default function TenantsScreen() {
         </View>
 
         {/* --- THE HERO: REVENUE SNAPSHOT --- */}
-        <View className="relative overflow-hidden rounded-[32px] bg-[#1d1d1f] p-6 shadow-xl shadow-slate-900/20">
+        <View className="relative overflow-hidden rounded-[32px] bg-textPrimary p-6 shadow-xl shadow-primary/20">
           {/* Decorative Background Accent */}
-          <View className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-[#2563EB]/10" />
+          <View className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-secondary/10" />
 
           <View className="flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
               <Ionicons name="wallet-outline" color="#FFFFFF" size={20} />
             </View>
-            <Text className="text-xs font-ralewayExtraBold uppercase tracking-widest text-white/60">
+            <Text className="font-ralewayExtraBold text-xs uppercase tracking-widest text-white/60">
               Linked Revenue
             </Text>
           </View>
@@ -101,50 +102,50 @@ export default function TenantsScreen() {
         {/* --- METRIC ROW: Clean & Borderless --- */}
         <View className="flex-row gap-4 px-1">
           {/* Total Tenants */}
-          <View className="flex-1 rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
             <View className="flex-row items-center gap-2">
-              <View className="h-8 w-8 items-center justify-center rounded-xl bg-slate-50">
-                <Ionicons name="people" color="#2563EB" size={16} />
+              <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
+                <Ionicons name="people" color={colors.primary} size={16} />
               </View>
-              <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
+              <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
                 Capacity
               </Text>
             </View>
             <View className="mt-3 flex-row items-end gap-1">
-              <Text className="font-ralewayBold text-2xl text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-2xl text-textPrimary">
                 {tenants.length}
               </Text>
-              <Text className="mb-1 text-xs font-ralewaySemiBold text-slate-400">
+              <Text className="mb-1 font-ralewaySemiBold text-xs text-description">
                 Profiles
               </Text>
             </View>
           </View>
 
           {/* Lease Linkage Health */}
-          <View className="flex-1 rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-xl bg-emerald-50">
-                  <Ionicons name="link" color="#10B981" size={16} />
+                <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
+                  <Ionicons name="link" color={colors.primary} size={16} />
                 </View>
-                <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
+                <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
                   Linkage
                 </Text>
               </View>
               {/* Simple Health Badge */}
-              <Text className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-ralewayExtraBold text-emerald-600">
+              <Text className="rounded-md bg-accent px-1.5 py-0.5 font-ralewayExtraBold text-[10px] text-textPrimary">
                 {Math.round(linkedTenantPercentage)}%
               </Text>
             </View>
 
             <View className="mt-3">
-              <Text className="font-ralewayBold text-2xl text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-2xl text-textPrimary">
                 {linkedTenantCount}
               </Text>
               {/* Mini Progress Bar for Linkage Health */}
-              <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/10">
                 <View
-                  className="h-full bg-emerald-500"
+                  className="h-full bg-primary"
                   style={{
                     width: `${linkedTenantPercentage}%`,
                   }}
@@ -154,23 +155,23 @@ export default function TenantsScreen() {
           </View>
         </View>
 
-        <View className="rounded-[22px] border border-[#1d1d1f]/10 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
+        <View className="rounded-[22px] border border-textPrimary/10 bg-white px-3 py-3 shadow-xl shadow-primary/10">
           <View className="flex-row items-center gap-3">
-            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-              <Feather name="search" size={20} color="#2563EB" />
+            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
+              <Feather name="search" size={20} color={colors.primary} />
             </View>
 
             <View className="min-w-0 flex-1">
-              <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-[#1d1d1f]">
+              <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-textPrimary">
                 Find tenant
               </Text>
 
               <TextInput
                 accessibilityLabel="Search tenants"
                 autoCapitalize="none"
-                className="h-10 p-0 font-ralewaySemiBold text-sm text-zinc-950"
+                className="h-10 p-0 font-ralewaySemiBold text-sm text-textPrimary"
                 placeholder="Name, email, phone, or unit"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.description}
                 returnKeyType="search"
                 value={searchQuery}
                 onChangeText={setSearchQuery}

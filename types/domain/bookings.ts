@@ -3,6 +3,7 @@ export type TransientBookingStatus = "Booked" | "Cancelled";
 export type TransientBooking = {
   id: string;
   propertyId: string;
+  roomId: string;
   roomNumber: string;
   guestName: string;
   guestEmail: string;

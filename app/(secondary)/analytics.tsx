@@ -19,13 +19,12 @@ import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
 import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
+import { colors } from "../../constants/colors";
 
 type MetricCard = {
   label: string;
   value: string;
   icon: keyof typeof Feather.glyphMap;
-  toneColor: string;
-  iconColor: string;
 };
 
 type DistributionSlice = {
@@ -35,12 +34,11 @@ type DistributionSlice = {
 };
 
 const distributionColors = [
-  "#2563EB",
-  "#0F766E",
-  "#F59E0B",
-  "#E11D48",
-  "#7C3AED",
-  "#52525B",
+  colors.primary,
+  colors.secondary,
+  colors.accent,
+  colors.text,
+  colors.description,
 ];
 
 const formatAssetType = (type?: Property["type"]) => type ?? "Uncategorized";
@@ -91,20 +89,22 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
       : "";
 
   return (
-    <View className="mt-4 rounded-[28px] border border-slate-100 bg-white p-4 shadow-sm shadow-slate-900/10">
+    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between">
         <View>
-          <Text className="font-ralewayBold text-base text-zinc-950">
+          <Text className="font-ralewayBold text-base text-textPrimary">
             Portfolio Performance
           </Text>
-          <Text className="mt-1 text-xs text-zinc-500">Total value trend</Text>
+          <Text className="mt-1 text-xs text-description">
+            Total value trend
+          </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-blue-50">
-          <Feather name="activity" size={18} color="#2563EB" />
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
+          <Feather name="activity" size={18} color={colors.primary} />
         </View>
       </View>
 
-      <View className="mt-4 items-center overflow-hidden rounded-3xl bg-slate-50">
+      <View className="mt-4 items-center overflow-hidden rounded-3xl bg-secondary/10">
         {sortedHistory.length > 0 ? (
           <>
             <Svg
@@ -120,15 +120,19 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
                   x2="0"
                   y2="1"
                 >
-                  <Stop offset="0" stopColor="#2563EB" stopOpacity="0.24" />
-                  <Stop offset="1" stopColor="#2563EB" stopOpacity="0" />
+                  <Stop
+                    offset="0"
+                    stopColor={colors.primary}
+                    stopOpacity="0.24"
+                  />
+                  <Stop offset="1" stopColor={colors.primary} stopOpacity="0" />
                 </LinearGradient>
               </Defs>
               <Path d={areaPath} fill="url(#performanceFill)" />
               <Polyline
                 points={linePoints}
                 fill="none"
-                stroke="#2563EB"
+                stroke={colors.primary}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={4}
@@ -139,8 +143,8 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
                   cx={point.x}
                   cy={point.y}
                   r={5}
-                  fill="#FFFFFF"
-                  stroke="#2563EB"
+                  fill={colors.whitePrimary}
+                  stroke={colors.primary}
                   strokeWidth={3}
                 />
               ))}
@@ -149,7 +153,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
               {sortedHistory.map((snapshot) => (
                 <Text
                   key={snapshot.id}
-                  className="text-[10px] font-ralewaySemiBold text-slate-400"
+                  className="font-ralewaySemiBold text-[10px] text-description"
                 >
                   {formatSnapshotLabel(snapshot)}
                 </Text>
@@ -158,7 +162,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
           </>
         ) : (
           <View className="h-48 items-center justify-center">
-            <Text className="font-ralewaySemiBold text-xs text-zinc-400">
+            <Text className="font-ralewaySemiBold text-xs text-description">
               No performance history yet
             </Text>
           </View>
@@ -177,21 +181,21 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
   let cumulativePercent = 0;
 
   return (
-    <View className="mt-4 rounded-[28px] border border-slate-100 bg-white p-4 shadow-sm shadow-slate-900/10">
+    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between">
         <View className="min-w-0 flex-1 pr-4">
-          <Text className="font-ralewayBold text-base uppercase text-zinc-950">
+          <Text className="font-ralewayBold text-base uppercase text-textPrimary">
             Portfolio Distribution
           </Text>
-          <Text className="mt-1 text-xs text-zinc-500">
+          <Text className="mt-1 text-xs text-description">
             Allocation by asset category
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-teal-50">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
           <MaterialCommunityIcons
             name="chart-donut"
             size={19}
-            color="#0F766E"
+            color={colors.primary}
           />
         </View>
       </View>
@@ -205,7 +209,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
                 cy={size / 2}
                 r={radius}
                 fill="none"
-                stroke="#E5E7EB"
+                stroke={colors.surface}
                 strokeWidth={strokeWidth}
               />
               {slices.map((slice) => {
@@ -233,18 +237,18 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
               })}
             </Svg>
           ) : (
-            <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-slate-50">
-              <Text className="font-ralewaySemiBold text-xs text-slate-400">
+            <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-secondary/10">
+              <Text className="font-ralewaySemiBold text-xs text-description">
                 No assets
               </Text>
             </View>
           )}
           {totalValue > 0 && (
             <View className="absolute items-center">
-              <Text className="font-ralewayBold text-lg text-zinc-950">
+              <Text className="font-ralewayBold text-lg text-textPrimary">
                 {slices.length}
               </Text>
-              <Text className="text-[10px] uppercase text-zinc-400">
+              <Text className="text-[10px] uppercase text-description">
                 Categories
               </Text>
             </View>
@@ -266,24 +270,24 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
                         style={{ backgroundColor: slice.color }}
                       />
                       <Text
-                        className="min-w-0 flex-1 font-ralewaySemiBold text-xs text-zinc-700"
+                        className="min-w-0 flex-1 font-ralewaySemiBold text-xs text-textPrimary"
                         numberOfLines={1}
                       >
                         {slice.label}
                       </Text>
                     </View>
-                    <Text className="font-ralewayBold text-xs text-zinc-950">
+                    <Text className="font-ralewayBold text-xs text-textPrimary">
                       {percent.toFixed(0)}%
                     </Text>
                   </View>
-                  <Text className="mt-0.5 pl-4 text-[10px] text-zinc-400">
+                  <Text className="mt-0.5 pl-4 text-[10px] text-description">
                     {formatPesoValue(slice.value)}
                   </Text>
                 </View>
               );
             })
           ) : (
-            <Text className="font-ralewaySemiBold text-xs text-zinc-400">
+            <Text className="font-ralewaySemiBold text-xs text-description">
               Add properties to see allocation.
             </Text>
           )}
@@ -306,8 +310,6 @@ export default function AnalyticsScreen() {
         label: "Total Asset Value",
         value: isLoadingStats ? "..." : formatPesoValue(stats?.total_value),
         icon: "briefcase",
-        toneColor: "#EFF6FF",
-        iconColor: "#2563EB",
       },
       {
         label: "Average Yield",
@@ -315,15 +317,11 @@ export default function AnalyticsScreen() {
           ? "..."
           : `${Number(stats?.avg_yield ?? 0).toFixed(1)}%`,
         icon: "percent",
-        toneColor: "#ECFDF5",
-        iconColor: "#059669",
       },
       {
         label: "Total Arrears",
         value: isLoadingStats ? "..." : formatPesoValue(stats?.total_arrears),
         icon: "clock",
-        toneColor: "#FFFBEB",
-        iconColor: "#D97706",
       },
       {
         label: "Net Operating Income",
@@ -331,8 +329,6 @@ export default function AnalyticsScreen() {
           ? "..."
           : formatPesoValue(stats?.net_operating_income),
         icon: "trending-up",
-        toneColor: "#F0FDFA",
-        iconColor: "#0F766E",
       },
     ],
     [isLoadingStats, stats],
@@ -360,15 +356,15 @@ export default function AnalyticsScreen() {
   }, [properties]);
 
   return (
-    <Screen className="bg-[#F8FAFC]">
+    <Screen className="bg-surface">
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
       >
         <ModuleHeader
           action={
-            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary shadow-md shadow-primary/20">
-              <Feather name="bar-chart-2" size={22} color="#FFFFFF" />
+            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 shadow-md shadow-primary/20">
+              <Feather name="bar-chart-2" size={22} color={colors.primary} />
             </View>
           }
           eyebrow="Portfolio Intelligence"
@@ -384,21 +380,18 @@ export default function AnalyticsScreen() {
         <View className="mt-6 flex-row flex-wrap">
           {metricCards.map((card) => (
             <View key={card.label} className="w-1/2 p-1.5">
-              <View className="min-h-[132px] rounded-[24px] border border-slate-100 bg-white p-4 shadow-sm shadow-slate-900/10">
-                <View
-                  className="h-10 w-10 items-center justify-center rounded-2xl"
-                  style={{ backgroundColor: card.toneColor }}
-                >
-                  <Feather name={card.icon} size={18} color={card.iconColor} />
+              <View className="min-h-[132px] rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
+                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
+                  <Feather name={card.icon} size={18} color={colors.primary} />
                 </View>
                 <Text
-                  className="mt-4 font-ralewayBold text-lg text-zinc-950"
+                  className="mt-4 font-ralewayBold text-lg text-textPrimary"
                   numberOfLines={1}
                   adjustsFontSizeToFit
                 >
                   {card.value}
                 </Text>
-                <Text className="mt-1 text-[11px] font-ralewaySemiBold uppercase leading-4 text-zinc-400">
+                <Text className="mt-1 font-ralewaySemiBold text-[11px] uppercase leading-4 text-description">
                   {card.label}
                 </Text>
               </View>

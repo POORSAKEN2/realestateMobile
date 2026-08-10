@@ -15,10 +15,10 @@ export function BookingCalendarLoading() {
 export function BookingCalendarEmpty() {
   return (
     <View className="items-center rounded-[24px] border border-dashed border-slate-300 bg-white p-8">
-      <View className="bg-secondary/20 h-14 w-14 items-center justify-center rounded-2xl">
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10">
         <Ionicons name="calendar-outline" color="#634CE4" size={28} />
       </View>
-      <Text className="text-textPrimary mt-4 text-center font-ralewayBold text-base">
+      <Text className="mt-4 text-center font-ralewayBold text-base text-textPrimary">
         No bookable buildings yet
       </Text>
       <Text className="mt-1 text-center text-sm leading-5 text-slate-500">
