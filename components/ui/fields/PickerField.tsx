@@ -59,7 +59,7 @@ export function PickerField({
         accessibilityRole="button"
         className={`h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
           isFilledVariant
-            ? "bg-surface border-slate-200"
+            ? "border-slate-200 bg-surface"
             : "border-textPrimary/10 bg-[#FFFFFF] shadow-sm"
         }`}
         onPress={onPress}
@@ -93,9 +93,9 @@ export function PickerModalShell({
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent visible>
       <View className="flex-1 justify-center bg-black/40 px-5">
-        <View className="border-textPrimary/10 rounded-3xl border bg-[#FFFFFF] p-5 shadow-xl">
+        <View className="rounded-3xl border border-textPrimary/10 bg-[#FFFFFF] p-5 shadow-xl">
           <View className="mb-2 flex-row items-center justify-between">
-            <Text className="font-ralewayExtraBold text-textPrimary text-sm">
+            <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               {title}
             </Text>
             <View className="flex-row items-center gap-2">
@@ -114,7 +114,7 @@ export function PickerModalShell({
                 accessibilityLabel={`Confirm ${title}`}
                 accessibilityRole="button"
                 activeOpacity={0.8}
-                className="rounded-full bg-secondary/20 px-3 py-1.5"
+                className="rounded-full bg-secondary/10 px-3 py-1.5"
                 onPress={onConfirm}
               >
                 <Text className="font-ralewayExtraBold text-xs text-primary">

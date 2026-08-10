@@ -27,6 +27,7 @@ import {
 import { formatCurrency } from "../../utils/formatters";
 import { useLeaseManagement } from "../../hooks/leases/useLeaseManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { colors } from "../../constants/colors";
 
 type Option = {
   label: string;
@@ -85,7 +86,7 @@ export default function LeasesScreen() {
   });
 
   return (
-    <Screen className="bg-[#2563EB]/5">
+    <Screen className="bg-surface">
       <View className="flex-1 gap-5">
         {/* --- TOP HEADER: Title & Primary Action --- */}
         <View className="px-1">
@@ -103,15 +104,15 @@ export default function LeasesScreen() {
         </View>
 
         {/* --- THE HERO: REVENUE SNAPSHOT --- */}
-        <View className="relative overflow-hidden rounded-[32px] bg-[#1d1d1f] p-6 shadow-xl shadow-slate-900/20">
+        <View className="relative overflow-hidden rounded-[32px] bg-textPrimary p-6 shadow-xl shadow-primary/20">
           {/* Decorative Background Accent */}
-          <View className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-white/5" />
+          <View className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-secondary/10" />
 
           <View className="flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
               <Ionicons name="cash-outline" color="#FFFFFF" size={20} />
             </View>
-            <Text className="text-xs font-ralewayExtraBold uppercase tracking-widest text-white/60">
+            <Text className="font-ralewayExtraBold text-xs uppercase tracking-widest text-white/60">
               Contracted Revenue
             </Text>
           </View>
@@ -129,50 +130,58 @@ export default function LeasesScreen() {
         {/* --- METRIC GRID: Status & Volume --- */}
         <View className="flex-row gap-4 px-1">
           {/* Total Leases */}
-          <View className="flex-1 rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
             <View className="flex-row items-center gap-2">
-              <View className="h-8 w-8 items-center justify-center rounded-xl bg-slate-50">
-                <Ionicons name="document-text" color="#2563EB" size={16} />
+              <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
+                <Ionicons
+                  name="document-text"
+                  color={colors.primary}
+                  size={16}
+                />
               </View>
-              <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
+              <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
                 Total
               </Text>
             </View>
             <View className="mt-3 flex-row items-end gap-1">
-              <Text className="font-ralewayBold text-2xl text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-2xl text-textPrimary">
                 {leases.length}
               </Text>
-              <Text className="mb-1 text-xs font-ralewaySemiBold text-slate-400">
+              <Text className="mb-1 font-ralewaySemiBold text-xs text-description">
                 Files
               </Text>
             </View>
           </View>
 
           {/* Active Health */}
-          <View className="flex-1 rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-xl bg-blue-50">
-                  <Ionicons name="checkmark-circle" color="#2563EB" size={16} />
+                <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
+                  <Ionicons
+                    name="checkmark-circle"
+                    color={colors.primary}
+                    size={16}
+                  />
                 </View>
-                <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
+                <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
                   Active
                 </Text>
               </View>
               {/* Simple Health % */}
-              <Text className="rounded-md bg-blue-50 px-1.5 py-0.5 text-[10px] font-ralewayExtraBold text-blue-600">
+              <Text className="rounded-md bg-accent px-1.5 py-0.5 font-ralewayExtraBold text-[10px] text-textPrimary">
                 {Math.round(activeLeasePercentage)}%
               </Text>
             </View>
 
             <View className="mt-3">
-              <Text className="font-ralewayBold text-2xl text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-2xl text-textPrimary">
                 {activeLeaseCount}
               </Text>
               {/* Visual Progress toward 100% active capacity */}
-              <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/10">
                 <View
-                  className="h-full bg-blue-500"
+                  className="h-full bg-primary"
                   style={{ width: `${activeLeasePercentage}%` }}
                 />
               </View>
@@ -180,22 +189,22 @@ export default function LeasesScreen() {
           </View>
         </View>
 
-        <View className="rounded-[22px] border border-[#1d1d1f]/10 bg-white px-3 py-3 shadow-xl shadow-slate-900/10">
+        <View className="rounded-[22px] border border-textPrimary/10 bg-white px-3 py-3 shadow-xl shadow-primary/10">
           <View className="flex-row items-center gap-3">
-            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#2563EB]/10">
-              <Feather name="search" size={20} color="#2563EB" />
+            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
+              <Feather name="search" size={20} color={colors.primary} />
             </View>
 
             <View className="min-w-0 flex-1">
-              <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-[#1d1d1f]">
+              <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-textPrimary">
                 Find lease
               </Text>
 
               <TextInput
                 accessibilityLabel="Search leases"
-                className="h-10 p-0 font-ralewaySemiBold text-sm text-zinc-950"
+                className="h-10 p-0 font-ralewaySemiBold text-sm text-textPrimary"
                 placeholder="Tenant, unit, property, or lease"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.description}
                 returnKeyType="search"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
@@ -310,11 +319,11 @@ export default function LeasesScreen() {
           </View>
 
           {form.startDate && Number(form.durationMonths) >= 1 ? (
-            <View className="flex-row items-center justify-between rounded-2xl border border-[#2563EB]/15 bg-[#2563EB]/5 px-4 py-3.5">
-              <Text className="text-xs font-ralewayExtraBold uppercase tracking-wider text-[#2563EB]">
+            <View className="flex-row items-center justify-between rounded-2xl border border-secondary/20 bg-secondary/10 px-4 py-3.5">
+              <Text className="font-ralewayExtraBold text-xs uppercase tracking-wider text-primary">
                 Calculated End Date
               </Text>
-              <Text className="font-ralewayBold text-sm text-[#1d1d1f]">
+              <Text className="font-ralewayBold text-sm text-textPrimary">
                 {formatLeaseDateLabel(
                   calculateLeaseEndDate(
                     form.startDate,

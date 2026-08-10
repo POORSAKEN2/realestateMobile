@@ -102,7 +102,7 @@ export function RegistrationStepLayout({
               className={`mt-6 flex-row rounded-[12px] border px-4 py-3 ${
                 feedback.tone === "error"
                   ? "border-rose-200 bg-rose-50"
-                  : "border-secondary bg-secondary/20"
+                  : "border-secondary bg-secondary/10"
               }`}
             >
               <Feather

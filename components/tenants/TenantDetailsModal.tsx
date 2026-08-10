@@ -24,21 +24,21 @@ export function TenantDetailsModal({
       <View className="rounded-t-[32px] bg-white p-6">
         <View className="flex-row items-start justify-between gap-4">
           <View className="flex-1">
-            <Text className="font-ralewayExtraBold text-textPrimary text-2xl">
+            <Text className="font-ralewayExtraBold text-2xl text-textPrimary">
               {tenant?.name}
             </Text>
-            <Text className="mt-1 text-sm text-[#6F6D6D]">
+            <Text className="mt-1 text-sm text-description">
               {tenant?.contactEmail || "No email on file"}
             </Text>
-            <Text className="mt-1 text-sm text-[#6F6D6D]">
+            <Text className="mt-1 text-sm text-description">
               {tenant?.phone || "No phone on file"}
             </Text>
             {linkedLeaseCount !== undefined ? (
-              <View className="bg-secondary/20 mt-5 rounded-2xl p-4">
-                <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-[#6F6D6D]">
+              <View className="mt-5 rounded-2xl bg-secondary/10 p-4">
+                <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
                   Active Records
                 </Text>
-                <Text className="font-ralewayExtraBold text-textPrimary mt-1 text-base">
+                <Text className="mt-1 font-ralewayExtraBold text-base text-textPrimary">
                   {linkedLeaseCount} linked leases
                 </Text>
               </View>
@@ -46,7 +46,7 @@ export function TenantDetailsModal({
           </View>
           <TouchableOpacity
             accessibilityLabel="Close tenant details"
-            className="bg-textPrimary/5 h-10 w-10 items-center justify-center rounded-full"
+            className="h-10 w-10 items-center justify-center rounded-full bg-textPrimary/5"
             onPress={onClose}
           >
             <Ionicons name="close" color="#1E1F45" size={20} />

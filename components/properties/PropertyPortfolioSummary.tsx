@@ -6,7 +6,9 @@ import { formatPeso } from "../../utils/properties/propertyForm";
 function SummaryMetric({ label, value }: { label: string; value: string }) {
   return (
     <View className="min-w-0 flex-1">
-      <Text className="text-xs font-ralewaySemiBold text-white/70">{label}</Text>
+      <Text className="font-ralewaySemiBold text-xs text-white/70">
+        {label}
+      </Text>
       <Text
         className="mt-1 font-ralewayBold text-base text-white"
         numberOfLines={1}
@@ -39,12 +41,12 @@ export function PropertyPortfolioSummary({
         : formatPeso(portfolioValue);
 
   return (
-    <View className="overflow-hidden rounded-3xl bg-textPrimary p-5 shadow-lg shadow-slate-900/15">
-      <View className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-white/5" />
+    <View className="overflow-hidden rounded-3xl bg-secondary p-5 shadow-lg shadow-secondary/20">
+      <View className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-primary/40" />
 
       <View className="flex-row items-start justify-between gap-4">
         <View className="min-w-0 flex-1">
-          <Text className="text-xs font-ralewaySemiBold text-white/70">
+          <Text className="font-ralewaySemiBold text-xs text-white/70">
             Total portfolio value
           </Text>
           <Text
@@ -55,10 +57,10 @@ export function PropertyPortfolioSummary({
             {portfolioValueLabel}
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white/10">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
           <MaterialCommunityIcons
             name="chart-box-outline"
-            color="#BEE3DB"
+            color="#FFFFFF"
             size={21}
           />
         </View>

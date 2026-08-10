@@ -33,13 +33,13 @@ export function DocumentSortSheet({
               accessibilityState={{ checked: isSelected }}
               activeOpacity={0.8}
               className={`min-h-14 flex-row items-center rounded-2xl px-4 ${
-                isSelected ? "bg-secondary/20" : "bg-slate-50"
+                isSelected ? "bg-secondary/10" : "bg-surface"
               }`}
               onPress={() => onSelect(option.value)}
             >
               <Text
                 className={`min-w-0 flex-1 font-ralewayBold text-sm ${
-                  isSelected ? "text-primary" : "text-slate-700"
+                  isSelected ? "text-primary" : "text-textPrimary"
                 }`}
               >
                 {option.label}
@@ -134,7 +134,7 @@ export function DeleteDocumentSheet({
       title="Delete document?"
       visible={Boolean(document)}
     >
-      <Text className="font-ralewayMedium text-sm leading-6 text-slate-500">
+      <Text className="font-ralewayMedium text-sm leading-6 text-description">
         “{document?.name ?? "This document"}” will be permanently removed from
         your library. This action can’t be undone.
       </Text>
@@ -142,11 +142,11 @@ export function DeleteDocumentSheet({
         <TouchableOpacity
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-slate-100"
+          className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-secondary/10"
           disabled={isDeleting}
           onPress={onCancel}
         >
-          <Text className="font-ralewayExtraBold text-sm text-slate-700">
+          <Text className="font-ralewayExtraBold text-sm text-textPrimary">
             Cancel
           </Text>
         </TouchableOpacity>
@@ -186,7 +186,7 @@ function BottomSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title}`}
-      backdropClassName="bg-slate-950/45"
+      backdropClassName="bg-textPrimary/45"
       onClose={onClose}
       visible={visible}
     >
@@ -194,18 +194,18 @@ function BottomSheet({
         accessibilityViewIsModal
         className="rounded-t-[30px] bg-white px-5 pb-8 pt-3"
       >
-        <View className="mb-3 h-1 w-10 self-center rounded-full bg-slate-300" />
+        <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
         <View className="mb-5 flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
             <Text
               accessibilityRole="header"
-              className="font-ralewayExtraBold text-textPrimary text-xl"
+              className="font-ralewayExtraBold text-xl text-textPrimary"
             >
               {title}
             </Text>
             {subtitle ? (
               <Text
-                className="mt-1 font-ralewayMedium text-xs text-slate-500"
+                className="mt-1 font-ralewayMedium text-xs text-description"
                 numberOfLines={1}
               >
                 {subtitle}
@@ -216,10 +216,10 @@ function BottomSheet({
             accessibilityLabel="Close"
             accessibilityRole="button"
             activeOpacity={0.75}
-            className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+            className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
             onPress={onClose}
           >
-            <MaterialCommunityIcons name="close" color="#334155" size={21} />
+            <MaterialCommunityIcons name="close" color="#1E1F45" size={21} />
           </TouchableOpacity>
         </View>
         {children}

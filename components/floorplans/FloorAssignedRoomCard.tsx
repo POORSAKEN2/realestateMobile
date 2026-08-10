@@ -31,7 +31,7 @@ export function FloorAssignedRoomCard({ room }: { room: PropertyRoom }) {
   return (
     <View className="rounded-2xl border border-slate-200 bg-white p-4">
       <View className="flex-row items-center gap-3">
-        <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary/20">
+        <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary/10">
           <MaterialCommunityIcons name="door" color="#634CE4" size={20} />
         </View>
         <View className="min-w-0 flex-1">

@@ -20,25 +20,25 @@ export function SelectionField({
 }) {
   return (
     <View className="gap-2">
-      <Text className="font-ralewaySemiBold text-sm text-slate-600">
+      <Text className="font-ralewaySemiBold text-sm text-description">
         {label}
       </Text>
       <TouchableOpacity
         accessibilityLabel={`${label}, ${value}`}
         accessibilityRole="button"
         activeOpacity={0.8}
-        className="min-h-14 flex-row items-center rounded-2xl border border-slate-200 bg-slate-50 px-4"
+        className="min-h-14 flex-row items-center rounded-2xl border border-secondary/20 bg-secondary/10 px-4"
         onPress={onPress}
       >
         <Text
-          className="min-w-0 flex-1 font-ralewaySemiBold text-sm text-slate-800"
+          className="min-w-0 flex-1 font-ralewaySemiBold text-sm text-textPrimary"
           numberOfLines={1}
         >
           {value}
         </Text>
         <MaterialCommunityIcons
           name="chevron-right"
-          color="#64748B"
+          color="#634CE4"
           size={21}
         />
       </TouchableOpacity>
@@ -72,34 +72,34 @@ export function SearchableOptionSelector({
   );
 
   return (
-    <View className="bg-surface min-h-[500px]">
+    <View className="min-h-[500px] bg-surface">
       <View className="flex-row items-center gap-3 bg-white px-5 pb-5 pt-2">
         <TouchableOpacity
           accessibilityLabel={backAccessibilityLabel}
           accessibilityRole="button"
           activeOpacity={0.75}
-          className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+          className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
           onPress={onBack}
         >
-          <MaterialCommunityIcons name="arrow-left" color="#334155" size={21} />
+          <MaterialCommunityIcons name="arrow-left" color="#1E1F45" size={21} />
         </TouchableOpacity>
         <Text
           accessibilityRole="header"
-          className="text-textPrimary font-ralewayBold text-2xl tracking-tight"
+          className="font-ralewayBold text-2xl tracking-tight text-textPrimary"
         >
           {title}
         </Text>
       </View>
       <View className="px-5 pt-4">
-        <View className="min-h-14 flex-row items-center gap-3 rounded-2xl bg-slate-100 px-4">
-          <MaterialCommunityIcons name="magnify" color="#64748B" size={20} />
+        <View className="min-h-14 flex-row items-center gap-3 rounded-2xl bg-secondary/10 px-4">
+          <MaterialCommunityIcons name="magnify" color="#634CE4" size={20} />
           <TextInput
             accessibilityLabel={`Search ${title.toLowerCase()}`}
             autoFocus
-            className="text-textPrimary min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm"
+            className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-textPrimary"
             onChangeText={onChangeQuery}
             placeholder="Search"
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor="#6F6D6D"
             value={query}
           />
         </View>
@@ -123,7 +123,7 @@ export function SearchableOptionSelector({
           />
         ))}
         {visibleOptions.length === 0 ? (
-          <Text className="py-8 text-center font-ralewayMedium text-sm text-slate-500">
+          <Text className="py-8 text-center font-ralewayMedium text-sm text-description">
             No matches found
           </Text>
         ) : null}
@@ -148,14 +148,14 @@ function OptionRow({
       activeOpacity={0.8}
       className={`min-h-14 flex-row items-center rounded-2xl border px-4 ${
         isSelected
-          ? "border-secondary bg-secondary/20"
-          : "border-slate-200 bg-white"
+          ? "border-secondary bg-secondary/10"
+          : "border-secondary/20 bg-white"
       }`}
       onPress={onPress}
     >
       <Text
         className={`min-w-0 flex-1 font-ralewaySemiBold text-sm ${
-          isSelected ? "text-primary" : "text-slate-700"
+          isSelected ? "text-primary" : "text-textPrimary"
         }`}
         numberOfLines={1}
       >

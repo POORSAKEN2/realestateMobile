@@ -33,8 +33,8 @@ export function FormSection({
         <View
           className={
             isCard
-              ? "bg-secondary/20 h-12 w-12 items-center justify-center rounded-2xl"
-              : "bg-secondary/20 h-9 w-9 items-center justify-center rounded-xl"
+              ? "h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10"
+              : "h-9 w-9 items-center justify-center rounded-xl bg-secondary/10"
           }
         >
           <MaterialCommunityIcons
@@ -47,8 +47,8 @@ export function FormSection({
           <Text
             className={
               isCard
-                ? "text-textPrimary font-ralewayBold text-xl"
-                : "font-ralewayExtraBold text-textPrimary text-lg"
+                ? "font-ralewayBold text-xl text-textPrimary"
+                : "font-ralewayExtraBold text-lg text-textPrimary"
             }
           >
             {title}

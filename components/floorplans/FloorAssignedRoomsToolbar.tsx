@@ -41,7 +41,7 @@ export function FloorAssignedRoomsToolbar({
         </Text>
       </View>
       <ChoiceChips
-        activeClassName="border-primary bg-secondary/20"
+        activeClassName="border-primary bg-secondary/10"
         activeTextClassName="text-primary"
         className="mt-2 flex-row flex-wrap gap-2"
         onSelect={onChangeStatus}

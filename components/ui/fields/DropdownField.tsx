@@ -131,7 +131,7 @@ export function DropdownField<T extends string>({
                     activeOpacity={0.85}
                     className={`min-h-14 flex-row items-center justify-between rounded-lg border px-4 ${
                       isSelected
-                        ? "border-primary bg-secondary/20"
+                        ? "border-primary bg-secondary/10"
                         : "border-textPrimary/10 bg-[#FFFFFF]"
                     }`}
                     onPress={() => handleSelect(option.value)}

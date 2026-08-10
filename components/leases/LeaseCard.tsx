@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 import type { Lease, Lessee, Property } from "../../types";
 import { formatCurrency } from "../../utils/formatters";
+import { colors } from "../../constants/colors";
 
 export function LeaseCard({
   lease,
@@ -26,7 +27,7 @@ export function LeaseCard({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onOpenTenant}
-      className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm shadow-slate-300/30"
+      className="w-full overflow-hidden rounded-3xl border border-textPrimary/10 bg-white shadow-sm shadow-primary/10"
     >
       <View className="p-5">
         {/* --- HEADER: Identity, Status & Actions --- */}
@@ -45,19 +46,19 @@ export function LeaseCard({
               <View
                 className={`shrink-0 rounded-md px-2 py-0.5 ${
                   isActive
-                    ? "bg-emerald-50"
+                    ? "bg-accent"
                     : isExpired
                       ? "bg-rose-50"
-                      : "bg-slate-100"
+                      : "bg-secondary/10"
                 }`}
               >
                 <Text
-                  className={`text-[10px] font-ralewayExtraBold uppercase tracking-wider ${
+                  className={`font-ralewayExtraBold text-[10px] uppercase tracking-wider ${
                     isActive
-                      ? "text-emerald-600"
+                      ? "text-textPrimary"
                       : isExpired
                         ? "text-rose-600"
-                        : "text-slate-600"
+                        : "text-description"
                   }`}
                 >
                   {lease.status}
@@ -67,9 +68,13 @@ export function LeaseCard({
 
             {/* Grouped Property Details */}
             <View className="mt-1 flex-row items-center gap-1.5">
-              <Ionicons name="business-outline" size={14} color="#94A3B8" />
+              <Ionicons
+                name="business-outline"
+                size={14}
+                color={colors.description}
+              />
               <Text
-                className="min-w-0 flex-1 text-sm font-ralewaySemiBold text-slate-500"
+                className="min-w-0 flex-1 font-ralewaySemiBold text-sm text-description"
                 numberOfLines={1}
               >
                 {property?.title ?? "Unknown Property"}
@@ -79,13 +84,13 @@ export function LeaseCard({
           </View>
 
           {/* Quick Actions (Top Right to match Tenant Card) */}
-          <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-slate-100 bg-slate-50 p-1">
+          <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-secondary/20 bg-secondary/10 p-1">
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={onEdit}
-              className="rounded-full p-1.5 hover:bg-slate-200"
+              className="rounded-full p-1.5 hover:bg-secondary/10"
             >
-              <Ionicons name="pencil" size={16} color="#64748B" />
+              <Ionicons name="pencil" size={16} color={colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -98,15 +103,19 @@ export function LeaseCard({
         </View>
 
         {/* --- DIVIDER --- */}
-        <View className="my-4 h-[1px] w-full bg-slate-100" />
+        <View className="my-4 h-[1px] w-full bg-secondary/10" />
 
         {/* --- METRICS GRID: Rent & Terms Side-by-Side --- */}
         <View className="flex-row items-center justify-between gap-4">
           {/* Financials */}
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-1.5">
-              <Ionicons name="wallet-outline" color="#94A3B8" size={14} />
-              <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-500">
+              <Ionicons
+                name="wallet-outline"
+                color={colors.description}
+                size={14}
+              />
+              <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-description">
                 Monthly Rent
               </Text>
             </View>
@@ -120,18 +129,22 @@ export function LeaseCard({
           </View>
 
           {/* Vertical Separator */}
-          <View className="h-10 w-[1px] bg-slate-100" />
+          <View className="h-10 w-[1px] bg-secondary/10" />
 
           {/* Lease Term */}
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-1.5">
-              <Ionicons name="calendar-outline" color="#94A3B8" size={14} />
-              <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-500">
+              <Ionicons
+                name="calendar-outline"
+                color={colors.description}
+                size={14}
+              />
+              <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-description">
                 Lease Term
               </Text>
             </View>
             <Text
-              className="mt-1.5 text-sm font-ralewaySemiBold leading-5 text-textPrimary"
+              className="mt-1.5 font-ralewaySemiBold text-sm leading-5 text-textPrimary"
               numberOfLines={1}
             >
               {lease.startDate} to {lease.endDate}

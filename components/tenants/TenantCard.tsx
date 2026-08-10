@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 import type { Lessee } from "../../types";
 import { formatCurrency } from "../../utils/formatters";
+import { colors } from "../../constants/colors";
 
 export function TenantCard({
   tenant,
@@ -25,14 +26,14 @@ export function TenantCard({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onOpen}
-      className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm shadow-slate-300/30"
+      className="w-full overflow-hidden rounded-3xl border border-textPrimary/10 bg-white shadow-sm shadow-primary/10"
     >
       <View className="p-5">
         {/* --- HEADER: Identity & Actions --- */}
         <View className="flex-row items-start justify-between gap-3">
           {/* Avatar & Info */}
           <View className="min-w-0 flex-1 flex-row gap-3.5">
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-secondary/20">
+            <View className="h-12 w-12 items-center justify-center rounded-full bg-secondary/10">
               <Ionicons name="person" color="#634CE4" size={20} />
             </View>
 
@@ -45,8 +46,8 @@ export function TenantCard({
                   {tenant.name}
                 </Text>
                 {/* Subtle Inline Badge */}
-                <View className="rounded-md bg-slate-100 px-2 py-0.5">
-                  <Text className="text-[10px] font-ralewayExtraBold uppercase tracking-wider text-slate-600">
+                <View className="rounded-md bg-secondary/10 px-2 py-0.5">
+                  <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
                     {leaseCount} Lease{leaseCount === 1 ? "" : "s"}
                   </Text>
                 </View>
@@ -55,8 +56,8 @@ export function TenantCard({
               {/* Contact Info (Simplified layout) */}
               <View className="mt-1 flex-row items-center gap-3">
                 <View className="min-w-0 flex-1 flex-row items-center gap-1.5">
-                  <Ionicons name="mail" size={12} color="#94A3B8" />
-                  <Text className="text-sm text-slate-500" numberOfLines={1}>
+                  <Ionicons name="mail" size={12} color={colors.description} />
+                  <Text className="text-sm text-description" numberOfLines={1}>
                     {tenant.contactEmail || "No email"}
                   </Text>
                 </View>
@@ -65,13 +66,13 @@ export function TenantCard({
           </View>
 
           {/* Quick Actions (Moved to top right to declutter bottom) */}
-          <View className="flex-row items-center gap-1 rounded-full border border-slate-100 bg-slate-50 p-1">
+          <View className="flex-row items-center gap-1 rounded-full border border-secondary/20 bg-secondary/10 p-1">
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={onEdit}
-              className="rounded-full p-1.5 hover:bg-slate-200"
+              className="rounded-full p-1.5 hover:bg-secondary/10"
             >
-              <Ionicons name="pencil" size={16} color="#64748B" />
+              <Ionicons name="pencil" size={16} color={colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -84,15 +85,19 @@ export function TenantCard({
         </View>
 
         {/* --- DIVIDER --- */}
-        <View className="my-4 h-[1px] w-full bg-slate-100" />
+        <View className="my-4 h-[1px] w-full bg-secondary/10" />
 
         {/* --- METRICS GRID: Rent & Properties Side-by-Side --- */}
         <View className="flex-row items-center justify-between gap-4">
           {/* Financials */}
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-1.5">
-              <Ionicons name="wallet-outline" color="#94A3B8" size={14} />
-              <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-500">
+              <Ionicons
+                name="wallet-outline"
+                color={colors.description}
+                size={14}
+              />
+              <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-description">
                 Monthly Rent
               </Text>
             </View>
@@ -106,18 +111,22 @@ export function TenantCard({
           </View>
 
           {/* Vertical Separator */}
-          <View className="h-10 w-[1px] bg-slate-100" />
+          <View className="h-10 w-[1px] bg-secondary/10" />
 
           {/* Assets/Properties */}
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-1.5">
-              <Ionicons name="business-outline" color="#94A3B8" size={14} />
-              <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-500">
+              <Ionicons
+                name="business-outline"
+                color={colors.description}
+                size={14}
+              />
+              <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-description">
                 Properties
               </Text>
             </View>
             <Text
-              className="mt-1.5 text-sm font-ralewaySemiBold leading-5 text-textPrimary"
+              className="mt-1.5 font-ralewaySemiBold text-sm leading-5 text-textPrimary"
               numberOfLines={2}
             >
               {propertyNames.length > 0

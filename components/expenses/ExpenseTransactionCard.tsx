@@ -54,7 +54,7 @@ export function ExpenseTransactionCard({
         elevation: 2,
       }}
     >
-      <View className="mr-3 h-11 w-11 items-center justify-center rounded-[14px] bg-[#F1EEFF]">
+      <View className="mr-3 h-11 w-11 items-center justify-center rounded-[14px] bg-secondary/10 ">
         <MaterialCommunityIcons
           name={getExpenseIcon(expense.category)}
           color="#6547D9"

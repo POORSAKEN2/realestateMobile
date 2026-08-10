@@ -52,7 +52,7 @@ function PropertyAction({
       accessibilityRole="button"
       activeOpacity={0.8}
       className={`min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl px-3 ${
-        primary ? "bg-primary" : "bg-secondary/20"
+        primary ? "bg-secondary" : "bg-secondary/10"
       }`}
       onPress={(event) => {
         event.stopPropagation();
@@ -66,7 +66,7 @@ function PropertyAction({
       />
       <Text
         className={`font-ralewayExtraBold text-xs ${
-          primary ? "text-white" : "text-primary"
+          primary ? "text-white" : "text-secondary"
         }`}
       >
         {label}
@@ -110,7 +110,7 @@ export function PropertyCard({
       accessibilityLabel={`View overview for ${property.title}`}
       accessibilityRole="button"
       activeOpacity={0.9}
-      className="w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+      className="w-full overflow-hidden rounded-3xl border border-secondary/20 bg-white shadow-sm shadow-secondary/10"
       onPress={onOpenDetails}
     >
       <TouchableOpacity
@@ -225,11 +225,11 @@ export function PropertyCard({
           </View>
         </View>
 
-        <View className="mt-4 flex-row gap-3 rounded-2xl bg-slate-50 p-3.5">
+        <View className="mt-4 flex-row gap-3 rounded-2xl bg-secondary/5 p-3.5">
           <PropertyMetric label="Value" value={formatPeso(property.value)} />
-          <View className="w-px bg-slate-200" />
+          <View className="w-px bg-secondary/10" />
           <PropertyMetric label="ROI" value={`${property.roi.toFixed(1)}%`} />
-          <View className="w-px bg-slate-200" />
+          <View className="w-px bg-secondary/10" />
           <PropertyMetric label="Occupancy" value={`${occupancy}%`} />
         </View>
 
@@ -240,14 +240,14 @@ export function PropertyCard({
           className={`mt-4 flex-row items-center gap-3 rounded-2xl border p-3.5 ${
             floorManagerPolicy.floorSummaryProminence === "primary"
               ? "border-secondary/25 bg-secondary/10"
-              : "border-slate-200 bg-slate-50"
+              : "border-secondary/20 bg-white"
           }`}
           onPress={(event) => {
             event.stopPropagation();
             onOpenFloorPlans();
           }}
         >
-          <View className="h-11 w-11 items-center justify-center rounded-xl bg-white">
+          <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary/10">
             <MaterialCommunityIcons
               name="floor-plan"
               color={
@@ -262,7 +262,7 @@ export function PropertyCard({
             <Text
               className={`font-ralewayBold text-xs uppercase ${
                 floorManagerPolicy.floorSummaryProminence === "primary"
-                  ? "text-primary"
+                  ? "text-secondary"
                   : "text-slate-600"
               }`}
             >

@@ -62,7 +62,7 @@ export function EmptyFloorPlanState({
 
   return (
     <View className="flex-1 items-center justify-center px-8">
-      <View className="h-20 w-20 items-center justify-center rounded-[28px] bg-secondary/20">
+      <View className="h-20 w-20 items-center justify-center rounded-[28px] bg-secondary/10">
         <MaterialCommunityIcons name="layers-plus" color="#634CE4" size={36} />
       </View>
       <Text className="mt-5 text-center font-ralewayBold text-xl text-textPrimary">

@@ -80,7 +80,7 @@ export function DocumentFilterSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close document filters"
-      backdropClassName="bg-slate-950/45"
+      backdropClassName="bg-textPrimary/45"
       onClose={handleClose}
       visible={visible}
     >
@@ -89,7 +89,7 @@ export function DocumentFilterSheet({
         className="max-h-[90%] min-h-[520px] rounded-t-[30px] bg-white"
       >
         <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-slate-300" />
+          <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
         </View>
 
         {selectorMode ? (
@@ -116,7 +116,7 @@ export function DocumentFilterSheet({
           />
         ) : (
           <>
-            <View className="flex-row items-center justify-between border-b border-slate-100 px-5 pb-4">
+            <View className="flex-row items-center justify-between border-b border-secondary/20 px-5 pb-4">
               <Text
                 accessibilityRole="header"
                 className="font-ralewayExtraBold text-xl text-textPrimary"
@@ -127,12 +127,12 @@ export function DocumentFilterSheet({
                 accessibilityLabel="Close filters"
                 accessibilityRole="button"
                 activeOpacity={0.75}
-                className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+                className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
                 onPress={onClose}
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#334155"
+                  color="#1E1F45"
                   size={21}
                 />
               </TouchableOpacity>
@@ -154,7 +154,7 @@ export function DocumentFilterSheet({
               />
 
               <View className="gap-2">
-                <Text className="font-ralewayBold text-xs uppercase tracking-wide text-slate-500">
+                <Text className="font-ralewayBold text-xs uppercase tracking-wide text-description">
                   File type
                 </Text>
                 <View className="flex-row flex-wrap gap-2">
@@ -168,8 +168,8 @@ export function DocumentFilterSheet({
                         activeOpacity={0.8}
                         className={`min-h-11 justify-center rounded-2xl border px-4 ${
                           isSelected
-                            ? "border-slate-950 bg-slate-950"
-                            : "border-slate-200 bg-white"
+                            ? "border-primary bg-primary"
+                            : "border-secondary/20 bg-white"
                         }`}
                         onPress={() =>
                           setDraft((current) => ({ ...current, type }))
@@ -177,7 +177,7 @@ export function DocumentFilterSheet({
                       >
                         <Text
                           className={`font-ralewayBold text-xs ${
-                            isSelected ? "text-white" : "text-slate-600"
+                            isSelected ? "text-white" : "text-textPrimary"
                           }`}
                         >
                           {type === "All" ? "All types" : type}
@@ -189,16 +189,16 @@ export function DocumentFilterSheet({
               </View>
             </ScrollView>
 
-            <View className="flex-row gap-3 border-t border-slate-100 p-5 pb-8">
+            <View className="flex-row gap-3 border-t border-secondary/20 p-5 pb-8">
               <TouchableOpacity
                 accessibilityRole="button"
                 activeOpacity={0.82}
-                className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-slate-100"
+                className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-secondary/10"
                 onPress={() =>
                   setDraft({ propertyId: "", lesseeId: "", type: "All" })
                 }
               >
-                <Text className="font-ralewayExtraBold text-sm text-slate-700">
+                <Text className="font-ralewayExtraBold text-sm text-textPrimary">
                   Reset
                 </Text>
               </TouchableOpacity>

@@ -90,7 +90,7 @@ export function BookingFormModal({
       title={mode === "create" ? "Create a booking" : "Edit booking"}
       showCancelAction
     >
-      <View className="flex-row items-start gap-3 rounded-2xl border border-secondary bg-secondary/20 px-4 py-3.5">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-secondary bg-secondary/10 px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
           color="#634CE4"
@@ -162,7 +162,7 @@ export function BookingFormModal({
 
         {selectedBuilding ? (
           <View className="flex-row items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/20">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
               <MaterialCommunityIcons
                 name="door-open"
                 color="#634CE4"

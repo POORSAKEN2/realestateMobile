@@ -5,7 +5,7 @@ import type { Lessee, Property, PropertyDocument } from "../../types";
 import {
   formatDocumentDate,
   getCategoryPresentation,
-  getDocumentIcon,
+  getDocumentTypePresentation,
 } from "../../utils/documents/documentPresentation";
 
 export function DocumentCard({
@@ -22,6 +22,7 @@ export function DocumentCard({
   property?: Property;
 }) {
   const category = getCategoryPresentation(document.category);
+  const documentType = getDocumentTypePresentation(document.type);
   const metadata = [
     `Updated ${formatDocumentDate(document.date)}`,
     document.size,
@@ -30,7 +31,7 @@ export function DocumentCard({
     .join(" · ");
 
   return (
-    <View className="overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm shadow-slate-900/5">
+    <View className="overflow-hidden rounded-[24px] border border-textPrimary/10 bg-white shadow-sm shadow-primary/10">
       <View className="flex-row items-start gap-2 p-4">
         <TouchableOpacity
           accessibilityHint="Opens the document"
@@ -50,16 +51,16 @@ export function DocumentCard({
         >
           <View
             className="h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
-            style={{ backgroundColor: category.backgroundColor }}
+            style={{ backgroundColor: documentType.backgroundColor }}
           >
             <MaterialCommunityIcons
-              name={getDocumentIcon(document.type)}
-              color={category.color}
+              name={documentType.icon}
+              color={documentType.color}
               size={25}
             />
             <Text
               className="mt-0.5 font-ralewayExtraBold text-[9px]"
-              style={{ color: category.color }}
+              style={{ color: documentType.color }}
             >
               {document.type}
             </Text>
@@ -77,11 +78,11 @@ export function DocumentCard({
               <View className="mt-2 flex-row items-center gap-2">
                 <MaterialCommunityIcons
                   name="office-building-outline"
-                  color="#64748B"
+                  color="#6F6D6D"
                   size={16}
                 />
                 <Text
-                  className="min-w-0 flex-1 font-ralewayMedium text-xs text-slate-500"
+                  className="min-w-0 flex-1 font-ralewayMedium text-xs text-description"
                   numberOfLines={1}
                 >
                   {property.title}
@@ -93,11 +94,11 @@ export function DocumentCard({
               <View className="mt-1.5 flex-row items-center gap-2">
                 <MaterialCommunityIcons
                   name="account-outline"
-                  color="#64748B"
+                  color="#6F6D6D"
                   size={16}
                 />
                 <Text
-                  className="min-w-0 flex-1 font-ralewayMedium text-xs text-slate-500"
+                  className="min-w-0 flex-1 font-ralewayMedium text-xs text-description"
                   numberOfLines={1}
                 >
                   {lessee.name}
@@ -120,7 +121,7 @@ export function DocumentCard({
                   {category.label}
                 </Text>
               </View>
-              <Text className="font-ralewayMedium text-[11px] text-slate-500">
+              <Text className="font-ralewayMedium text-[11px] text-description">
                 {metadata}
               </Text>
             </View>
@@ -131,7 +132,7 @@ export function DocumentCard({
           accessibilityLabel={`More actions for ${document.name}`}
           accessibilityRole="button"
           activeOpacity={0.75}
-          className="h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white"
+          className="h-11 w-11 shrink-0 items-center justify-center rounded-full border border-secondary/20 bg-secondary/10"
           onPress={onOpenActions}
         >
           <MaterialCommunityIcons

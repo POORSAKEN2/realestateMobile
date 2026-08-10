@@ -40,11 +40,11 @@ export function PropertyListMessage({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-3xl border border-dashed border-slate-300 bg-white p-8">
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/20">
+    <View className="items-center rounded-3xl border border-dashed border-secondary/20 bg-white p-8">
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10">
         <MaterialCommunityIcons name={icon} color="#634CE4" size={28} />
       </View>
-      <Text className="mt-4 text-center text-lg font-ralewayExtraBold text-textPrimary">
+      <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-textPrimary">
         {title}
       </Text>
       <Text className="mt-1 text-center text-sm leading-5 text-slate-600">
@@ -53,10 +53,12 @@ export function PropertyListMessage({
       <TouchableOpacity
         accessibilityRole="button"
         activeOpacity={0.85}
-        className="mt-5 min-h-11 items-center justify-center rounded-2xl bg-primary px-5"
+        className="mt-5 min-h-11 items-center justify-center rounded-2xl bg-secondary px-5"
         onPress={onAction}
       >
-        <Text className="text-sm font-ralewayExtraBold text-white">{actionLabel}</Text>
+        <Text className="font-ralewayExtraBold text-sm text-white">
+          {actionLabel}
+        </Text>
       </TouchableOpacity>
     </View>
   );

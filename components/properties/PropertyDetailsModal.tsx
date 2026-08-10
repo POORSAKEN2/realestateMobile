@@ -136,7 +136,7 @@ export function PropertyDetailsModal({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close property details"
-      backdropClassName="bg-black/45"
+      backdropClassName="bg-textPrimary/45"
       onClose={onClose}
       statusBarTranslucent
       visible={Boolean(property)}
@@ -155,7 +155,7 @@ export function PropertyDetailsModal({
             className="h-10 items-center justify-center"
             {...swipeDownResponder.panHandlers}
           >
-            <View className="h-1.5 w-12 rounded-full bg-zinc-200" />
+            <View className="h-1.5 w-12 rounded-full bg-secondary/30" />
           </View>
           <ScrollView
             bounces={false}
@@ -170,7 +170,7 @@ export function PropertyDetailsModal({
               >
                 {images.map((image, index) => (
                   <Image
-                    className="h-full bg-zinc-100"
+                    className="h-full bg-white"
                     key={`${image}:${index}`}
                     resizeMode="cover"
                     source={{ uri: image }}
@@ -178,12 +178,12 @@ export function PropertyDetailsModal({
                   />
                 ))}
               </ScrollView>
-              <View className="absolute inset-0 bg-black/35" />
+              <View className="absolute inset-0 bg-textPrimary/35" />
               <TouchableOpacity
                 accessibilityLabel="Close property details"
                 accessibilityRole="button"
                 activeOpacity={0.78}
-                className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-black/35"
+                className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-textPrimary/45"
                 onPress={onClose}
               >
                 <Feather name="x" color="#ffffff" size={20} />
@@ -199,7 +199,7 @@ export function PropertyDetailsModal({
                     ))}
                   </View>
                 ) : null}
-                <Text className="self-start rounded-md bg-teal-600 px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
+                <Text className="self-start rounded-md bg-secondary px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
                   {formatPropertyStatus(property.status)}
                 </Text>
                 <Text
@@ -292,7 +292,7 @@ export function PropertyDetailsModal({
 
               <DetailsSection title="Current Tenants">
                 {isLoading ? (
-                  <View className="h-16 rounded-2xl bg-zinc-50" />
+                  <View className="h-16 rounded-2xl bg-white" />
                 ) : propertyLeases.length ? (
                   propertyLeases.map((lease) => {
                     const lessee =
@@ -300,26 +300,26 @@ export function PropertyDetailsModal({
                       lessees.find((item) => item.id === lease.lesseeId);
                     return (
                       <View
-                        className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
+                        className="rounded-2xl border border-secondary/20 p-3"
                         key={lease.id}
                       >
                         <View className="flex-row items-start justify-between gap-2">
                           <View className="min-w-0 flex-1">
                             <Text
-                              className="font-ralewayBold text-sm text-zinc-950"
+                              className="font-ralewayBold text-sm text-textPrimary"
                               numberOfLines={1}
                             >
                               {lessee?.name ?? "Linked tenant"}
                             </Text>
                             <Text
-                              className="mt-0.5 text-[11px] text-zinc-500"
+                              className="mt-0.5 text-[11px] text-description"
                               numberOfLines={1}
                             >
                               {getLeaseRoomNumber(lease.roomNumber)} |{" "}
                               {lease.startDate} to {lease.endDate}
                             </Text>
                           </View>
-                          <Text className="rounded-full bg-white px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-zinc-500">
+                          <Text className="rounded-full bg-secondary/10 px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-secondary">
                             {lease.status}
                           </Text>
                         </View>
@@ -333,27 +333,27 @@ export function PropertyDetailsModal({
 
               <DetailsSection title="Property Documents">
                 {isLoading ? (
-                  <View className="h-16 rounded-2xl bg-zinc-50" />
+                  <View className="h-16 rounded-2xl bg-white" />
                 ) : propertyDocuments.length ? (
                   propertyDocuments.map((document) => (
                     <TouchableOpacity
                       activeOpacity={0.8}
-                      className="flex-row items-center gap-3 rounded-2xl border border-zinc-100 bg-zinc-50 p-3"
+                      className="flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
                       key={document.id}
                       onPress={() => openPropertyDocument(document)}
                     >
-                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-white">
+                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
                         <Feather name="file-text" color="#634CE4" size={17} />
                       </View>
                       <View className="min-w-0 flex-1">
                         <Text
-                          className="font-ralewayBold text-sm text-zinc-950"
+                          className="font-ralewayBold text-sm text-textPrimary"
                           numberOfLines={1}
                         >
                           {document.name}
                         </Text>
                         <Text
-                          className="mt-0.5 text-[11px] text-zinc-500"
+                          className="mt-0.5 text-[11px] text-description"
                           numberOfLines={1}
                         >
                           {document.category} | {document.size}
@@ -361,7 +361,7 @@ export function PropertyDetailsModal({
                       </View>
                       <Feather
                         name="external-link"
-                        color={document.url ? "#71717a" : "#d4d4d8"}
+                        color={document.url ? "#634CE4" : "#BEE3DB"}
                         size={15}
                       />
                     </TouchableOpacity>
@@ -371,7 +371,7 @@ export function PropertyDetailsModal({
                 )}
               </DetailsSection>
 
-              <View className="mt-6 flex-row gap-3 border-t border-zinc-100 pt-5">
+              <View className="mt-6 flex-row gap-3 border-t border-secondary/20 pt-5">
                 <Attribute
                   icon="maximize-2"
                   label="Total Area"
@@ -403,16 +403,16 @@ function DetailMetric({
   return (
     <View className="w-1/2 p-1.5">
       <View
-        className={`rounded-2xl border p-3 ${accent ? "border-emerald-100 bg-emerald-50" : "border-zinc-100 bg-zinc-50"}`}
+        className={`rounded-2xl border border-secondary/20 p-3 ${accent ? "bg-accent/50" : "bg-white"}`}
       >
         <Text
-          className={`font-ralewayBold text-[10px] uppercase ${accent ? "text-emerald-700/70" : "text-zinc-400"}`}
+          className={`font-ralewayBold text-[10px] uppercase ${accent ? "text-textPrimary/70" : "text-description"}`}
         >
           {label}
         </Text>
         <Text
           adjustsFontSizeToFit
-          className={`mt-1 font-ralewayExtraBold text-lg ${accent ? "text-emerald-700" : "text-zinc-950"}`}
+          className="mt-1 font-ralewayExtraBold text-lg text-textPrimary"
           numberOfLines={1}
         >
           {value}
@@ -434,14 +434,14 @@ function CountMetric({
   value: number;
 }) {
   return (
-    <View className="flex-1 rounded-2xl border border-teal-100 bg-teal-50 p-4">
+    <View className="flex-1 rounded-2xl border border-secondary/20 bg-white p-4">
       <View className="flex-row items-center gap-2">
         <Feather name={icon} color="#634CE4" size={16} />
-        <Text className="font-ralewayBold text-[10px] uppercase text-teal-700">
+        <Text className="font-ralewayBold text-[10px] uppercase text-secondary">
           {label}
         </Text>
       </View>
-      <Text className="mt-2 font-ralewayExtraBold text-2xl text-zinc-950">
+      <Text className="mt-2 font-ralewayExtraBold text-2xl text-textPrimary">
         {loading ? "..." : value}
       </Text>
     </View>
@@ -456,8 +456,8 @@ function DetailsSection({
   title: string;
 }) {
   return (
-    <View className="mt-6 border-t border-zinc-100 pt-5">
-      <Text className="font-ralewayBold text-xs uppercase text-zinc-400">
+    <View className="mt-6 border-t border-secondary/20 pt-5">
+      <Text className="font-ralewayBold text-xs uppercase text-description">
         {title}
       </Text>
       <View className="mt-3 gap-2">{children}</View>
@@ -467,8 +467,10 @@ function DetailsSection({
 
 function EmptyDetail({ text }: { text: string }) {
   return (
-    <View className="items-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5">
-      <Text className="font-ralewaySemiBold text-xs text-zinc-500">{text}</Text>
+    <View className="items-center rounded-2xl border border-dashed border-secondary/20 bg-white px-4 py-5">
+      <Text className="font-ralewaySemiBold text-xs text-description">
+        {text}
+      </Text>
     </View>
   );
 }
@@ -483,16 +485,16 @@ function Attribute({
   value: string;
 }) {
   return (
-    <View className="flex-1 flex-row items-center gap-3 rounded-2xl bg-zinc-50 p-3">
-      <View className="h-9 w-9 items-center justify-center rounded-xl bg-white">
-        <Feather name={icon} color="#52525b" size={15} />
+    <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3">
+      <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/10">
+        <Feather name={icon} color="#634CE4" size={15} />
       </View>
       <View className="min-w-0 flex-1">
-        <Text className="font-ralewayBold text-[9px] uppercase text-zinc-400">
+        <Text className="font-ralewayBold text-[9px] uppercase text-description">
           {label}
         </Text>
         <Text
-          className="font-ralewayBold text-xs text-zinc-950"
+          className="font-ralewayBold text-xs text-textPrimary"
           numberOfLines={1}
         >
           {value}

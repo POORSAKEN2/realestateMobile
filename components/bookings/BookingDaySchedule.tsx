@@ -37,7 +37,7 @@ export function BookingDaySchedule({
     <View className="gap-3 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
       <View className="flex-row items-start justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-wider text-slate-400">
+          <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-slate-400">
             Day schedule
           </Text>
           <Text className="mt-1 font-ralewayBold text-lg text-textPrimary">
@@ -45,7 +45,9 @@ export function BookingDaySchedule({
           </Text>
         </View>
         <View className={`rounded-full px-3 py-1.5 ${availability.bg}`}>
-          <Text className={`text-[11px] font-ralewayExtraBold ${availability.text}`}>
+          <Text
+            className={`font-ralewayExtraBold text-[11px] ${availability.text}`}
+          >
             {availability.label}
           </Text>
         </View>
@@ -62,7 +64,7 @@ export function BookingDaySchedule({
               className="min-h-[64px] flex-row items-center gap-3 rounded-2xl bg-slate-50 px-3 py-3"
               onPress={() => onOpenBooking(booking)}
             >
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/20">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
                 <Ionicons name="bed-outline" color="#634CE4" size={19} />
               </View>
               <View className="min-w-0 flex-1">
@@ -72,7 +74,7 @@ export function BookingDaySchedule({
                 >
                   {booking.guestName}
                 </Text>
-                <Text className="mt-0.5 text-xs font-ralewaySemiBold text-slate-500">
+                <Text className="mt-0.5 font-ralewaySemiBold text-xs text-slate-500">
                   Room {booking.roomNumber} ·{" "}
                   {formatDisplayTime(booking.checkInTime)}–
                   {formatDisplayTime(booking.checkOutTime)}
@@ -88,7 +90,7 @@ export function BookingDaySchedule({
             <Ionicons name="sparkles-outline" color="#64748B" size={18} />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="text-sm font-ralewayExtraBold text-slate-800">
+            <Text className="font-ralewayExtraBold text-sm text-slate-800">
               No stays scheduled
             </Text>
             <Text className="mt-0.5 text-xs leading-5 text-slate-500">

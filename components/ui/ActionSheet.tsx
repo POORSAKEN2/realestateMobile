@@ -107,7 +107,7 @@ export function ActionSheet({
               >
                 <View
                   className={`h-10 w-10 items-center justify-center rounded-xl ${
-                    action.destructive ? "bg-red-100" : "bg-secondary/20"
+                    action.destructive ? "bg-red-100" : "bg-secondary/10"
                   }`}
                 >
                   <MaterialCommunityIcons

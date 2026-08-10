@@ -15,10 +15,10 @@ export function PropertyImagesField({
   onRemove: (index: number) => void;
 }) {
   return (
-    <View className="gap-4 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5">
+    <View className="gap-4 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
-          <View className="bg-secondary/20 h-12 w-12 items-center justify-center rounded-2xl">
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10">
             <MaterialCommunityIcons
               name="image-outline"
               color="#634CE4"
@@ -26,10 +26,10 @@ export function PropertyImagesField({
             />
           </View>
           <View className="flex-1">
-            <Text className="font-ralewayExtraBold text-textPrimary text-sm">
+            <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               Property images
             </Text>
-            <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+            <Text className="mt-1 text-xs leading-4 text-description">
               JPG, PNG, or WEBP. Upload up to {maxImages}.
             </Text>
           </View>
@@ -40,7 +40,7 @@ export function PropertyImagesField({
             images.length ? "Add property images" : "Choose property images"
           }
           accessibilityRole="button"
-          className="min-h-11 justify-center rounded-2xl bg-primary px-4 py-2.5"
+          className="min-h-11 justify-center rounded-2xl bg-secondary px-4 py-2.5"
           onPress={onPick}
         >
           <Text className="font-ralewayExtraBold text-xs text-[#FFFFFF]">
@@ -57,7 +57,7 @@ export function PropertyImagesField({
         >
           {images.map((image, index) => (
             <View
-              className="border-textPrimary/10 bg-secondary/20 w-64 overflow-hidden rounded-2xl border"
+              className="w-64 overflow-hidden rounded-2xl border border-secondary/20 bg-secondary/10"
               key={`${image.uri}:${index}`}
             >
               <Image
@@ -67,7 +67,7 @@ export function PropertyImagesField({
               />
               <View className="flex-row items-center justify-between gap-3 p-3">
                 <Text
-                  className="text-textPrimary flex-1 font-ralewayBold text-xs"
+                  className="flex-1 font-ralewayBold text-xs text-textPrimary"
                   numberOfLines={1}
                 >
                   {index + 1}. {image.name}
