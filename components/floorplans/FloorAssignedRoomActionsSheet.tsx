@@ -39,6 +39,7 @@ export function FloorAssignedRoomActionsSheet({
           {
             description: `Currently ${getRoomStatusLabel(room.status).toLowerCase()}.`,
             disabled: isBusy,
+            dismissOnPress: false,
             icon: "pencil-outline",
             label: "Edit status",
             onPress: onShowStatus,

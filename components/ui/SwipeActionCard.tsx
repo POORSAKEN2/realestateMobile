@@ -10,6 +10,7 @@ export function SwipeActionCard({
   actionIcon,
   actionLabel,
   actionWidth = DEFAULT_ACTION_WIDTH,
+  borderRadius = 16,
   children,
   disabled = false,
   onAction,
@@ -18,6 +19,7 @@ export function SwipeActionCard({
   actionIcon: keyof typeof MaterialCommunityIcons.glyphMap;
   actionLabel: string;
   actionWidth?: number;
+  borderRadius?: number;
   children: React.ReactNode;
   disabled?: boolean;
   onAction: () => void;
@@ -64,8 +66,8 @@ export function SwipeActionCard({
       )}
       rightThreshold={actionWidth / 2}
       containerStyle={{
-        backgroundColor: "#634CE4",
-        borderRadius: 16,
+        backgroundColor: "#8A77F4",
+        borderRadius,
         overflow: "hidden",
       }}
     >

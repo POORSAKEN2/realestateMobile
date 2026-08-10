@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRef } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -8,6 +9,7 @@ export type ActionSheetItem = {
   description?: string;
   destructive?: boolean;
   disabled?: boolean;
+  dismissOnPress?: boolean;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   label: string;
   onPress: () => void;
@@ -27,15 +29,29 @@ export function ActionSheet({
   title: string;
   visible: boolean;
 }) {
+  const pendingAction = useRef<(() => void) | null>(null);
+
   function handleAction(action: ActionSheetItem) {
+    if (action.dismissOnPress === false) {
+      action.onPress();
+      return;
+    }
+
+    pendingAction.current = action.onPress;
     onClose();
-    action.onPress();
+  }
+
+  function handleDismiss() {
+    const action = pendingAction.current;
+    pendingAction.current = null;
+    action?.();
   }
 
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title}`}
       onClose={onClose}
+      onDismiss={handleDismiss}
       visible={visible}
     >
       <SafeAreaView

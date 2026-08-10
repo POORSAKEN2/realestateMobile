@@ -1,3 +1,4 @@
+export { ExpenseActionSheet } from "./ExpenseActionSheet";
 export { ExpenseDashboard } from "./ExpenseDashboard";
 export { ExpenseDashboardCard } from "./ExpenseDashboardCard";
 export { ExpenseFormModal } from "./ExpenseFormModal";

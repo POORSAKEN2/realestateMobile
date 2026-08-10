@@ -4,8 +4,10 @@ import {
   ScrollView,
   View,
 } from "react-native";
+import { useState } from "react";
 
 import {
+  ExpenseActionSheet,
   ExpenseDashboard,
   ExpenseFormModal,
   ExpenseHeader,
@@ -15,9 +17,11 @@ import { Screen } from "../../components/ui/Screen";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useExpenseForm } from "../../hooks/expenses/useExpenseForm";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import type { Expense } from "../../types/domain/expenses";
 
 export default function ExpensesScreen() {
   const expenseSnackbar = useSnackbar();
+  const [actionExpense, setActionExpense] = useState<Expense | null>(null);
   const {
     closeForm,
     editingExpense,
@@ -29,6 +33,7 @@ export default function ExpensesScreen() {
     isFormVisible,
     isLoading,
     isSaving,
+    openEditForm,
     openForm,
     propertyOptions,
     refetch,
@@ -65,11 +70,20 @@ export default function ExpensesScreen() {
             }
             showsVerticalScrollIndicator={false}
           >
-            <ExpenseDashboard />
-            <ExpenseTransactionList expenses={expenses} />
+            <ExpenseDashboard expenses={expenses} />
+            <ExpenseTransactionList
+              expenses={expenses}
+              onOpenActions={setActionExpense}
+            />
           </ScrollView>
         )}
       </View>
+
+      <ExpenseActionSheet
+        expense={actionExpense}
+        onClose={() => setActionExpense(null)}
+        onEdit={openEditForm}
+      />
 
       <ExpenseFormModal
         editingExpense={editingExpense}

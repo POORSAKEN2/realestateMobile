@@ -69,6 +69,7 @@ export type BottomSheetModalProps = PropsWithChildren<{
   closeOnBackdropPress?: boolean;
   keyboardAvoiding?: boolean;
   onClose: () => void;
+  onDismiss?: () => void;
   statusBarTranslucent?: boolean;
   visible: boolean;
 }>;
@@ -80,6 +81,7 @@ export function BottomSheetModal({
   closeOnBackdropPress = true,
   keyboardAvoiding = false,
   onClose,
+  onDismiss,
   statusBarTranslucent = false,
   visible,
 }: BottomSheetModalProps) {
@@ -87,11 +89,14 @@ export function BottomSheetModal({
   const hostId = useRef(Symbol("bottom-sheet")).current;
   const { height } = useWindowDimensions();
   const [isMounted, setIsMounted] = useState(visible);
+  const onDismissRef = useRef(onDismiss);
   const backdropOpacity = useRef(new Animated.Value(visible ? 1 : 0)).current;
   const sheetTranslateY = useRef(
     new Animated.Value(visible ? 0 : height),
   ).current;
   const renderedChildren = useRef(children);
+
+  onDismissRef.current = onDismiss;
 
   if (visible) {
     renderedChildren.current = children;
@@ -120,11 +125,16 @@ export function BottomSheetModal({
     ]);
 
     animation.start(({ finished }) => {
-      if (finished && !visible) setIsMounted(false);
+      if (finished && !visible) {
+        setIsMounted(false);
+        if (host || Platform.OS !== "ios") {
+          requestAnimationFrame(() => onDismissRef.current?.());
+        }
+      }
     });
 
     return () => animation.stop();
-  }, [backdropOpacity, height, sheetTranslateY, visible]);
+  }, [backdropOpacity, height, host, sheetTranslateY, visible]);
 
   const sheet = (
     <KeyboardAvoidingView
@@ -176,6 +186,7 @@ export function BottomSheetModal({
   return (
     <Modal
       animationType="none"
+      onDismiss={onDismiss}
       onRequestClose={onClose}
       statusBarTranslucent={statusBarTranslucent}
       transparent
