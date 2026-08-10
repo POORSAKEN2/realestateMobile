@@ -26,10 +26,6 @@ import {
   getParamValue,
   type StatusFilter,
 } from "../../utils/bookings/bookingCalendar";
-import {
-  useFloorPlanQueries,
-  usePropertyRoomsQuery,
-} from "../../hooks/api/useFloorPlans";
 
 export default function BookingsScreen() {
   const { session } = useAuth();
@@ -56,10 +52,6 @@ export default function BookingsScreen() {
     enabled: Boolean(accessToken),
   });
   const { data: guests = [] } = useClients(accessToken);
-  const { data: rooms = [] } = usePropertyRoomsQuery(
-    selectedPropertyId,
-    accessToken,
-  );
 
   const buildingOptions = useMemo(
     () =>
@@ -115,7 +107,6 @@ export default function BookingsScreen() {
     accessToken,
     bookings,
     buildings: buildingOptions,
-    rooms,
     guests,
     onSaved: (payload, operation) => {
       setSelectedPropertyId(payload.propertyId);
@@ -216,7 +207,7 @@ export default function BookingsScreen() {
 
       <BookingFormModal
         buildings={buildingOptions}
-        rooms={rooms}
+        rooms={bookingForm.rooms}
         conflict={bookingForm.conflict}
         editingBooking={bookingForm.editingBooking}
         form={bookingForm.form}
@@ -224,6 +215,7 @@ export default function BookingsScreen() {
         guests={guests}
         isAddingGuest={bookingForm.isAddingGuest}
         isCancelling={bookingForm.isCancelling}
+        isLoadingRooms={bookingForm.isLoadingRooms}
         isSaving={bookingForm.isSaving}
         isVisible={bookingForm.isOpen}
         mode={bookingForm.mode}
@@ -237,6 +229,7 @@ export default function BookingsScreen() {
         onUpdateForm={bookingForm.updateForm}
         selectedBuilding={bookingForm.selectedBuilding}
         selectedGuestId={bookingForm.selectedGuestId}
+        selectedRoom={bookingForm.selectedRoom}
       />
 
       <ScreenSnackbar

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -11,10 +11,10 @@ import {
   updateTransientBooking,
 } from "../../api/bookings";
 import { clientKeys } from "../api/useClients";
+import { usePropertyRoomsQuery } from "../api/useFloorPlans";
 import type {
   Lessee,
   Property,
-  PropertyRoom,
   TransientBooking,
   TransientBookingPayload,
 } from "../../types";
@@ -34,7 +34,6 @@ type UseBookingFormOptions = {
   accessToken?: string;
   bookings: TransientBooking[];
   buildings: Property[];
-  rooms: PropertyRoom[];
   guests: Lessee[];
   onSaved: (
     booking: TransientBookingPayload,
@@ -47,7 +46,6 @@ export function useBookingForm({
   bookings,
   buildings,
   guests,
-  rooms,
   onSaved,
 }: UseBookingFormOptions) {
   const queryClient = useQueryClient();
@@ -59,12 +57,38 @@ export function useBookingForm({
   const [message, setMessage] = useState("");
   const [form, setForm] = useState<BookingFormState>(() => emptyForm());
   const [selectedGuestId, setSelectedGuestId] = useState("");
-  const [selectedRoomId, setSelectedRoomId] = useState("");
   const [isAddingGuest, setIsAddingGuest] = useState(false);
+  const { data: rooms = [], isFetching: isLoadingRooms } =
+    usePropertyRoomsQuery(form.propertyId, accessToken);
 
   const selectedBuilding = buildings.find(
     (building) => building.id === form.propertyId,
   );
+  const selectedRoom = rooms.find((room) => room.id === form.roomId);
+
+  useEffect(() => {
+    if (
+      !isOpen ||
+      mode !== "edit" ||
+      !editingBooking ||
+      editingBooking.propertyId !== form.propertyId ||
+      rooms.length === 0 ||
+      rooms.some((room) => room.id === form.roomId)
+    ) {
+      return;
+    }
+
+    const matchedRoom = rooms.find(
+      (room) =>
+        room.id === editingBooking.roomId ||
+        room.roomNumber === editingBooking.roomNumber,
+    );
+
+    if (matchedRoom) {
+      setForm((current) => ({ ...current, roomId: matchedRoom.id }));
+    }
+  }, [editingBooking, form.propertyId, form.roomId, isOpen, mode, rooms]);
+
   const conflict = useMemo(() => {
     if (
       !form.propertyId ||
@@ -84,21 +108,21 @@ export function useBookingForm({
     return findTransientBookingConflict({
       bookings,
       propertyId: form.propertyId,
-      roomNumber: form.roomId,
+      roomId: form.roomId,
+      roomNumber: selectedRoom?.roomNumber ?? "",
       startDate: form.startDate,
       checkInTime: form.checkInTime,
       endDate: form.endDate,
       checkOutTime: form.checkOutTime,
       ignoreBookingId: editingBooking?.id,
     });
-  }, [bookings, editingBooking?.id, form]);
+  }, [bookings, editingBooking?.id, form, selectedRoom?.roomNumber]);
 
   function close() {
     setIsOpen(false);
     setEditingBooking(null);
     setMessage("");
     setSelectedGuestId("");
-    setSelectedRoomId("");
     setIsAddingGuest(false);
   }
 
@@ -150,7 +174,6 @@ export function useBookingForm({
     setForm(emptyForm(propertyId, date));
     setMessage("");
     setSelectedGuestId("");
-    setSelectedRoomId("");
     setIsAddingGuest(false);
     setIsOpen(true);
   }
@@ -177,22 +200,16 @@ export function useBookingForm({
         guest.contactEmail.toLowerCase() === booking.guestEmail.toLowerCase(),
     );
 
-    const matchedRoom = rooms.find((room) => room.roomNumber == booking.roomId);
-
     setSelectedGuestId(matchedGuest?.id ?? "");
-    setSelectedRoomId(matchedRoom?.roomNumber ?? "");
     setIsAddingGuest(!matchedGuest);
     setIsOpen(true);
   }
 
   function selectBuilding(propertyId: string) {
-    setForm((current) => ({ ...current, propertyId, roomNumber: "" }));
+    setForm((current) => ({ ...current, propertyId, roomId: "" }));
   }
 
   function selectRoom(roomId: string) {
-    const room = rooms.find((item) => item.id === roomId);
-    setSelectedRoomId(room?.id ?? "");
-
     setForm((current) => ({ ...current, roomId }));
   }
 
@@ -228,7 +245,12 @@ export function useBookingForm({
     setMessage("");
 
     if (!form.propertyId) return setMessage("Please select a building.");
-    if (!form.roomId) return setMessage("Please enter a room number.");
+    if (!form.roomId) return setMessage("Please select a room.");
+    if (!selectedRoom) {
+      return setMessage(
+        "The selected room is not available for this building.",
+      );
+    }
     if (!isAddingGuest && !selectedGuestId) {
       return setMessage("Please select an existing guest or add a new guest.");
     }
@@ -263,6 +285,7 @@ export function useBookingForm({
     saveMutation.mutate({
       propertyId: form.propertyId,
       roomId: form.roomId,
+      roomNumber: selectedRoom.roomNumber,
       guestName: form.guestName.trim(),
       guestEmail: form.guestEmail.trim(),
       guestPhone: form.guestPhone.trim(),
@@ -287,6 +310,7 @@ export function useBookingForm({
     form,
     isAddingGuest,
     isCancelling: cancelMutation.isPending,
+    isLoadingRooms,
     isOpen,
     isSaving: saveMutation.isPending,
     message,
@@ -297,8 +321,9 @@ export function useBookingForm({
     selectBuilding,
     selectRoom,
     selectedBuilding,
+    selectedRoom,
     selectedGuestId,
-    selectedRoomId,
+    rooms,
     selectGuest,
     submit,
     toggleAddingGuest,

@@ -23,6 +23,7 @@ function normalizeBooking(lease: Record<string, any>): TransientBooking {
   return {
     id: String(lease?.id ?? ""),
     propertyId: String(lease?.propertyId ?? lease?.property_id ?? ""),
+    roomId: String(lease?.roomId ?? lease?.room_id ?? lease?.room?.id ?? ""),
     roomNumber: String(lease?.roomNumber ?? lease?.room_number ?? ""),
     guestName: String(client?.name ?? lease?.guestName ?? "Unknown"),
     guestEmail: String(
@@ -50,6 +51,7 @@ function toBookingApiPayload(
   return {
     property_id: payload.propertyId,
     client_id: clientId,
+    room_id: payload.roomId,
     room_number: payload.roomNumber,
     type: "Transient",
     start_date: payload.startDate,
@@ -99,6 +101,7 @@ export function rangesOverlap(
 export function findTransientBookingConflict({
   bookings,
   propertyId,
+  roomId,
   roomNumber,
   startDate,
   checkInTime,
@@ -108,6 +111,7 @@ export function findTransientBookingConflict({
 }: {
   bookings: TransientBooking[];
   propertyId: string;
+  roomId: string;
   roomNumber: string;
   startDate: string;
   checkInTime: string;
@@ -121,7 +125,9 @@ export function findTransientBookingConflict({
   return bookings.find(
     (booking) =>
       booking.propertyId === propertyId &&
-      booking.roomNumber === roomNumber &&
+      (booking.roomId && roomId
+        ? booking.roomId === roomId
+        : booking.roomNumber === roomNumber) &&
       booking.status === "Booked" &&
       booking.id !== ignoreBookingId &&
       rangesOverlap(
@@ -191,6 +197,8 @@ export async function updateTransientBooking(
   >(
     `/leases/${id}?_method=PUT`,
     {
+      property_id: payload.propertyId,
+      room_id: payload.roomId,
       room_number: payload.roomNumber,
       start_date: payload.startDate,
       check_in_time: payload.checkInTime,

@@ -116,8 +116,8 @@ export function getParamValue(value?: string | string[]) {
 
 export function emptyForm(
   propertyId = "",
-  roomId = "",
   date = dateKey(new Date()),
+  roomId = "",
 ): BookingFormState {
   return {
     propertyId,

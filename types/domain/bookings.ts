@@ -4,6 +4,7 @@ export type TransientBooking = {
   id: string;
   propertyId: string;
   roomId: string;
+  roomNumber: string;
   guestName: string;
   guestEmail: string;
   guestPhone: string;

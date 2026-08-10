@@ -13,7 +13,16 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BackButton } from "./buttons/BackButton";
+import { BottomSheetHost } from "./BottomSheetModal";
 import { FormActionRow } from "./forms/FormActionRow";
+
+function AddEditModalHost({ children }: React.PropsWithChildren) {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <BottomSheetHost>{children}</BottomSheetHost>
+    </GestureHandlerRootView>
+  );
+}
 
 interface AddEditModalProps {
   appearance?: "default" | "card";
@@ -76,7 +85,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
       presentationStyle="formSheet"
       visible={isVisible}
     >
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <AddEditModalHost>
         {/* Explicit style layout string replaces 'modal-container' */}
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -202,7 +211,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
             </SafeAreaView>
           ) : null}
         </KeyboardAvoidingView>
-      </GestureHandlerRootView>
+      </AddEditModalHost>
     </Modal>
   );
 };

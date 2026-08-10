@@ -30,6 +30,7 @@ type BookingFormModalProps = {
   guests: Lessee[];
   isAddingGuest: boolean;
   isCancelling: boolean;
+  isLoadingRooms: boolean;
   isSaving: boolean;
   isVisible: boolean;
   mode: BookingFormMode;
@@ -56,6 +57,7 @@ export function BookingFormModal({
   guests,
   isAddingGuest,
   isCancelling,
+  isLoadingRooms,
   isSaving,
   isVisible,
   mode,
@@ -127,20 +129,23 @@ export function BookingFormModal({
                 label: room.roomNumber,
                 value: room.id,
               }))}
+              disabled={
+                !form.propertyId || isLoadingRooms || rooms.length === 0
+              }
               onSelect={onSelectRoom}
-              placeholder="Select a room"
+              placeholder={
+                !form.propertyId
+                  ? "Select a building first"
+                  : isLoadingRooms
+                    ? "Loading rooms..."
+                    : rooms.length === 0
+                      ? "No rooms available"
+                      : "Select a room"
+              }
               required
               value={form.roomId}
               variant="filled"
             />
-            {/* <BaseField
-              label="Room number"
-              onChangeText={(value) => onUpdateForm("roomNumber", value)}
-              placeholder="e.g. 101"
-              required
-              value={form.roomNumber}
-              variant="filled"
-            /> */}
           </View>
           <View className="flex-1">
             <BaseField
@@ -170,8 +175,7 @@ export function BookingFormModal({
               </Text>
               <Text className="mt-0.5 font-ralewayExtraBold text-sm text-textPrimary">
                 {selectedBuilding.title}
-                {selectedRoom?.roomNumber}
-                {/* {form.roomNumber ? ` · Room ${form.roomNumber}` : ""} */}
+                {selectedRoom ? ` · Room ${selectedRoom.roomNumber}` : ""}
               </Text>
             </View>
           </View>
@@ -212,7 +216,7 @@ export function BookingFormModal({
         ) : (
           <View className="rounded-2xl bg-slate-100 p-4">
             <Text className="text-sm leading-5 text-slate-600">
-              Add a room number and stay window to check availability.
+              Select a room and stay window to check availability.
             </Text>
           </View>
         )}
