@@ -13,9 +13,14 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "bundleIdentifier": "com.angelod2.realestateMobile",
       "supportsTablet": true,
       "config": {
         "usesAppleMaps": true
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "We use your location to show nearby services."
       }
     },
     "android": {
@@ -35,6 +40,13 @@
     "plugins": ["expo-router", "expo-font"],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "apiBaseUrl": "https://realestatebe-production-8papzb.laravel.cloud/api",
+      "router": {},
+      "eas": {
+        "projectId": "e765223d-6185-470b-ba96-978a83e5c2ea"
+      }
     }
   }
 }
