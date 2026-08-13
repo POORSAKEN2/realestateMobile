@@ -36,7 +36,7 @@ type NominatimReverseResult = {
 const REQUEST_HEADERS = {
   Accept: "application/json",
   "Accept-Language": "en",
-  "User-Agent": "realestateMobile/1.0 (com.angelod2.realestateMobile)",
+  "User-Agent": "realestateMobile/1.0 (com.raze.terrane)",
 };
 
 export async function searchLocations(
