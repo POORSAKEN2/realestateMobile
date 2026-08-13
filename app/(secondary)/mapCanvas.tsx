@@ -1,4 +1,5 @@
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useMemo } from "react";
 import {
   ActivityIndicator,
   StyleSheet,
@@ -6,14 +7,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, { Marker, type LatLng } from "react-native-maps";
 
 import { MapPropertyPreview } from "../../components/properties/MapPropertyPreview";
+import { AdaptiveMap } from "../../components/ui/maps/AdaptiveMap";
 import { useProperties } from "../../hooks/api/useProperties";
-import {
-  PHILIPPINES_REGION,
-  usePropertyMap,
-} from "../../hooks/properties/usePropertyMap";
+import { usePropertyMap } from "../../hooks/properties/usePropertyMap";
 import { Screen } from "../../components/ui/Screen";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import {
@@ -25,49 +23,43 @@ export default function MapCanvasScreen() {
   const { useList } = useProperties();
   const { data: properties = [], isError, isLoading, refetch } = useList();
   const {
-    mapRef,
+    clearSelection,
+    mapRegion,
     mappedProperties,
     recenter,
     selectedProperty,
-    selectProperty,
-    setIsMapReady,
-    setSelectedProperty,
+    selectPropertyById,
     unmappedPropertyCount,
+    viewportRevision,
   } = usePropertyMap(properties);
+  const pins = useMemo(
+    () =>
+      mappedProperties.map((property) => ({
+        id: property.id,
+        coordinate: getPropertyCoordinate(property),
+        color:
+          selectedProperty?.id === property.id
+            ? "#0F172A"
+            : getPropertyMarkerColor(property.status),
+        description: property.location,
+        title: property.title,
+      })),
+    [mappedProperties, selectedProperty?.id],
+  );
 
   return (
     <Screen className="bg-[#EFF6FF]">
       <View style={styles.container}>
-        <MapView
-          ref={mapRef}
-          initialRegion={PHILIPPINES_REGION}
-          onMapReady={() => setIsMapReady(true)}
-          onPress={() => setSelectedProperty(null)}
+        <AdaptiveMap
+          onMapPress={clearSelection}
+          onPinPress={selectPropertyById}
+          pins={pins}
+          region={mapRegion}
           showsCompass
           showsScale
           style={styles.map}
-        >
-          {mappedProperties.map((property) => {
-            const coordinate: LatLng = getPropertyCoordinate(property);
-            const isSelected = selectedProperty?.id === property.id;
-
-            return (
-              <Marker
-                key={property.id}
-                coordinate={coordinate}
-                description={property.location}
-                identifier={property.id}
-                onPress={() => selectProperty(property)}
-                pinColor={
-                  isSelected
-                    ? "#0F172A"
-                    : getPropertyMarkerColor(property.status)
-                }
-                title={property.title}
-              />
-            );
-          })}
-        </MapView>
+          viewportRevision={viewportRevision}
+        />
 
         <View style={styles.topBar}>
           <SecondaryBackButton
@@ -170,7 +162,7 @@ export default function MapCanvasScreen() {
 
         {selectedProperty ? (
           <MapPropertyPreview
-            onClose={() => setSelectedProperty(null)}
+            onClose={clearSelection}
             property={selectedProperty}
           />
         ) : null}

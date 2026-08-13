@@ -1,4 +1,4 @@
-import type { Region } from "react-native-maps";
+import type { MapRegion } from "../types/maps";
 
 export type DefaultDashboardLocation = {
   id: string;
@@ -238,7 +238,7 @@ export function getDefaultLocationByCountry(country?: string | null) {
 
 export function getDefaultLocationRegion(
   location: DefaultDashboardLocation | null,
-): Region {
+): MapRegion {
   const nextLocation =
     location ??
     getDefaultLocationByCountry("Philippines") ??
@@ -251,6 +251,8 @@ export function getDefaultLocationRegion(
     longitudeDelta: nextLocation.longitudeDelta,
   };
 }
+
+export const DEFAULT_PHILIPPINES_REGION = getDefaultLocationRegion(null);
 
 export function getLocationSuggestionsForCountry(country?: string | null) {
   const normalizedCountry = country?.trim().toLowerCase();

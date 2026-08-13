@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Keyboard, TextInput } from "react-native";
-import MapView, { type MapPressEvent, type Region } from "react-native-maps";
 
 import {
   reverseGeocodeLocation,
@@ -8,17 +7,14 @@ import {
   type LocationSearchResult,
   type ReverseGeocodeResult,
 } from "../../api/geocoding";
+import { DEFAULT_PHILIPPINES_REGION } from "../../constants/defaultLocation";
+import type { MapCoordinate, MapRegion } from "../../types/maps";
 import {
   formatCoordinate,
   parseNumber,
 } from "../../utils/properties/propertyForm";
 
-export const LOCATION_PICKER_REGION: Region = {
-  latitude: 12.8797,
-  longitude: 121.774,
-  latitudeDelta: 12,
-  longitudeDelta: 12,
-};
+export const LOCATION_PICKER_REGION: MapRegion = DEFAULT_PHILIPPINES_REGION;
 const PIN_DELTA = { latitudeDelta: 0.02, longitudeDelta: 0.02 };
 
 export function useLocationPinController({
@@ -44,7 +40,6 @@ export function useLocationPinController({
   const [isResolvingPinLocation, setIsResolvingPinLocation] = useState(false);
   const [pinLocationError, setPinLocationError] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const mapRef = useRef<MapView | null>(null);
   const searchInputRef = useRef<TextInput | null>(null);
   const requestRef = useRef(0);
   const reverseGeocodeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -90,39 +85,48 @@ export function useLocationPinController({
     };
   }, [lat, lng]);
 
-  const latitude = parseNumber(lat);
-  const longitude = parseNumber(lng);
-  const markerCoordinate =
-    latitude !== undefined && longitude !== undefined
+  const markerCoordinate = useMemo(() => {
+    const latitude = parseNumber(lat);
+    const longitude = parseNumber(lng);
+    return latitude !== undefined && longitude !== undefined
       ? { latitude, longitude }
       : undefined;
-  const mapRegion = markerCoordinate
-    ? { ...markerCoordinate, ...PIN_DELTA }
-    : LOCATION_PICKER_REGION;
+  }, [lat, lng]);
+  const mapRegion = useMemo(
+    () =>
+      markerCoordinate
+        ? { ...markerCoordinate, ...PIN_DELTA }
+        : LOCATION_PICKER_REGION,
+    [markerCoordinate],
+  );
   const coordinateLabel = markerCoordinate
     ? `${formatCoordinate(markerCoordinate.latitude)}, ${formatCoordinate(markerCoordinate.longitude)}`
     : "No pin selected";
 
-  function setPinnedLocation(latitudeValue: number, longitudeValue: number) {
-    onChange({
-      lat: formatCoordinate(latitudeValue),
-      lng: formatCoordinate(longitudeValue),
-    });
-  }
+  const setPinnedLocation = useCallback(
+    (latitudeValue: number, longitudeValue: number) => {
+      onChange({
+        lat: formatCoordinate(latitudeValue),
+        lng: formatCoordinate(longitudeValue),
+      });
+    },
+    [onChange],
+  );
 
-  function handleMapPress(event: MapPressEvent) {
-    const { latitude: nextLatitude, longitude: nextLongitude } =
-      event.nativeEvent.coordinate;
-    setSearchResults([]);
-    Keyboard.dismiss();
-    setPinnedLocation(nextLatitude, nextLongitude);
-  }
+  const handleMapCoordinateChange = useCallback(
+    ({ latitude, longitude }: MapCoordinate) => {
+      setSearchResults([]);
+      Keyboard.dismiss();
+      setPinnedLocation(latitude, longitude);
+    },
+    [setPinnedLocation],
+  );
 
-  function changeSearchQuery(value: string) {
+  const changeSearchQuery = useCallback((value: string) => {
     setSearchQuery(value);
     setSearchError("");
     if (!value.trim()) setSearchResults([]);
-  }
+  }, []);
 
   async function search() {
     if (!searchQuery.trim() || isSearching) return;
@@ -142,16 +146,15 @@ export function useLocationPinController({
     }
   }
 
-  function selectSearchResult(result: LocationSearchResult) {
-    setSearchQuery(result.label);
-    setSearchResults([]);
-    setSearchError("");
-    setPinnedLocation(result.latitude, result.longitude);
-    mapRef.current?.animateToRegion(
-      { latitude: result.latitude, longitude: result.longitude, ...PIN_DELTA },
-      450,
-    );
-  }
+  const selectSearchResult = useCallback(
+    (result: LocationSearchResult) => {
+      setSearchQuery(result.label);
+      setSearchResults([]);
+      setSearchError("");
+      setPinnedLocation(result.latitude, result.longitude);
+    },
+    [setPinnedLocation],
+  );
 
   async function usePinLocation() {
     if (!markerCoordinate || isResolvingPinLocation) return;
@@ -197,12 +200,11 @@ export function useLocationPinController({
   return {
     changeSearchQuery,
     coordinateLabel,
-    handleMapPress,
+    handleMapCoordinateChange,
     isMapVisible,
     isResolvingPinLocation,
     isSearchFocused,
     isSearching,
-    mapRef,
     mapRegion,
     markerCoordinate,
     pinLocationError,
@@ -214,7 +216,6 @@ export function useLocationPinController({
     selectSearchResult,
     setIsMapVisible,
     setIsSearchFocused,
-    setPinnedLocation,
     usePinLocation,
   };
 }

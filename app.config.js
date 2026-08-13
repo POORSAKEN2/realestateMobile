@@ -20,6 +20,13 @@ module.exports = ({ config }) => {
           }
         : {}),
     },
+    ios: {
+      ...config.ios,
+      config: {
+        ...config.ios?.config,
+        usesAppleMaps: true,
+      },
+    },
     plugins: [
       ...(config.plugins ?? []),
       [
