@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -17,6 +18,7 @@ import {
 } from "react-native";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 
+import { useAppleMapsAuthorization } from "../../../hooks/maps/useAppleMapsAuthorization";
 import { APPLE_MAP_MESSAGE_SOURCE, mapHtml } from "./mapHtml";
 
 export type AppleMapCoordinate = { lat: number; lng: number };
@@ -78,9 +80,6 @@ const MapWebView = WebView as unknown as ForwardRefExoticComponent<
   MapWebViewProps & RefAttributes<WebViewHandle>
 >;
 
-const MAPKIT_JS_TOKEN = process.env.EXPO_PUBLIC_MAPKIT_JS_TOKEN?.trim() ?? "";
-const MAPKIT_PAGE_URL = process.env.EXPO_PUBLIC_MAPKIT_PAGE_URL?.trim();
-
 function parseMessage(value: string): AppleMapMessage | undefined {
   try {
     const message = JSON.parse(value) as AppleMapMessage;
@@ -111,12 +110,10 @@ export function AppleMap({
 }: AppleMapProps) {
   const ref = useRef<WebViewHandle | null>(null);
   const sourceRef = useRef<AppleMapSource | null>(null);
+  const getAuthorizationToken = useAppleMapsAuthorization();
   const [ready, setReady] = useState(false);
-  const [error, setError] = useState(
-    MAPKIT_JS_TOKEN
-      ? ""
-      : "Add EXPO_PUBLIC_MAPKIT_JS_TOKEN to load Apple Maps.",
-  );
+  const [error, setError] = useState("");
+  const [webViewRevision, setWebViewRevision] = useState(0);
   const serializedPins = useMemo(
     () => JSON.stringify(pins).replaceAll("<", "\\u003c"),
     [pins],
@@ -133,7 +130,7 @@ export function AppleMap({
   const lastPinsRef = useRef(serializedPins);
   const lastRegionKeyRef = useRef(regionKey);
 
-  if (MAPKIT_JS_TOKEN && !sourceRef.current) {
+  if (!sourceRef.current) {
     sourceRef.current = {
       html: mapHtml({
         center,
@@ -142,11 +139,42 @@ export function AppleMap({
         pins,
         showsCompass,
         showsScale,
-        token: MAPKIT_JS_TOKEN,
       }),
-      ...(MAPKIT_PAGE_URL ? { baseUrl: MAPKIT_PAGE_URL } : {}),
     };
   }
+
+  const provideMapKitToken = useCallback(
+    async (forceRefresh = false) => {
+      setError("");
+
+      try {
+        const token = await getAuthorizationToken(forceRefresh);
+        const serializedToken = JSON.stringify(token).replaceAll(
+          "<",
+          "\\u003c",
+        );
+        ref.current?.injectJavaScript(
+          `window.provideMapKitToken(${serializedToken}); true;`,
+        );
+      } catch {
+        setReady(false);
+        setError("Apple Maps authorization failed.");
+      }
+    },
+    [getAuthorizationToken],
+  );
+
+  const retryMap = useCallback(async () => {
+    setError("");
+    setReady(false);
+
+    try {
+      await getAuthorizationToken(true);
+      setWebViewRevision((revision) => revision + 1);
+    } catch {
+      setError("Apple Maps authorization failed. Please try again.");
+    }
+  }, [getAuthorizationToken]);
 
   useEffect(() => {
     if (!ready || lastPinsRef.current === serializedPins) return;
@@ -167,6 +195,10 @@ export function AppleMap({
       const message = parseMessage(event.nativeEvent.data);
       if (!message) return;
 
+      if (message.type === "token-request") {
+        void provideMapKitToken();
+        return;
+      }
       if (message.type === "ready") {
         setError("");
         setReady(true);
@@ -186,16 +218,8 @@ export function AppleMap({
       if (message.type === "pin-drag-end" && message.id && coordinate)
         onPinDragEnd?.(message.id, coordinate);
     },
-    [onMapPress, onPinDragEnd, onPinPress, onRegionChange],
+    [onMapPress, onPinDragEnd, onPinPress, onRegionChange, provideMapKitToken],
   );
-
-  if (!MAPKIT_JS_TOKEN || !sourceRef.current) {
-    return (
-      <View style={styles.fallback}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -205,6 +229,7 @@ export function AppleMap({
         bounces={false}
         domStorageEnabled
         javaScriptEnabled
+        key={webViewRevision}
         nestedScrollEnabled
         onError={() => {
           setReady(false);
@@ -215,7 +240,7 @@ export function AppleMap({
         ref={ref}
         scrollEnabled={false}
         setSupportMultipleWindows={false}
-        source={sourceRef.current}
+        source={sourceRef.current as AppleMapSource}
         style={styles.webView}
       />
       {!ready && !error ? (
@@ -225,8 +250,15 @@ export function AppleMap({
         </View>
       ) : null}
       {error ? (
-        <View pointerEvents="none" style={styles.fallback}>
+        <View style={styles.fallback}>
           <Text style={styles.errorText}>{error}</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void retryMap()}
+            style={styles.retryButton}
+          >
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </Pressable>
         </View>
       ) : null}
     </View>
@@ -256,5 +288,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     textAlign: "center",
+  },
+  retryButton: {
+    borderRadius: 8,
+    marginTop: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    backgroundColor: "#634CE4",
+  },
+  retryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "700",
   },
 });

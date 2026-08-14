@@ -17,16 +17,7 @@ type MapHtmlOptions = {
   pins: MapHtmlPin[];
   showsCompass: boolean;
   showsScale: boolean;
-  token: string;
 };
-
-function escapeHtmlAttribute(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
-}
 
 export function mapHtml({
   center,
@@ -35,7 +26,6 @@ export function mapHtml({
   pins,
   showsCompass,
   showsScale,
-  token,
 }: MapHtmlOptions) {
   const configuration = JSON.stringify({
     center,
@@ -75,6 +65,7 @@ export function mapHtml({
       (function () {
         var map;
         var markers = [];
+        var authorizationCallbacks = [];
         var configuration = ${configuration};
         var messageSource = ${messageSource};
 
@@ -88,6 +79,21 @@ export function mapHtml({
         function coordinate(value) {
           return new mapkit.Coordinate(Number(value.lat), Number(value.lng));
         }
+
+        function requestAuthorization(done) {
+          authorizationCallbacks.push(done);
+          if (authorizationCallbacks.length === 1) post("token-request");
+        }
+
+        window.provideMapKitToken = function (token) {
+          if (typeof token !== "string" || !token) return false;
+
+          var callbacks = authorizationCallbacks.splice(0);
+          callbacks.forEach(function (done) {
+            done(token);
+          });
+          return callbacks.length > 0;
+        };
 
         function postCoordinate(type, pin, nextCoordinate) {
           post(type, {
@@ -133,44 +139,49 @@ export function mapHtml({
           return true;
         };
 
+        function createMap() {
+          if (map) return;
+
+          map = new mapkit.Map("map", {
+            center: coordinate(configuration.center),
+            showsCompass: configuration.showsCompass
+              ? mapkit.FeatureVisibility.Visible
+              : mapkit.FeatureVisibility.Hidden,
+            showsScale: configuration.showsScale
+              ? mapkit.FeatureVisibility.Visible
+              : mapkit.FeatureVisibility.Hidden
+          });
+          window.setRegion(configuration);
+          window.setPins(configuration.pins || []);
+
+          map.addEventListener("single-tap", function (event) {
+            var nextCoordinate = map.convertPointOnPageToCoordinate(
+              event.pointOnPage
+            );
+            post("map-press", {
+              lat: nextCoordinate.latitude,
+              lng: nextCoordinate.longitude
+            });
+          });
+          map.addEventListener("region-change-end", function () {
+            post("region-change", {
+              lat: map.region.center.latitude,
+              lng: map.region.center.longitude
+            });
+          });
+          post("ready");
+        }
+
         window.initMapKit = function (error) {
           if (error) {
-            post("error", { message: "Apple Maps authorization failed." });
+            post("error", { message: "Apple Maps failed to load." });
             return;
           }
 
-          try {
-            map = new mapkit.Map("map", {
-              center: coordinate(configuration.center),
-              showsCompass: configuration.showsCompass
-                ? mapkit.FeatureVisibility.Visible
-                : mapkit.FeatureVisibility.Hidden,
-              showsScale: configuration.showsScale
-                ? mapkit.FeatureVisibility.Visible
-                : mapkit.FeatureVisibility.Hidden
-            });
-            window.setRegion(configuration);
-            window.setPins(configuration.pins || []);
-
-            map.addEventListener("single-tap", function (event) {
-              var nextCoordinate = map.convertPointOnPageToCoordinate(
-                event.pointOnPage
-              );
-              post("map-press", {
-                lat: nextCoordinate.latitude,
-                lng: nextCoordinate.longitude
-              });
-            });
-            map.addEventListener("region-change-end", function () {
-              post("region-change", {
-                lat: map.region.center.latitude,
-                lng: map.region.center.longitude
-              });
-            });
-            post("ready");
-          } catch (mapError) {
-            post("error", { message: "Apple Maps could not be loaded." });
-          }
+          mapkit.init({ authorizationCallback: requestAuthorization });
+          mapkit.load("full-map").then(createMap).catch(function () {
+            post("error", { message: "Apple Maps authorization failed." });
+          });
         };
 
         window.addEventListener("error", function () {
@@ -183,8 +194,6 @@ export function mapHtml({
       crossorigin
       async
       data-callback="initMapKit"
-      data-libraries="full-map"
-      data-token="${escapeHtmlAttribute(token)}"
     ></script>
   </body>
 </html>`;
