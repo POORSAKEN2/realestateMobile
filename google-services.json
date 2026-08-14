@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1005222744710",
+    "project_id": "terrane-mobile",
+    "storage_bucket": "terrane-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005222744710:android:e2fb63bbcdf2309821f707",
+        "android_client_info": {
+          "package_name": "com.raze.terrane"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOlGi5URQgRAXyYweNST0Y7wvPuY2rN4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

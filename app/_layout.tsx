@@ -18,6 +18,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 LogBox.ignoreLogs(["Unable to activate keep awake"]);
 
 import "../global.css";
+import { AppleMapsTokenBootstrap } from "../components/maps/AppleMapsTokenBootstrap";
 import { NotificationBootstrap } from "../components/notifications/NotificationBootstrap";
 import { AuthProvider } from "../context/AuthContext";
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
@@ -77,6 +78,7 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <DefaultLocationProvider>
+            <AppleMapsTokenBootstrap />
             <NotificationBootstrap />
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(auth)" options={{ headerShown: false }} />

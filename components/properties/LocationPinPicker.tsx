@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -7,9 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
 
 import { useLocationPinController } from "../../hooks/properties/useLocationPinController";
+import type { MapCoordinate } from "../../types/maps";
+import { AdaptiveMap } from "../ui/maps/AdaptiveMap";
 
 export function LocationPinPicker({
   lat,
@@ -27,12 +29,11 @@ export function LocationPinPicker({
   const {
     changeSearchQuery,
     coordinateLabel,
-    handleMapPress,
+    handleMapCoordinateChange,
     isMapVisible,
     isResolvingPinLocation,
     isSearchFocused,
     isSearching,
-    mapRef,
     mapRegion,
     markerCoordinate,
     pinLocationError,
@@ -44,7 +45,6 @@ export function LocationPinPicker({
     selectSearchResult,
     setIsMapVisible,
     setIsSearchFocused,
-    setPinnedLocation,
     usePinLocation,
   } = useLocationPinController({
     lat,
@@ -53,6 +53,26 @@ export function LocationPinPicker({
     onCountryChange,
     onLocationChange,
   });
+  const pins = useMemo(
+    () =>
+      markerCoordinate
+        ? [
+            {
+              id: "property-pin",
+              coordinate: markerCoordinate,
+              title: "Property Pin",
+              color: "#634CE4",
+              draggable: true,
+            },
+          ]
+        : [],
+    [markerCoordinate],
+  );
+  const handlePinDragEnd = useCallback(
+    (_: string, coordinate: MapCoordinate) =>
+      handleMapCoordinateChange(coordinate),
+    [handleMapCoordinateChange],
+  );
 
   return (
     <View className="gap-3 rounded-2xl border border-secondary/20 bg-white p-4">
@@ -130,24 +150,14 @@ export function LocationPinPicker({
         visible={isMapVisible}
       >
         <View className="flex-1 bg-[#FFFFFF]">
-          <MapView
-            initialRegion={mapRegion}
-            onPress={handleMapPress}
-            ref={mapRef}
-            style={{ flex: 1 }}
-          >
-            {markerCoordinate ? (
-              <Marker
-                coordinate={markerCoordinate}
-                draggable
-                onDragEnd={(event) => {
-                  const { latitude: nextLatitude, longitude: nextLongitude } =
-                    event.nativeEvent.coordinate;
-                  setPinnedLocation(nextLatitude, nextLongitude);
-                }}
-              />
-            ) : null}
-          </MapView>
+          {isMapVisible ? (
+            <AdaptiveMap
+              onMapPress={handleMapCoordinateChange}
+              onPinDragEnd={handlePinDragEnd}
+              pins={pins}
+              region={mapRegion}
+            />
+          ) : null}
           <View className="absolute left-5 right-8 top-16 rounded-3xl border border-secondary/20 bg-[#FFFFFF] px-4 py-6 shadow-sm shadow-secondary/10">
             <View className="flex-row items-center justify-between gap-3">
               <View className="min-w-0 flex-1">

@@ -7,6 +7,8 @@ export type PropertyStatusTone = {
   textClassName: string;
 };
 
+export type MappedProperty = Property & { lat: number; lng: number };
+
 const STATUS_TONES: Record<Property["status"], PropertyStatusTone> = {
   IDLE: {
     backgroundClassName: "bg-slate-100",
@@ -50,10 +52,9 @@ export function getPropertyStatusTone(
   return STATUS_TONES[status];
 }
 
-export function hasMapCoordinate(property: Property): property is Property & {
-  lat: number;
-  lng: number;
-} {
+export function hasMapCoordinate(
+  property: Property,
+): property is MappedProperty {
   return (
     typeof property.lat === "number" &&
     Number.isFinite(property.lat) &&
@@ -62,9 +63,7 @@ export function hasMapCoordinate(property: Property): property is Property & {
   );
 }
 
-export function getPropertyCoordinate(
-  property: Property & { lat: number; lng: number },
-) {
+export function getPropertyCoordinate(property: MappedProperty) {
   return { latitude: property.lat, longitude: property.lng };
 }
 

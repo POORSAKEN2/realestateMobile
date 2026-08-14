@@ -22,7 +22,7 @@ axiosInstance.interceptors.request.use(
         sessionStr = localStorage.getItem(AUTH_STORAGE_KEY);
       }
 
-      if (sessionStr) {
+      if (sessionStr && !config.headers.Authorization) {
         let token = sessionStr;
         try {
           const session = JSON.parse(sessionStr);

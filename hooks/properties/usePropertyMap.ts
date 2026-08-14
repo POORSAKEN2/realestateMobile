@@ -1,87 +1,77 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import MapView, { type Region } from "react-native-maps";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { DEFAULT_PHILIPPINES_REGION } from "../../constants/defaultLocation";
 import type { Property } from "../../types";
+import type { MapRegion } from "../../types/maps";
+import { hasMapCoordinate } from "../../utils/properties/propertyPresentation";
 import {
-  getPropertyCoordinate,
-  hasMapCoordinate,
-} from "../../utils/properties/propertyPresentation";
-
-export const PHILIPPINES_REGION: Region = {
-  latitude: 12.8797,
-  longitude: 121.774,
-  latitudeDelta: 12,
-  longitudeDelta: 12,
-};
-
-export const SELECTED_PROPERTY_DELTA = {
-  latitudeDelta: 0.035,
-  longitudeDelta: 0.035,
-};
+  getPortfolioRegion,
+  getSelectedPropertyRegion,
+} from "../../utils/properties/propertyMap";
 
 export function usePropertyMap(properties: Property[]) {
-  const mapRef = useRef<MapView | null>(null);
-  const [isMapReady, setIsMapReady] = useState(false);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
     null,
   );
+  const [viewport, setViewport] = useState({
+    region: DEFAULT_PHILIPPINES_REGION,
+    revision: 0,
+  });
   const mappedProperties = useMemo(
     () => properties.filter(hasMapCoordinate),
     [properties],
   );
+  const propertiesById = useMemo(
+    () => new Map(mappedProperties.map((property) => [property.id, property])),
+    [mappedProperties],
+  );
+  const selectedProperty = selectedPropertyId
+    ? (propertiesById.get(selectedPropertyId) ?? null)
+    : null;
+  const portfolioRegion = useMemo(
+    () => getPortfolioRegion(mappedProperties),
+    [mappedProperties],
+  );
 
-  function fitPortfolio(animated = true) {
-    if (!mappedProperties.length) {
-      mapRef.current?.animateToRegion(PHILIPPINES_REGION, 800);
-    } else if (mappedProperties.length === 1) {
-      mapRef.current?.animateToRegion(
-        {
-          ...getPropertyCoordinate(mappedProperties[0]),
-          ...SELECTED_PROPERTY_DELTA,
-        },
-        800,
-      );
-    } else {
-      mapRef.current?.fitToCoordinates(
-        mappedProperties.map(getPropertyCoordinate),
-        {
-          animated,
-          edgePadding: { top: 110, right: 70, bottom: 220, left: 70 },
-        },
-      );
-    }
-  }
+  const moveViewport = useCallback(
+    (region: MapRegion) =>
+      setViewport((current) => ({
+        region,
+        revision: current.revision + 1,
+      })),
+    [],
+  );
 
   useEffect(() => {
-    if (!isMapReady || !mappedProperties.length) return;
-    const timer = setTimeout(() => fitPortfolio(), 250);
+    const timer = setTimeout(() => moveViewport(portfolioRegion), 250);
     return () => clearTimeout(timer);
-  }, [isMapReady, mappedProperties]);
+  }, [moveViewport, portfolioRegion]);
 
-  function recenter() {
-    setSelectedProperty(null);
-    fitPortfolio();
-  }
+  const clearSelection = useCallback(() => setSelectedPropertyId(null), []);
 
-  function selectProperty(property: Property & { lat: number; lng: number }) {
-    setSelectedProperty(property);
-    mapRef.current?.animateToRegion(
-      {
-        ...getPropertyCoordinate(property),
-        ...SELECTED_PROPERTY_DELTA,
-      },
-      500,
-    );
-  }
+  const recenter = useCallback(() => {
+    clearSelection();
+    moveViewport(portfolioRegion);
+  }, [clearSelection, moveViewport, portfolioRegion]);
+
+  const selectPropertyById = useCallback(
+    (propertyId: string) => {
+      const property = propertiesById.get(propertyId);
+      if (!property) return;
+      setSelectedPropertyId(propertyId);
+      moveViewport(getSelectedPropertyRegion(property));
+    },
+    [moveViewport, propertiesById],
+  );
 
   return {
-    mapRef,
+    clearSelection,
     mappedProperties,
-    unmappedPropertyCount: properties.length - mappedProperties.length,
-    selectedProperty,
-    setSelectedProperty,
-    setIsMapReady,
+    mapRegion: viewport.region,
     recenter,
-    selectProperty,
+    selectedProperty,
+    selectPropertyById,
+    unmappedPropertyCount: properties.length - mappedProperties.length,
+    viewportRevision: viewport.revision,
   };
 }
