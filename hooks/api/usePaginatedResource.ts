@@ -3,6 +3,7 @@ import {
   useInfiniteQuery,
   UseInfiniteQueryOptions,
 } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { PaginatedApiData } from "../../types/api/common";
 
 export interface PaginatedResult<T> {
