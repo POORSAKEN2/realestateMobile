@@ -18,15 +18,30 @@ export const AdaptiveMap = memo(function AdaptiveMap({
   viewportRevision = 0,
 }: AdaptiveMapProps) {
   const mapRef = useRef<MapView | null>(null);
+  const lastRevisionRef = useRef(viewportRevision);
+  const lastRegionRef = useRef(region);
 
   useEffect(() => {
-    mapRef.current?.animateToRegion(region, 500);
+    const revisionChanged = lastRevisionRef.current !== viewportRevision;
+    const regionChanged =
+      lastRegionRef.current.latitude !== region.latitude ||
+      lastRegionRef.current.longitude !== region.longitude ||
+      lastRegionRef.current.latitudeDelta !== region.latitudeDelta ||
+      lastRegionRef.current.longitudeDelta !== region.longitudeDelta;
+
+    lastRevisionRef.current = viewportRevision;
+    lastRegionRef.current = region;
+
+    if (revisionChanged || (viewportRevision === 0 && regionChanged)) {
+      mapRef.current?.animateToRegion(region, 500);
+    }
   }, [
     region.latitude,
     region.longitude,
     region.latitudeDelta,
     region.longitudeDelta,
     viewportRevision,
+    region,
   ]);
 
   return (

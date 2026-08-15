@@ -46,6 +46,7 @@ export function LocationPinPicker({
     setIsMapVisible,
     setIsSearchFocused,
     usePinLocation,
+    viewportRevision,
   } = useLocationPinController({
     lat,
     lng,
@@ -156,6 +157,7 @@ export function LocationPinPicker({
               onPinDragEnd={handlePinDragEnd}
               pins={pins}
               region={mapRegion}
+              viewportRevision={viewportRevision}
             />
           ) : null}
           <View className="absolute left-5 right-8 top-16 rounded-3xl border border-secondary/20 bg-[#FFFFFF] px-4 py-6 shadow-sm shadow-secondary/10">

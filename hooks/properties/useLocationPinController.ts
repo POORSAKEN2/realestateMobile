@@ -40,6 +40,7 @@ export function useLocationPinController({
   const [isResolvingPinLocation, setIsResolvingPinLocation] = useState(false);
   const [pinLocationError, setPinLocationError] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [viewportRevision, setViewportRevision] = useState(0);
   const searchInputRef = useRef<TextInput | null>(null);
   const requestRef = useRef(0);
   const reverseGeocodeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -152,6 +153,7 @@ export function useLocationPinController({
       setSearchResults([]);
       setSearchError("");
       setPinnedLocation(result.latitude, result.longitude);
+      setViewportRevision((revision) => revision + 1);
     },
     [setPinnedLocation],
   );
@@ -217,5 +219,6 @@ export function useLocationPinController({
     setIsMapVisible,
     setIsSearchFocused,
     usePinLocation,
+    viewportRevision,
   };
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { DEFAULT_PHILIPPINES_REGION } from "../../constants/defaultLocation";
 import type { Property } from "../../types";
@@ -42,10 +42,23 @@ export function usePropertyMap(properties: Property[]) {
     [],
   );
 
+  const propertiesKey = useMemo(
+    () =>
+      mappedProperties
+        .map((property) => `${property.id}:${property.lat}:${property.lng}`)
+        .join("|"),
+    [mappedProperties],
+  );
+  const lastPropertiesKeyRef = useRef<string | null>(null);
+
   useEffect(() => {
+    if (mappedProperties.length === 0) return;
+    if (lastPropertiesKeyRef.current === propertiesKey) return;
+    lastPropertiesKeyRef.current = propertiesKey;
+
     const timer = setTimeout(() => moveViewport(portfolioRegion), 250);
     return () => clearTimeout(timer);
-  }, [moveViewport, portfolioRegion]);
+  }, [moveViewport, portfolioRegion, propertiesKey, mappedProperties.length]);
 
   const clearSelection = useCallback(() => setSelectedPropertyId(null), []);
 

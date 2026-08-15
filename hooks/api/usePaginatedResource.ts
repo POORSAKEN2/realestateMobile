@@ -47,8 +47,10 @@ export function usePaginatedQuery<TData, TError extends Error = Error>(
     ...options,
   });
 
-  const flattenedData =
-    queryInfo.data?.pages.flatMap((page) => page.data ?? []) ?? [];
+  const flattenedData = useMemo(
+    () => queryInfo.data?.pages.flatMap((page) => page.data ?? []) ?? [],
+    [queryInfo.data],
+  );
 
   return {
     data: flattenedData,
