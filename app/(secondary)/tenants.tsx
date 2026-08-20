@@ -21,7 +21,11 @@ import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { colors } from "../../constants/colors";
 
-export default function TenantsScreen() {
+type TenantsScreenProps = {
+  showBackButton?: boolean;
+};
+
+export function TenantsScreen({ showBackButton = true }: TenantsScreenProps) {
   const tenantSnackbar = useSnackbar();
   const {
     closeForm,
@@ -65,10 +69,12 @@ export default function TenantsScreen() {
             action={<AddButton onPress={openCreateForm} />}
             eyebrow="CRM Dashboard"
             leading={
-              <SecondaryBackButton
-                accessibilityLabel="Back from tenants"
-                variant="secondary"
-              />
+              showBackButton ? (
+                <SecondaryBackButton
+                  accessibilityLabel="Back from tenants"
+                  variant="secondary"
+                />
+              ) : undefined
             }
             title="Tenants"
           />
@@ -289,3 +295,5 @@ export default function TenantsScreen() {
     </Screen>
   );
 }
+
+export default TenantsScreen;

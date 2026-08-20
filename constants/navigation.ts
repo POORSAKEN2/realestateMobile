@@ -9,11 +9,11 @@ export const appRoutes = {
     properties: "/(tabs)/properties",
     bookings: "/(tabs)/bookings",
     expenses: "/(tabs)/expenses",
+    tenants: "/(tabs)/tenants",
   },
   secondary: {
     analytics: "/(secondary)/analytics",
     leases: "/(secondary)/leases",
-    tenants: "/(secondary)/tenants",
     documents: "/(secondary)/documents",
     profile: "/(secondary)/profile",
     settings: "/(secondary)/settings",
@@ -37,15 +37,14 @@ const moduleRoutes: Record<string, Href> = {
   profile: appRoutes.secondary.profile,
   properties: appRoutes.primary.properties,
   settings: appRoutes.secondary.settings,
-  tenants: appRoutes.secondary.tenants,
+  tenants: appRoutes.primary.tenants,
 };
 
 function splitRoute(route: string) {
   const separatorIndex = route.search(/[?#]/);
 
   return {
-    moduleName:
-      separatorIndex >= 0 ? route.slice(0, separatorIndex) : route,
+    moduleName: separatorIndex >= 0 ? route.slice(0, separatorIndex) : route,
     suffix: separatorIndex >= 0 ? route.slice(separatorIndex) : "",
   };
 }
@@ -57,9 +56,7 @@ export function resolveModuleRoute(route?: string | null): Href | null {
     return route as Href;
   }
 
-  const normalizedRoute = route
-    .replace(/^\/\(tabs\)\//, "")
-    .replace(/^\//, "");
+  const normalizedRoute = route.replace(/^\/\(tabs\)\//, "").replace(/^\//, "");
   const { moduleName, suffix } = splitRoute(normalizedRoute);
   const moduleRoute = moduleRoutes[moduleName];
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { MoreBottomSheet } from "../../components/navigation/MoreBottomSheet";
 import { colors } from "../../constants/colors";
+import { Platform } from "react-native";
 
 export default function TabsLayout() {
   const [isMoreMenuVisible, setIsMoreMenuVisible] = useState(false);
@@ -25,32 +26,27 @@ export default function TabsLayout() {
             paddingVertical: 6,
           },
           tabBarStyle: {
-            position: "absolute",
             backgroundColor: colors.whitePrimary,
-            borderColor: "#E2E8F0",
-            borderRadius: 24,
-            borderTopWidth: 2,
-            borderWidth: 2,
-            bottom: 32,
-            height: 80,
-            marginHorizontal: 12,
+            borderTopColor: "#E2E8F0",
+            borderTopWidth: 1,
+            height: Platform.OS === "ios" ? 96 : 80,
             paddingBottom: 8,
             paddingTop: 6,
             shadowColor: "#0F172A",
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.14,
-            shadowRadius: 22,
-            elevation: 16,
+            shadowOffset: { width: 0, height: -4 },
+            shadowOpacity: 0.08,
+            shadowRadius: 24,
+            elevation: 12,
           },
         }}
       >
         <Tabs.Screen
           name="dashboard"
           options={{
-            title: "Dashboard",
+            title: "Home",
             tabBarIcon: ({ color, size, focused }) => (
-              <MaterialCommunityIcons
-                name={focused ? "view-dashboard" : "view-dashboard-outline"}
+              <Ionicons
+                name={focused ? "home" : "home-outline"}
                 color={color}
                 size={size}
               />
@@ -74,10 +70,24 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="bookings"
           options={{
+            href: null,
             title: "Bookings",
+          }}
+        />
+        <Tabs.Screen
+          name="expenses"
+          options={{
+            href: null,
+            title: "Expenses",
+          }}
+        />
+        <Tabs.Screen
+          name="tenants"
+          options={{
+            title: "Tenants",
             tabBarIcon: ({ color, size, focused }) => (
               <Ionicons
-                name={focused ? "calendar" : "calendar-outline"}
+                name={focused ? "people" : "people-outline"}
                 color={color}
                 size={size}
               />
@@ -85,12 +95,18 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="expenses"
+          name="rent"
+          listeners={{
+            tabPress: (event) => {
+              event.preventDefault();
+            },
+          }}
           options={{
-            title: "Expenses",
+            title: "Rent",
+            tabBarAccessibilityLabel: "Rent collection, coming soon",
             tabBarIcon: ({ color, size, focused }) => (
-              <Ionicons
-                name={focused ? "receipt" : "receipt-outline"}
+              <MaterialCommunityIcons
+                name={focused ? "cash-multiple" : "cash"}
                 color={color}
                 size={size}
               />

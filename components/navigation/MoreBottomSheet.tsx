@@ -13,27 +13,28 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Svg, {
-  Circle,
-  Defs,
-  Line,
-  LinearGradient,
-  Path,
-  Stop,
-} from "react-native-svg";
 
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 
+type MenuIcon =
+  | { family: "Ionicons"; name: keyof typeof Ionicons.glyphMap }
+  | {
+      family: "MaterialCommunityIcons";
+      name: keyof typeof MaterialCommunityIcons.glyphMap;
+    };
+
 type MenuItem = {
   label: string;
-  href: Href;
-  icon:
-    | { family: "Ionicons"; name: keyof typeof Ionicons.glyphMap }
-    | {
-        family: "MaterialCommunityIcons";
-        name: keyof typeof MaterialCommunityIcons.glyphMap;
-      };
+  supportingText: string;
+  href?: Href;
+  badge?: string;
+  icon: MenuIcon;
+};
+
+type MenuSection = {
+  title: string;
+  items: MenuItem[];
 };
 
 type MoreBottomSheetProps = {
@@ -41,43 +42,113 @@ type MoreBottomSheetProps = {
   onClose: () => void;
 };
 
-const menuItems: MenuItem[] = [
+const menuSections: MenuSection[] = [
   {
-    label: "Analytics",
-    href: appRoutes.secondary.analytics,
-    icon: { family: "Ionicons", name: "analytics-outline" },
+    title: "Operations",
+    items: [
+      {
+        label: "Inquiries",
+        supportingText: "Review listing leads and engagement",
+        badge: "Planned",
+        icon: { family: "Ionicons", name: "chatbubbles-outline" },
+      },
+      {
+        label: "Leases",
+        supportingText: "Manage agreements and lease terms",
+        href: appRoutes.secondary.leases,
+        icon: { family: "Ionicons", name: "document-text-outline" },
+      },
+      {
+        label: "Expenses",
+        supportingText: "Track portfolio operating costs",
+        href: appRoutes.primary.expenses,
+        icon: { family: "Ionicons", name: "receipt-outline" },
+      },
+      {
+        label: "Documents",
+        supportingText: "Store property and tenant files",
+        href: appRoutes.secondary.documents,
+        icon: {
+          family: "MaterialCommunityIcons",
+          name: "file-document-outline",
+        },
+      },
+      {
+        label: "Bookings",
+        supportingText: "Manage transient property stays",
+        href: appRoutes.primary.bookings,
+        badge: "Review scope",
+        icon: { family: "Ionicons", name: "calendar-outline" },
+      },
+    ],
   },
   {
-    label: "Leases",
-    href: appRoutes.secondary.leases,
-    icon: { family: "Ionicons", name: "document-text-outline" },
+    title: "Portfolio",
+    items: [
+      {
+        label: "Public Listing",
+        supportingText: "Manage published properties and units",
+        badge: "Planned",
+        icon: { family: "Ionicons", name: "globe-outline" },
+      },
+      {
+        label: "Analytics & Reports",
+        supportingText: "View performance and portfolio insights",
+        href: appRoutes.secondary.analytics,
+        icon: { family: "Ionicons", name: "analytics-outline" },
+      },
+      {
+        label: "AI Assistant",
+        supportingText: "Ask questions and create reports",
+        badge: "All-In",
+        icon: { family: "MaterialCommunityIcons", name: "robot-outline" },
+      },
+    ],
   },
   {
-    label: "Tenants",
-    href: appRoutes.secondary.tenants,
-    icon: { family: "Ionicons", name: "people-outline" },
-  },
-  {
-    label: "Documents",
-    href: appRoutes.secondary.documents,
-    icon: {
-      family: "MaterialCommunityIcons",
-      name: "file-document-outline",
-    },
-  },
-  {
-    label: "Profile",
-    href: appRoutes.secondary.profile,
-    icon: { family: "Ionicons", name: "person-outline" },
-  },
-  {
-    label: "Settings",
-    href: appRoutes.secondary.settings,
-    icon: { family: "Ionicons", name: "settings-outline" },
+    title: "Account",
+    items: [
+      {
+        label: "Team & Access",
+        supportingText: "Manage managers and property access",
+        badge: "Owner",
+        icon: { family: "Ionicons", name: "people-circle-outline" },
+      },
+      {
+        label: "Plan & Billing",
+        supportingText: "View subscription and property limits",
+        badge: "Owner",
+        icon: { family: "Ionicons", name: "card-outline" },
+      },
+      {
+        label: "Notifications & Reminders",
+        supportingText: "Review alerts and rent reminders",
+        href: appRoutes.secondary.notifications,
+        icon: { family: "Ionicons", name: "notifications-outline" },
+      },
+      {
+        label: "Support",
+        supportingText: "Get product and account help",
+        badge: "Planned",
+        icon: { family: "Ionicons", name: "help-buoy-outline" },
+      },
+      {
+        label: "Profile",
+        supportingText: "Update your personal information",
+        href: appRoutes.secondary.profile,
+        icon: { family: "Ionicons", name: "person-outline" },
+      },
+      {
+        label: "Settings & Security",
+        supportingText: "Manage password and app preferences",
+        href: appRoutes.secondary.settings,
+        icon: { family: "Ionicons", name: "settings-outline" },
+      },
+    ],
   },
 ];
 
-function MenuIcon({ icon }: { icon: MenuItem["icon"] }) {
+function MenuItemIcon({ icon }: { icon: MenuIcon }) {
   if (icon.family === "Ionicons") {
     return <Ionicons name={icon.name} size={21} color={colors.primary} />;
   }
@@ -87,162 +158,48 @@ function MenuIcon({ icon }: { icon: MenuItem["icon"] }) {
   );
 }
 
-function AnalyticsCard({
+function MenuItemCard({
   item,
   onPress,
 }: {
   item: MenuItem;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      accessibilityRole="button"
-      accessibilityLabel="Open analytics"
-      activeOpacity={0.82}
-      onPress={onPress}
-      className="overflow-hidden rounded-[22px] border border-secondary/50 bg-white px-4 pt-4"
-    >
-      <View className="flex-row items-center">
-        <View className="h-[46px] w-[46px] items-center justify-center rounded-2xl bg-secondary/10">
-          <MenuIcon icon={item.icon} />
-        </View>
-        <View className="ml-3 flex-1">
-          <Text className="font-ralewayExtraBold text-lg text-textPrimary">
-            {item.label}
-          </Text>
-          <Text className="mt-0.5 font-ralewayBold text-[13px] text-slate-500">
-            View insights
-          </Text>
-        </View>
-        <View className="h-[38px] w-[38px] items-center justify-center rounded-2xl bg-secondary/10">
-          <Ionicons name="arrow-forward" color={colors.primary} size={18} />
-        </View>
-      </View>
-
-      <View className="mt-2.5 h-28">
-        <Svg width="100%" height="112" viewBox="0 0 320 112">
-          <Defs>
-            <LinearGradient id="analyticsArea" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0" stopColor={colors.primary} stopOpacity={0.2} />
-              <Stop offset="1" stopColor={colors.primary} stopOpacity={0} />
-            </LinearGradient>
-          </Defs>
-
-          {[24, 56, 88].map((y) => (
-            <Line
-              key={y}
-              x1="0"
-              x2="320"
-              y1={y}
-              y2={y}
-              stroke="#BEE3DB"
-              strokeDasharray="5 6"
-              strokeWidth="1"
-            />
-          ))}
-
-          <Path
-            d="M0 94 C18 88 24 98 39 86 C53 74 61 76 76 88 C92 101 103 83 118 87 C138 91 146 69 165 64 C181 59 188 72 204 61 C220 49 228 55 243 38 C257 23 266 43 280 29 C294 14 303 23 320 6 L320 112 L0 112 Z"
-            fill="url(#analyticsArea)"
-          />
-          <Path
-            d="M0 94 C18 88 24 98 39 86 C53 74 61 76 76 88 C92 101 103 83 118 87 C138 91 146 69 165 64 C181 59 188 72 204 61 C220 49 228 55 243 38 C257 23 266 43 280 29 C294 14 303 23 320 6"
-            fill="none"
-            stroke={colors.primary}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="3"
-          />
-          <Circle
-            cx="320"
-            cy="6"
-            r="5"
-            fill={colors.whitePrimary}
-            stroke={colors.primary}
-            strokeWidth="3"
-          />
-        </Svg>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-function CompactBentoCard({
-  item,
-  onPress,
-}: {
-  item: MenuItem;
-  onPress: () => void;
+  onPress?: () => void;
 }) {
   return (
     <TouchableOpacity
       accessibilityRole="button"
       accessibilityLabel={`Open ${item.label}`}
-      activeOpacity={0.8}
+      activeOpacity={0.78}
       onPress={onPress}
-      className="min-h-[122px] flex-1 justify-between rounded-[22px] border border-slate-200 bg-white p-4"
-    >
-      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
-        <MenuIcon icon={item.icon} />
-      </View>
-      <View className="flex-row items-center">
-        <Text className="flex-1 font-ralewayBold text-[15px] text-textPrimary">
-          {item.label}
-        </Text>
-        <Ionicons name="chevron-forward" color={colors.primary} size={18} />
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-function WideBentoCard({
-  item,
-  onPress,
-}: {
-  item: MenuItem;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      accessibilityRole="button"
-      accessibilityLabel={`Open ${item.label}`}
-      activeOpacity={0.8}
-      onPress={onPress}
-      className="min-h-[78px] flex-row items-center rounded-[22px] border border-slate-200 bg-white px-4"
+      className="min-h-[78px] flex-row items-center rounded-[22px] border border-slate-200 bg-white px-4 py-3"
     >
       <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
-        <MenuIcon icon={item.icon} />
+        <MenuItemIcon icon={item.icon} />
       </View>
-      <Text className="flex-1 font-ralewayBold text-[15px] text-textPrimary">
-        {item.label}
-      </Text>
-      <Ionicons name="chevron-forward" color={colors.primary} size={19} />
-    </TouchableOpacity>
-  );
-}
 
-function UtilityBentoCard({
-  item,
-  onPress,
-}: {
-  item: MenuItem;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      accessibilityRole="button"
-      accessibilityLabel={`Open ${item.label}`}
-      activeOpacity={0.8}
-      onPress={onPress}
-      className="min-h-[70px] flex-1 flex-row items-center rounded-[20px] border border-slate-200 bg-slate-50 px-3.5"
-    >
-      <View className="mr-2.5 h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
-        <MenuIcon icon={item.icon} />
+      <View className="min-w-0 flex-1">
+        <View className="flex-row items-center gap-2">
+          <Text
+            className="shrink font-ralewayBold text-[15px] text-textPrimary"
+            numberOfLines={1}
+          >
+            {item.label}
+          </Text>
+          {item.badge ? (
+            <Text className="rounded-full bg-secondary/10 px-2 py-0.5 font-ralewayExtraBold text-[9px] uppercase tracking-wide text-secondary">
+              {item.badge}
+            </Text>
+          ) : null}
+        </View>
+        <Text
+          className="mt-0.5 font-ralewayMedium text-xs text-slate-500"
+          numberOfLines={1}
+        >
+          {item.supportingText}
+        </Text>
       </View>
-      <Text className="flex-1 font-ralewayBold text-sm text-textPrimary">
-        {item.label}
-      </Text>
-      <Ionicons name="chevron-forward" color="#94A3B8" size={17} />
+
+      <Ionicons name="chevron-forward" color="#94A3B8" size={18} />
     </TouchableOpacity>
   );
 }
@@ -254,14 +211,6 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
   const translateY = useRef(new Animated.Value(height)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const sheetOpacity = useRef(new Animated.Value(0)).current;
-  const [
-    analyticsItem,
-    leasesItem,
-    tenantsItem,
-    documentsItem,
-    profileItem,
-    settingsItem,
-  ] = menuItems;
 
   useEffect(() => {
     const closedPosition = height;
@@ -300,7 +249,7 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
       }),
       Animated.timing(sheetOpacity, {
         toValue: visible ? 1 : 0.96,
-        duration: visible ? 180 : 180,
+        duration: 180,
         easing: Easing.out(Easing.quad),
         useNativeDriver: true,
       }),
@@ -342,7 +291,7 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
         <Animated.View
           className="rounded-t-[30px] bg-white px-5 pt-2.5 shadow-2xl shadow-slate-950/20"
           style={{
-            maxHeight: height - Math.max(insets.top, 20) - 12,
+            height: Math.min(height - Math.max(insets.top, 20) - 12, 760),
             opacity: sheetOpacity,
             paddingBottom: Math.max(insets.bottom, 18),
             transform: [{ translateY }],
@@ -370,44 +319,28 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
             </TouchableOpacity>
           </View>
 
-          <View
-            className="gap-[18px] pb-0.5"
-            // showsVerticalScrollIndicator={false}
+          <ScrollView
+            className="-mx-1 flex-1 px-1"
+            contentContainerClassName="gap-6 pb-2"
+            showsVerticalScrollIndicator={false}
           >
-            <AnalyticsCard
-              item={analyticsItem}
-              onPress={() => handleItemPress(analyticsItem.href)}
-            />
-
-            <View className="gap-3.5">
-              <View className="flex-row gap-3">
-                <CompactBentoCard
-                  item={leasesItem}
-                  onPress={() => handleItemPress(leasesItem.href)}
-                />
-                <CompactBentoCard
-                  item={tenantsItem}
-                  onPress={() => handleItemPress(tenantsItem.href)}
-                />
+            {menuSections.map((section) => (
+              <View key={section.title} className="gap-3">
+                <Text className="px-1 font-ralewayExtraBold text-[11px] uppercase tracking-[1.6px] text-slate-500">
+                  {section.title}
+                </Text>
+                {section.items.map((item) => (
+                  <MenuItemCard
+                    key={item.label}
+                    item={item}
+                    onPress={
+                      item.href ? () => handleItemPress(item.href!) : undefined
+                    }
+                  />
+                ))}
               </View>
-
-              <WideBentoCard
-                item={documentsItem}
-                onPress={() => handleItemPress(documentsItem.href)}
-              />
-
-              <View className="flex-row gap-3">
-                <UtilityBentoCard
-                  item={profileItem}
-                  onPress={() => handleItemPress(profileItem.href)}
-                />
-                <UtilityBentoCard
-                  item={settingsItem}
-                  onPress={() => handleItemPress(settingsItem.href)}
-                />
-              </View>
-            </View>
-          </View>
+            ))}
+          </ScrollView>
         </Animated.View>
       </View>
     </Modal>
