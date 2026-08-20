@@ -7,30 +7,30 @@ export function FloorPlanIconButton({
   icon,
   label,
   onPress,
+  selected = false,
 }: {
   danger?: boolean;
   disabled?: boolean;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   label: string;
   onPress: () => void;
+  selected?: boolean;
 }) {
+  const color = danger ? "#DC2626" : selected ? "#634CE4" : "#475569";
+
   return (
     <TouchableOpacity
       accessibilityLabel={label}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled, selected }}
       activeOpacity={0.8}
       className={`h-11 w-11 items-center justify-center rounded-xl ${
-        danger ? "bg-red-50" : "bg-slate-100"
+        danger ? "bg-red-50" : selected ? "bg-secondary/15" : "bg-slate-100"
       } ${disabled ? "opacity-50" : ""}`}
       disabled={disabled}
       onPress={onPress}
     >
-      <MaterialCommunityIcons
-        name={icon}
-        color={danger ? "#DC2626" : "#475569"}
-        size={18}
-      />
+      <MaterialCommunityIcons name={icon} color={color} size={18} />
     </TouchableOpacity>
   );
 }

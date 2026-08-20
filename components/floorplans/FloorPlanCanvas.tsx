@@ -2,30 +2,27 @@ import Feather from "@expo/vector-icons/Feather";
 import { useEffect, useMemo, useState } from "react";
 import {
   GestureResponderEvent,
-  Image,
   LayoutChangeEvent,
   Pressable,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import Svg, { Circle, Polygon, Polyline } from "react-native-svg";
+import Svg, {
+  Circle,
+  Image as SvgImage,
+  Polygon,
+  Polyline,
+} from "react-native-svg";
 
 import type {
   FloorArea,
   FloorPlanDrawingMode,
   FloorPlanPoint,
 } from "../../types";
+import { getFloorAreaColor } from "../../utils/floorplans/floorPlanAreaColors";
 import { FLOOR_PLAN_SHAPE_STRATEGIES } from "../../utils/floorplans/floorPlanShapes";
-
-const AREA_COLORS = [
-  "#634CE4",
-  "#0D9488",
-  "#E11D48",
-  "#D97706",
-  "#2563EB",
-  "#7C3AED",
-];
+import { createFloorPlanViewport } from "../../utils/floorplans/floorPlanViewport";
 
 function pointList(points: FloorPlanPoint[], width: number, height: number) {
   return points
@@ -37,6 +34,7 @@ export function FloorPlanCanvas({
   areas,
   drawingArea,
   drawingMode,
+  focusedAreaId,
   hiddenAreaIds,
   image,
   isSaving,
@@ -46,6 +44,7 @@ export function FloorPlanCanvas({
   areas: FloorArea[];
   drawingArea: FloorArea | null;
   drawingMode: FloorPlanDrawingMode | null;
+  focusedAreaId: string | null;
   hiddenAreaIds: Set<string>;
   image?: string;
   isSaving: boolean;
@@ -65,6 +64,22 @@ export function FloorPlanCanvas({
   const displayedDraftPoints = useMemo(() => {
     return drawingStrategy?.displayPoints(draftPoints) ?? draftPoints;
   }, [draftPoints, drawingStrategy]);
+  const focusedArea = useMemo(
+    () => areas.find((area) => area.id === focusedAreaId) ?? null,
+    [areas, focusedAreaId],
+  );
+  const viewport = useMemo(() => {
+    if (drawingArea || !focusedArea || hiddenAreaIds.has(focusedArea.id)) {
+      return createFloorPlanViewport([], canvas.width, canvas.height);
+    }
+
+    return createFloorPlanViewport(
+      focusedArea.points,
+      canvas.width,
+      canvas.height,
+    );
+  }, [canvas.height, canvas.width, drawingArea, focusedArea, hiddenAreaIds]);
+  const viewBox = `${viewport.x} ${viewport.y} ${viewport.width} ${viewport.height}`;
 
   function handleLayout(event: LayoutChangeEvent) {
     const { width, height } = event.nativeEvent.layout;
@@ -106,13 +121,7 @@ export function FloorPlanCanvas({
         onLayout={handleLayout}
         onPress={handlePress}
       >
-        {image ? (
-          <Image
-            className="h-full w-full"
-            resizeMode="contain"
-            source={{ uri: image }}
-          />
-        ) : (
+        {!image ? (
           <View className="flex-1 items-center justify-center px-8">
             <View className="h-14 w-14 items-center justify-center rounded-2xl bg-white">
               <Feather name="image" color="#634CE4" size={24} />
@@ -124,15 +133,25 @@ export function FloorPlanCanvas({
               Upload this floor's plan image before drawing area shapes.
             </Text>
           </View>
-        )}
+        ) : null}
 
-        {canvas.width && canvas.height ? (
+        {image && canvas.width && canvas.height ? (
           <Svg
             height={canvas.height}
             pointerEvents="none"
             style={{ left: 0, position: "absolute", top: 0 }}
+            viewBox={viewBox}
             width={canvas.width}
           >
+            <SvgImage
+              height={canvas.height}
+              href={{ uri: image }}
+              preserveAspectRatio="xMidYMid meet"
+              width={canvas.width}
+              x={0}
+              y={0}
+            />
+
             {areas.map((area, index) => {
               if (
                 hiddenAreaIds.has(area.id) ||
@@ -141,7 +160,7 @@ export function FloorPlanCanvas({
               ) {
                 return null;
               }
-              const color = AREA_COLORS[index % AREA_COLORS.length];
+              const color = getFloorAreaColor(index);
 
               return (
                 <Polygon
@@ -151,6 +170,7 @@ export function FloorPlanCanvas({
                   points={pointList(area.points, canvas.width, canvas.height)}
                   stroke={color}
                   strokeWidth={2.5}
+                  vectorEffect="non-scaling-stroke"
                 />
               );
             })}
@@ -169,6 +189,7 @@ export function FloorPlanCanvas({
                     stroke="#634CE4"
                     strokeDasharray="7 5"
                     strokeWidth={3}
+                    vectorEffect="non-scaling-stroke"
                   />
                 ) : (
                   <Polyline
@@ -181,6 +202,7 @@ export function FloorPlanCanvas({
                     stroke="#634CE4"
                     strokeDasharray="7 5"
                     strokeWidth={3}
+                    vectorEffect="non-scaling-stroke"
                   />
                 )}
                 {draftPoints.map((point, index) => (
@@ -192,6 +214,7 @@ export function FloorPlanCanvas({
                     r={6}
                     stroke="#634CE4"
                     strokeWidth={3}
+                    vectorEffect="non-scaling-stroke"
                   />
                 ))}
               </>

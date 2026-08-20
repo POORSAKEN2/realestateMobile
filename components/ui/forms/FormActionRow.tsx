@@ -48,7 +48,7 @@ export function FormActionRow({
           accessibilityRole="button"
           accessibilityState={{ disabled: actionsDisabled, busy: isPending }}
           activeOpacity={0.85}
-          className={`h-14 flex-1 items-center justify-center rounded-2xl bg-secondary ${
+          className={`h-14 flex-auto items-center justify-center rounded-2xl bg-secondary ${
             actionsDisabled ? "opacity-60" : ""
           }`}
           disabled={actionsDisabled}

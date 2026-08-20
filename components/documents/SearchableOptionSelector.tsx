@@ -106,7 +106,7 @@ export function SearchableOptionSelector({
       </View>
       <ScrollView
         className="mt-3"
-        contentContainerClassName="gap-2 px-5 pb-8"
+        contentContainerClassName="gap-2 px-5 pb-20"
         keyboardShouldPersistTaps="handled"
       >
         <OptionRow

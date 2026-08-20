@@ -97,7 +97,7 @@ export function DropdownField<T extends string>({
         onClose={() => setIsOpen(false)}
         visible={isOpen}
       >
-        <View className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-[#FFFFFF] px-5 pb-8 pt-5">
+        <View className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-[#FFFFFF] px-5 pt-5">
           <View className="mb-4 flex-row items-center justify-between">
             <View>
               <Text className="font-ralewayExtraBold text-lg text-textPrimary">
@@ -120,7 +120,10 @@ export function DropdownField<T extends string>({
             </TouchableOpacity>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView
+            contentContainerClassName="pb-20"
+            showsVerticalScrollIndicator={false}
+          >
             <View className="gap-2">
               {options.map((option) => {
                 const isSelected = option.value === value;

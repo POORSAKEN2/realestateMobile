@@ -127,7 +127,7 @@ export default function BookingsScreen() {
   }
 
   return (
-    <Screen className="bg-surface">
+    <Screen bottomInset="tab-bar" className="bg-surface">
       <View className="flex-1 gap-5">
         <View className="px-1">
           <ModuleHeader

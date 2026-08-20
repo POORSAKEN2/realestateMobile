@@ -189,7 +189,7 @@ export function DocumentFilterSheet({
               </View>
             </ScrollView>
 
-            <View className="flex-row gap-3 border-t border-secondary/20 p-5 pb-8">
+            <View className="flex-row gap-3 border-t border-secondary/20 px-4 pb-20 pt-4">
               <TouchableOpacity
                 accessibilityRole="button"
                 activeOpacity={0.82}

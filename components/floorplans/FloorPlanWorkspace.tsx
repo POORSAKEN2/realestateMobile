@@ -1,4 +1,5 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useEffect, useRef, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { FloorAreaCard } from "./FloorAreaCard";
@@ -11,6 +12,7 @@ import type {
   FloorPlanPoint,
   PropertyRoom,
 } from "../../types";
+import { getFloorAreaColor } from "../../utils/floorplans/floorPlanAreaColors";
 import { getFloorRoomCount } from "../../utils/floorplans/floorPlanPresentation";
 
 export function FloorPlanWorkspace({
@@ -58,6 +60,47 @@ export function FloorPlanWorkspace({
   rooms: PropertyRoom[];
   showRoomActions: boolean;
 }) {
+  const contentScrollRef = useRef<ScrollView>(null);
+  const [zoomedAreaId, setZoomedAreaId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setZoomedAreaId(null);
+  }, [activeFloor.id]);
+
+  useEffect(() => {
+    if (
+      zoomedAreaId &&
+      !activeFloor.areas.some(
+        (area) => area.id === zoomedAreaId && area.points.length >= 3,
+      )
+    ) {
+      setZoomedAreaId(null);
+    }
+  }, [activeFloor.areas, zoomedAreaId]);
+
+  function toggleAreaZoom(area: FloorArea) {
+    const shouldZoomIn = zoomedAreaId !== area.id;
+    setZoomedAreaId(shouldZoomIn ? area.id : null);
+
+    if (shouldZoomIn) {
+      requestAnimationFrame(() => {
+        contentScrollRef.current?.scrollTo({ animated: true, y: 0 });
+      });
+    }
+  }
+
+  function startAreaDrawing(areaId: string, mode: FloorPlanDrawingMode) {
+    setZoomedAreaId(null);
+    onDrawArea(areaId, mode);
+  }
+
+  function toggleAreaVisibility(area: FloorArea) {
+    if (!hiddenAreaIds.has(area.id) && zoomedAreaId === area.id) {
+      setZoomedAreaId(null);
+    }
+    onToggleAreaVisibility(area.id);
+  }
+
   return (
     <>
       <ScrollView
@@ -100,6 +143,7 @@ export function FloorPlanWorkspace({
           paddingBottom: 130,
           paddingHorizontal: 24,
         }}
+        ref={contentScrollRef}
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-row items-center justify-between rounded-2xl border border-slate-200 bg-white p-3">
@@ -140,6 +184,7 @@ export function FloorPlanWorkspace({
           areas={activeFloor.areas}
           drawingArea={drawingArea}
           drawingMode={drawingMode}
+          focusedAreaId={zoomedAreaId}
           hiddenAreaIds={hiddenAreaIds}
           image={activeFloor.image}
           isSaving={isShapeSaving}
@@ -183,20 +228,23 @@ export function FloorPlanWorkspace({
         ) : null}
 
         {activeFloor.areas.length ? (
-          activeFloor.areas.map((area) => (
+          activeFloor.areas.map((area, index) => (
             <FloorAreaCard
               area={area}
               canDraw={Boolean(activeFloor.image)}
+              color={getFloorAreaColor(index)}
               hidden={hiddenAreaIds.has(area.id)}
               key={area.id}
               onDelete={() => onDeleteArea(area)}
-              onDraw={(mode) => onDrawArea(area.id, mode)}
+              onDraw={(mode) => startAreaDrawing(area.id, mode)}
               onManageRooms={
                 showRoomActions ? () => onManageRooms(area) : undefined
               }
               onRename={() => onRenameArea(area)}
-              onToggleVisibility={() => onToggleAreaVisibility(area.id)}
+              onToggleVisibility={() => toggleAreaVisibility(area)}
+              onToggleZoom={() => toggleAreaZoom(area)}
               roomCount={rooms.filter((room) => room.areaId === area.id).length}
+              zoomed={zoomedAreaId === area.id}
             />
           ))
         ) : (

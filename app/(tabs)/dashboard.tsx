@@ -11,21 +11,21 @@ import {
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { GlassView } from "expo-glass-effect";
-import { type ReactNode, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Screen } from "../../components/ui/Screen";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
 import { useProperties } from "../../hooks/api/useProperties";
-import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
 import { useAuth } from "../../hooks/useAuth";
 import type { Property } from "../../types";
 import { router } from "expo-router";
 import { appRoutes } from "../../constants/navigation";
 import { colors } from "../../constants/colors";
 import PropertyImageGallery from "../../components/properties/PropertyImageGallery";
+import { PortfolioAssetFilterSheet } from "../../components/properties/PortfolioAssetFilterSheet";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
+import { PropertyPortfolioSummary } from "../../components/properties/PropertyPortfolioSummary";
 import {
-  ASSET_STATUS_FILTERS,
   capitalizeWords,
   filterAndSortProperties,
   formatPesoValue,
@@ -38,66 +38,6 @@ import {
   type AssetSortOrder,
   type AssetStatusFilter,
 } from "../../utils/dashboard/dashboardHelpers";
-
-type AnalyticsMetric = {
-  icon: ReactNode;
-  label: string;
-  value: string;
-};
-
-function AnalyticsMetricCard({
-  height,
-  icon,
-  isLoading,
-  label,
-  value,
-}: {
-  height: number;
-  icon: ReactNode;
-  isLoading: boolean;
-  label: string;
-  value: string;
-}) {
-  return (
-    <View
-      className="justify-between rounded-[24px] border border-secondary/20 bg-white p-3 shadow-sm shadow-secondary/10"
-      style={{ height }}
-    >
-      <View className="h-9 w-9 items-center justify-center rounded-2xl bg-secondary/10">
-        {icon}
-      </View>
-
-      <View>
-        <Text
-          adjustsFontSizeToFit
-          className="font-ralewayBold text-[17px] tracking-tight text-textPrimary"
-          numberOfLines={1}
-        >
-          {isLoading ? "..." : value}
-        </Text>
-        <Text
-          className="mt-1 font-ralewaySemiBold text-[10px] uppercase leading-4 text-description"
-          numberOfLines={1}
-        >
-          {label}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function formatCompactPesoValue(value = 0) {
-  const absoluteValue = Math.abs(value);
-
-  if (absoluteValue < 1_000 || absoluteValue >= 1_000_000) {
-    return formatPesoValue(value);
-  }
-
-  const prefix = value < 0 ? "-₱" : "₱";
-  const compactValue = (absoluteValue / 1_000).toFixed(1).replace(/\.0$/, "");
-
-  return `${prefix}${compactValue}K`;
-}
 
 export default function DashboardScreen() {
   const { session } = useAuth();
@@ -124,52 +64,42 @@ export default function DashboardScreen() {
   const [assetSortOrder, setAssetSortOrder] = useState<AssetSortOrder>("desc");
   const [assetStatusFilter, setAssetStatusFilter] =
     useState<AssetStatusFilter>("ALL");
+  const hasCustomAssetFilters =
+    assetStatusFilter !== "ALL" ||
+    assetSortBy !== "value" ||
+    assetSortOrder !== "desc";
   const [imageGalleryProperty, setImageGalleryProperty] =
     useState<Property | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
   );
-  const { stats, isLoading: isLoadingAnalytics } =
-    usePortfolioAnalytics(accessToken);
-  const { useList } = useProperties();
-  const { data: properties = [], isLoading: isLoadingProperties } = useList();
+  const { useList } = useProperties(accessToken);
+  const {
+    data: properties = [],
+    isError: isPropertiesError,
+    isLoading: isLoadingProperties,
+  } = useList();
   const { height } = Dimensions.get("window");
-  const floatingCardHeight = Math.min(Math.max(height * 0.36, 320), 360);
-  const floatingCardPadding = 16;
-  const analyticsHeaderHeight = 52;
-  const metricGridGap = 12;
-  const metricTileHeight = Math.max(
-    (floatingCardHeight -
-      floatingCardPadding * 2 -
-      analyticsHeaderHeight -
-      metricGridGap) /
-      2,
-    112,
+  const heroHeight = Math.min(Math.max(height * 0.24, 192), 224);
+  const portfolioValue = useMemo(
+    () => properties.reduce((sum, property) => sum + property.value, 0),
+    [properties],
   );
-  const netIncome = stats?.net_operating_income ?? 0;
-  const arrears = stats?.total_arrears ?? 0;
-  const analyticsMetrics: AnalyticsMetric[] = [
-    {
-      icon: <Feather name="briefcase" size={17} color={colors.secondary} />,
-      label: "Portfolio Value",
-      value: formatPesoValue(stats?.total_value),
-    },
-    {
-      icon: <Feather name="home" size={17} color={colors.secondary} />,
-      label: "Occupancy",
-      value: `${Number(stats?.occupancy_rate ?? 0).toFixed(0)}%`,
-    },
-    {
-      icon: <Feather name="trending-up" size={17} color={colors.secondary} />,
-      label: "Net Income",
-      value: formatCompactPesoValue(netIncome),
-    },
-    {
-      icon: <Feather name="clock" size={17} color={colors.secondary} />,
-      label: "Arrears",
-      value: formatCompactPesoValue(arrears),
-    },
-  ];
+  const averageRoi = useMemo(() => {
+    if (properties.length === 0) return 0;
+
+    const totalRoi = properties.reduce(
+      (sum, property) => sum + property.roi,
+      0,
+    );
+    return totalRoi / properties.length;
+  }, [properties]);
+  const revenueGeneratingCount = useMemo(
+    () =>
+      properties.filter((property) => property.status === "REVENUE_GENERATING")
+        .length,
+    [properties],
+  );
   const visibleAssets = useMemo(
     () =>
       filterAndSortProperties(
@@ -235,13 +165,13 @@ export default function DashboardScreen() {
   );
 
   return (
-    <Screen className="flex-1 bg-surface">
+    <Screen bottomInset="tab-bar" className="flex-1 bg-surface">
       <ImageBackground
         source={require("../../assets/images/dashboard.webp")}
         resizeMode="cover"
         className="-mx-6 -mt-6 overflow-hidden px-6 pt-6"
         style={{
-          height: height * 0.3,
+          height: heroHeight,
           width: "auto",
         }}
       >
@@ -323,228 +253,63 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </View>
       </ImageBackground>
-      <View
-        className="w-full rounded-[32px] border border-secondary/20 bg-white"
-        style={{
-          height: floatingCardHeight,
-          padding: floatingCardPadding,
-          marginTop: -176,
-          zIndex: 10,
-          shadowColor: colors.text,
-          shadowOffset: { width: 0, height: 12 },
-          shadowOpacity: 0.12,
-          shadowRadius: 16,
-          elevation: 8,
-        }}
-      >
-        <View
-          className="flex-row items-center justify-between"
-          style={{ height: analyticsHeaderHeight }}
-        >
-          <View className="min-w-0 flex-1 flex-row items-center gap-2.5 pr-2">
-            <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/10">
-              <Feather name="bar-chart-2" size={17} color={colors.secondary} />
-            </View>
-            <Text
-              className="min-w-0 flex-1 font-ralewayBold text-[14px] tracking-tight text-textPrimary"
-              numberOfLines={1}
-            >
-              Analytics Overview
-            </Text>
-          </View>
-          <TouchableOpacity
-            accessibilityLabel="View portfolio analytics"
-            accessibilityRole="button"
-            activeOpacity={0.75}
-            className="h-9 flex-row items-center gap-0.5 px-1"
-            onPress={() => router.navigate(appRoutes.secondary.analytics)}
-          >
-            <Text className="font-ralewayBold text-[10px] text-secondary">
-              View analytics
-            </Text>
-            <Feather name="chevron-right" size={15} color={colors.secondary} />
-          </TouchableOpacity>
-        </View>
-
-        <View
-          className="flex-row flex-wrap"
-          style={{ margin: -(metricGridGap / 2) }}
-        >
-          {analyticsMetrics.map((item) => (
-            <View
-              key={item.label}
-              className="w-1/2" // Forces 2 items per row
-              style={{ padding: metricGridGap / 2 }}
-            >
-              <AnalyticsMetricCard
-                height={metricTileHeight}
-                icon={item.icon}
-                isLoading={isLoadingAnalytics}
-                label={item.label}
-                value={item.value}
-              />
-            </View>
-          ))}
-        </View>
+      <View className="z-10 -mt-32">
+        <PropertyPortfolioSummary
+          averageRoi={averageRoi}
+          portfolioValue={portfolioValue}
+          propertyCount={properties.length}
+          revenueGeneratingCount={revenueGeneratingCount}
+          state={
+            isLoadingProperties
+              ? "loading"
+              : isPropertiesError
+                ? "error"
+                : "ready"
+          }
+        />
       </View>
 
-      <View className="flex flex-row items-center justify-between">
-        <View className="my-5">
-          <Text className="font-ralewayBold">Portfolio Assets</Text>
-          <Text className="font-ralewayMedium text-description">
-            High-value holdings
-          </Text>
-        </View>
+      <View className="mb-4 mt-5">
+        <Text className="font-ralewayBold">Portfolio Assets</Text>
 
-        <View>
-          <TouchableOpacity
-            className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary"
-            onPress={() => router.navigate(appRoutes.secondary.map)}
-          >
-            <Feather name="map" color={colors.whitePrimary} size={18} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View className="rounded-[22px] border border-secondary/20 bg-white px-3 py-3 shadow-xl shadow-secondary/10">
-        <View className="flex-row items-center gap-3">
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
+        <View className="mt-3 flex-row items-center gap-3">
+          <View className="h-14 min-w-0 flex-1 flex-row items-center gap-3 rounded-[22px] border border-secondary/20 bg-white px-4 shadow-xl shadow-secondary/10">
             <Feather name="search" size={20} color={colors.secondary} />
-          </View>
 
-          <View className="min-w-0 flex-1">
-            <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-secondary">
-              Find property
-            </Text>
             <TextInput
               accessibilityLabel="Search portfolio assets"
-              className="h-7 p-0 font-ralewaySemiBold text-sm text-textPrimary"
-              placeholder="Location, unit, tenant, or asset"
+              className="h-full min-w-0 flex-1 p-0 font-ralewaySemiBold text-sm text-textPrimary"
+              placeholder="Location or asset"
               placeholderTextColor={colors.description}
               returnKeyType="search"
               value={assetSearchQuery}
               onChangeText={setAssetSearchQuery}
             />
+
+            <TouchableOpacity
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel="Open portfolio asset filters"
+              onPress={() => setShowAssetFilters(true)}
+              className="relative h-10 w-8 items-center justify-center"
+            >
+              <Feather name="sliders" size={18} color={colors.secondary} />
+              {hasCustomAssetFilters ? (
+                <View className="absolute right-0 top-1.5 h-2 w-2 rounded-full bg-secondary" />
+              ) : null}
+            </TouchableOpacity>
           </View>
 
           <TouchableOpacity
-            activeOpacity={0.75}
+            activeOpacity={0.8}
+            accessibilityLabel="Open property map"
             accessibilityRole="button"
-            accessibilityLabel={
-              showAssetFilters ? "Close search filters" : "Open search filters"
-            }
-            onPress={() =>
-              setShowAssetFilters((current) => {
-                if (current) {
-                  setAssetStatusFilter("ALL");
-                }
-
-                return !current;
-              })
-            }
-            className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10"
+            className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary"
+            onPress={() => router.navigate(appRoutes.secondary.map)}
           >
-            <Feather name="sliders" size={18} color={colors.secondary} />
+            <Feather name="map" color={colors.whitePrimary} size={18} />
           </TouchableOpacity>
         </View>
-
-        {showAssetFilters && (
-          <View className="mt-4 gap-3 border-t border-secondary/20 pt-3">
-            <View>
-              <Text className="mb-2 font-ralewayBold text-[10px] uppercase text-description">
-                Sort by
-              </Text>
-              <View className="flex-row gap-2">
-                {(["value", "roi", "name"] as AssetSortBy[]).map((sortKey) => {
-                  const isActive = assetSortBy === sortKey;
-                  const label =
-                    sortKey === "value"
-                      ? "Value"
-                      : sortKey === "roi"
-                        ? "ROI"
-                        : "Name";
-
-                  return (
-                    <TouchableOpacity
-                      key={sortKey}
-                      activeOpacity={0.75}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Sort assets by ${label}`}
-                      onPress={() => {
-                        if (assetSortBy === sortKey) {
-                          setAssetSortOrder((current) =>
-                            current === "desc" ? "asc" : "desc",
-                          );
-                        } else {
-                          setAssetSortBy(sortKey);
-                          setAssetSortOrder(
-                            sortKey === "name" ? "asc" : "desc",
-                          );
-                        }
-                      }}
-                      className={`flex-row items-center gap-1 rounded-full px-3 py-1.5 ${
-                        isActive ? "bg-secondary" : "bg-surface"
-                      }`}
-                    >
-                      <Text
-                        className={`font-ralewayBold text-[11px] ${
-                          isActive ? "text-white" : "text-description"
-                        }`}
-                      >
-                        {label}
-                      </Text>
-                      {isActive && (
-                        <Feather
-                          name={
-                            assetSortOrder === "desc"
-                              ? "arrow-down"
-                              : "arrow-up"
-                          }
-                          size={11}
-                          color={colors.whitePrimary}
-                        />
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-
-            <View>
-              <Text className="mb-2 font-ralewayBold text-[10px] uppercase text-description">
-                Status
-              </Text>
-              <View className="flex-row flex-wrap gap-2">
-                {ASSET_STATUS_FILTERS.map((status) => {
-                  const isActive = assetStatusFilter === status;
-                  const label =
-                    status === "ALL" ? "All" : formatPropertyStatus(status);
-
-                  return (
-                    <TouchableOpacity
-                      key={status}
-                      activeOpacity={0.75}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Show ${label} assets`}
-                      onPress={() => setAssetStatusFilter(status)}
-                      className={`rounded-full px-3 py-1.5 ${
-                        isActive ? "bg-secondary" : "bg-surface"
-                      }`}
-                    >
-                      <Text
-                        className={`font-ralewayBold text-[10px] ${
-                          isActive ? "text-white" : "text-description"
-                        }`}
-                      >
-                        {label}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-          </View>
-        )}
       </View>
 
       <View className="mt-4 flex-1">
@@ -647,6 +412,21 @@ export default function DashboardScreen() {
         )}
       </View>
 
+      <PortfolioAssetFilterSheet
+        filters={{
+          sortBy: assetSortBy,
+          sortOrder: assetSortOrder,
+          status: assetStatusFilter,
+        }}
+        onApply={(filters) => {
+          setAssetSortBy(filters.sortBy);
+          setAssetSortOrder(filters.sortOrder);
+          setAssetStatusFilter(filters.status);
+          setShowAssetFilters(false);
+        }}
+        onClose={() => setShowAssetFilters(false)}
+        visible={showAssetFilters}
+      />
       <PropertyDetailsModal
         accessToken={accessToken}
         onClose={() => setSelectedProperty(null)}

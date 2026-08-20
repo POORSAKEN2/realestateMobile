@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { ScrollView, Text, TextInput, View } from "react-native";
-import { Screen } from "../../components/ui/Screen";
+import { Screen, type ScreenBottomInset } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import {
   ModuleEmptyState,
@@ -22,10 +22,14 @@ import { useSnackbar } from "../../hooks/useSnackbar";
 import { colors } from "../../constants/colors";
 
 type TenantsScreenProps = {
+  bottomInset?: ScreenBottomInset;
   showBackButton?: boolean;
 };
 
-export function TenantsScreen({ showBackButton = true }: TenantsScreenProps) {
+export function TenantsScreen({
+  bottomInset,
+  showBackButton = true,
+}: TenantsScreenProps) {
   const tenantSnackbar = useSnackbar();
   const {
     closeForm,
@@ -61,7 +65,7 @@ export function TenantsScreen({ showBackButton = true }: TenantsScreenProps) {
   });
 
   return (
-    <Screen className="bg-surface">
+    <Screen bottomInset={bottomInset} className="bg-surface">
       <View className="flex-1 gap-6">
         {/* --- TOP HEADER: Title & Global Action --- */}
         <View className="px-1">

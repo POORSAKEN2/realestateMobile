@@ -32,11 +32,10 @@ type BottomSheetHostValue = {
 };
 
 const BottomSheetHostContext = createContext<BottomSheetHostValue | null>(null);
-const FORM_SHEET_EDGE_OVERDRAW = 16;
+const BOTTOM_SHEET_EDGE_INSET = 8;
 
 export function BottomSheetHost({ children }: PropsWithChildren) {
   const [activeSheet, setActiveSheet] = useState<HostedSheet | null>(null);
-  const insets = useSafeAreaInsets();
   const host = useMemo<BottomSheetHostValue>(
     () => ({
       hide: (id) =>
@@ -50,14 +49,7 @@ export function BottomSheetHost({ children }: PropsWithChildren) {
     <BottomSheetHostContext.Provider value={host}>
       {children}
       {activeSheet ? (
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            { bottom: -(insets.bottom + FORM_SHEET_EDGE_OVERDRAW) },
-          ]}
-        >
-          {activeSheet.content}
-        </View>
+        <View style={StyleSheet.absoluteFill}>{activeSheet.content}</View>
       ) : null}
     </BottomSheetHostContext.Provider>
   );
@@ -88,6 +80,7 @@ export function BottomSheetModal({
   const host = useContext(BottomSheetHostContext);
   const hostId = useRef(Symbol("bottom-sheet")).current;
   const { height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const [isMounted, setIsMounted] = useState(visible);
   const onDismissRef = useRef(onDismiss);
   const backdropOpacity = useRef(new Animated.Value(visible ? 1 : 0)).current;
@@ -161,8 +154,15 @@ export function BottomSheetModal({
 
       <Animated.View
         accessibilityViewIsModal
+        className="overflow-hidden rounded-t-[30px] bg-white"
         pointerEvents={visible ? "auto" : "none"}
-        style={{ transform: [{ translateY: sheetTranslateY }] }}
+        style={{
+          marginBottom:
+            Platform.OS === "ios"
+              ? -Math.max(insets.bottom - BOTTOM_SHEET_EDGE_INSET, 0)
+              : 0,
+          transform: [{ translateY: sheetTranslateY }],
+        }}
       >
         {renderedChildren.current}
       </Animated.View>
@@ -186,9 +186,12 @@ export function BottomSheetModal({
   return (
     <Modal
       animationType="none"
+      navigationBarTranslucent
       onDismiss={onDismiss}
       onRequestClose={onClose}
-      statusBarTranslucent={statusBarTranslucent}
+      statusBarTranslucent={
+        Platform.OS === "android" ? true : statusBarTranslucent
+      }
       transparent
       visible={isMounted}
     >

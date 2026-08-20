@@ -12,23 +12,29 @@ import type { FloorArea, FloorPlanDrawingMode } from "../../types";
 export function FloorAreaCard({
   area,
   canDraw,
+  color,
   hidden,
   onDelete,
   onDraw,
   onManageRooms,
   onRename,
+  onToggleZoom,
   onToggleVisibility,
   roomCount,
+  zoomed,
 }: {
   area: FloorArea;
   canDraw: boolean;
+  color: string;
   hidden: boolean;
   onDelete: () => void;
   onDraw: (mode: FloorPlanDrawingMode) => void;
   onManageRooms?: () => void;
   onRename: () => void;
+  onToggleZoom: () => void;
   onToggleVisibility: () => void;
   roomCount: number;
+  zoomed: boolean;
 }) {
   const [activeSheet, setActiveSheet] = useState<FloorAreaActionView | null>(
     null,
@@ -39,7 +45,13 @@ export function FloorAreaCard({
     <>
       <View className="rounded-[24px] border border-slate-200 bg-white p-4">
         <View className="flex-row items-start gap-3">
-          <View className="mt-1 h-4 w-4 rounded-full border-[3px] border-primary bg-secondary/30" />
+          <View
+            className="mt-1 h-4 w-4 rounded-full border-[3px]"
+            style={{
+              backgroundColor: hasShape ? `${color}33` : "#E2E8F0",
+              borderColor: hasShape ? color : "#94A3B8",
+            }}
+          />
           <View className="min-w-0 flex-1">
             <View className="flex-row items-center gap-2">
               <Text
@@ -75,11 +87,26 @@ export function FloorAreaCard({
           </View>
           <View className="flex-row gap-1">
             {hasShape ? (
-              <FloorPlanIconButton
-                icon={hidden ? "eye-off-outline" : "eye-outline"}
-                label={hidden ? "Show area shape" : "Hide area shape"}
-                onPress={onToggleVisibility}
-              />
+              <>
+                <FloorPlanIconButton
+                  icon={hidden ? "eye-off-outline" : "eye-outline"}
+                  label={hidden ? "Show area shape" : "Hide area shape"}
+                  onPress={onToggleVisibility}
+                />
+                <FloorPlanIconButton
+                  disabled={hidden}
+                  icon={
+                    zoomed ? "magnify-minus-outline" : "magnify-plus-outline"
+                  }
+                  label={
+                    zoomed
+                      ? `Zoom out from ${area.label}`
+                      : `Zoom into ${area.label}`
+                  }
+                  onPress={onToggleZoom}
+                  selected={zoomed}
+                />
+              </>
             ) : null}
             <FloorPlanIconButton
               icon="dots-horizontal"
