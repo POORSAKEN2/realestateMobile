@@ -12,7 +12,7 @@ export function AppleMapsTokenBootstrap() {
   const accessToken = session?.accessToken;
 
   useEffect(() => {
-    if (Platform.OS !== "android") return;
+    if (Platform.OS === "web") return;
 
     if (!isAuthenticated || !accessToken) {
       appleMapsTokenManager.clear();

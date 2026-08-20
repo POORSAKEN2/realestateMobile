@@ -1,13 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Keyboard, TextInput } from "react-native";
 
-import {
-  reverseGeocodeLocation,
-  searchLocations,
-  type LocationSearchResult,
-  type ReverseGeocodeResult,
-} from "../../api/geocoding";
 import { DEFAULT_PHILIPPINES_REGION } from "../../constants/defaultLocation";
+import { useMapKitGeocoding } from "../maps/useMapKitGeocoding";
+import type { LocationSearchResult, ReverseGeocodeResult } from "../../types";
 import type { MapCoordinate, MapRegion } from "../../types/maps";
 import {
   formatCoordinate,
@@ -30,6 +26,7 @@ export function useLocationPinController({
   onCountryChange: (country: string) => void;
   onLocationChange: (location: string) => void;
 }) {
+  const { reverseGeocodeLocation, searchLocations } = useMapKitGeocoding();
   const [isMapVisible, setIsMapVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<LocationSearchResult[]>(
@@ -84,7 +81,7 @@ export function useLocationPinController({
       if (reverseGeocodeTimerRef.current)
         clearTimeout(reverseGeocodeTimerRef.current);
     };
-  }, [lat, lng]);
+  }, [lat, lng, reverseGeocodeLocation]);
 
   const markerCoordinate = useMemo(() => {
     const latitude = parseNumber(lat);

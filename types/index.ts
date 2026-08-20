@@ -14,6 +14,11 @@ export type {
 } from "./auth";
 export type { PortfolioSnapshot, PortfolioStats } from "./domain/analytics";
 export type {
+  GeocodingClient,
+  LocationSearchResult,
+  ReverseGeocodeResult,
+} from "./domain/geocoding";
+export type {
   FloorArea,
   FloorAreaPayload,
   FloorPlan,
