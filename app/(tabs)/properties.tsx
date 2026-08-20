@@ -12,7 +12,6 @@ import {
   PropertyListSkeleton,
 } from "../../components/properties/PropertyListState";
 import { PropertyListToolbar } from "../../components/properties/PropertyListToolbar";
-import { PropertyPortfolioSummary } from "../../components/properties/PropertyPortfolioSummary";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { Screen } from "../../components/ui/Screen";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
@@ -126,27 +125,8 @@ export default function PropertiesScreen() {
     [form.classification],
   );
 
-  const portfolioValue = useMemo(
-    () => properties.reduce((sum, property) => sum + property.value, 0),
-    [properties],
-  );
-  const averageRoi = useMemo(() => {
-    if (properties.length === 0) return 0;
-
-    const totalRoi = properties.reduce(
-      (sum, property) => sum + property.roi,
-      0,
-    );
-    return totalRoi / properties.length;
-  }, [properties]);
-  const revenueGeneratingCount = useMemo(
-    () =>
-      properties.filter((property) => property.status === "REVENUE_GENERATING")
-        .length,
-    [properties],
-  );
   return (
-    <Screen className="bg-[#F5F7FC]">
+    <Screen bottomInset="tab-bar" className="bg-[#F5F7FC]">
       <View className="flex-1">
         <FlatList
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
@@ -156,21 +136,11 @@ export default function PropertiesScreen() {
             item.kind === "property" ? item.property.id : item.kind
           }
           ListHeaderComponent={
-            <View className="gap-5 pb-5">
-              <View className="px-1">
-                <ModuleHeader
-                  action={<AddButton title="Add" onPress={openForm} />}
-                  eyebrow="Asset Management"
-                  title="Properties"
-                />
-              </View>
-
-              <PropertyPortfolioSummary
-                averageRoi={averageRoi}
-                portfolioValue={portfolioValue}
-                propertyCount={properties.length}
-                revenueGeneratingCount={revenueGeneratingCount}
-                state={isLoading ? "loading" : isError ? "error" : "ready"}
+            <View className="px-1 pb-5">
+              <ModuleHeader
+                action={<AddButton title="Add" onPress={openForm} />}
+                eyebrow="Asset Management"
+                title="Properties"
               />
             </View>
           }

@@ -154,15 +154,15 @@ Optional environment values:
 
   EXPO_PROJECT_ID=<Expo-project-ID>
   GOOGLE_MAPS_API_KEY=<Android-Google-Maps-key>
-  EXPO_PUBLIC_GEOCODING_BASE_URL=https://nominatim.openstreetmap.org
 
 MapKit JS powers geographic maps on Android. Tokens are prefetched after login
 from authenticated GET /apple-maps/token using EXPO_PUBLIC_API_BASE_URL, cached
 in memory for their one-hour lifetime, and refreshed five minutes before
 expiration. Inline WebView HTML uses a null origin, so the backend token omits
-the origin claim. Geographic maps on iOS use react-native-maps. The Google Maps
-key is optional unless a native Android map is added later. Keep tokens and keys
-out of Git.
+the origin claim. Apple MapKit JS provides forward and reverse geocoding on both
+mobile platforms through a shared background bridge. Geographic maps on iOS use
+react-native-maps with Apple Maps. The Google Maps key is optional unless a native
+Android map is added later. Keep tokens and keys out of Git.
 
 Known dependency mismatch:
 

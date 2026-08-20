@@ -1,9 +1,10 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import { SearchField } from "../ui/fields/SearchField";
+import { RadioOptionList } from "../ui/groups/RadioOptionList";
 import {
   formatStatus,
   statusFilterChoices,
@@ -77,8 +78,8 @@ export function PropertyListToolbar({
         onClose={() => setIsFilterVisible(false)}
         visible={isFilterVisible}
       >
-        <View className="rounded-t-[28px] bg-white px-5 pb-9 pt-5">
-          <View className="mb-4 flex-row items-center justify-between">
+        <View className="max-h-[82%] rounded-t-[30px] bg-white pt-5">
+          <View className="mb-4 flex-row items-center justify-between px-5">
             <View>
               <Text className="font-ralewayBold text-xl text-textPrimary">
                 Filter properties
@@ -98,44 +99,19 @@ export function PropertyListToolbar({
             </TouchableOpacity>
           </View>
 
-          <View className="gap-2">
-            {statusFilterChoices.map((choice) => {
-              const selected = choice.value === statusFilter;
-
-              return (
-                <TouchableOpacity
-                  key={choice.value}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: selected }}
-                  activeOpacity={0.8}
-                  className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
-                    selected
-                      ? "border-secondary bg-secondary/10"
-                      : "border-slate-200 bg-white"
-                  }`}
-                  onPress={() => {
-                    onChangeStatus(choice.value);
-                    setIsFilterVisible(false);
-                  }}
-                >
-                  <Text
-                    className={`font-ralewayBold text-base ${
-                      selected ? "text-secondary" : "text-textPrimary"
-                    }`}
-                  >
-                    {choice.label}
-                  </Text>
-                  {selected ? (
-                    <MaterialCommunityIcons
-                      name="check-circle"
-                      color="#634CE4"
-                      size={21}
-                    />
-                  ) : null}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          <ScrollView
+            contentContainerClassName="px-5 pb-20"
+            showsVerticalScrollIndicator={false}
+          >
+            <RadioOptionList
+              onSelect={(status) => {
+                onChangeStatus(status);
+                setIsFilterVisible(false);
+              }}
+              options={statusFilterChoices}
+              value={statusFilter}
+            />
+          </ScrollView>
         </View>
       </BottomSheetModal>
     </View>

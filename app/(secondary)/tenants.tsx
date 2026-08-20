@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { ScrollView, Text, TextInput, View } from "react-native";
-import { Screen } from "../../components/ui/Screen";
+import { Screen, type ScreenBottomInset } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import {
   ModuleEmptyState,
@@ -21,7 +21,15 @@ import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { colors } from "../../constants/colors";
 
-export default function TenantsScreen() {
+type TenantsScreenProps = {
+  bottomInset?: ScreenBottomInset;
+  showBackButton?: boolean;
+};
+
+export function TenantsScreen({
+  bottomInset,
+  showBackButton = true,
+}: TenantsScreenProps) {
   const tenantSnackbar = useSnackbar();
   const {
     closeForm,
@@ -57,7 +65,7 @@ export default function TenantsScreen() {
   });
 
   return (
-    <Screen className="bg-surface">
+    <Screen bottomInset={bottomInset} className="bg-surface">
       <View className="flex-1 gap-6">
         {/* --- TOP HEADER: Title & Global Action --- */}
         <View className="px-1">
@@ -65,10 +73,12 @@ export default function TenantsScreen() {
             action={<AddButton onPress={openCreateForm} />}
             eyebrow="CRM Dashboard"
             leading={
-              <SecondaryBackButton
-                accessibilityLabel="Back from tenants"
-                variant="secondary"
-              />
+              showBackButton ? (
+                <SecondaryBackButton
+                  accessibilityLabel="Back from tenants"
+                  variant="secondary"
+                />
+              ) : undefined
             }
             title="Tenants"
           />
@@ -289,3 +299,5 @@ export default function TenantsScreen() {
     </Screen>
   );
 }
+
+export default TenantsScreen;

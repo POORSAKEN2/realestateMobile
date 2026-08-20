@@ -295,7 +295,7 @@ export function DocumentFormModal({
               </FormSection>
             </ScrollView>
 
-            <View className="flex-row gap-3 border-t border-secondary/20 bg-white p-5 pb-8">
+            <View className="flex-row gap-3 border-t border-secondary/20 bg-white px-5 pb-20 pt-5">
               <TouchableOpacity
                 accessibilityLabel="Cancel document form"
                 accessibilityRole="button"

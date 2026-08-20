@@ -274,7 +274,7 @@ export function LocationPinPicker({
               </View>
             ) : null}
             <Text className="mt-2 text-xs text-slate-600">
-              Search data © OpenStreetMap contributors
+              Search and geocoding provided by Apple Maps
             </Text>
           </View>
           <View className="absolute bottom-8 left-5 right-5">

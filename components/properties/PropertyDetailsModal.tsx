@@ -159,7 +159,7 @@ export function PropertyDetailsModal({
           </View>
           <ScrollView
             bounces={false}
-            contentContainerStyle={{ paddingBottom: 28 }}
+            contentContainerClassName="pb-20"
             showsVerticalScrollIndicator={false}
           >
             <View className="relative mt-4 h-56 overflow-hidden">

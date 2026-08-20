@@ -192,7 +192,7 @@ function BottomSheet({
     >
       <View
         accessibilityViewIsModal
-        className="rounded-t-[30px] bg-white px-5 pb-8 pt-3"
+        className="rounded-t-[30px] bg-white px-5 pb-20 pt-3"
       >
         <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
         <View className="mb-5 flex-row items-start justify-between gap-3">

@@ -19,6 +19,7 @@ LogBox.ignoreLogs(["Unable to activate keep awake"]);
 
 import "../global.css";
 import { AppleMapsTokenBootstrap } from "../components/maps/AppleMapsTokenBootstrap";
+import { MapKitGeocodingProvider } from "../components/maps/MapKitGeocodingProvider";
 import { NotificationBootstrap } from "../components/notifications/NotificationBootstrap";
 import { AuthProvider } from "../context/AuthContext";
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
@@ -77,18 +78,20 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <DefaultLocationProvider>
-            <AppleMapsTokenBootstrap />
-            <NotificationBootstrap />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen
-                name="(secondary)"
-                options={{ headerShown: false }}
-              />
-            </Stack>
-          </DefaultLocationProvider>
+          <MapKitGeocodingProvider>
+            <DefaultLocationProvider>
+              <AppleMapsTokenBootstrap />
+              <NotificationBootstrap />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="(secondary)"
+                  options={{ headerShown: false }}
+                />
+              </Stack>
+            </DefaultLocationProvider>
+          </MapKitGeocodingProvider>
         </AuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>
