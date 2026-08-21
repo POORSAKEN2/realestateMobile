@@ -42,9 +42,11 @@ export function useExpenseForm({
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
 
   const { useList: usePropertiesList } = useProperties();
-  const { data: properties = [] } = usePropertiesList();
+  const propertiesQuery = usePropertiesList();
+  const properties = propertiesQuery.data;
   const { useList: useExpensesList } = useExpenses();
-  const { data: expenses = [], isLoading, refetch } = useExpensesList();
+  const expensesQuery = useExpensesList();
+  const expenses = expensesQuery.data;
 
   const propertyOptions = useMemo(
     () =>
@@ -163,6 +165,10 @@ export function useExpenseForm({
     });
   }
 
+  async function refresh() {
+    await Promise.all([expensesQuery.refetch(), propertiesQuery.refetch()]);
+  }
+
   return {
     closeForm,
     editingExpense,
@@ -172,12 +178,15 @@ export function useExpenseForm({
     handleDateConfirm,
     isDatePickerVisible,
     isFormVisible,
-    isLoading,
+    isLoading: expensesQuery.isLoading,
+    isRefreshing:
+      !expensesQuery.isLoading &&
+      (expensesQuery.isFetching || propertiesQuery.isFetching),
     isSaving: saveMutation.isPending,
     openEditForm,
     openForm,
     propertyOptions,
-    refetch,
+    refetch: refresh,
     setIsDatePickerVisible,
     submit,
     updateForm,

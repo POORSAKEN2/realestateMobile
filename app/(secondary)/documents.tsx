@@ -214,6 +214,12 @@ export default function DocumentsScreen() {
 
   return (
     <Screen className="bg-surface">
+      <DocumentsHeader
+        documentCount={documents.length}
+        isLoading={isLoading}
+        onUpload={openCreateForm}
+      />
+
       <FlatList
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
@@ -221,11 +227,7 @@ export default function DocumentsScreen() {
         ItemSeparatorComponent={() => <View className="h-3" />}
         keyExtractor={(document) => document.id}
         ListHeaderComponent={
-          <View className="gap-6 pb-5">
-            <DocumentsHeader
-              documentCount={documents.length}
-              onUpload={openCreateForm}
-            />
+          <View className="pb-5 pt-6">
             <DocumentsToolbar
               activeFilterCount={activeFilterCount}
               category={category}

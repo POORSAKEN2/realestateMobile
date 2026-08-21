@@ -1,6 +1,12 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { FloorAreaCard } from "./FloorAreaCard";
 import { FloorPlanCanvas } from "./FloorPlanCanvas";
@@ -31,12 +37,14 @@ export function FloorPlanWorkspace({
   onPickImage,
   onRenameArea,
   onRenameFloor,
+  onRefresh,
   onSaveShape,
   onSelectFloor,
   onToggleAreaVisibility,
   roomGuidance,
   rooms,
   showRoomActions,
+  refreshing,
 }: {
   activeFloor: FloorPlan;
   drawingArea: FloorArea | null;
@@ -53,12 +61,14 @@ export function FloorPlanWorkspace({
   onPickImage: () => void;
   onRenameArea: (area: FloorArea) => void;
   onRenameFloor: (floor: FloorPlan) => void;
+  onRefresh: () => void;
   onSaveShape: (points: FloorPlanPoint[]) => void;
   onSelectFloor: (id: string) => void;
   onToggleAreaVisibility: (areaId: string) => void;
   roomGuidance?: string;
   rooms: PropertyRoom[];
   showRoomActions: boolean;
+  refreshing: boolean;
 }) {
   const contentScrollRef = useRef<ScrollView>(null);
   const [zoomedAreaId, setZoomedAreaId] = useState<string | null>(null);
@@ -144,6 +154,14 @@ export function FloorPlanWorkspace({
           paddingHorizontal: 24,
         }}
         ref={contentScrollRef}
+        refreshControl={
+          <RefreshControl
+            colors={["#634CE4"]}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            tintColor="#634CE4"
+          />
+        }
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-row items-center justify-between rounded-2xl border border-slate-200 bg-white p-3">

@@ -86,13 +86,14 @@ export default function ProfileScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
+        <ProfileHeader onBack={handleBack} />
+
         <ScrollView
-          className="-mx-6"
+          className="-mx-6 flex-1"
           contentContainerClassName="px-6 pb-32"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <ProfileHeader onBack={handleBack} />
           <ProfileSummaryCard
             completion={profile.completion}
             email={profile.email}

@@ -1,9 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
-function SkeletonBlock({ className }: { className: string }) {
-  return <View className={`bg-slate-200 ${className}`} />;
-}
+import { SkeletonBlock } from "../ui/Skeleton";
 
 export function PropertyListSkeleton() {
   return (

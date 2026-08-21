@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { View } from "react-native";
+import { useState } from "react";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 import { FloorPlanManagerHeader } from "../../components/floorplans/FloorPlanManagerHeader";
 import {
@@ -77,6 +78,7 @@ export default function FloorPlansScreen() {
     propertyId,
     roomCapability: basePolicy.rooms,
   });
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   if (!propertyId) {
     return (
@@ -100,6 +102,19 @@ export default function FloorPlansScreen() {
     controller.queries.rooms.isLoading;
   const isError =
     controller.queries.floorPlans.isError || controller.queries.rooms.isError;
+
+  async function refreshFloorPlans() {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        propertyQuery.refetch(),
+        controller.queries.floorPlans.refetch(),
+        controller.queries.rooms.refetch(),
+      ]);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   return (
     <Screen className="bg-[#F5F7FC]">
@@ -128,11 +143,24 @@ export default function FloorPlansScreen() {
             }}
           />
         ) : !controller.activeFloor ? (
-          <EmptyFloorPlanState
-            canCreate={policy.canCreateFloorPlans}
-            mode={policy.mode}
-            onCreate={actions.openFloorCreate}
-          />
+          <ScrollView
+            className="-mx-6 flex-1"
+            contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24 }}
+            refreshControl={
+              <RefreshControl
+                colors={["#634CE4"]}
+                onRefresh={refreshFloorPlans}
+                refreshing={isRefreshing}
+                tintColor="#634CE4"
+              />
+            }
+          >
+            <EmptyFloorPlanState
+              canCreate={policy.canCreateFloorPlans}
+              mode={policy.mode}
+              onCreate={actions.openFloorCreate}
+            />
+          </ScrollView>
         ) : (
           <FloorPlanWorkspace
             activeFloor={controller.activeFloor}
@@ -150,12 +178,14 @@ export default function FloorPlansScreen() {
             onPickImage={actions.pickFloorPlanImage}
             onRenameArea={actions.openAreaEdit}
             onRenameFloor={actions.openFloorEdit}
+            onRefresh={refreshFloorPlans}
             onSaveShape={actions.saveShape}
             onSelectFloor={actions.selectFloor}
             onToggleAreaVisibility={controller.visibility.toggle}
             roomGuidance={getRoomManagementGuidance(policy)}
             rooms={controller.rooms}
             showRoomActions={policy.showRoomActions}
+            refreshing={isRefreshing}
           />
         )}
       </View>

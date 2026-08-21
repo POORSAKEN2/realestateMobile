@@ -1,7 +1,13 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { FloorAssignedRoomsSection } from "../../components/floorplans/FloorAssignedRoomsSection";
 import { BackButton } from "../../components/ui/buttons/BackButton";
@@ -172,6 +178,14 @@ export default function AssignedRoomsScreen() {
               paddingHorizontal: 24,
             }}
             keyboardShouldPersistTaps="handled"
+            refreshControl={
+              <RefreshControl
+                colors={["#634CE4"]}
+                onRefresh={() => roomsQuery.refetch()}
+                refreshing={roomsQuery.isFetching}
+                tintColor="#634CE4"
+              />
+            }
             showsVerticalScrollIndicator={false}
           >
             <FloorAssignedRoomsSection

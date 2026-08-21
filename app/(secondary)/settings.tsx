@@ -133,25 +133,25 @@ export default function SettingsScreen() {
   return (
     <Screen className="bg-surface">
       <View className="flex-1">
+        <ModuleHeader
+          eyebrow="Account"
+          leading={
+            <SecondaryBackButton
+              accessibilityLabel="Back from settings"
+              variant="secondary"
+            />
+          }
+          title="Settings"
+        />
+        <Text className="mt-2 text-base leading-6 text-description">
+          Manage your password, account security, and secure access.
+        </Text>
+
         <ScrollView
-          className="-mx-6"
+          className="-mx-6 flex-1"
           contentContainerClassName="px-6 pb-10"
           showsVerticalScrollIndicator={false}
         >
-          <ModuleHeader
-            eyebrow="Account"
-            leading={
-              <SecondaryBackButton
-                accessibilityLabel="Back from settings"
-                variant="secondary"
-              />
-            }
-            title="Settings"
-          />
-          <Text className="mt-2 text-base leading-6 text-description">
-            Manage your password, account security, and secure access.
-          </Text>
-
           <View className="mt-8 rounded-[28px] border border-secondary/20 bg-secondary/10 p-5 shadow-sm shadow-secondary/10">
             <View className="flex-row items-center justify-between gap-4">
               <View className="min-w-0 flex-1">

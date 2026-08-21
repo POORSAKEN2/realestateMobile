@@ -18,6 +18,11 @@ import {
 import { Screen } from "../../components/ui/Screen";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import {
+  SkeletonGroup,
+  SkeletonList,
+  SkeletonListCard,
+} from "../../components/ui/Skeleton";
 import { colors } from "../../constants/colors";
 import { resolveModuleRoute } from "../../constants/navigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -80,9 +85,13 @@ function EmptyState({ onRefresh }: { onRefresh: () => void }) {
   return (
     <View className="flex-1 items-center justify-center px-8 py-20">
       <View className="mb-5 h-16 w-16 items-center justify-center rounded-full bg-[#EFF6FF]">
-        <Ionicons name="notifications-outline" size={30} color={colors.primary} />
+        <Ionicons
+          name="notifications-outline"
+          size={30}
+          color={colors.primary}
+        />
       </View>
-      <Text className="text-center text-xl font-ralewayBold text-[#1d1d1f]">
+      <Text className="text-center font-ralewayBold text-xl text-[#1d1d1f]">
         No notifications yet
       </Text>
       <Text className="mt-2 text-center text-sm leading-6 text-[#6F6D6D]">
@@ -93,7 +102,7 @@ function EmptyState({ onRefresh }: { onRefresh: () => void }) {
         className="mt-6 rounded-full bg-[#2563EB] px-5 py-3"
         onPress={onRefresh}
       >
-        <Text className="text-sm font-ralewayBold text-white">Refresh</Text>
+        <Text className="font-ralewayBold text-sm text-white">Refresh</Text>
       </TouchableOpacity>
     </View>
   );
@@ -130,7 +139,7 @@ function NotificationRow({
         <View className="min-w-0 flex-1">
           <View className="flex-row items-start gap-2">
             <Text
-              className="min-w-0 flex-1 text-[15px] font-ralewayBold text-[#1d1d1f]"
+              className="min-w-0 flex-1 font-ralewayBold text-[15px] text-[#1d1d1f]"
               numberOfLines={2}
             >
               {notification.title}
@@ -140,20 +149,27 @@ function NotificationRow({
             ) : null}
           </View>
 
-          <Text className="mt-1 text-sm leading-5 text-[#6F6D6D]" numberOfLines={3}>
+          <Text
+            className="mt-1 text-sm leading-5 text-[#6F6D6D]"
+            numberOfLines={3}
+          >
             {notification.message}
           </Text>
 
           <View className="mt-3 flex-row items-center justify-between gap-3">
-            <Text className="text-xs font-ralewayBold text-[#94A3B8]">
+            <Text className="font-ralewayBold text-xs text-[#94A3B8]">
               {formatTimestamp(notification.timestamp)}
             </Text>
             {notification.actionUrl ? (
               <View className="flex-row items-center gap-1">
-                <Text className="text-xs font-ralewayBold text-[#2563EB]">
+                <Text className="font-ralewayBold text-xs text-[#2563EB]">
                   {notification.actionLabel || "Open"}
                 </Text>
-                <Ionicons name="chevron-forward" size={14} color={colors.primary} />
+                <Ionicons
+                  name="chevron-forward"
+                  size={14}
+                  color={colors.primary}
+                />
               </View>
             ) : null}
           </View>
@@ -176,7 +192,9 @@ export default function NotificationScreen() {
   });
 
   const notifications = notificationsQuery.data ?? [];
-  const unreadCount = notifications.filter((notification) => !notification.isRead).length;
+  const unreadCount = notifications.filter(
+    (notification) => !notification.isRead,
+  ).length;
 
   const markReadMutation = useMutation({
     mutationFn: (notificationId: string) =>
@@ -184,7 +202,9 @@ export default function NotificationScreen() {
     onSuccess: (updatedNotification) => {
       queryClient.setQueryData<AppNotification[]>(queryKey, (current = []) =>
         current.map((notification) =>
-          notification.id === updatedNotification.id ? updatedNotification : notification,
+          notification.id === updatedNotification.id
+            ? updatedNotification
+            : notification,
         ),
       );
     },
@@ -211,7 +231,8 @@ export default function NotificationScreen() {
     }
   }
 
-  const isInitialLoading = notificationsQuery.isLoading && notifications.length === 0;
+  const isInitialLoading =
+    notificationsQuery.isLoading && notifications.length === 0;
 
   return (
     <Screen className="bg-[#F8FAFC]">
@@ -236,9 +257,7 @@ export default function NotificationScreen() {
                 <Ionicons
                   name="checkmark-done"
                   size={21}
-                  color={
-                    unreadCount > 0 ? colors.primary : colors.description
-                  }
+                  color={unreadCount > 0 ? colors.primary : colors.description}
                 />
               )}
             </TouchableOpacity>
@@ -248,9 +267,11 @@ export default function NotificationScreen() {
             <SecondaryBackButton accessibilityLabel="Back from notifications" />
           }
           supportingText={
-            unreadCount > 0
-              ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}`
-              : "You're all caught up"
+            isInitialLoading
+              ? "Loading activity"
+              : unreadCount > 0
+                ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}`
+                : "You're all caught up"
           }
           title="Notifications"
         />
@@ -270,12 +291,15 @@ export default function NotificationScreen() {
       ) : null}
 
       {isInitialLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text className="mt-3 text-sm font-ralewayBold text-[#6F6D6D]">
-            Loading notifications
-          </Text>
-        </View>
+        <SkeletonGroup
+          accessibilityLabel="Loading notifications"
+          className="flex-1 gap-3"
+        >
+          <SkeletonList
+            count={4}
+            renderItem={() => <SkeletonListCard className="min-h-28" />}
+          />
+        </SkeletonGroup>
       ) : (
         <FlatList
           data={notifications}

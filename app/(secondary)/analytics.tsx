@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useMemo } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 import Svg, {
   Circle,
   Defs,
@@ -16,6 +16,12 @@ import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
+import {
+  SkeletonBlock,
+  SkeletonGroup,
+  SkeletonList,
+  SkeletonMetricCard,
+} from "../../components/ui/Skeleton";
 import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
 import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
@@ -301,12 +307,70 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
   );
 }
 
+function AnalyticsLoadingState() {
+  return (
+    <SkeletonGroup accessibilityLabel="Loading portfolio analytics">
+      <View className="mt-6 flex-row flex-wrap">
+        <SkeletonList
+          count={4}
+          renderItem={() => (
+            <View className="w-1/2 p-1.5">
+              <SkeletonMetricCard />
+            </View>
+          )}
+        />
+      </View>
+
+      <View className="mt-4 rounded-[28px] border border-slate-200 bg-white p-4">
+        <View className="flex-row items-center justify-between">
+          <View className="gap-2">
+            <SkeletonBlock className="h-5 w-44" />
+            <SkeletonBlock className="h-3 w-24" />
+          </View>
+          <SkeletonBlock className="h-10 w-10 rounded-2xl" />
+        </View>
+        <SkeletonBlock className="mt-4 h-48 w-full rounded-3xl" />
+      </View>
+
+      <View className="mt-4 rounded-[28px] border border-slate-200 bg-white p-4">
+        <View className="flex-row items-center justify-between">
+          <View className="gap-2">
+            <SkeletonBlock className="h-5 w-48" />
+            <SkeletonBlock className="h-3 w-36" />
+          </View>
+          <SkeletonBlock className="h-10 w-10 rounded-2xl" />
+        </View>
+        <View className="mt-5 flex-row items-center gap-5">
+          <SkeletonBlock className="h-40 w-40 rounded-full" />
+          <View className="min-w-0 flex-1 gap-3">
+            <SkeletonBlock className="h-4 w-full" />
+            <SkeletonBlock className="h-4 w-4/5" />
+            <SkeletonBlock className="h-4 w-3/5" />
+          </View>
+        </View>
+      </View>
+    </SkeletonGroup>
+  );
+}
+
 export default function AnalyticsScreen() {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
-  const { stats, history, isLoadingStats } = usePortfolioAnalytics(accessToken);
+  const {
+    stats,
+    history,
+    isLoading: isLoadingAnalytics,
+    isLoadingStats,
+    refetch: refetchAnalytics,
+  } = usePortfolioAnalytics(accessToken);
   const { useList } = useProperties();
-  const { data: properties = [] } = useList();
+  const {
+    data: properties = [],
+    isLoading: isLoadingProperties,
+    refetch: refetchProperties,
+  } = useList();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const isInitialLoading = isLoadingAnalytics || isLoadingProperties;
 
   const metricCards = useMemo<MetricCard[]>(
     () => [
@@ -359,56 +423,80 @@ export default function AnalyticsScreen() {
       }));
   }, [properties]);
 
+  async function refreshAnalytics() {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([refetchAnalytics(), refetchProperties()]);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
   return (
     <Screen className="bg-surface">
+      <ModuleHeader
+        action={
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 shadow-md shadow-secondary/20">
+            <Feather name="bar-chart-2" size={22} color={colors.secondary} />
+          </View>
+        }
+        eyebrow="Portfolio Intelligence"
+        leading={
+          <SecondaryBackButton
+            accessibilityLabel="Back from analytics"
+            variant="secondary"
+          />
+        }
+        title="Analytics"
+      />
+
       <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
+        refreshControl={
+          <RefreshControl
+            colors={[colors.secondary]}
+            onRefresh={refreshAnalytics}
+            refreshing={isRefreshing}
+            tintColor={colors.secondary}
+          />
+        }
       >
-        <ModuleHeader
-          action={
-            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 shadow-md shadow-secondary/20">
-              <Feather name="bar-chart-2" size={22} color={colors.secondary} />
-            </View>
-          }
-          eyebrow="Portfolio Intelligence"
-          leading={
-            <SecondaryBackButton
-              accessibilityLabel="Back from analytics"
-              variant="secondary"
-            />
-          }
-          title="Analytics"
-        />
-
-        <View className="mt-6 flex-row flex-wrap">
-          {metricCards.map((card) => (
-            <View key={card.label} className="w-1/2 p-1.5">
-              <View className="min-h-[132px] rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
-                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
-                  <Feather
-                    name={card.icon}
-                    size={18}
-                    color={colors.secondary}
-                  />
+        {isInitialLoading ? (
+          <AnalyticsLoadingState />
+        ) : (
+          <>
+            <View className="mt-6 flex-row flex-wrap">
+              {metricCards.map((card) => (
+                <View key={card.label} className="w-1/2 p-1.5">
+                  <View className="min-h-[132px] rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+                    <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
+                      <Feather
+                        name={card.icon}
+                        size={18}
+                        color={colors.secondary}
+                      />
+                    </View>
+                    <Text
+                      className="mt-4 font-ralewayBold text-lg text-textPrimary"
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      {card.value}
+                    </Text>
+                    <Text className="mt-1 font-ralewaySemiBold text-[11px] uppercase leading-4 text-description">
+                      {card.label}
+                    </Text>
+                  </View>
                 </View>
-                <Text
-                  className="mt-4 font-ralewayBold text-lg text-textPrimary"
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                >
-                  {card.value}
-                </Text>
-                <Text className="mt-1 font-ralewaySemiBold text-[11px] uppercase leading-4 text-description">
-                  {card.label}
-                </Text>
-              </View>
+              ))}
             </View>
-          ))}
-        </View>
 
-        <PerformanceChart history={history} />
-        <DistributionChart slices={distributionSlices} />
+            <PerformanceChart history={history} />
+            <DistributionChart slices={distributionSlices} />
+          </>
+        )}
       </ScrollView>
     </Screen>
   );

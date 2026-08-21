@@ -1,6 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { Screen, type ScreenBottomInset } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import {
@@ -16,6 +22,7 @@ import AddButton from "../../components/ui/buttons/AddButton";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
+import { SkeletonBlock } from "../../components/ui/Skeleton";
 import { formatCurrency } from "../../utils/formatters";
 import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
@@ -43,10 +50,12 @@ export function TenantsScreen({
     getTenantLeases,
     isFormOpen,
     isLoading,
+    isRefreshing,
     linkedTenantCount,
     linkedTenantPercentage,
     openCreateForm,
     openEditForm,
+    refresh,
     saveMutation,
     searchQuery,
     selectedTenant,
@@ -99,13 +108,21 @@ export function TenantsScreen({
           </View>
 
           <View className="mt-5">
-            <Text className="font-ralewayBold text-4xl text-white">
-              {formatCurrency(tenantMonthlyRent)}
-            </Text>
-            <Text className="mt-2 text-sm leading-5 text-white/50">
-              Monthly recurring revenue from {linkedTenantCount} active lease
-              agreements.
-            </Text>
+            {isLoading ? (
+              <SkeletonBlock className="h-10 w-3/4 rounded-xl bg-white/20" />
+            ) : (
+              <Text className="font-ralewayBold text-4xl text-white">
+                {formatCurrency(tenantMonthlyRent)}
+              </Text>
+            )}
+            {isLoading ? (
+              <SkeletonBlock className="mt-3 h-4 w-5/6 bg-white/20" />
+            ) : (
+              <Text className="mt-2 text-sm leading-5 text-white/50">
+                Monthly recurring revenue from {linkedTenantCount} active lease
+                agreements.
+              </Text>
+            )}
           </View>
         </View>
 
@@ -122,9 +139,13 @@ export function TenantsScreen({
               </Text>
             </View>
             <View className="mt-3 flex-row items-end gap-1">
-              <Text className="font-ralewayBold text-2xl text-textPrimary">
-                {tenants.length}
-              </Text>
+              {isLoading ? (
+                <SkeletonBlock className="h-7 w-12" />
+              ) : (
+                <Text className="font-ralewayBold text-2xl text-textPrimary">
+                  {tenants.length}
+                </Text>
+              )}
               <Text className="mb-1 font-ralewaySemiBold text-xs text-description">
                 Profiles
               </Text>
@@ -143,15 +164,23 @@ export function TenantsScreen({
                 </Text>
               </View>
               {/* Simple Health Badge */}
-              <Text className="rounded-md bg-accent px-1.5 py-0.5 font-ralewayExtraBold text-[10px] text-textPrimary">
-                {Math.round(linkedTenantPercentage)}%
-              </Text>
+              {isLoading ? (
+                <SkeletonBlock className="h-5 w-9 rounded-md" />
+              ) : (
+                <Text className="rounded-md bg-accent px-1.5 py-0.5 font-ralewayExtraBold text-[10px] text-textPrimary">
+                  {Math.round(linkedTenantPercentage)}%
+                </Text>
+              )}
             </View>
 
             <View className="mt-3">
-              <Text className="font-ralewayBold text-2xl text-textPrimary">
-                {linkedTenantCount}
-              </Text>
+              {isLoading ? (
+                <SkeletonBlock className="h-7 w-12" />
+              ) : (
+                <Text className="font-ralewayBold text-2xl text-textPrimary">
+                  {linkedTenantCount}
+                </Text>
+              )}
               {/* Mini Progress Bar for Linkage Health */}
               <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/10">
                 <View
@@ -196,7 +225,17 @@ export function TenantsScreen({
             title="Loading tenants"
           />
         ) : (
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                colors={[colors.secondary]}
+                onRefresh={refresh}
+                refreshing={isRefreshing}
+                tintColor={colors.secondary}
+              />
+            }
+            showsVerticalScrollIndicator={false}
+          >
             <View className="gap-4 pb-8">
               {filteredTenants.map((tenant) => {
                 const tenantLeases = getTenantLeases(tenant.id);

@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 
 import { colors } from "../../constants/colors";
 import { formatPeso } from "../../utils/properties/propertyForm";
+import { SkeletonBlock } from "../ui/Skeleton";
 
 const portfolioSummaryShadow = {
   elevation: 10,
@@ -12,18 +13,30 @@ const portfolioSummaryShadow = {
   shadowRadius: 16,
 };
 
-function SummaryMetric({ label, value }: { label: string; value: string }) {
+function SummaryMetric({
+  isLoading,
+  label,
+  value,
+}: {
+  isLoading: boolean;
+  label: string;
+  value: string;
+}) {
   return (
     <View className="min-w-0 flex-1">
       <Text className="font-ralewaySemiBold text-xs text-white/70">
         {label}
       </Text>
-      <Text
-        className="mt-1 font-ralewayBold text-base text-white"
-        numberOfLines={1}
-      >
-        {value}
-      </Text>
+      {isLoading ? (
+        <SkeletonBlock className="mt-2 h-4 w-2/3 bg-white/20" />
+      ) : (
+        <Text
+          className="mt-1 font-ralewayBold text-base text-white"
+          numberOfLines={1}
+        >
+          {value}
+        </Text>
+      )}
     </View>
   );
 }
@@ -42,6 +55,7 @@ export function PropertyPortfolioSummary({
   state?: "error" | "loading" | "ready";
 }) {
   const isReady = state === "ready";
+  const isLoading = state === "loading";
   const portfolioValueLabel =
     state === "loading"
       ? "Loading…"
@@ -62,13 +76,17 @@ export function PropertyPortfolioSummary({
             <Text className="font-ralewaySemiBold text-xs text-white/70">
               Total portfolio value
             </Text>
-            <Text
-              adjustsFontSizeToFit
-              className="mt-1 font-ralewayBold text-3xl text-white"
-              numberOfLines={1}
-            >
-              {portfolioValueLabel}
-            </Text>
+            {isLoading ? (
+              <SkeletonBlock className="mt-2 h-9 w-4/5 rounded-xl bg-white/20" />
+            ) : (
+              <Text
+                adjustsFontSizeToFit
+                className="mt-1 font-ralewayBold text-3xl text-white"
+                numberOfLines={1}
+              >
+                {portfolioValueLabel}
+              </Text>
+            )}
           </View>
           <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white/15">
             <MaterialCommunityIcons
@@ -81,14 +99,17 @@ export function PropertyPortfolioSummary({
 
         <View className="mt-5 flex-row gap-4 border-t border-white/10 pt-4">
           <SummaryMetric
+            isLoading={isLoading}
             label="Properties"
             value={isReady ? String(propertyCount) : "—"}
           />
           <SummaryMetric
+            isLoading={isLoading}
             label="Average ROI"
             value={isReady ? `${averageRoi.toFixed(1)}%` : "—"}
           />
           <SummaryMetric
+            isLoading={isLoading}
             label="Generating"
             value={
               isReady ? `${revenueGeneratingCount} of ${propertyCount}` : "—"

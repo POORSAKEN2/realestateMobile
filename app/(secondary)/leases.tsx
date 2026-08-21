@@ -1,6 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import {
@@ -19,6 +25,7 @@ import AddButton from "../../components/ui/buttons/AddButton";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
+import { SkeletonBlock } from "../../components/ui/Skeleton";
 import {
   calculateLeaseEndDate,
   formatLeaseDateLabel,
@@ -60,6 +67,7 @@ export default function LeasesScreen() {
     handleStartDateConfirm,
     isFormOpen,
     isLoading,
+    isRefreshing,
     isStartDatePickerOpen,
     leases,
     lesseeOptions,
@@ -70,6 +78,7 @@ export default function LeasesScreen() {
     openStartDatePicker,
     properties,
     propertyOptions,
+    refresh,
     saveMutation,
     searchQuery,
     selectedTenant,
@@ -118,12 +127,20 @@ export default function LeasesScreen() {
           </View>
 
           <View className="mt-5">
-            <Text className="font-ralewayBold text-4xl text-white">
-              {formatCurrency(monthlyRevenue)}
-            </Text>
-            <Text className="mt-2 text-sm leading-5 text-white/50">
-              Total monthly value across {activeLeaseCount} active contracts.
-            </Text>
+            {isLoading ? (
+              <SkeletonBlock className="h-10 w-3/4 rounded-xl bg-white/20" />
+            ) : (
+              <Text className="font-ralewayBold text-4xl text-white">
+                {formatCurrency(monthlyRevenue)}
+              </Text>
+            )}
+            {isLoading ? (
+              <SkeletonBlock className="mt-3 h-4 w-5/6 bg-white/20" />
+            ) : (
+              <Text className="mt-2 text-sm leading-5 text-white/50">
+                Total monthly value across {activeLeaseCount} active contracts.
+              </Text>
+            )}
           </View>
         </View>
 
@@ -144,9 +161,13 @@ export default function LeasesScreen() {
               </Text>
             </View>
             <View className="mt-3 flex-row items-end gap-1">
-              <Text className="font-ralewayBold text-2xl text-textPrimary">
-                {leases.length}
-              </Text>
+              {isLoading ? (
+                <SkeletonBlock className="h-7 w-12" />
+              ) : (
+                <Text className="font-ralewayBold text-2xl text-textPrimary">
+                  {leases.length}
+                </Text>
+              )}
               <Text className="mb-1 font-ralewaySemiBold text-xs text-description">
                 Files
               </Text>
@@ -169,15 +190,23 @@ export default function LeasesScreen() {
                 </Text>
               </View>
               {/* Simple Health % */}
-              <Text className="rounded-md bg-accent px-1.5 py-0.5 font-ralewayExtraBold text-[10px] text-textPrimary">
-                {Math.round(activeLeasePercentage)}%
-              </Text>
+              {isLoading ? (
+                <SkeletonBlock className="h-5 w-9 rounded-md" />
+              ) : (
+                <Text className="rounded-md bg-accent px-1.5 py-0.5 font-ralewayExtraBold text-[10px] text-textPrimary">
+                  {Math.round(activeLeasePercentage)}%
+                </Text>
+              )}
             </View>
 
             <View className="mt-3">
-              <Text className="font-ralewayBold text-2xl text-textPrimary">
-                {activeLeaseCount}
-              </Text>
+              {isLoading ? (
+                <SkeletonBlock className="h-7 w-12" />
+              ) : (
+                <Text className="font-ralewayBold text-2xl text-textPrimary">
+                  {activeLeaseCount}
+                </Text>
+              )}
               {/* Visual Progress toward 100% active capacity */}
               <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/10">
                 <View
@@ -219,7 +248,18 @@ export default function LeasesScreen() {
             title="Loading leases"
           />
         ) : (
-          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+          <ScrollView
+            className="flex-1"
+            refreshControl={
+              <RefreshControl
+                colors={[colors.secondary]}
+                onRefresh={refresh}
+                refreshing={isRefreshing}
+                tintColor={colors.secondary}
+              />
+            }
+            showsVerticalScrollIndicator={false}
+          >
             <View className="gap-4 pb-8">
               {filteredLeases.map((lease) => {
                 const property = properties.find(

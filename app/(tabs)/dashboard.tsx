@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { GlassView } from "expo-glass-effect";
@@ -25,6 +26,11 @@ import PropertyImageGallery from "../../components/properties/PropertyImageGalle
 import { PortfolioAssetFilterSheet } from "../../components/properties/PortfolioAssetFilterSheet";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import { PropertyPortfolioSummary } from "../../components/properties/PropertyPortfolioSummary";
+import {
+  SkeletonGroup,
+  SkeletonList,
+  SkeletonListCard,
+} from "../../components/ui/Skeleton";
 import {
   capitalizeWords,
   filterAndSortProperties,
@@ -78,7 +84,9 @@ export default function DashboardScreen() {
     data: properties = [],
     isError: isPropertiesError,
     isLoading: isLoadingProperties,
+    refetch: refetchProperties,
   } = useList();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { height } = Dimensions.get("window");
   const heroHeight = Math.min(Math.max(height * 0.24, 192), 224);
   const portfolioValue = useMemo(
@@ -163,6 +171,15 @@ export default function DashboardScreen() {
       {notificationIcon}
     </>
   );
+
+  async function refreshDashboard() {
+    setIsRefreshing(true);
+    try {
+      await refetchProperties();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   return (
     <Screen bottomInset="tab-bar" className="flex-1 bg-surface">
@@ -314,21 +331,38 @@ export default function DashboardScreen() {
 
       <View className="mt-4 flex-1">
         {isLoadingProperties ? (
-          <View className="gap-3">
-            {Array.from({ length: 2 }).map((_, index) => (
-              <View
-                key={index}
-                className="h-24 rounded-2xl border border-secondary/20 bg-secondary/10"
-              />
-            ))}
-          </View>
-        ) : visibleAssets.length > 0 ? (
+          <SkeletonGroup
+            accessibilityLabel="Loading portfolio assets"
+            className="gap-3"
+          >
+            <SkeletonList
+              count={2}
+              renderItem={() => <SkeletonListCard className="min-h-24" />}
+            />
+          </SkeletonGroup>
+        ) : (
           <FlatList
             data={visibleAssets}
             keyExtractor={(property) => property.id}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 140 }}
             ItemSeparatorComponent={() => <View className="h-3" />}
+            ListEmptyComponent={
+              <View className="items-center justify-center rounded-2xl border border-dashed border-secondary/30 bg-secondary/10 px-4 py-6">
+                <Feather name="search" size={22} color={colors.secondary} />
+                <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
+                  No assets found
+                </Text>
+              </View>
+            }
+            refreshControl={
+              <RefreshControl
+                colors={[colors.secondary]}
+                onRefresh={refreshDashboard}
+                refreshing={isRefreshing}
+                tintColor={colors.secondary}
+              />
+            }
             renderItem={({ item: property }) => (
               <TouchableOpacity
                 activeOpacity={0.82}
@@ -402,13 +436,6 @@ export default function DashboardScreen() {
               </TouchableOpacity>
             )}
           />
-        ) : (
-          <View className="items-center justify-center rounded-2xl border border-dashed border-secondary/30 bg-secondary/10 px-4 py-6">
-            <Feather name="search" size={22} color={colors.secondary} />
-            <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
-              No assets found
-            </Text>
-          </View>
         )}
       </View>
 

@@ -40,15 +40,17 @@ export function useLeaseManagement({
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isStartDatePickerOpen, setIsStartDatePickerOpen] = useState(false);
 
-  const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
+  const leasesQuery = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),
     enabled: Boolean(accessToken),
   });
-  const { data: lessees = [], isLoading: isLoadingLessees } =
-    useClients(accessToken);
+  const leases = leasesQuery.data ?? [];
+  const lesseesQuery = useClients(accessToken);
+  const lessees = lesseesQuery.data ?? [];
   const { useList } = useProperties();
-  const { data: properties = [], isLoading: isLoadingProperties } = useList();
+  const propertiesQuery = useList();
+  const properties = propertiesQuery.data;
 
   const saveMutation = useMutation({
     mutationFn: (payload: LeasePayload) =>
@@ -158,6 +160,14 @@ export function useLeaseManagement({
     saveMutation.mutate(result.payload);
   }
 
+  async function refresh() {
+    await Promise.all([
+      leasesQuery.refetch(),
+      lesseesQuery.refetch(),
+      propertiesQuery.refetch(),
+    ]);
+  }
+
   const activeLeaseCount = leases.filter(
     (lease) => lease.status === "Active",
   ).length;
@@ -179,7 +189,14 @@ export function useLeaseManagement({
     formError,
     handleStartDateConfirm,
     isFormOpen,
-    isLoading: isLoadingLeases || isLoadingLessees || isLoadingProperties,
+    isLoading:
+      leasesQuery.isLoading ||
+      lesseesQuery.isLoading ||
+      propertiesQuery.isLoading,
+    isRefreshing:
+      leasesQuery.isFetching ||
+      lesseesQuery.isFetching ||
+      propertiesQuery.isFetching,
     isStartDatePickerOpen,
     leases,
     lesseeOptions,
@@ -190,6 +207,7 @@ export function useLeaseManagement({
     openStartDatePicker,
     properties,
     propertyOptions,
+    refresh,
     saveMutation,
     searchQuery,
     selectedTenant,

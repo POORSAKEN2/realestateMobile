@@ -81,18 +81,35 @@ export function useDocumentLibrary(
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["documents"] }),
   });
 
+  const isLoading =
+    documentsQuery.isLoading ||
+    clientsQuery.isLoading ||
+    propertiesQuery.isLoading;
+
+  async function refresh() {
+    await Promise.all([
+      documentsQuery.refetch(),
+      clientsQuery.refetch(),
+      propertiesQuery.refetch(),
+    ]);
+  }
+
   return {
     deleteDocument: deleteMutation.mutateAsync,
     documents: documentsQuery.data ?? [],
     error: documentsQuery.error,
     isDeleting: deleteMutation.isPending,
     isError: documentsQuery.isError,
-    isLoading: documentsQuery.isLoading,
-    isRefreshing: documentsQuery.isRefetching,
+    isLoading,
+    isRefreshing:
+      !isLoading &&
+      (documentsQuery.isFetching ||
+        clientsQuery.isFetching ||
+        propertiesQuery.isFetching),
     isSaving: saveMutation.isPending,
     lessees: clientsQuery.data ?? [],
     properties: propertiesQuery.data ?? [],
-    refresh: documentsQuery.refetch,
+    refresh,
     saveDocument: saveMutation.mutateAsync,
   };
 }

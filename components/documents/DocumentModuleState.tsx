@@ -1,5 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+
+import { SkeletonGroup, SkeletonList, SkeletonListCard } from "../ui/Skeleton";
 
 export function DocumentModuleState({
   isError,
@@ -18,16 +20,12 @@ export function DocumentModuleState({
 }) {
   if (isLoading) {
     return (
-      <View
-        accessibilityLabel="Loading documents"
-        accessibilityRole="progressbar"
-        className="h-52 items-center justify-center rounded-[24px] border border-secondary/20 bg-white"
-      >
-        <ActivityIndicator color="#634CE4" />
-        <Text className="mt-3 font-ralewaySemiBold text-sm text-description">
-          Loading documents
-        </Text>
-      </View>
+      <SkeletonGroup accessibilityLabel="Loading documents" className="gap-3">
+        <SkeletonList
+          count={3}
+          renderItem={() => <SkeletonListCard className="min-h-32" />}
+        />
+      </SkeletonGroup>
     );
   }
 

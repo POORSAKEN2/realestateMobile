@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
 
 import { PropertyCard } from "../../components/properties/PropertyCard";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
@@ -46,6 +46,7 @@ export default function PropertiesScreen() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
   );
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { useList } = useProperties(accessToken);
   const { data: properties = [], isError, isLoading, refetch } = useList();
@@ -125,24 +126,32 @@ export default function PropertiesScreen() {
     [form.classification],
   );
 
+  async function refreshProperties() {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
   return (
     <Screen bottomInset="tab-bar" className="bg-[#F5F7FC]">
       <View className="flex-1">
+        <View className="px-1 pb-5">
+          <ModuleHeader
+            action={<AddButton title="Add" onPress={openForm} />}
+            eyebrow="Asset Management"
+            title="Properties"
+          />
+        </View>
+
         <FlatList
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
           data={propertyListItems}
           ItemSeparatorComponent={() => <View className="h-4" />}
           keyExtractor={(item) =>
             item.kind === "property" ? item.property.id : item.kind
-          }
-          ListHeaderComponent={
-            <View className="px-1 pb-5">
-              <ModuleHeader
-                action={<AddButton title="Add" onPress={openForm} />}
-                eyebrow="Asset Management"
-                title="Properties"
-              />
-            </View>
           }
           renderItem={({ item }) => {
             if (item.kind === "search") {
@@ -247,8 +256,16 @@ export default function PropertiesScreen() {
               />
             );
           }}
+          refreshControl={
+            <RefreshControl
+              colors={["#634CE4"]}
+              onRefresh={refreshProperties}
+              refreshing={isRefreshing}
+              tintColor="#634CE4"
+            />
+          }
           showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[1]}
+          stickyHeaderIndices={[0]}
         />
       </View>
 

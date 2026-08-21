@@ -42,7 +42,7 @@ export default function DefaultLocationScreen() {
   }
 
   return (
-    <Screen className="bg-slate-50">
+    <Screen bottomInset="safe-area" className="bg-slate-50">
       <Stack.Screen options={{ headerShown: false }} />
       <View className="flex-1">
         <View className="pb-6 pt-4">

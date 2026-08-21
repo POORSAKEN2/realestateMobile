@@ -6,9 +6,11 @@ import { ModuleHeader } from "../ui/ModuleHeader";
 
 export function DocumentsHeader({
   documentCount,
+  isLoading = false,
   onUpload,
 }: {
   documentCount: number;
+  isLoading?: boolean;
   onUpload: () => void;
 }) {
   return (
@@ -34,9 +36,11 @@ export function DocumentsHeader({
           variant="secondary"
         />
       }
-      supportingText={`${documentCount} ${
-        documentCount === 1 ? "document" : "documents"
-      }`}
+      supportingText={
+        isLoading
+          ? "Loading library"
+          : `${documentCount} ${documentCount === 1 ? "document" : "documents"}`
+      }
       title="Documents"
     />
   );
