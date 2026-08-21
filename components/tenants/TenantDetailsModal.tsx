@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import type { Lessee } from "../../types";
@@ -21,7 +22,10 @@ export function TenantDetailsModal({
       onClose={onClose}
       visible={Boolean(tenant)}
     >
-      <View className="rounded-t-[32px] bg-white px-6 pb-20 pt-6">
+      <SafeAreaView
+        className="rounded-t-[32px] bg-white px-6 pb-4 pt-6"
+        edges={["bottom"]}
+      >
         <View className="flex-row items-start justify-between gap-4">
           <View className="flex-1">
             <Text className="font-ralewayExtraBold text-2xl text-textPrimary">
@@ -52,7 +56,7 @@ export function TenantDetailsModal({
             <Ionicons name="close" color="#634CE4" size={20} />
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     </BottomSheetModal>
   );
 }

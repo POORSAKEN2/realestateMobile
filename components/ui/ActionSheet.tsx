@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomSheetModal } from "./BottomSheetModal";
 
@@ -53,9 +54,10 @@ export function ActionSheet({
       onDismiss={handleDismiss}
       visible={visible}
     >
-      <View
+      <SafeAreaView
         accessibilityViewIsModal
-        className="rounded-t-[28px] bg-white px-5 pb-20 pt-5"
+        className="rounded-t-[28px] bg-white px-5 pb-4 pt-5"
+        edges={["bottom"]}
       >
         <View className="mb-4 flex-row items-start gap-3">
           <View className="min-w-0 flex-1">
@@ -145,7 +147,7 @@ export function ActionSheet({
             );
           })}
         </View>
-      </View>
+      </SafeAreaView>
     </BottomSheetModal>
   );
 }

@@ -10,7 +10,10 @@ import {
   type DocumentCategoryFilter,
 } from "../../utils/documents/documentPresentation";
 import { RadioOptionList } from "../ui/groups/RadioOptionList";
-import { SearchFilterSection } from "../ui/SearchFilterSheet";
+import {
+  SearchFilterActions,
+  SearchFilterSection,
+} from "../ui/SearchFilterSheet";
 import {
   SearchableOptionSelector,
   SelectionField,
@@ -194,31 +197,13 @@ export function DocumentFilterSheet({
               </SearchFilterSection>
             </ScrollView>
 
-            <View className="flex-row gap-3 border-t border-secondary/20 px-4 pb-20 pt-4">
-              <TouchableOpacity
-                accessibilityRole="button"
-                activeOpacity={0.82}
-                className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-secondary/10"
-                onPress={() => {
-                  setDraft({ propertyId: "", lesseeId: "", type: "All" });
-                  setDraftCategory("All");
-                }}
-              >
-                <Text className="font-ralewayExtraBold text-sm text-textPrimary">
-                  Reset
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                accessibilityRole="button"
-                activeOpacity={0.82}
-                className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-secondary"
-                onPress={() => onApply(draft, draftCategory)}
-              >
-                <Text className="font-ralewayExtraBold text-sm text-white">
-                  Apply filters
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <SearchFilterActions
+              onApply={() => onApply(draft, draftCategory)}
+              onReset={() => {
+                setDraft({ propertyId: "", lesseeId: "", type: "All" });
+                setDraftCategory("All");
+              }}
+            />
           </>
         )}
       </View>

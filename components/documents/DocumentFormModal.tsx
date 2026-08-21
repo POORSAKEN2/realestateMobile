@@ -1,7 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   ScrollView,
   Text,
   TextInput,
@@ -26,6 +25,8 @@ import {
   SelectionField,
 } from "./SearchableOptionSelector";
 import { FormSection } from "../ui/forms/FormSection";
+import { FormActionRow } from "../ui/forms/FormActionRow";
+import { ModalActionFooter } from "../ui/ModalActionFooter";
 import { DocumentFileField } from "./DocumentFileField";
 
 type SelectorMode = "property" | "tenant" | null;
@@ -295,40 +296,18 @@ export function DocumentFormModal({
               </FormSection>
             </ScrollView>
 
-            <View className="flex-row gap-3 border-t border-secondary/20 bg-white px-5 pb-20 pt-5">
-              <TouchableOpacity
-                accessibilityLabel="Cancel document form"
-                accessibilityRole="button"
-                activeOpacity={0.85}
-                className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-secondary bg-white ${
-                  isSaving ? "opacity-60" : ""
-                }`}
-                disabled={isSaving}
-                onPress={onClose}
-              >
-                <Text className="font-ralewayBold text-base text-secondary">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                accessibilityRole="button"
-                accessibilityState={{ disabled: !canSubmit }}
-                activeOpacity={0.85}
-                className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-secondary ${
-                  canSubmit ? "" : "opacity-40"
-                }`}
-                disabled={!canSubmit}
-                onPress={onSubmit}
-              >
-                {isSaving ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="font-ralewayBold text-base text-white">
-                    {editingDocument ? "Save changes" : "Upload document"}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
+            <ModalActionFooter>
+              <FormActionRow
+                appearance="card"
+                isPending={isSaving}
+                onCancel={onClose}
+                onSubmit={onSubmit}
+                submitDisabled={!canSubmit}
+                submitText={
+                  editingDocument ? "Save changes" : "Upload document"
+                }
+              />
+            </ModalActionFooter>
           </>
         )}
       </View>

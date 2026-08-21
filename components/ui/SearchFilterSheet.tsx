@@ -1,9 +1,12 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomSheetModal } from "./BottomSheetModal";
+import { FormActionRow } from "./forms/FormActionRow";
 import { RadioOptionList, type RadioOption } from "./groups/RadioOptionList";
+import { ModalActionFooter } from "./ModalActionFooter";
 
 export function SearchFilterSheet({
   children,
@@ -27,7 +30,10 @@ export function SearchFilterSheet({
       onClose={onClose}
       visible={visible}
     >
-      <View className="max-h-[90%] rounded-t-[30px] bg-white">
+      <SafeAreaView
+        className="max-h-[90%] rounded-t-[30px] bg-white"
+        edges={footer ? [] : ["bottom"]}
+      >
         <View className="pt-3">
           <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
         </View>
@@ -51,9 +57,7 @@ export function SearchFilterSheet({
         </View>
 
         <ScrollView
-          contentContainerClassName={`gap-5 px-5 pt-5 ${
-            footer ? "pb-5" : "pb-20"
-          }`}
+          contentContainerClassName="gap-5 px-5 pb-5 pt-5"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -61,7 +65,7 @@ export function SearchFilterSheet({
         </ScrollView>
 
         {footer}
-      </View>
+      </SafeAreaView>
     </BottomSheetModal>
   );
 }
@@ -91,28 +95,16 @@ export function SearchFilterActions({
   onReset: () => void;
 }) {
   return (
-    <View className="flex-row gap-3 border-t border-secondary/20 px-4 pb-20 pt-4">
-      <TouchableOpacity
-        accessibilityRole="button"
-        activeOpacity={0.82}
-        className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-secondary/10"
-        onPress={onReset}
-      >
-        <Text className="font-ralewayExtraBold text-sm text-textPrimary">
-          Reset
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        accessibilityRole="button"
-        activeOpacity={0.82}
-        className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-secondary"
-        onPress={onApply}
-      >
-        <Text className="font-ralewayExtraBold text-sm text-white">
-          Apply filters
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <ModalActionFooter>
+      <FormActionRow
+        appearance="card"
+        cancelText="Reset"
+        isPending={false}
+        onCancel={onReset}
+        onSubmit={onApply}
+        submitText="Apply filters"
+      />
+    </ModalActionFooter>
   );
 }
 

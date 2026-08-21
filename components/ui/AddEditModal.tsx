@@ -10,11 +10,11 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BackButton } from "./buttons/BackButton";
 import { BottomSheetHost } from "./BottomSheetModal";
 import { FormActionRow } from "./forms/FormActionRow";
+import { ModalActionFooter } from "./ModalActionFooter";
 
 function AddEditModalHost({ children }: React.PropsWithChildren) {
   return (
@@ -191,10 +191,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
           </ScrollView>
 
           {footer || showCancelAction || showSubmitAction ? (
-            <SafeAreaView
-              className="border-t border-textPrimary/10 bg-white px-5 pb-4 pt-4"
-              edges={["bottom"]}
-            >
+            <ModalActionFooter>
               {footer ?? (
                 <FormActionRow
                   appearance={appearance}
@@ -208,7 +205,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                   submitText={submitText}
                 />
               )}
-            </SafeAreaView>
+            </ModalActionFooter>
           ) : null}
         </KeyboardAvoidingView>
       </AddEditModalHost>

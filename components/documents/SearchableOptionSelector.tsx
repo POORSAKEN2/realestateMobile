@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export type SearchableOption = { id: string; label: string };
 
@@ -72,7 +73,7 @@ export function SearchableOptionSelector({
   );
 
   return (
-    <View className="min-h-[500px] bg-surface">
+    <SafeAreaView className="min-h-[500px] bg-surface" edges={["bottom"]}>
       <View className="flex-row items-center gap-3 bg-white px-5 pb-5 pt-2">
         <TouchableOpacity
           accessibilityLabel={backAccessibilityLabel}
@@ -106,7 +107,7 @@ export function SearchableOptionSelector({
       </View>
       <ScrollView
         className="mt-3"
-        contentContainerClassName="gap-2 px-5 pb-20"
+        contentContainerClassName="gap-2 px-5 pb-4"
         keyboardShouldPersistTaps="handled"
       >
         <OptionRow
@@ -128,7 +129,7 @@ export function SearchableOptionSelector({
           </Text>
         ) : null}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

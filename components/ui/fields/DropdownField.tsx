@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons"; // Or your specific icon import
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomSheetModal } from "../BottomSheetModal";
 
@@ -97,7 +98,10 @@ export function DropdownField<T extends string>({
         onClose={() => setIsOpen(false)}
         visible={isOpen}
       >
-        <View className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-[#FFFFFF] px-5 pt-5">
+        <SafeAreaView
+          className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-[#FFFFFF] px-5 pb-4 pt-5"
+          edges={["bottom"]}
+        >
           <View className="mb-4 flex-row items-center justify-between">
             <View>
               <Text className="font-ralewayExtraBold text-lg text-textPrimary">
@@ -120,10 +124,7 @@ export function DropdownField<T extends string>({
             </TouchableOpacity>
           </View>
 
-          <ScrollView
-            contentContainerClassName="pb-20"
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView showsVerticalScrollIndicator={false}>
             <View className="gap-2">
               {options.map((option) => {
                 const isSelected = option.value === value;
@@ -158,7 +159,7 @@ export function DropdownField<T extends string>({
               })}
             </View>
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </BottomSheetModal>
     </View>
   );

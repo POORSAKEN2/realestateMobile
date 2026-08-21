@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ActionSheet, type ActionSheetItem } from "../ui/ActionSheet";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
@@ -142,25 +143,25 @@ export function DeleteDocumentSheet({
         <TouchableOpacity
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-secondary/10"
+          className="min-h-14 flex-1 items-center justify-center rounded-2xl border border-secondary bg-white"
           disabled={isDeleting}
           onPress={onCancel}
         >
-          <Text className="font-ralewayExtraBold text-sm text-textPrimary">
+          <Text className="font-ralewayBold text-base text-secondary">
             Cancel
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-red-600"
+          className="min-h-14 flex-1 items-center justify-center rounded-2xl bg-red-600"
           disabled={isDeleting}
           onPress={() => document && onConfirm(document)}
         >
           {isDeleting ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text className="font-ralewayExtraBold text-sm text-white">
+            <Text className="font-ralewayBold text-base text-white">
               Delete
             </Text>
           )}
@@ -190,9 +191,10 @@ function BottomSheet({
       onClose={onClose}
       visible={visible}
     >
-      <View
+      <SafeAreaView
         accessibilityViewIsModal
-        className="rounded-t-[30px] bg-white px-5 pb-20 pt-3"
+        className="rounded-t-[30px] bg-white px-5 pb-4 pt-3"
+        edges={["bottom"]}
       >
         <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
         <View className="mb-5 flex-row items-start justify-between gap-3">
@@ -223,7 +225,7 @@ function BottomSheet({
           </TouchableOpacity>
         </View>
         {children}
-      </View>
+      </SafeAreaView>
     </BottomSheetModal>
   );
 }

@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { appRoutes } from "../../constants/navigation";
 
 import { fetchDocuments, fetchLeases } from "../../api/propertyDetails";
@@ -39,6 +40,7 @@ export function PropertyDetailsModal({
   property: Property | null;
 }) {
   const { height, width } = Dimensions.get("window");
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const sheetTranslateY = useRef(new Animated.Value(0)).current;
   const swipeDownResponder = useMemo(
@@ -159,7 +161,7 @@ export function PropertyDetailsModal({
           </View>
           <ScrollView
             bounces={false}
-            contentContainerClassName="pb-20"
+            contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
             showsVerticalScrollIndicator={false}
           >
             <View className="relative mt-4 h-56 overflow-hidden">
