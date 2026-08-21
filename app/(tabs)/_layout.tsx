@@ -96,11 +96,6 @@ export default function TabsLayout() {
         />
         <Tabs.Screen
           name="rent"
-          listeners={{
-            tabPress: (event) => {
-              event.preventDefault();
-            },
-          }}
           options={{
             title: "Rent",
             tabBarAccessibilityLabel: "Rent collection, coming soon",

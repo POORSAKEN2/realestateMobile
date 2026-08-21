@@ -186,7 +186,7 @@ function MenuItemCard({
             {item.label}
           </Text>
           {item.badge ? (
-            <Text className="rounded-full bg-secondary/10 px-2 py-0.5 font-ralewayExtraBold text-[9px] uppercase tracking-wide text-secondary">
+            <Text className="rounded-full bg-accent px-2 py-0.5 font-ralewayExtraBold text-[9px] uppercase tracking-wide text-textPrimary">
               {item.badge}
             </Text>
           ) : null}
