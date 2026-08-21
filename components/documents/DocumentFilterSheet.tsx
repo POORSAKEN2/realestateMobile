@@ -4,7 +4,13 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import type { Lessee, Property, PropertyDocument } from "../../types";
-import type { DocumentAdvancedFilters } from "../../utils/documents/documentPresentation";
+import {
+  DOCUMENT_CATEGORIES,
+  type DocumentAdvancedFilters,
+  type DocumentCategoryFilter,
+} from "../../utils/documents/documentPresentation";
+import { RadioOptionList } from "../ui/groups/RadioOptionList";
+import { SearchFilterSection } from "../ui/SearchFilterSheet";
 import {
   SearchableOptionSelector,
   SelectionField,
@@ -21,6 +27,7 @@ const documentTypes: Array<PropertyDocument["type"] | "All"> = [
 ];
 
 export function DocumentFilterSheet({
+  category,
   filters,
   lessees,
   onApply,
@@ -28,23 +35,29 @@ export function DocumentFilterSheet({
   properties,
   visible,
 }: {
+  category: DocumentCategoryFilter;
   filters: DocumentAdvancedFilters;
   lessees: Lessee[];
-  onApply: (filters: DocumentAdvancedFilters) => void;
+  onApply: (
+    filters: DocumentAdvancedFilters,
+    category: DocumentCategoryFilter,
+  ) => void;
   onClose: () => void;
   properties: Property[];
   visible: boolean;
 }) {
   const [draft, setDraft] = useState(filters);
+  const [draftCategory, setDraftCategory] = useState(category);
   const [selectorMode, setSelectorMode] = useState<SelectorMode>(null);
   const [selectorQuery, setSelectorQuery] = useState("");
 
   useEffect(() => {
     if (!visible) return;
     setDraft(filters);
+    setDraftCategory(category);
     setSelectorMode(null);
     setSelectorQuery("");
-  }, [filters, visible]);
+  }, [category, filters, visible]);
 
   const propertyOptions = useMemo(
     () => properties.map(({ id, title }) => ({ id, label: title })),
@@ -153,40 +166,32 @@ export function DocumentFilterSheet({
                 value={selectedTenant?.label ?? "All tenants"}
               />
 
-              <View className="gap-2">
-                <Text className="font-ralewayBold text-xs uppercase tracking-wide text-description">
-                  File type
-                </Text>
-                <View className="flex-row flex-wrap gap-2">
-                  {documentTypes.map((type) => {
-                    const isSelected = draft.type === type;
-                    return (
-                      <TouchableOpacity
-                        key={type}
-                        accessibilityRole="radio"
-                        accessibilityState={{ checked: isSelected }}
-                        activeOpacity={0.8}
-                        className={`min-h-11 justify-center rounded-2xl border px-4 ${
-                          isSelected
-                            ? "border-secondary bg-secondary"
-                            : "border-secondary/20 bg-white"
-                        }`}
-                        onPress={() =>
-                          setDraft((current) => ({ ...current, type }))
-                        }
-                      >
-                        <Text
-                          className={`font-ralewayBold text-xs ${
-                            isSelected ? "text-white" : "text-textPrimary"
-                          }`}
-                        >
-                          {type === "All" ? "All types" : type}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
+              <SearchFilterSection label="Category">
+                <RadioOptionList
+                  onSelect={setDraftCategory}
+                  options={[
+                    { label: "All categories", value: "All" },
+                    ...DOCUMENT_CATEGORIES.map((item) => ({
+                      label: item,
+                      value: item,
+                    })),
+                  ]}
+                  value={draftCategory}
+                />
+              </SearchFilterSection>
+
+              <SearchFilterSection label="File type">
+                <RadioOptionList
+                  onSelect={(type) =>
+                    setDraft((current) => ({ ...current, type }))
+                  }
+                  options={documentTypes.map((type) => ({
+                    label: type === "All" ? "All types" : type,
+                    value: type,
+                  }))}
+                  value={draft.type}
+                />
+              </SearchFilterSection>
             </ScrollView>
 
             <View className="flex-row gap-3 border-t border-secondary/20 px-4 pb-20 pt-4">
@@ -194,9 +199,10 @@ export function DocumentFilterSheet({
                 accessibilityRole="button"
                 activeOpacity={0.82}
                 className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-secondary/10"
-                onPress={() =>
-                  setDraft({ propertyId: "", lesseeId: "", type: "All" })
-                }
+                onPress={() => {
+                  setDraft({ propertyId: "", lesseeId: "", type: "All" });
+                  setDraftCategory("All");
+                }}
               >
                 <Text className="font-ralewayExtraBold text-sm text-textPrimary">
                   Reset
@@ -206,7 +212,7 @@ export function DocumentFilterSheet({
                 accessibilityRole="button"
                 activeOpacity={0.82}
                 className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-secondary"
-                onPress={() => onApply(draft)}
+                onPress={() => onApply(draft, draftCategory)}
               >
                 <Text className="font-ralewayExtraBold text-sm text-white">
                   Apply filters

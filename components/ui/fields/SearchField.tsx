@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import type { ReactNode } from "react";
 import {
   TextInput,
   type TextInputProps,
@@ -11,22 +12,30 @@ type SearchFieldProps = Omit<
   "onChange" | "onChangeText" | "value"
 > & {
   clearAccessibilityLabel: string;
+  endAccessory?: ReactNode;
   onChangeText: (value: string) => void;
   value: string;
+  variant?: "filled" | "outlined";
   wrapperClassName?: string;
 };
 
 export function SearchField({
   clearAccessibilityLabel,
+  endAccessory,
   onChangeText,
   placeholder,
   value,
+  variant = "filled",
   wrapperClassName = "",
   ...inputProps
 }: SearchFieldProps) {
   return (
     <View
-      className={`h-12 min-w-0 flex-row items-center rounded-2xl bg-slate-100 px-3.5 ${wrapperClassName}`}
+      className={`h-12 min-w-0 flex-row items-center rounded-2xl px-3.5 ${
+        variant === "outlined"
+          ? "border border-secondary/20 bg-white"
+          : "bg-slate-100"
+      } ${wrapperClassName}`}
     >
       <MaterialCommunityIcons name="magnify" color="#475569" size={20} />
       <TextInput
@@ -55,6 +64,7 @@ export function SearchField({
           />
         </TouchableOpacity>
       ) : null}
+      {endAccessory}
     </View>
   );
 }

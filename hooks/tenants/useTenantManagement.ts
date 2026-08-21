@@ -184,6 +184,7 @@ export function useTenantManagement({
       tenants.length === 0 ? 0 : (linkedTenantCount / tenants.length) * 100,
     openCreateForm,
     openEditForm,
+    properties,
     refresh,
     saveMutation,
     searchQuery,

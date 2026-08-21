@@ -1,7 +1,7 @@
-import { Text, View } from "react-native";
+import { useState } from "react";
 
-import ChoiceChips from "../ui/chips/ChoiceChips";
-import { SearchField } from "../ui/fields/SearchField";
+import { SingleChoiceFilterSheet } from "../ui/SearchFilterSheet";
+import { formatSearchResultLabel, SearchToolbar } from "../ui/SearchToolbar";
 import {
   ROOM_STATUS_FILTER_OPTIONS,
   type RoomStatusFilter,
@@ -22,32 +22,41 @@ export function FloorAssignedRoomsToolbar({
   statusFilter: RoomStatusFilter;
   totalCount: number;
 }) {
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const statusLabel =
+    ROOM_STATUS_FILTER_OPTIONS.find((option) => option.value === statusFilter)
+      ?.label ?? "All";
+
   return (
-    <View className="rounded-2xl border border-slate-200 bg-white p-3">
-      <SearchField
+    <>
+      <SearchToolbar
         accessibilityLabel="Search assigned rooms by room number"
+        activeFilterCount={statusFilter === "ALL" ? 0 : 1}
         clearAccessibilityLabel="Clear room search"
+        filterAccessibilityLabel={`Filter assigned rooms, ${statusLabel}`}
+        filterLabel={
+          statusFilter === "ALL" ? "All statuses" : `${statusLabel} status`
+        }
         onChangeText={onChangeSearch}
+        onFilterPress={() => setIsFilterVisible(true)}
         placeholder="Search room number"
+        resultLabel={formatSearchResultLabel({
+          filteredCount,
+          singular: "room",
+          totalCount,
+        })}
         value={searchQuery}
       />
 
-      <View className="mt-3 flex-row items-center justify-between px-1">
-        <Text className="font-ralewayBold text-xs text-slate-600">
-          Filter by status
-        </Text>
-        <Text className="font-ralewaySemiBold text-xs text-slate-500">
-          {filteredCount} of {totalCount}
-        </Text>
-      </View>
-      <ChoiceChips
-        activeClassName="border-primary bg-secondary/10"
-        activeTextClassName="text-primary"
-        className="mt-2 flex-row flex-wrap gap-2"
-        onSelect={onChangeStatus}
+      <SingleChoiceFilterSheet
+        description="Choose one room status."
+        onChange={onChangeStatus}
+        onClose={() => setIsFilterVisible(false)}
         options={ROOM_STATUS_FILTER_OPTIONS}
+        title="Filter assigned rooms"
         value={statusFilter}
+        visible={isFilterVisible}
       />
-    </View>
+    </>
   );
 }

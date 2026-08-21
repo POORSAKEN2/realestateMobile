@@ -109,7 +109,8 @@ export default function DocumentsScreen() {
       sort,
     ],
   );
-  const activeFilterCount = countAdvancedFilters(filters);
+  const activeFilterCount =
+    countAdvancedFilters(filters) + Number(category !== "All");
   const sortLabel =
     DOCUMENT_SORT_OPTIONS.find(({ value }) => value === sort)?.label ??
     "Newest";
@@ -278,10 +279,12 @@ export default function DocumentsScreen() {
       />
 
       <DocumentFilterSheet
+        category={category}
         filters={filters}
         lessees={lessees}
-        onApply={(nextFilters) => {
+        onApply={(nextFilters, nextCategory) => {
           setFilters(nextFilters);
+          setCategory(nextCategory);
           setIsFilterVisible(false);
         }}
         onClose={() => setIsFilterVisible(false)}

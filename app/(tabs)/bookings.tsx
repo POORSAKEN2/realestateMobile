@@ -9,13 +9,17 @@ import {
   BookingCalendarEmpty,
   BookingCalendarLoading,
   BookingDaySchedule,
-  BookingFilters,
+  BookingFilterSheet,
   BookingFormModal,
   BookingReservationList,
 } from "../../components/bookings";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
+import {
+  formatSearchResultLabel,
+  SearchToolbar,
+} from "../../components/ui/SearchToolbar";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useClients } from "../../hooks/api/useClients";
@@ -34,6 +38,8 @@ export default function BookingsScreen() {
   const requestedPropertyId = getParamValue(params.propertyId);
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("Booked");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { useList } = useProperties();
@@ -91,13 +97,29 @@ export default function BookingsScreen() {
       bookings.filter((booking) => booking.propertyId === selectedPropertyId),
     [bookings, selectedPropertyId],
   );
-  const visibleBookings = useMemo(
-    () =>
-      selectedBuildingBookings.filter((booking) =>
-        statusFilter === "All" ? true : booking.status === statusFilter,
-      ),
-    [selectedBuildingBookings, statusFilter],
-  );
+  const visibleBookings = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return selectedBuildingBookings.filter((booking) => {
+      const matchesStatus =
+        statusFilter === "All" || booking.status === statusFilter;
+      const matchesSearch =
+        !query ||
+        [
+          booking.guestName,
+          booking.guestEmail,
+          booking.guestPhone,
+          booking.roomNumber,
+          booking.notes,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [searchQuery, selectedBuildingBookings, statusFilter]);
   const calendar = useBookingCalendar({
     bookings: visibleBookings,
     availabilityBookings: selectedBuildingBookings,
@@ -116,6 +138,12 @@ export default function BookingsScreen() {
     },
   });
   const isLoading = isLoadingProperties || isLoadingBookings;
+  const activeBookingFilterCount = [
+    statusFilter !== "Booked",
+    Boolean(
+      selectedPropertyId && selectedPropertyId !== buildingOptions[0]?.id,
+    ),
+  ].filter(Boolean).length;
 
   async function refreshBookings() {
     setIsRefreshing(true);
@@ -159,12 +187,24 @@ export default function BookingsScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View className="gap-4 pb-8">
-            <BookingFilters
-              buildings={buildingOptions}
-              onSelectBuilding={setSelectedPropertyId}
-              onSelectStatus={setStatusFilter}
-              selectedBuilding={selectedBuilding}
-              selectedStatus={statusFilter}
+            <SearchToolbar
+              accessibilityLabel="Search bookings"
+              activeFilterCount={activeBookingFilterCount}
+              clearAccessibilityLabel="Clear booking search"
+              filterAccessibilityLabel="Filter bookings"
+              filterLabel={`${selectedBuilding?.title ?? "No property"} · ${
+                statusFilter === "All" ? "All statuses" : "Confirmed"
+              }`}
+              onChangeText={setSearchQuery}
+              onFilterPress={() => setIsFilterVisible(true)}
+              placeholder="Guest, room, email, or phone"
+              resultLabel={formatSearchResultLabel({
+                filteredCount: visibleBookings.length,
+                isLoading,
+                singular: "reservation",
+                totalCount: selectedBuildingBookings.length,
+              })}
+              value={searchQuery}
             />
 
             {isLoading ? (
@@ -198,12 +238,29 @@ export default function BookingsScreen() {
             <BookingReservationList
               bookings={visibleBookings}
               buildingTitle={selectedBuilding?.title}
+              hasActiveFilters={
+                Boolean(searchQuery.trim()) ||
+                visibleBookings.length !== selectedBuildingBookings.length
+              }
               isLoading={isLoading}
               onOpenBooking={bookingForm.openEdit}
             />
           </View>
         </ScrollView>
       </View>
+
+      <BookingFilterSheet
+        buildings={buildingOptions}
+        onApply={(filters) => {
+          setSelectedPropertyId(filters.propertyId);
+          setStatusFilter(filters.status);
+          setIsFilterVisible(false);
+        }}
+        onClose={() => setIsFilterVisible(false)}
+        selectedBuildingId={selectedPropertyId}
+        selectedStatus={statusFilter}
+        visible={isFilterVisible}
+      />
 
       <BookingFormModal
         buildings={buildingOptions}

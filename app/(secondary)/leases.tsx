@@ -1,12 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import Feather from "@expo/vector-icons/Feather";
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { useMemo, useState } from "react";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import {
@@ -26,6 +20,15 @@ import { SecondaryBackButton } from "../../components/navigation/SecondaryBackBu
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { SkeletonBlock } from "../../components/ui/Skeleton";
+import {
+  formatSearchResultLabel,
+  SearchToolbar,
+} from "../../components/ui/SearchToolbar";
+import {
+  EMPTY_LEASE_FILTERS,
+  LeaseFilterSheet,
+  type LeaseFilters,
+} from "../../components/leases/LeaseFilterSheet";
 import {
   calculateLeaseEndDate,
   formatLeaseDateLabel,
@@ -53,6 +56,8 @@ function cleanNumber(value: string) {
 
 export default function LeasesScreen() {
   const leaseSnackbar = useSnackbar();
+  const [filters, setFilters] = useState<LeaseFilters>(EMPTY_LEASE_FILTERS);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const {
     activeLeaseCount,
     activeLeasePercentage,
@@ -93,6 +98,25 @@ export default function LeasesScreen() {
         operation === "created" ? "Lease added." : "Lease updated.",
       ),
   });
+  const visibleLeases = useMemo(
+    () =>
+      filteredLeases.filter(
+        (lease) =>
+          (filters.status === "ALL" || lease.status === filters.status) &&
+          (filters.propertyId === "ALL" ||
+            lease.propertyId === filters.propertyId) &&
+          (filters.lesseeId === "ALL" || lease.lesseeId === filters.lesseeId),
+      ),
+    [filteredLeases, filters],
+  );
+  const activeFilterCount = [
+    filters.status !== "ALL",
+    filters.propertyId !== "ALL",
+    filters.lesseeId !== "ALL",
+  ].filter(Boolean).length;
+  const filterLabel = activeFilterCount
+    ? `${activeFilterCount} active filters`
+    : "All leases";
 
   return (
     <Screen className="bg-surface">
@@ -218,29 +242,23 @@ export default function LeasesScreen() {
           </View>
         </View>
 
-        <View className="rounded-[22px] border border-secondary/20 bg-white px-3 py-3 shadow-xl shadow-secondary/10">
-          <View className="flex-row items-center gap-3">
-            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
-              <Feather name="search" size={20} color={colors.secondary} />
-            </View>
-
-            <View className="min-w-0 flex-1">
-              <Text className="mb-0.5 font-ralewayBold text-[11px] uppercase text-textPrimary">
-                Find lease
-              </Text>
-
-              <TextInput
-                accessibilityLabel="Search leases"
-                className="h-10 p-0 font-ralewaySemiBold text-sm text-textPrimary"
-                placeholder="Tenant, unit, property, or lease"
-                placeholderTextColor={colors.description}
-                returnKeyType="search"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
-          </View>
-        </View>
+        <SearchToolbar
+          accessibilityLabel="Search leases"
+          activeFilterCount={activeFilterCount}
+          clearAccessibilityLabel="Clear lease search"
+          filterAccessibilityLabel={`Filter leases, ${filterLabel}`}
+          filterLabel={filterLabel}
+          onChangeText={setSearchQuery}
+          onFilterPress={() => setIsFilterVisible(true)}
+          placeholder="Tenant, unit, property, or lease"
+          resultLabel={formatSearchResultLabel({
+            filteredCount: visibleLeases.length,
+            isLoading,
+            singular: "lease",
+            totalCount: leases.length,
+          })}
+          value={searchQuery}
+        />
 
         {isLoading ? (
           <ModuleLoadingState
@@ -261,7 +279,7 @@ export default function LeasesScreen() {
             showsVerticalScrollIndicator={false}
           >
             <View className="gap-4 pb-8">
-              {filteredLeases.map((lease) => {
+              {visibleLeases.map((lease) => {
                 const property = properties.find(
                   (item) => item.id === lease.propertyId,
                 );
@@ -282,17 +300,37 @@ export default function LeasesScreen() {
                 );
               })}
 
-              {filteredLeases.length === 0 ? (
+              {visibleLeases.length === 0 ? (
                 <ModuleEmptyState
-                  description="Create a lease once a property and tenant are available."
+                  description={
+                    searchQuery.trim() || activeFilterCount
+                      ? "Change the search or filters to see more leases."
+                      : "Create a lease once a property and tenant are available."
+                  }
                   icon="document-text-outline"
-                  title="No leases found"
+                  title={
+                    searchQuery.trim() || activeFilterCount
+                      ? "No matching leases"
+                      : "No leases found"
+                  }
                 />
               ) : null}
             </View>
           </ScrollView>
         )}
       </View>
+
+      <LeaseFilterSheet
+        filters={filters}
+        lessees={lessees}
+        onApply={(nextFilters) => {
+          setFilters(nextFilters);
+          setIsFilterVisible(false);
+        }}
+        onClose={() => setIsFilterVisible(false)}
+        properties={properties}
+        visible={isFilterVisible}
+      />
 
       <AddEditModal
         appearance="card"

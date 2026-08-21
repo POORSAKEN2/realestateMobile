@@ -13,6 +13,7 @@ const monthFormatter = new Intl.DateTimeFormat("en-US", { month: "short" });
 type BookingReservationListProps = {
   bookings: TransientBooking[];
   buildingTitle?: string;
+  hasActiveFilters?: boolean;
   isLoading: boolean;
   onOpenBooking: (booking: TransientBooking) => void;
 };
@@ -20,6 +21,7 @@ type BookingReservationListProps = {
 export function BookingReservationList({
   bookings,
   buildingTitle,
+  hasActiveFilters = false,
   isLoading,
   onOpenBooking,
 }: BookingReservationListProps) {
@@ -58,10 +60,14 @@ export function BookingReservationList({
       ) : (
         <View className="items-center rounded-2xl border border-dashed border-secondary/20 p-6">
           <Text className="text-center font-ralewayExtraBold text-sm text-slate-800">
-            No reservations found
+            {hasActiveFilters
+              ? "No matching reservations"
+              : "No reservations found"}
           </Text>
           <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
-            Select an available day to add your first booking.
+            {hasActiveFilters
+              ? "Change the search or filters to see more reservations."
+              : "Select an available day to add your first booking."}
           </Text>
         </View>
       )}

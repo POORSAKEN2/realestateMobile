@@ -1,14 +1,21 @@
 import { RefreshControl, ScrollView, Text, View } from "react-native";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   ExpenseActionSheet,
   ExpenseDashboard,
+  EMPTY_EXPENSE_FILTERS,
+  ExpenseFilterSheet,
   ExpenseFormModal,
   ExpenseHeader,
   ExpenseTransactionList,
+  type ExpenseFilters,
 } from "../../components/expenses";
 import { Screen } from "../../components/ui/Screen";
+import {
+  formatSearchResultLabel,
+  SearchToolbar,
+} from "../../components/ui/SearchToolbar";
 import {
   SkeletonBlock,
   SkeletonGroup,
@@ -66,6 +73,9 @@ function ExpenseLoadingState() {
 export default function ExpensesScreen() {
   const expenseSnackbar = useSnackbar();
   const [actionExpense, setActionExpense] = useState<Expense | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<ExpenseFilters>(EMPTY_EXPENSE_FILTERS);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const {
     closeForm,
     editingExpense,
@@ -91,6 +101,47 @@ export default function ExpensesScreen() {
         operation === "created" ? "Expense recorded." : "Expense updated.",
       ),
   });
+  const filteredExpenses = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return expenses.filter((expense) => {
+      const matchesSearch =
+        !query ||
+        [
+          expense.category,
+          expense.description,
+          expense.reference_no,
+          expense.status,
+          expense.property?.title,
+          expense.property?.location,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+      const matchesProperty =
+        filters.propertyId === "ALL" ||
+        expense.property_id === filters.propertyId;
+      const matchesCategory =
+        filters.category === "ALL" || expense.category === filters.category;
+      const matchesStatus =
+        filters.status === "ALL" || expense.status === filters.status;
+
+      return (
+        matchesSearch && matchesProperty && matchesCategory && matchesStatus
+      );
+    });
+  }, [expenses, filters, searchQuery]);
+  const expenseCategories = useMemo(
+    () =>
+      Array.from(new Set(expenses.map((expense) => expense.category))).sort(),
+    [expenses],
+  );
+  const activeFilterCount = [
+    filters.propertyId !== "ALL",
+    filters.category !== "ALL",
+    filters.status !== "ALL",
+  ].filter(Boolean).length;
 
   return (
     <Screen bottomInset="tab-bar" className="bg-surface">
@@ -115,14 +166,52 @@ export default function ExpensesScreen() {
           ) : (
             <>
               <ExpenseDashboard expenses={expenses} />
+              <SearchToolbar
+                accessibilityLabel="Search expenses"
+                activeFilterCount={activeFilterCount}
+                className="mt-4"
+                clearAccessibilityLabel="Clear expense search"
+                filterAccessibilityLabel={
+                  activeFilterCount
+                    ? `Filter expenses, ${activeFilterCount} active`
+                    : "Filter expenses"
+                }
+                filterLabel={
+                  activeFilterCount
+                    ? `${activeFilterCount} active filters`
+                    : "All expenses"
+                }
+                onChangeText={setSearchQuery}
+                onFilterPress={() => setIsFilterVisible(true)}
+                placeholder="Category, property, reference, or status"
+                resultLabel={formatSearchResultLabel({
+                  filteredCount: filteredExpenses.length,
+                  singular: "expense",
+                  totalCount: expenses.length,
+                })}
+                value={searchQuery}
+              />
               <ExpenseTransactionList
-                expenses={expenses}
+                expenses={filteredExpenses}
+                isFiltered={Boolean(searchQuery.trim() || activeFilterCount)}
                 onOpenActions={setActionExpense}
               />
             </>
           )}
         </ScrollView>
       </View>
+
+      <ExpenseFilterSheet
+        categories={expenseCategories}
+        filters={filters}
+        onApply={(nextFilters) => {
+          setFilters(nextFilters);
+          setIsFilterVisible(false);
+        }}
+        onClose={() => setIsFilterVisible(false)}
+        properties={propertyOptions}
+        visible={isFilterVisible}
+      />
 
       <ExpenseActionSheet
         expense={actionExpense}

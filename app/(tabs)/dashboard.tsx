@@ -3,7 +3,6 @@ import {
   Image,
   ImageBackground,
   Text,
-  TextInput,
   View,
   TouchableOpacity,
   Dimensions,
@@ -14,6 +13,7 @@ import { BlurView } from "expo-blur";
 import { GlassView } from "expo-glass-effect";
 import { useMemo, useState } from "react";
 import { Screen } from "../../components/ui/Screen";
+import { SearchToolbar } from "../../components/ui/SearchToolbar";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
 import { useProperties } from "../../hooks/api/useProperties";
@@ -70,10 +70,11 @@ export default function DashboardScreen() {
   const [assetSortOrder, setAssetSortOrder] = useState<AssetSortOrder>("desc");
   const [assetStatusFilter, setAssetStatusFilter] =
     useState<AssetStatusFilter>("ALL");
-  const hasCustomAssetFilters =
-    assetStatusFilter !== "ALL" ||
-    assetSortBy !== "value" ||
-    assetSortOrder !== "desc";
+  const activeAssetFilterCount = [
+    assetStatusFilter !== "ALL",
+    assetSortBy !== "value",
+    assetSortOrder !== "desc",
+  ].filter(Boolean).length;
   const [imageGalleryProperty, setImageGalleryProperty] =
     useState<Property | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
@@ -290,32 +291,18 @@ export default function DashboardScreen() {
         <Text className="font-ralewayBold">Portfolio Assets</Text>
 
         <View className="mt-3 flex-row items-center gap-3">
-          <View className="h-14 min-w-0 flex-1 flex-row items-center gap-3 rounded-[22px] border border-secondary/20 bg-white px-4 shadow-xl shadow-secondary/10">
-            <Feather name="search" size={20} color={colors.secondary} />
-
-            <TextInput
-              accessibilityLabel="Search portfolio assets"
-              className="h-full min-w-0 flex-1 p-0 font-ralewaySemiBold text-sm text-textPrimary"
-              placeholder="Location or asset"
-              placeholderTextColor={colors.description}
-              returnKeyType="search"
-              value={assetSearchQuery}
-              onChangeText={setAssetSearchQuery}
-            />
-
-            <TouchableOpacity
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Open portfolio asset filters"
-              onPress={() => setShowAssetFilters(true)}
-              className="relative h-10 w-8 items-center justify-center"
-            >
-              <Feather name="sliders" size={18} color={colors.secondary} />
-              {hasCustomAssetFilters ? (
-                <View className="absolute right-0 top-1.5 h-2 w-2 rounded-full bg-secondary" />
-              ) : null}
-            </TouchableOpacity>
-          </View>
+          <SearchToolbar
+            accessibilityLabel="Search portfolio assets"
+            activeFilterCount={activeAssetFilterCount}
+            className="flex-1"
+            clearAccessibilityLabel="Clear portfolio asset search"
+            filterAccessibilityLabel="Open portfolio asset filters"
+            onChangeText={setAssetSearchQuery}
+            onFilterPress={() => setShowAssetFilters(true)}
+            placeholder="Location or asset"
+            value={assetSearchQuery}
+            variant="compact"
+          />
 
           <TouchableOpacity
             activeOpacity={0.8}

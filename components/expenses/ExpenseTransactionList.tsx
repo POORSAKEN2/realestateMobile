@@ -8,11 +8,13 @@ import { ExpenseTransactionCard } from "./ExpenseTransactionCard";
 
 type ExpenseTransactionListProps = {
   expenses: Expense[];
+  isFiltered?: boolean;
   onOpenActions: (expense: Expense) => void;
 };
 
 export function ExpenseTransactionList({
   expenses,
+  isFiltered = false,
   onOpenActions,
 }: ExpenseTransactionListProps) {
   return (
@@ -45,10 +47,14 @@ export function ExpenseTransactionList({
               size={30}
             />
             <Text className="mt-3 font-ralewayBold text-sm text-textPrimary">
-              No recent transactions
+              {isFiltered
+                ? "No matching transactions"
+                : "No recent transactions"}
             </Text>
             <Text className="mt-1 text-center font-ralewayMedium text-xs leading-5 text-description">
-              New expenses and approvals will appear here.
+              {isFiltered
+                ? "Try a different search to find another expense."
+                : "New expenses and approvals will appear here."}
             </Text>
           </View>
         )}

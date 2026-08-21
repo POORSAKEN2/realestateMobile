@@ -1,7 +1,7 @@
 export { BookingAvailabilityMessage } from "./BookingAvailabilityMessage";
 export { BookingCalendar } from "./BookingCalendar";
 export { BookingDaySchedule } from "./BookingDaySchedule";
-export { BookingFilters } from "./BookingFilters";
+export { BookingFilterSheet } from "./BookingFilters";
 export { BookingFormModal } from "./BookingFormModal";
 export { BookingGuestFields } from "./BookingGuestFields";
 export {
