@@ -16,12 +16,7 @@ import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
-import {
-  SkeletonBlock,
-  SkeletonGroup,
-  SkeletonList,
-  SkeletonMetricCard,
-} from "../../components/ui/Skeleton";
+import { SkeletonBlock, SkeletonGroup } from "../../components/ui/Skeleton";
 import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
 import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
@@ -307,41 +302,76 @@ function AnalyticsLoadingState() {
   return (
     <SkeletonGroup accessibilityLabel="Loading portfolio analytics">
       <View className="mt-6 flex-row flex-wrap">
-        <SkeletonList
-          count={4}
-          renderItem={() => (
-            <View className="w-1/2 p-1.5">
-              <SkeletonMetricCard />
+        {Array.from({ length: 4 }, (_, index) => (
+          <View className="w-1/2 p-1.5" key={index}>
+            <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+              <SkeletonBlock className="h-10 w-10 rounded-2xl bg-primary/10" />
+              <SkeletonBlock className="mt-4 h-5 w-4/5 bg-primary/15" />
+              <View className="mt-2 gap-1.5">
+                <SkeletonBlock className="h-2.5 w-3/4" />
+                <SkeletonBlock className="h-2.5 w-1/2" />
+              </View>
             </View>
-          )}
-        />
+          </View>
+        ))}
       </View>
 
-      <View className="mt-4 rounded-[28px] border border-slate-200 bg-white p-4">
+      <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
         <View className="flex-row items-center justify-between">
           <View className="gap-2">
             <SkeletonBlock className="h-5 w-44" />
             <SkeletonBlock className="h-3 w-24" />
           </View>
-          <SkeletonBlock className="h-10 w-10 rounded-2xl" />
+          <SkeletonBlock className="h-10 w-10 rounded-2xl bg-primary/10" />
         </View>
-        <SkeletonBlock className="mt-4 h-48 w-full rounded-3xl" />
+        <View className="mt-4 h-48 overflow-hidden rounded-3xl bg-primary/10 px-5 pb-4 pt-5">
+          <View className="flex-1 flex-row items-end justify-between gap-3">
+            {["h-1/3", "h-1/2", "h-2/5", "h-3/4", "h-3/5", "h-full"].map(
+              (height, index) => (
+                <SkeletonBlock
+                  className={`w-3 rounded-full bg-primary/20 ${height}`}
+                  key={index}
+                />
+              ),
+            )}
+          </View>
+          <View className="mt-4 flex-row justify-between">
+            {Array.from({ length: 6 }, (_, index) => (
+              <SkeletonBlock
+                className="h-2 w-6 rounded-full bg-primary/20"
+                key={index}
+              />
+            ))}
+          </View>
+        </View>
       </View>
 
-      <View className="mt-4 rounded-[28px] border border-slate-200 bg-white p-4">
+      <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
         <View className="flex-row items-center justify-between">
-          <View className="gap-2">
-            <SkeletonBlock className="h-5 w-48" />
+          <View className="min-w-0 flex-1 gap-2 pr-4">
+            <SkeletonBlock className="h-5 w-44 max-w-full" />
             <SkeletonBlock className="h-3 w-36" />
           </View>
-          <SkeletonBlock className="h-10 w-10 rounded-2xl" />
+          <SkeletonBlock className="h-10 w-10 rounded-2xl bg-primary/10" />
         </View>
         <View className="mt-5 flex-row items-center gap-5">
-          <SkeletonBlock className="h-40 w-40 rounded-full" />
+          <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-primary/10">
+            <View className="h-28 w-28 items-center justify-center rounded-full bg-white">
+              <SkeletonBlock className="h-5 w-8 bg-primary/15" />
+              <SkeletonBlock className="mt-2 h-2.5 w-14" />
+            </View>
+          </View>
           <View className="min-w-0 flex-1 gap-3">
-            <SkeletonBlock className="h-4 w-full" />
-            <SkeletonBlock className="h-4 w-4/5" />
-            <SkeletonBlock className="h-4 w-3/5" />
+            {Array.from({ length: 4 }, (_, index) => (
+              <View className="gap-1.5" key={index}>
+                <View className="flex-row items-center gap-2">
+                  <SkeletonBlock className="h-2.5 w-2.5 rounded-full bg-primary/20" />
+                  <SkeletonBlock className="h-3 flex-1" />
+                  <SkeletonBlock className="h-3 w-7" />
+                </View>
+                <SkeletonBlock className="ml-[18px] h-2 w-12" />
+              </View>
+            ))}
           </View>
         </View>
       </View>

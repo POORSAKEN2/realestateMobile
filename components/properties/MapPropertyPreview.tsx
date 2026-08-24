@@ -6,16 +6,21 @@ import { formatPeso, formatStatus } from "../../utils/properties/propertyForm";
 import { getPropertyImages } from "../../utils/properties/propertyPresentation";
 
 export function MapPropertyPreview({
+  bottomInset = 0,
   onClose,
   property,
 }: {
+  bottomInset?: number;
   onClose: () => void;
   property: Property;
 }) {
   const images = getPropertyImages(property);
 
   return (
-    <View className="absolute bottom-6 left-4 right-4 flex-row items-center gap-3 rounded-3xl border border-primary/20 bg-white p-3 shadow-xl shadow-primary/20">
+    <View
+      className="absolute left-4 right-4 flex-row items-center gap-3 rounded-3xl border border-primary/20 bg-white p-3 shadow-xl shadow-primary/20"
+      style={{ bottom: bottomInset + 24 }}
+    >
       <View className="h-[74px] w-[74px] items-center justify-center overflow-hidden rounded-[18px] bg-slate-200">
         {images.length ? (
           <ScrollView
