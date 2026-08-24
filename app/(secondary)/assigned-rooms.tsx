@@ -47,11 +47,21 @@ export default function AssignedRoomsScreen() {
   const roomsQuery = usePropertyRoomsQuery(propertyId, session?.accessToken);
   const commands = usePropertyRoomCommands(propertyId, session?.accessToken);
   const [notice, setNotice] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const rooms = useMemo(
     () => (roomsQuery.data ?? []).filter((room) => room.areaId === areaId),
     [areaId, roomsQuery.data],
   );
   const isBusy = commands.update.isPending;
+
+  async function refreshRooms() {
+    setIsRefreshing(true);
+    try {
+      await roomsQuery.refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   async function updateStatus(room: PropertyRoom, status: PropertyRoomStatus) {
     if (room.status === status) return;
@@ -181,8 +191,8 @@ export default function AssignedRoomsScreen() {
             refreshControl={
               <RefreshControl
                 colors={["#8A77F4"]}
-                onRefresh={() => roomsQuery.refetch()}
-                refreshing={roomsQuery.isFetching}
+                onRefresh={refreshRooms}
+                refreshing={isRefreshing}
                 tintColor="#8A77F4"
               />
             }

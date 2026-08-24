@@ -38,6 +38,7 @@ export function useLeaseManagement({
   const [selectedTenant, setSelectedTenant] = useState<Lessee | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Lease | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isStartDatePickerOpen, setIsStartDatePickerOpen] = useState(false);
 
   const leasesQuery = useQuery({
@@ -161,11 +162,16 @@ export function useLeaseManagement({
   }
 
   async function refresh() {
-    await Promise.all([
-      leasesQuery.refetch(),
-      lesseesQuery.refetch(),
-      propertiesQuery.refetch(),
-    ]);
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        leasesQuery.refetch(),
+        lesseesQuery.refetch(),
+        propertiesQuery.refetch(),
+      ]);
+    } finally {
+      setIsRefreshing(false);
+    }
   }
 
   const activeLeaseCount = leases.filter(
@@ -193,10 +199,7 @@ export function useLeaseManagement({
       leasesQuery.isLoading ||
       lesseesQuery.isLoading ||
       propertiesQuery.isLoading,
-    isRefreshing:
-      leasesQuery.isFetching ||
-      lesseesQuery.isFetching ||
-      propertiesQuery.isFetching,
+    isRefreshing,
     isStartDatePickerOpen,
     leases,
     lesseeOptions,

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
+import { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -184,6 +185,7 @@ export default function NotificationScreen() {
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
   const queryKey = ["notifications", accessToken];
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const notificationsQuery = useQuery({
     queryKey,
@@ -233,6 +235,15 @@ export default function NotificationScreen() {
 
   const isInitialLoading =
     notificationsQuery.isLoading && notifications.length === 0;
+
+  async function refreshNotifications() {
+    setIsRefreshing(true);
+    try {
+      await notificationsQuery.refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   return (
     <Screen className="bg-[#F8FAFC]">
@@ -309,13 +320,13 @@ export default function NotificationScreen() {
             paddingBottom: 118,
           }}
           ListEmptyComponent={
-            <EmptyState onRefresh={() => notificationsQuery.refetch()} />
+            <EmptyState onRefresh={() => void refreshNotifications()} />
           }
           refreshControl={
             <RefreshControl
-              refreshing={notificationsQuery.isFetching && !isInitialLoading}
+              refreshing={isRefreshing}
               tintColor={colors.primary}
-              onRefresh={() => notificationsQuery.refetch()}
+              onRefresh={refreshNotifications}
             />
           }
           renderItem={({ item }) => (
