@@ -52,7 +52,7 @@ function PropertyAction({
       accessibilityRole="button"
       activeOpacity={0.8}
       className={`min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl px-3 ${
-        primary ? "bg-secondary" : "bg-secondary/10"
+        primary ? "bg-secondary" : "bg-primary/10"
       }`}
       onPress={(event) => {
         event.stopPropagation();
@@ -61,7 +61,7 @@ function PropertyAction({
     >
       <MaterialCommunityIcons
         name={icon}
-        color={primary ? "#FFFFFF" : "#634CE4"}
+        color={primary ? "#FFFFFF" : "#8A77F4"}
         size={17}
       />
       <Text
@@ -110,7 +110,7 @@ export function PropertyCard({
       accessibilityLabel={`View overview for ${property.title}`}
       accessibilityRole="button"
       activeOpacity={0.9}
-      className="w-full overflow-hidden rounded-3xl border border-secondary/20 bg-white shadow-sm shadow-secondary/10"
+      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-sm shadow-primary/10"
       onPress={onOpenDetails}
     >
       <TouchableOpacity
@@ -225,11 +225,11 @@ export function PropertyCard({
           </View>
         </View>
 
-        <View className="mt-4 flex-row gap-3 rounded-2xl bg-secondary/5 p-3.5">
+        <View className="mt-4 flex-row gap-3 rounded-2xl bg-primary/5 p-3.5">
           <PropertyMetric label="Value" value={formatPeso(property.value)} />
-          <View className="w-px bg-secondary/10" />
+          <View className="w-px bg-primary/10" />
           <PropertyMetric label="ROI" value={`${property.roi.toFixed(1)}%`} />
-          <View className="w-px bg-secondary/10" />
+          <View className="w-px bg-primary/10" />
           <PropertyMetric label="Occupancy" value={`${occupancy}%`} />
         </View>
 
@@ -239,20 +239,20 @@ export function PropertyCard({
           activeOpacity={0.82}
           className={`mt-4 flex-row items-center gap-3 rounded-2xl border p-3.5 ${
             floorManagerPolicy.floorSummaryProminence === "primary"
-              ? "border-secondary/25 bg-secondary/10"
-              : "border-secondary/20 bg-white"
+              ? "border-primary/25 bg-primary/10"
+              : "border-primary/20 bg-white"
           }`}
           onPress={(event) => {
             event.stopPropagation();
             onOpenFloorPlans();
           }}
         >
-          <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary/10">
+          <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
             <MaterialCommunityIcons
               name="floor-plan"
               color={
                 floorManagerPolicy.floorSummaryProminence === "primary"
-                  ? "#634CE4"
+                  ? "#8A77F4"
                   : "#64748B"
               }
               size={21}
@@ -282,7 +282,7 @@ export function PropertyCard({
             name="chevron-right"
             color={
               floorManagerPolicy.floorSummaryProminence === "primary"
-                ? "#634CE4"
+                ? "#8A77F4"
                 : "#64748B"
             }
             size={21}

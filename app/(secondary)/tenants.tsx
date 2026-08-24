@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Screen, type ScreenBottomInset } from "../../components/ui/Screen";
@@ -15,8 +14,8 @@ import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { OverviewMetricCard } from "../../components/ui/OverviewMetricCard";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
-import { SkeletonBlock } from "../../components/ui/Skeleton";
 import {
   formatSearchResultLabel,
   SearchToolbar,
@@ -103,6 +102,13 @@ export function TenantsScreen({
     filters.propertyId !== "ALL",
   ].filter(Boolean).length;
   const filterLabel = getTenantFilterLabel(filters);
+  const selectedTenantLeases = selectedTenant
+    ? getTenantLeases(selectedTenant.id)
+    : [];
+  const selectedTenantMonthlyRent = selectedTenantLeases.reduce(
+    (sum, lease) => sum + lease.monthlyRent,
+    0,
+  );
 
   return (
     <Screen bottomInset={bottomInset} className="bg-surface">
@@ -124,106 +130,27 @@ export function TenantsScreen({
           />
         </View>
 
-        {/* --- THE HERO: REVENUE SNAPSHOT --- */}
-        <View className="relative overflow-hidden rounded-[32px] bg-secondary p-6 shadow-xl shadow-secondary/20">
-          {/* Decorative Background Accent */}
-          <View className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-primary/40" />
-
-          <View className="flex-row items-center gap-3">
-            <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
-              <Ionicons name="wallet-outline" color="#FFFFFF" size={20} />
-            </View>
-            <Text className="font-ralewayExtraBold text-xs uppercase tracking-widest text-white/60">
-              Linked Revenue
-            </Text>
-          </View>
-
-          <View className="mt-5">
-            {isLoading ? (
-              <SkeletonBlock className="h-10 w-3/4 rounded-xl bg-white/20" />
-            ) : (
-              <Text className="font-ralewayBold text-4xl text-white">
-                {formatCurrency(tenantMonthlyRent)}
-              </Text>
-            )}
-            {isLoading ? (
-              <SkeletonBlock className="mt-3 h-4 w-5/6 bg-white/20" />
-            ) : (
-              <Text className="mt-2 text-sm leading-5 text-white/50">
-                Monthly recurring revenue from {linkedTenantCount} active lease
-                agreements.
-              </Text>
-            )}
-          </View>
-        </View>
-
-        {/* --- METRIC ROW: Clean & Borderless --- */}
-        <View className="flex-row gap-4 px-1">
-          {/* Total Tenants */}
-          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
-            <View className="flex-row items-center gap-2">
-              <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
-                <Ionicons name="people" color={colors.secondary} size={16} />
-              </View>
-              <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
-                Capacity
-              </Text>
-            </View>
-            <View className="mt-3 flex-row items-end gap-1">
-              {isLoading ? (
-                <SkeletonBlock className="h-7 w-12" />
-              ) : (
-                <Text className="font-ralewayBold text-2xl text-textPrimary">
-                  {tenants.length}
-                </Text>
-              )}
-              <Text className="mb-1 font-ralewaySemiBold text-xs text-description">
-                Profiles
-              </Text>
-            </View>
-          </View>
-
-          {/* Lease Linkage Health */}
-          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
-                  <Ionicons name="link" color={colors.secondary} size={16} />
-                </View>
-                <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
-                  Linkage
-                </Text>
-              </View>
-              {/* Simple Health Badge */}
-              {isLoading ? (
-                <SkeletonBlock className="h-5 w-9 rounded-md" />
-              ) : (
-                <Text className="rounded-md bg-accent px-1.5 py-0.5 font-ralewayExtraBold text-[10px] text-textPrimary">
-                  {Math.round(linkedTenantPercentage)}%
-                </Text>
-              )}
-            </View>
-
-            <View className="mt-3">
-              {isLoading ? (
-                <SkeletonBlock className="h-7 w-12" />
-              ) : (
-                <Text className="font-ralewayBold text-2xl text-textPrimary">
-                  {linkedTenantCount}
-                </Text>
-              )}
-              {/* Mini Progress Bar for Linkage Health */}
-              <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/10">
-                <View
-                  className="h-full bg-secondary"
-                  style={{
-                    width: `${linkedTenantPercentage}%`,
-                  }}
-                />
-              </View>
-            </View>
-          </View>
-        </View>
+        <OverviewMetricCard
+          icon="cash-outline"
+          isLoading={isLoading}
+          label="Monthly revenue"
+          metrics={[
+            {
+              detail: `${linkedTenantCount} linked`,
+              icon: "people",
+              label: "Total capacity",
+              value: String(tenants.length),
+            },
+            {
+              detail: `${Math.round(linkedTenantPercentage)}%`,
+              icon: "link",
+              label: "Linked Tenants",
+              progress: linkedTenantPercentage,
+              value: `${linkedTenantCount} of ${tenants.length}`,
+            },
+          ]}
+          value={formatCurrency(tenantMonthlyRent)}
+        />
 
         <SearchToolbar
           accessibilityLabel="Search tenants"
@@ -252,10 +179,10 @@ export function TenantsScreen({
           <ScrollView
             refreshControl={
               <RefreshControl
-                colors={[colors.secondary]}
+                colors={[colors.primary]}
                 onRefresh={refresh}
                 refreshing={isRefreshing}
-                tintColor={colors.secondary}
+                tintColor={colors.primary}
               />
             }
             showsVerticalScrollIndicator={false}
@@ -359,9 +286,13 @@ export function TenantsScreen({
 
       <TenantDetailsModal
         linkedLeaseCount={
-          selectedTenant ? getTenantLeases(selectedTenant.id).length : undefined
+          selectedTenant ? selectedTenantLeases.length : undefined
         }
+        monthlyRent={selectedTenant ? selectedTenantMonthlyRent : undefined}
         onClose={() => setSelectedTenant(null)}
+        propertyNames={
+          selectedTenant ? getLinkedProperties(selectedTenant.id) : []
+        }
         tenant={selectedTenant}
       />
 

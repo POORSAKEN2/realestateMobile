@@ -22,7 +22,7 @@ export function DocumentFileField({
         File{!editingDocument ? <Text className="text-red-600"> *</Text> : null}
       </Text>
       <View
-        className={`flex-row items-center gap-2 rounded-2xl border border-dashed bg-secondary/10 p-2 ${error ? "border-red-400" : "border-secondary/30"}`}
+        className={`flex-row items-center gap-2 rounded-2xl border border-dashed bg-primary/10 p-2 ${error ? "border-red-400" : "border-primary/30"}`}
       >
         <TouchableOpacity
           accessibilityLabel={
@@ -35,12 +35,12 @@ export function DocumentFileField({
           className="min-h-14 min-w-0 flex-1 flex-row items-center gap-3 px-2"
           onPress={onPick}
         >
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
+          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
             <MaterialCommunityIcons
               name={
                 selectedFile ? "file-check-outline" : "cloud-upload-outline"
               }
-              color="#634CE4"
+              color="#8A77F4"
               size={23}
             />
           </View>

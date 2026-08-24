@@ -105,7 +105,7 @@ export function DocumentFilterSheet({
         className="max-h-[90%] min-h-[520px] rounded-t-[30px] bg-white"
       >
         <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
+          <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
         </View>
 
         {selectorMode ? (
@@ -132,7 +132,7 @@ export function DocumentFilterSheet({
           />
         ) : (
           <>
-            <View className="flex-row items-center justify-between border-b border-secondary/20 px-5 pb-4">
+            <View className="flex-row items-center justify-between border-b border-primary/20 px-5 pb-4">
               <Text
                 accessibilityRole="header"
                 className="font-ralewayExtraBold text-xl text-textPrimary"
@@ -143,12 +143,12 @@ export function DocumentFilterSheet({
                 accessibilityLabel="Close filters"
                 accessibilityRole="button"
                 activeOpacity={0.75}
-                className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
+                className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
                 onPress={onClose}
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#634CE4"
+                  color="#8A77F4"
                   size={21}
                 />
               </TouchableOpacity>

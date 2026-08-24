@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Screen } from "../../components/ui/Screen";
@@ -18,8 +17,8 @@ import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { OverviewMetricCard } from "../../components/ui/OverviewMetricCard";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
-import { SkeletonBlock } from "../../components/ui/Skeleton";
 import {
   formatSearchResultLabel,
   SearchToolbar,
@@ -136,111 +135,27 @@ export default function LeasesScreen() {
           />
         </View>
 
-        {/* --- THE HERO: REVENUE SNAPSHOT --- */}
-        <View className="relative overflow-hidden rounded-[32px] bg-secondary p-6 shadow-xl shadow-secondary/20">
-          {/* Decorative Background Accent */}
-          <View className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-primary/40" />
-
-          <View className="flex-row items-center gap-3">
-            <View className="h-10 w-10 items-center justify-center rounded-full bg-white/10">
-              <Ionicons name="cash-outline" color="#FFFFFF" size={20} />
-            </View>
-            <Text className="font-ralewayExtraBold text-xs uppercase tracking-widest text-white/60">
-              Contracted Revenue
-            </Text>
-          </View>
-
-          <View className="mt-5">
-            {isLoading ? (
-              <SkeletonBlock className="h-10 w-3/4 rounded-xl bg-white/20" />
-            ) : (
-              <Text className="font-ralewayBold text-4xl text-white">
-                {formatCurrency(monthlyRevenue)}
-              </Text>
-            )}
-            {isLoading ? (
-              <SkeletonBlock className="mt-3 h-4 w-5/6 bg-white/20" />
-            ) : (
-              <Text className="mt-2 text-sm leading-5 text-white/50">
-                Total monthly value across {activeLeaseCount} active contracts.
-              </Text>
-            )}
-          </View>
-        </View>
-
-        {/* --- METRIC GRID: Status & Volume --- */}
-        <View className="flex-row gap-4 px-1">
-          {/* Total Leases */}
-          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
-            <View className="flex-row items-center gap-2">
-              <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
-                <Ionicons
-                  name="document-text"
-                  color={colors.secondary}
-                  size={16}
-                />
-              </View>
-              <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
-                Total
-              </Text>
-            </View>
-            <View className="mt-3 flex-row items-end gap-1">
-              {isLoading ? (
-                <SkeletonBlock className="h-7 w-12" />
-              ) : (
-                <Text className="font-ralewayBold text-2xl text-textPrimary">
-                  {leases.length}
-                </Text>
-              )}
-              <Text className="mb-1 font-ralewaySemiBold text-xs text-description">
-                Files
-              </Text>
-            </View>
-          </View>
-
-          {/* Active Health */}
-          <View className="flex-1 rounded-3xl border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
-                  <Ionicons
-                    name="checkmark-circle"
-                    color={colors.secondary}
-                    size={16}
-                  />
-                </View>
-                <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
-                  Active
-                </Text>
-              </View>
-              {/* Simple Health % */}
-              {isLoading ? (
-                <SkeletonBlock className="h-5 w-9 rounded-md" />
-              ) : (
-                <Text className="rounded-md bg-accent px-1.5 py-0.5 font-ralewayExtraBold text-[10px] text-textPrimary">
-                  {Math.round(activeLeasePercentage)}%
-                </Text>
-              )}
-            </View>
-
-            <View className="mt-3">
-              {isLoading ? (
-                <SkeletonBlock className="h-7 w-12" />
-              ) : (
-                <Text className="font-ralewayBold text-2xl text-textPrimary">
-                  {activeLeaseCount}
-                </Text>
-              )}
-              {/* Visual Progress toward 100% active capacity */}
-              <View className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/10">
-                <View
-                  className="h-full bg-secondary"
-                  style={{ width: `${activeLeasePercentage}%` }}
-                />
-              </View>
-            </View>
-          </View>
-        </View>
+        <OverviewMetricCard
+          icon="cash-outline"
+          isLoading={isLoading}
+          label="Monthly revenue"
+          metrics={[
+            {
+              detail: `${activeLeaseCount} active`,
+              icon: "document-text",
+              label: "Total lease files",
+              value: String(leases.length),
+            },
+            {
+              detail: `${Math.round(activeLeasePercentage)}%`,
+              icon: "checkmark-circle",
+              label: "Active leases",
+              progress: activeLeasePercentage,
+              value: `${activeLeaseCount} of ${leases.length}`,
+            },
+          ]}
+          value={formatCurrency(monthlyRevenue)}
+        />
 
         <SearchToolbar
           accessibilityLabel="Search leases"
@@ -270,10 +185,10 @@ export default function LeasesScreen() {
             className="flex-1"
             refreshControl={
               <RefreshControl
-                colors={[colors.secondary]}
+                colors={[colors.primary]}
                 onRefresh={refresh}
                 refreshing={isRefreshing}
-                tintColor={colors.secondary}
+                tintColor={colors.primary}
               />
             }
             showsVerticalScrollIndicator={false}
@@ -397,7 +312,7 @@ export default function LeasesScreen() {
           </View>
 
           {form.startDate && Number(form.durationMonths) >= 1 ? (
-            <View className="flex-row items-center justify-between rounded-2xl border border-secondary/20 bg-secondary/10 px-4 py-3.5">
+            <View className="flex-row items-center justify-between rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3.5">
               <Text className="font-ralewayExtraBold text-xs uppercase tracking-wider text-secondary">
                 Calculated End Date
               </Text>

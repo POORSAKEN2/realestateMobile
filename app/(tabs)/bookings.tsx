@@ -178,10 +178,10 @@ export default function BookingsScreen() {
         <ScrollView
           refreshControl={
             <RefreshControl
-              colors={["#634CE4"]}
+              colors={["#8A77F4"]}
               onRefresh={refreshBookings}
               refreshing={isRefreshing}
-              tintColor="#634CE4"
+              tintColor="#8A77F4"
             />
           }
           showsVerticalScrollIndicator={false}

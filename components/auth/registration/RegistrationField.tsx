@@ -53,7 +53,7 @@ export function RegistrationField({
         <Feather
           name={icon}
           size={19}
-          color={isFocused ? "#634CE4" : "#6F6D6D"}
+          color={isFocused ? "#8A77F4" : "#6F6D6D"}
         />
         <TextInput
           autoCapitalize={autoCapitalize}

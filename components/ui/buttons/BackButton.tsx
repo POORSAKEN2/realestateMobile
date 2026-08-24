@@ -15,7 +15,7 @@ type BackButtonProps = {
 const iconColors: Record<BackButtonVariant, string> = {
   neutral: colors.text,
   primary: colors.primary,
-  secondary: colors.secondary,
+  secondary: colors.primary,
   overlay: colors.primary,
 };
 

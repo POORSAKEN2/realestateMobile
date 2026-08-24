@@ -16,7 +16,7 @@ export default function TabsLayout() {
           headerShown: false,
           headerStyle: { backgroundColor: colors.whitePrimary },
           headerTintColor: colors.black,
-          tabBarActiveTintColor: colors.secondary,
+          tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: "#94A3B8",
           tabBarLabelStyle: {
             fontFamily: "Raleway_800ExtraBold",

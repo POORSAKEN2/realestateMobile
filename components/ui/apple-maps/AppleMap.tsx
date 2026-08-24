@@ -245,7 +245,7 @@ export function AppleMap({
       />
       {!ready && !error ? (
         <View pointerEvents="none" style={styles.loading}>
-          <ActivityIndicator color="#634CE4" size="large" />
+          <ActivityIndicator color="#8A77F4" size="large" />
           <Text style={styles.loadingText}>Loading Apple Maps...</Text>
         </View>
       ) : null}
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingHorizontal: 18,
     paddingVertical: 10,
-    backgroundColor: "#634CE4",
+    backgroundColor: "#8A77F4",
   },
   retryButtonText: {
     color: "#FFFFFF",

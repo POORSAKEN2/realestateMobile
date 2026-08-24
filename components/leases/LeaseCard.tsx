@@ -27,7 +27,7 @@ export function LeaseCard({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onOpenTenant}
-      className="w-full overflow-hidden rounded-3xl border border-secondary/20 bg-white shadow-sm shadow-secondary/10"
+      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-sm shadow-primary/10"
     >
       <View className="p-5">
         {/* --- HEADER: Identity, Status & Actions --- */}
@@ -49,7 +49,7 @@ export function LeaseCard({
                     ? "bg-accent"
                     : isExpired
                       ? "bg-rose-50"
-                      : "bg-secondary/10"
+                      : "bg-primary/10"
                 }`}
               >
                 <Text
@@ -84,17 +84,23 @@ export function LeaseCard({
           </View>
 
           {/* Quick Actions (Top Right to match Tenant Card) */}
-          <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-secondary/20 bg-secondary/10 p-1">
+          <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-primary/20 bg-primary/10 p-1">
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={onEdit}
-              className="rounded-full p-1.5 hover:bg-secondary/10"
+              onPress={(event) => {
+                event.stopPropagation();
+                onEdit();
+              }}
+              className="rounded-full p-1.5 hover:bg-primary/10"
             >
-              <Ionicons name="pencil" size={16} color={colors.secondary} />
+              <Ionicons name="pencil" size={16} color={colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={onDelete}
+              onPress={(event) => {
+                event.stopPropagation();
+                onDelete();
+              }}
               className="rounded-full p-1.5 hover:bg-red-50"
             >
               <Ionicons name="trash" size={16} color="#EF4444" />
@@ -103,7 +109,7 @@ export function LeaseCard({
         </View>
 
         {/* --- DIVIDER --- */}
-        <View className="my-4 h-[1px] w-full bg-secondary/10" />
+        <View className="my-4 h-[1px] w-full bg-primary/10" />
 
         {/* --- METRICS GRID: Rent & Terms Side-by-Side --- */}
         <View className="flex-row items-center justify-between gap-4">
@@ -129,7 +135,7 @@ export function LeaseCard({
           </View>
 
           {/* Vertical Separator */}
-          <View className="h-10 w-[1px] bg-secondary/10" />
+          <View className="h-10 w-[1px] bg-primary/10" />
 
           {/* Lease Term */}
           <View className="min-w-0 flex-1">

@@ -28,7 +28,7 @@ export function SelectionField({
         accessibilityLabel={`${label}, ${value}`}
         accessibilityRole="button"
         activeOpacity={0.8}
-        className="min-h-14 flex-row items-center rounded-2xl border border-secondary/20 bg-secondary/10 px-4"
+        className="min-h-14 flex-row items-center rounded-2xl border border-primary/20 bg-primary/10 px-4"
         onPress={onPress}
       >
         <Text
@@ -39,7 +39,7 @@ export function SelectionField({
         </Text>
         <MaterialCommunityIcons
           name="chevron-right"
-          color="#634CE4"
+          color="#8A77F4"
           size={21}
         />
       </TouchableOpacity>
@@ -79,10 +79,10 @@ export function SearchableOptionSelector({
           accessibilityLabel={backAccessibilityLabel}
           accessibilityRole="button"
           activeOpacity={0.75}
-          className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
+          className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
           onPress={onBack}
         >
-          <MaterialCommunityIcons name="arrow-left" color="#634CE4" size={21} />
+          <MaterialCommunityIcons name="arrow-left" color="#8A77F4" size={21} />
         </TouchableOpacity>
         <Text
           accessibilityRole="header"
@@ -92,8 +92,8 @@ export function SearchableOptionSelector({
         </Text>
       </View>
       <View className="px-5 pt-4">
-        <View className="min-h-14 flex-row items-center gap-3 rounded-2xl bg-secondary/10 px-4">
-          <MaterialCommunityIcons name="magnify" color="#634CE4" size={20} />
+        <View className="min-h-14 flex-row items-center gap-3 rounded-2xl bg-primary/10 px-4">
+          <MaterialCommunityIcons name="magnify" color="#8A77F4" size={20} />
           <TextInput
             accessibilityLabel={`Search ${title.toLowerCase()}`}
             autoFocus
@@ -149,8 +149,8 @@ function OptionRow({
       activeOpacity={0.8}
       className={`min-h-14 flex-row items-center rounded-2xl border px-4 ${
         isSelected
-          ? "border-secondary bg-secondary/10"
-          : "border-secondary/20 bg-white"
+          ? "border-primary bg-primary/10"
+          : "border-primary/20 bg-white"
       }`}
       onPress={onPress}
     >
@@ -163,7 +163,7 @@ function OptionRow({
         {label}
       </Text>
       {isSelected ? (
-        <MaterialCommunityIcons name="check-circle" color="#634CE4" size={21} />
+        <MaterialCommunityIcons name="check-circle" color="#8A77F4" size={21} />
       ) : null}
     </TouchableOpacity>
   );

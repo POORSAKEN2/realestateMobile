@@ -78,7 +78,7 @@ export function PortfolioAssetFilterSheet({
         />
       </SearchFilterSection>
 
-      <View className="border-t border-secondary/20 pt-5">
+      <View className="border-t border-primary/20 pt-5">
         <SearchFilterSection label="Sort field">
           <RadioOptionList
             onSelect={(sortBy) =>
@@ -90,7 +90,7 @@ export function PortfolioAssetFilterSheet({
         </SearchFilterSection>
       </View>
 
-      <View className="border-t border-secondary/20 pt-5">
+      <View className="border-t border-primary/20 pt-5">
         <SearchFilterSection label="Sort by">
           <RadioOptionList
             onSelect={(sortOrder) =>

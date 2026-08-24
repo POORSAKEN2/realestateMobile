@@ -35,10 +35,10 @@ export function SearchFilterSheet({
         edges={footer ? [] : ["bottom"]}
       >
         <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
+          <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
         </View>
 
-        <View className="flex-row items-center justify-between border-b border-secondary/20 px-5 pb-4">
+        <View className="flex-row items-center justify-between border-b border-primary/20 px-5 pb-4">
           <View className="min-w-0 flex-1 pr-4">
             <Text className="font-ralewayExtraBold text-xl text-textPrimary">
               {title}
@@ -49,10 +49,10 @@ export function SearchFilterSheet({
             accessibilityLabel={`Close ${title.toLowerCase()}`}
             accessibilityRole="button"
             activeOpacity={0.8}
-            className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
+            className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
             onPress={onClose}
           >
-            <MaterialCommunityIcons name="close" color="#634CE4" size={21} />
+            <MaterialCommunityIcons name="close" color="#8A77F4" size={21} />
           </TouchableOpacity>
         </View>
 

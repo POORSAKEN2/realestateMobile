@@ -18,7 +18,7 @@ export function Button({
   const buttonClassName =
     variant === "primary"
       ? "bg-secondary active:opacity-90"
-      : "border border-secondary bg-whitePrimary active:bg-secondary/10";
+      : "border border-primary bg-whitePrimary active:bg-primary/10";
 
   const textClassName =
     variant === "primary" ? "text-whitePrimary" : "text-secondary";

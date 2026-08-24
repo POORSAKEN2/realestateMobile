@@ -31,7 +31,7 @@ export function DocumentCard({
     .join(" · ");
 
   return (
-    <View className="overflow-hidden rounded-[24px] border border-secondary/20 bg-white shadow-sm shadow-secondary/10">
+    <View className="overflow-hidden rounded-[24px] border border-primary/20 bg-white shadow-sm shadow-primary/10">
       <View className="flex-row items-start gap-2 p-4">
         <TouchableOpacity
           accessibilityHint="Opens the document"
@@ -132,12 +132,12 @@ export function DocumentCard({
           accessibilityLabel={`More actions for ${document.name}`}
           accessibilityRole="button"
           activeOpacity={0.75}
-          className="h-11 w-11 shrink-0 items-center justify-center rounded-full border border-secondary/20 bg-secondary/10"
+          className="h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10"
           onPress={onOpenActions}
         >
           <MaterialCommunityIcons
             name="dots-horizontal"
-            color="#634CE4"
+            color="#8A77F4"
             size={21}
           />
         </TouchableOpacity>

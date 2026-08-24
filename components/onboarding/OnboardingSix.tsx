@@ -52,7 +52,7 @@ export function OnboardingSix() {
             <View className="absolute right-5 top-12 w-44 rounded-[20px] border border-white/80 bg-whitePrimary/95 p-4 shadow-xl">
               <View className="flex-row items-center gap-2">
                 <View className="h-8 w-8 items-center justify-center rounded-2xl bg-teal-50">
-                  <Feather name="navigation" size={15} color="#634CE4" />
+                  <Feather name="navigation" size={15} color="#8A77F4" />
                 </View>
                 <Text className="text-textPrimaryPrimary flex-1 font-ralewayBold text-sm">
                   Property Location

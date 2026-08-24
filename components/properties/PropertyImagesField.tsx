@@ -15,13 +15,13 @@ export function PropertyImagesField({
   onRemove: (index: number) => void;
 }) {
   return (
-    <View className="gap-4 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+    <View className="gap-4 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10">
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
             <MaterialCommunityIcons
               name="image-outline"
-              color="#634CE4"
+              color="#8A77F4"
               size={22}
             />
           </View>
@@ -57,7 +57,7 @@ export function PropertyImagesField({
         >
           {images.map((image, index) => (
             <View
-              className="w-64 overflow-hidden rounded-2xl border border-secondary/20 bg-secondary/10"
+              className="w-64 overflow-hidden rounded-2xl border border-primary/20 bg-primary/10"
               key={`${image.uri}:${index}`}
             >
               <Image

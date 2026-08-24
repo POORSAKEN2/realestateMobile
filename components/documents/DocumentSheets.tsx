@@ -34,7 +34,7 @@ export function DocumentSortSheet({
               accessibilityState={{ checked: isSelected }}
               activeOpacity={0.8}
               className={`min-h-14 flex-row items-center rounded-2xl px-4 ${
-                isSelected ? "bg-secondary/10" : "bg-surface"
+                isSelected ? "bg-primary/10" : "bg-surface"
               }`}
               onPress={() => onSelect(option.value)}
             >
@@ -48,7 +48,7 @@ export function DocumentSortSheet({
               {isSelected ? (
                 <MaterialCommunityIcons
                   name="check-circle"
-                  color="#634CE4"
+                  color="#8A77F4"
                   size={21}
                 />
               ) : null}
@@ -143,7 +143,7 @@ export function DeleteDocumentSheet({
         <TouchableOpacity
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="min-h-14 flex-1 items-center justify-center rounded-2xl border border-secondary bg-white"
+          className="min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white"
           disabled={isDeleting}
           onPress={onCancel}
         >
@@ -196,7 +196,7 @@ function BottomSheet({
         className="rounded-t-[30px] bg-white px-5 pb-4 pt-3"
         edges={["bottom"]}
       >
-        <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
+        <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
         <View className="mb-5 flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
             <Text
@@ -218,10 +218,10 @@ function BottomSheet({
             accessibilityLabel="Close"
             accessibilityRole="button"
             activeOpacity={0.75}
-            className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
+            className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
             onPress={onClose}
           >
-            <MaterialCommunityIcons name="close" color="#634CE4" size={21} />
+            <MaterialCommunityIcons name="close" color="#8A77F4" size={21} />
           </TouchableOpacity>
         </View>
         {children}

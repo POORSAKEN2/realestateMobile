@@ -173,7 +173,7 @@ function MenuItemCard({
       onPress={onPress}
       className="min-h-[78px] flex-row items-center rounded-[22px] border border-slate-200 bg-white px-4 py-3"
     >
-      <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
+      <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
         <MenuItemIcon icon={item.icon} />
       </View>
 

@@ -11,7 +11,7 @@ export function ProfileAccountActions({
   onSignOut,
 }: ProfileAccountActionsProps) {
   return (
-    <View className="mt-8 border-t border-secondary/20 pt-6">
+    <View className="mt-8 border-t border-primary/20 pt-6">
       <Text className="font-ralewayBold text-base text-textPrimary">
         Account
       </Text>
@@ -19,15 +19,15 @@ export function ProfileAccountActions({
         accessibilityRole="button"
         activeOpacity={0.7}
         onPress={onOpenSecurity}
-        className="mt-3 min-h-14 flex-row items-center rounded-2xl border border-secondary/20 bg-white px-4"
+        className="mt-3 min-h-14 flex-row items-center rounded-2xl border border-primary/20 bg-white px-4"
       >
-        <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/10">
-          <Ionicons name="shield-checkmark-outline" color="#634CE4" size={19} />
+        <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+          <Ionicons name="shield-checkmark-outline" color="#8A77F4" size={19} />
         </View>
         <Text className="ml-3 flex-1 font-ralewaySemiBold text-sm text-textPrimary">
           Password and security
         </Text>
-        <Ionicons name="chevron-forward" color="#634CE4" size={20} />
+        <Ionicons name="chevron-forward" color="#8A77F4" size={20} />
       </TouchableOpacity>
 
       <TouchableOpacity

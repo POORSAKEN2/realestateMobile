@@ -21,7 +21,7 @@ export type ExpenseDashboardCardProps = {
 };
 
 const cardShadow = {
-  shadowColor: colors.secondary,
+  shadowColor: colors.primary,
   shadowOffset: { width: 0, height: 8 },
   shadowOpacity: 0.17,
   shadowRadius: 14,
@@ -32,7 +32,7 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
   if (type === "maintenance") {
     return (
       <View className="mt-auto h-[5px] overflow-hidden rounded-full bg-[#E5E2EA]">
-        <View className="h-full w-[56%] rounded-full bg-secondary" />
+        <View className="h-full w-[56%] rounded-full bg-primary" />
       </View>
     );
   }
@@ -52,7 +52,7 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
             width="18"
             height="39"
             rx="1"
-            fill={colors.secondary}
+            fill={colors.primary}
           />
           <Path
             d="M4 25 L22 23 L40 17 L58 23 L76 13 L96 8 L108 9"
@@ -100,7 +100,7 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
             width="42"
             height="5"
             rx="2.5"
-            fill={colors.secondary}
+            fill={colors.primary}
           />
           <Rect x="52" y="23" width="54" height="5" rx="2.5" fill="#ECE9F5" />
           <Rect x="52" y="23" width="31" height="5" rx="2.5" fill="#B7ABE9" />
@@ -124,7 +124,7 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
             width="18"
             height="33"
             rx="3"
-            fill={colors.secondary}
+            fill={colors.primary}
           />
           <Rect x="86" y="24" width="18" height="20" rx="3" fill="#B7ABE9" />
           <Circle cx="69" cy="7" r="3" fill="#168A68" />
@@ -144,7 +144,7 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
             width="76"
             height="8"
             rx="4"
-            fill={colors.secondary}
+            fill={colors.primary}
           />
           <Rect x="3" y="20" width="106" height="8" rx="4" fill="#ECE9F5" />
           <Rect x="3" y="20" width="55" height="8" rx="4" fill="#54A98D" />
@@ -166,13 +166,13 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
             width="31"
             height="12"
             rx="6"
-            fill={colors.secondary}
+            fill={colors.primary}
           />
           <Rect x="36" y="9" width="24" height="12" rx="6" fill="#54A98D" />
           <Rect x="62" y="9" width="18" height="12" rx="6" fill="#CFC6F3" />
           <Circle cx="12" cy="35" r="5" fill="#D9EEE8" />
           <Circle cx="31" cy="35" r="5" fill="#CFC6F3" />
-          <Circle cx="50" cy="35" r="5" fill={colors.secondary} />
+          <Circle cx="50" cy="35" r="5" fill={colors.primary} />
           <Path
             d="M59 35 H107"
             stroke="#B7ABE9"
@@ -191,7 +191,7 @@ function DashboardChart({ type }: { type: ExpenseDashboardVisual }) {
         <Path
           d="M2 39 C9 37 11 24 18 24 C24 24 26 32 32 32 C40 32 42 20 49 20 C56 20 58 26 64 25 C71 23 72 7 79 7 C86 7 87 23 94 23 C101 23 105 16 110 10"
           fill="none"
-          stroke={colors.secondary}
+          stroke={colors.primary}
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="2"
@@ -217,15 +217,11 @@ export function ExpenseDashboardCard({
   return (
     <Pressable
       accessibilityLabel={`${label}: ${value}`}
-      className="h-[164px] w-[128px] rounded-[20px] border border-secondary/20 bg-white p-3.5"
+      className="h-[164px] w-[128px] rounded-[20px] border border-primary/20 bg-white p-3.5"
       style={cardShadow}
     >
-      <View className="h-10 w-10 items-center justify-center rounded-[13px] bg-secondary/10">
-        <MaterialCommunityIcons
-          name={icon}
-          color={colors.secondary}
-          size={21}
-        />
+      <View className="h-10 w-10 items-center justify-center rounded-[13px] bg-primary/10">
+        <MaterialCommunityIcons name={icon} color={colors.primary} size={21} />
       </View>
       <Text
         adjustsFontSizeToFit

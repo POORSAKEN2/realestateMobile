@@ -148,10 +148,10 @@ export default function FloorPlansScreen() {
             contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24 }}
             refreshControl={
               <RefreshControl
-                colors={["#634CE4"]}
+                colors={["#8A77F4"]}
                 onRefresh={refreshFloorPlans}
                 refreshing={isRefreshing}
-                tintColor="#634CE4"
+                tintColor="#8A77F4"
               />
             }
           >

@@ -102,7 +102,7 @@ export function RegistrationStepLayout({
               className={`mt-6 flex-row rounded-[12px] border px-4 py-3 ${
                 feedback.tone === "error"
                   ? "border-rose-200 bg-rose-50"
-                  : "border-secondary bg-secondary/10"
+                  : "border-primary bg-primary/10"
               }`}
             >
               <Feather
@@ -110,7 +110,7 @@ export function RegistrationStepLayout({
                   feedback.tone === "error" ? "alert-circle" : "check-circle"
                 }
                 size={18}
-                color={feedback.tone === "error" ? "#e11d48" : "#634CE4"}
+                color={feedback.tone === "error" ? "#e11d48" : "#8A77F4"}
               />
               <Text
                 className={`ml-3 flex-1 text-sm leading-5 ${

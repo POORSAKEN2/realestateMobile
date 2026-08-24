@@ -108,7 +108,7 @@ export function mapHtml({
           if (markers.length) map.removeAnnotations(markers);
           markers = pins.map(function (pin) {
             var marker = new mapkit.MarkerAnnotation(coordinate(pin), {
-              color: pin.color || "#634CE4",
+              color: pin.color || "#8A77F4",
               data: { id: pin.id },
               draggable: Boolean(pin.draggable),
               subtitle: pin.subtitle || "",

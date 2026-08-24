@@ -90,10 +90,10 @@ export function BookingFormModal({
       title={mode === "create" ? "Create a booking" : "Edit booking"}
       showCancelAction
     >
-      <View className="flex-row items-start gap-3 rounded-2xl border border-secondary bg-secondary/10 px-4 py-3.5">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-primary bg-primary/10 px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
-          color="#634CE4"
+          color="#8A77F4"
           size={20}
         />
         <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-secondary">
@@ -161,11 +161,11 @@ export function BookingFormModal({
         </View>
 
         {selectedBuilding ? (
-          <View className="flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-secondary/5 p-4">
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
+          <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
               <MaterialCommunityIcons
                 name="door-open"
-                color="#634CE4"
+                color="#8A77F4"
                 size={20}
               />
             </View>
@@ -214,7 +214,7 @@ export function BookingFormModal({
         {form.propertyId && form.roomId && form.startDate && form.endDate ? (
           <BookingAvailabilityMessage conflict={conflict} />
         ) : (
-          <View className="rounded-2xl bg-secondary/5 p-4">
+          <View className="rounded-2xl bg-primary/5 p-4">
             <Text className="text-sm leading-5 text-slate-600">
               Select a room and stay window to check availability.
             </Text>

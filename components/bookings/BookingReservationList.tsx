@@ -30,7 +30,7 @@ export function BookingReservationList({
     .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
   return (
-    <View className="mb-16 gap-3 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+    <View className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-end justify-between gap-3">
         <View>
           <Text className="font-ralewayBold text-lg text-textPrimary">
@@ -58,7 +58,7 @@ export function BookingReservationList({
           />
         ))
       ) : (
-        <View className="items-center rounded-2xl border border-dashed border-secondary/20 p-6">
+        <View className="items-center rounded-2xl border border-dashed border-primary/20 p-6">
           <Text className="text-center font-ralewayExtraBold text-sm text-slate-800">
             {hasActiveFilters
               ? "No matching reservations"
@@ -90,10 +90,10 @@ function ReservationCard({
       activeOpacity={0.78}
       accessibilityLabel={`Open ${status.label} booking for ${booking.guestName}`}
       accessibilityRole="button"
-      className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
+      className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
       onPress={() => onPress(booking)}
     >
-      <View className="w-12 items-center rounded-xl bg-secondary/10 py-2">
+      <View className="w-12 items-center rounded-xl bg-primary/10 py-2">
         <Text className="font-ralewayExtraBold text-[10px] uppercase text-slate-400">
           {monthFormatter.format(startDate)}
         </Text>

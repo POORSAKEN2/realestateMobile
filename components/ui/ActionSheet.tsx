@@ -99,7 +99,7 @@ export function ActionSheet({
                 }}
                 activeOpacity={0.8}
                 className={`min-h-16 flex-row items-center gap-3 rounded-2xl px-4 py-3 ${
-                  action.destructive ? "bg-red-50" : "bg-secondary/10"
+                  action.destructive ? "bg-red-50" : "bg-primary/10"
                 } ${action.disabled ? "opacity-50" : ""}`}
                 disabled={action.disabled}
                 key={action.label}
@@ -107,7 +107,7 @@ export function ActionSheet({
               >
                 <View
                   className={`h-10 w-10 items-center justify-center rounded-xl ${
-                    action.destructive ? "bg-red-100" : "bg-secondary/10"
+                    action.destructive ? "bg-red-100" : "bg-primary/10"
                   }`}
                 >
                   <MaterialCommunityIcons

@@ -31,7 +31,7 @@ export function PickerField({
   onPress,
   required,
   iconName = "calendar-outline", // Default to calendar
-  iconColor = "#634CE4", // Default to the brand primary color
+  iconColor = "#8A77F4", // Default to the brand primary color
   iconSize = 20,
   rightElement,
   className = "gap-2",
@@ -93,7 +93,7 @@ export function PickerModalShell({
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent visible>
       <View className="flex-1 justify-center bg-black/40 px-5">
-        <View className="rounded-3xl border border-secondary/20 bg-[#FFFFFF] p-5 shadow-xl shadow-secondary/10">
+        <View className="rounded-3xl border border-primary/20 bg-[#FFFFFF] p-5 shadow-xl shadow-primary/10">
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               {title}
@@ -103,7 +103,7 @@ export function PickerModalShell({
                 accessibilityLabel={`Cancel ${title}`}
                 accessibilityRole="button"
                 activeOpacity={0.8}
-                className="rounded-full bg-secondary/10 px-3 py-1.5"
+                className="rounded-full bg-primary/10 px-3 py-1.5"
                 onPress={onClose}
               >
                 <Text className="font-ralewayExtraBold text-xs text-description">
@@ -114,7 +114,7 @@ export function PickerModalShell({
                 accessibilityLabel={`Confirm ${title}`}
                 accessibilityRole="button"
                 activeOpacity={0.8}
-                className="rounded-full bg-secondary/10 px-3 py-1.5"
+                className="rounded-full bg-primary/10 px-3 py-1.5"
                 onPress={onConfirm}
               >
                 <Text className="font-ralewayExtraBold text-xs text-secondary">

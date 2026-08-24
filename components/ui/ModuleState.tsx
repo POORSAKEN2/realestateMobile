@@ -34,7 +34,7 @@ export function ModuleEmptyState({
 }) {
   return (
     <View className="items-center rounded-[28px] border border-dashed border-textPrimary/20 bg-white/95 p-8 shadow-sm">
-      <Ionicons name={icon} color="#634CE4" size={38} />
+      <Ionicons name={icon} color="#8A77F4" size={38} />
       <Text className="mt-3 font-ralewayExtraBold text-base text-textPrimary">
         {title}
       </Text>

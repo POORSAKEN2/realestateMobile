@@ -115,7 +115,7 @@ function SummaryPill({
 }) {
   return (
     <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-2.5">
-      <MaterialCommunityIcons name={icon} color="#634CE4" size={15} />
+      <MaterialCommunityIcons name={icon} color="#8A77F4" size={15} />
       <Text
         className="font-ralewayBold text-[10px] text-slate-700"
         numberOfLines={1}

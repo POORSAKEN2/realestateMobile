@@ -115,7 +115,7 @@ export default function AssignedRoomsScreen() {
       <View className="flex-1">
         <ModuleHeader
           action={
-            <View className="min-w-11 items-center justify-center rounded-full bg-secondary/10 px-3 py-2">
+            <View className="min-w-11 items-center justify-center rounded-full bg-primary/10 px-3 py-2">
               <Text className="font-ralewayBold text-sm text-primary">
                 {rooms.length}
               </Text>
@@ -180,10 +180,10 @@ export default function AssignedRoomsScreen() {
             keyboardShouldPersistTaps="handled"
             refreshControl={
               <RefreshControl
-                colors={["#634CE4"]}
+                colors={["#8A77F4"]}
                 onRefresh={() => roomsQuery.refetch()}
                 refreshing={roomsQuery.isFetching}
-                tintColor="#634CE4"
+                tintColor="#8A77F4"
               />
             }
             showsVerticalScrollIndicator={false}

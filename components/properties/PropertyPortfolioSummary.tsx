@@ -7,7 +7,7 @@ import { SkeletonBlock } from "../ui/Skeleton";
 
 const portfolioSummaryShadow = {
   elevation: 10,
-  shadowColor: colors.secondary,
+  shadowColor: colors.primary,
   shadowOffset: { width: 0, height: 10 },
   shadowOpacity: 0.24,
   shadowRadius: 16,
@@ -65,7 +65,7 @@ export function PropertyPortfolioSummary({
 
   return (
     <View
-      className="rounded-3xl bg-secondary shadow-2xl shadow-secondary/30"
+      className="rounded-3xl bg-secondary shadow-2xl shadow-primary/30"
       style={portfolioSummaryShadow}
     >
       <View className="overflow-hidden rounded-3xl bg-secondary p-5">

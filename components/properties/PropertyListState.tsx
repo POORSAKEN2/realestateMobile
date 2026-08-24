@@ -38,9 +38,9 @@ export function PropertyListMessage({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-3xl border border-dashed border-secondary/20 bg-white p-8">
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10">
-        <MaterialCommunityIcons name={icon} color="#634CE4" size={28} />
+    <View className="items-center rounded-3xl border border-dashed border-primary/20 bg-white p-8">
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+        <MaterialCommunityIcons name={icon} color="#8A77F4" size={28} />
       </View>
       <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-textPrimary">
         {title}

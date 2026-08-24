@@ -250,7 +250,7 @@ export default function LoginScreen() {
                 onPress={handleLogin}
               >
                 {isLoading ? (
-                  <ActivityIndicator color="#634CE4" />
+                  <ActivityIndicator color="#8A77F4" />
                 ) : (
                   <Text
                     className={`font-ralewayBold text-base ${

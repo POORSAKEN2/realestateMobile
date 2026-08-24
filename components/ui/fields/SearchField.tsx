@@ -33,7 +33,7 @@ export function SearchField({
     <View
       className={`h-12 min-w-0 flex-row items-center rounded-2xl px-3.5 ${
         variant === "outlined"
-          ? "border border-secondary/20 bg-white"
+          ? "border border-primary/20 bg-white"
           : "bg-slate-100"
       } ${wrapperClassName}`}
     >

@@ -52,7 +52,7 @@ export function DocumentsToolbar({
             </Text>
             <MaterialCommunityIcons
               name="chevron-down"
-              color="#634CE4"
+              color="#8A77F4"
               size={20}
             />
           </TouchableOpacity>
@@ -82,8 +82,8 @@ export function DocumentsToolbar({
                 activeOpacity={0.82}
                 className={`min-h-11 justify-center rounded-2xl border px-4 ${
                   isSelected
-                    ? "border-secondary bg-secondary"
-                    : "border-secondary/20 bg-white"
+                    ? "border-primary bg-secondary"
+                    : "border-primary/20 bg-white"
                 }`}
                 onPress={() => onChangeCategory(option)}
               >

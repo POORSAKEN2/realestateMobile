@@ -14,7 +14,7 @@ function FloorAreaActionButton({
   onPress: () => void;
   primary?: boolean;
 }) {
-  const color = primary ? "#FFFFFF" : "#634CE4";
+  const color = primary ? "#FFFFFF" : "#8A77F4";
 
   return (
     <TouchableOpacity
@@ -22,7 +22,7 @@ function FloorAreaActionButton({
       accessibilityState={{ disabled }}
       activeOpacity={0.8}
       className={`min-h-12 flex-1 flex-row items-center justify-center gap-2 rounded-xl px-3 ${
-        primary ? "bg-primary" : "bg-secondary/15"
+        primary ? "bg-primary" : "bg-primary/15"
       } ${disabled ? "opacity-40" : ""}`}
       disabled={disabled}
       onPress={onPress}

@@ -29,7 +29,7 @@ export function RadioOptionList<T extends string>({
             activeOpacity={0.8}
             className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
               selected
-                ? "border-secondary bg-secondary/10"
+                ? "border-primary bg-primary/10"
                 : "border-slate-200 bg-white"
             }`}
             onPress={() => onSelect(option.value)}
@@ -44,7 +44,7 @@ export function RadioOptionList<T extends string>({
             {selected ? (
               <MaterialCommunityIcons
                 name="check-circle"
-                color="#634CE4"
+                color="#8A77F4"
                 size={21}
               />
             ) : null}

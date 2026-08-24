@@ -22,7 +22,7 @@ export function ProfileSummaryCard({
   onChangePhoto,
 }: ProfileSummaryCardProps) {
   return (
-    <View className="mt-7 rounded-[28px] border border-secondary/20 bg-white p-5 shadow-sm shadow-secondary/10">
+    <View className="mt-7 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
       <View className="items-center">
         <TouchableOpacity
           accessibilityRole="button"
@@ -32,7 +32,7 @@ export function ProfileSummaryCard({
           onPress={onChangePhoto}
           className="relative"
         >
-          <View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-secondary/10">
+          <View className="h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-primary/10">
             {imageUri ? (
               <Image
                 source={{ uri: imageUri }}
@@ -45,7 +45,7 @@ export function ProfileSummaryCard({
               </Text>
             )}
           </View>
-          <View className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-[3px] border-white bg-secondary">
+          <View className="absolute bottom-0 right-0 h-9 w-9 items-center justify-center rounded-full border-[3px] border-white bg-primary">
             <Ionicons name="camera" color="#FFFFFF" size={16} />
           </View>
         </TouchableOpacity>
@@ -72,7 +72,7 @@ export function ProfileSummaryCard({
         </Text>
       </View>
 
-      <View className="mt-5 rounded-2xl border border-secondary/20 bg-secondary/5 p-4">
+      <View className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-4">
         <View className="flex-row items-center justify-between">
           <Text className="font-ralewayBold text-sm text-slate-700">
             Profile completion
@@ -81,9 +81,9 @@ export function ProfileSummaryCard({
             {completion.percent}%
           </Text>
         </View>
-        <View className="mt-3 h-2 overflow-hidden rounded-full bg-secondary/10">
+        <View className="mt-3 h-2 overflow-hidden rounded-full bg-primary/10">
           <View
-            className="h-full rounded-full bg-secondary"
+            className="h-full rounded-full bg-primary"
             style={{ width: `${completion.percent}%` }}
           />
         </View>

@@ -27,7 +27,7 @@ export default function AddButton({
   iconSize = 20,
   loading = false,
   disabled = false,
-  className = "min-h-11 flex-row items-center gap-2 rounded-2xl bg-secondary px-4 py-3 shadow-md shadow-secondary/20",
+  className = "min-h-11 flex-row items-center gap-2 rounded-2xl bg-secondary px-4 py-3 shadow-md shadow-primary/20",
   textClassName = "font-ralewayBold text-sm text-white",
   style,
 }: AddButtonProps) {

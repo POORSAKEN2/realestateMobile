@@ -71,9 +71,9 @@ export const EmailVerificationCodeInput = forwardRef<
           caretHidden={Boolean(digit)}
           className={`h-14 flex-1 rounded-[12px] border-[1.5px] text-center font-ralewayBold text-xl text-textPrimary ${
             focusedIndex === index
-              ? "border-primary bg-secondary/10"
+              ? "border-primary bg-primary/10"
               : digit
-                ? "border-primary bg-secondary/10"
+                ? "border-primary bg-primary/10"
                 : "border-[#dfe3e3] bg-white"
           }`}
           keyboardType="number-pad"

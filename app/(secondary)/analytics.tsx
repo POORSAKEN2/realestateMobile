@@ -95,7 +95,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
       : "";
 
   return (
-    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+    <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between">
         <View>
           <Text className="font-ralewayBold text-base text-textPrimary">
@@ -105,12 +105,12 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
             Total value trend
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
-          <Feather name="activity" size={18} color={colors.secondary} />
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+          <Feather name="activity" size={18} color={colors.primary} />
         </View>
       </View>
 
-      <View className="mt-4 items-center overflow-hidden rounded-3xl bg-secondary/10">
+      <View className="mt-4 items-center overflow-hidden rounded-3xl bg-primary/10">
         {sortedHistory.length > 0 ? (
           <>
             <Svg
@@ -128,21 +128,17 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
                 >
                   <Stop
                     offset="0"
-                    stopColor={colors.secondary}
+                    stopColor={colors.primary}
                     stopOpacity="0.24"
                   />
-                  <Stop
-                    offset="1"
-                    stopColor={colors.secondary}
-                    stopOpacity="0"
-                  />
+                  <Stop offset="1" stopColor={colors.primary} stopOpacity="0" />
                 </LinearGradient>
               </Defs>
               <Path d={areaPath} fill="url(#performanceFill)" />
               <Polyline
                 points={linePoints}
                 fill="none"
-                stroke={colors.secondary}
+                stroke={colors.primary}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={4}
@@ -154,7 +150,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
                   cy={point.y}
                   r={5}
                   fill={colors.whitePrimary}
-                  stroke={colors.secondary}
+                  stroke={colors.primary}
                   strokeWidth={3}
                 />
               ))}
@@ -191,7 +187,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
   let cumulativePercent = 0;
 
   return (
-    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+    <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between">
         <View className="min-w-0 flex-1 pr-4">
           <Text className="font-ralewayBold text-base uppercase text-textPrimary">
@@ -201,11 +197,11 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
             Allocation by asset category
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
           <MaterialCommunityIcons
             name="chart-donut"
             size={19}
-            color={colors.secondary}
+            color={colors.primary}
           />
         </View>
       </View>
@@ -247,7 +243,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
               })}
             </Svg>
           ) : (
-            <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-secondary/10">
+            <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-primary/10">
               <Text className="font-ralewaySemiBold text-xs text-description">
                 No assets
               </Text>
@@ -436,8 +432,8 @@ export default function AnalyticsScreen() {
     <Screen className="bg-surface">
       <ModuleHeader
         action={
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 shadow-md shadow-secondary/20">
-            <Feather name="bar-chart-2" size={22} color={colors.secondary} />
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 shadow-md shadow-primary/20">
+            <Feather name="bar-chart-2" size={22} color={colors.primary} />
           </View>
         }
         eyebrow="Portfolio Intelligence"
@@ -456,10 +452,10 @@ export default function AnalyticsScreen() {
         contentContainerStyle={{ paddingBottom: 32 }}
         refreshControl={
           <RefreshControl
-            colors={[colors.secondary]}
+            colors={[colors.primary]}
             onRefresh={refreshAnalytics}
             refreshing={isRefreshing}
-            tintColor={colors.secondary}
+            tintColor={colors.primary}
           />
         }
       >
@@ -470,12 +466,12 @@ export default function AnalyticsScreen() {
             <View className="mt-6 flex-row flex-wrap">
               {metricCards.map((card) => (
                 <View key={card.label} className="w-1/2 p-1.5">
-                  <View className="min-h-[132px] rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
-                    <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
+                  <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+                    <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
                       <Feather
                         name={card.icon}
                         size={18}
-                        color={colors.secondary}
+                        color={colors.primary}
                       />
                     </View>
                     <Text

@@ -62,7 +62,7 @@ export function LocationPinPicker({
               id: "property-pin",
               coordinate: markerCoordinate,
               title: "Property Pin",
-              color: "#634CE4",
+              color: "#8A77F4",
               draggable: true,
             },
           ]
@@ -76,7 +76,7 @@ export function LocationPinPicker({
   );
 
   return (
-    <View className="gap-3 rounded-2xl border border-secondary/20 bg-white p-4">
+    <View className="gap-3 rounded-2xl border border-primary/20 bg-white p-4">
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
           <Text className="font-ralewayBold text-xs text-slate-600">
@@ -90,7 +90,7 @@ export function LocationPinPicker({
           accessibilityLabel="Open property pin map"
           accessibilityRole="button"
           activeOpacity={0.85}
-          className="h-11 w-11 items-center justify-center rounded-2xl bg-secondary"
+          className="h-11 w-11 items-center justify-center rounded-2xl bg-primary"
           onPress={() => setIsMapVisible(true)}
         >
           <MaterialCommunityIcons
@@ -103,10 +103,10 @@ export function LocationPinPicker({
       <TouchableOpacity
         accessibilityRole="button"
         activeOpacity={0.85}
-        className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-secondary/10"
+        className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary/10"
         onPress={() => setIsMapVisible(true)}
       >
-        <MaterialCommunityIcons name="map-search" color="#634CE4" size={19} />
+        <MaterialCommunityIcons name="map-search" color="#8A77F4" size={19} />
         <Text className="font-ralewayExtraBold text-sm text-secondary">
           {markerCoordinate ? "Update Pin on Map" : "Pin Property on Map"}
         </Text>
@@ -160,7 +160,7 @@ export function LocationPinPicker({
               viewportRevision={viewportRevision}
             />
           ) : null}
-          <View className="absolute left-5 right-8 top-16 rounded-3xl border border-secondary/20 bg-[#FFFFFF] px-4 py-6 shadow-sm shadow-secondary/10">
+          <View className="absolute left-5 right-8 top-16 rounded-3xl border border-primary/20 bg-[#FFFFFF] px-4 py-6 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between gap-3">
               <View className="min-w-0 flex-1">
                 <Text className="font-ralewayBold text-xs text-slate-600">
@@ -176,12 +176,12 @@ export function LocationPinPicker({
                 accessibilityLabel="Close property pin map"
                 accessibilityRole="button"
                 activeOpacity={0.85}
-                className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
+                className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
                 onPress={() => setIsMapVisible(false)}
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#634CE4"
+                  color="#8A77F4"
                   size={20}
                 />
               </TouchableOpacity>
@@ -225,7 +225,7 @@ export function LocationPinPicker({
               )}
               <TouchableOpacity
                 activeOpacity={0.8}
-                className="h-9 w-9 items-center justify-center rounded-xl bg-secondary"
+                className="h-9 w-9 items-center justify-center rounded-xl bg-primary"
                 disabled={!searchQuery.trim() || isSearching}
                 onPress={search}
               >
@@ -246,7 +246,7 @@ export function LocationPinPicker({
               </Text>
             ) : null}
             {searchResults.length > 0 ? (
-              <View className="mt-2 overflow-hidden rounded-2xl border border-secondary/20 bg-[#FFFFFF]">
+              <View className="mt-2 overflow-hidden rounded-2xl border border-primary/20 bg-[#FFFFFF]">
                 {searchResults.map((result, index) => (
                   <TouchableOpacity
                     activeOpacity={0.75}
@@ -260,7 +260,7 @@ export function LocationPinPicker({
                   >
                     <MaterialCommunityIcons
                       name="map-marker-outline"
-                      color="#634CE4"
+                      color="#8A77F4"
                       size={19}
                     />
                     <Text

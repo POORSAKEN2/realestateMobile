@@ -75,7 +75,7 @@ export function DateTimePickerModal({
       title={title}
     >
       <DateTimePicker
-        accentColor={colors.secondary}
+        accentColor={colors.primary}
         display="spinner"
         maximumDate={maximumDate}
         minimumDate={minimumDate}

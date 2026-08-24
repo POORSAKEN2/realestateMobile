@@ -25,7 +25,7 @@ export function ChoiceGroup<T extends string>({
     <View
       className={
         isSegmented
-          ? "flex-row overflow-hidden rounded-2xl border border-secondary/20 bg-surface p-0.5"
+          ? "flex-row overflow-hidden rounded-2xl border border-primary/20 bg-surface p-0.5"
           : "flex-row flex-wrap gap-2"
       }
     >
@@ -45,8 +45,8 @@ export function ChoiceGroup<T extends string>({
                   }`
                 : `min-h-11 items-center justify-center rounded-full border px-3.5 py-2.5 ${
                     selected
-                      ? "border-secondary bg-secondary"
-                      : "border-secondary/20 bg-secondary/10"
+                      ? "border-primary bg-secondary"
+                      : "border-primary/20 bg-primary/10"
                   }`
             }
             onPress={() => onSelect(choice.value)}

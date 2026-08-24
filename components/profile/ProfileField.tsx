@@ -40,8 +40,8 @@ export function ProfileField({
   const borderClassName = error
     ? "border-red-400 bg-red-50/40"
     : isFocused
-      ? "border-secondary bg-white"
-      : "border-secondary/20 bg-secondary/5";
+      ? "border-primary bg-white"
+      : "border-primary/20 bg-primary/5";
 
   return (
     <View>
@@ -61,7 +61,7 @@ export function ProfileField({
       >
         <Ionicons
           name={icon}
-          color={error ? "#DC2626" : isFocused ? "#634CE4" : "#64748B"}
+          color={error ? "#DC2626" : isFocused ? "#8A77F4" : "#64748B"}
           size={20}
         />
         <TextInput

@@ -124,7 +124,7 @@ export function FloorPlanCanvas({
         {!image ? (
           <View className="flex-1 items-center justify-center px-8">
             <View className="h-14 w-14 items-center justify-center rounded-2xl bg-white">
-              <Feather name="image" color="#634CE4" size={24} />
+              <Feather name="image" color="#8A77F4" size={24} />
             </View>
             <Text className="mt-3 text-center font-ralewayBold text-sm text-slate-700">
               Add floor plan image
@@ -179,14 +179,14 @@ export function FloorPlanCanvas({
               <>
                 {displayedDraftPoints.length >= 3 ? (
                   <Polygon
-                    fill="#634CE4"
+                    fill="#8A77F4"
                     fillOpacity={0.26}
                     points={pointList(
                       displayedDraftPoints,
                       canvas.width,
                       canvas.height,
                     )}
-                    stroke="#634CE4"
+                    stroke="#8A77F4"
                     strokeDasharray="7 5"
                     strokeWidth={3}
                     vectorEffect="non-scaling-stroke"
@@ -199,7 +199,7 @@ export function FloorPlanCanvas({
                       canvas.width,
                       canvas.height,
                     )}
-                    stroke="#634CE4"
+                    stroke="#8A77F4"
                     strokeDasharray="7 5"
                     strokeWidth={3}
                     vectorEffect="non-scaling-stroke"
@@ -212,7 +212,7 @@ export function FloorPlanCanvas({
                     fill="#FFFFFF"
                     key={`${point.x}:${point.y}:${index}`}
                     r={6}
-                    stroke="#634CE4"
+                    stroke="#8A77F4"
                     strokeWidth={3}
                     vectorEffect="non-scaling-stroke"
                   />

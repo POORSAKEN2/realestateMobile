@@ -24,7 +24,7 @@ export function ChoiceField<T extends string | number | boolean>({
   onChange,
   emptyText,
   isMultiSelect = false,
-  activeColorClass = "border-secondary bg-secondary",
+  activeColorClass = "border-primary bg-secondary",
   variant = "pill",
 }: ChoiceFieldProps<T>) {
   const isSegmented = variant === "segmented";
@@ -78,7 +78,7 @@ export function ChoiceField<T extends string | number | boolean>({
         <View
           className={
             isSegmented
-              ? "flex-row overflow-hidden rounded-2xl border border-secondary/20 bg-surface p-0.5"
+              ? "flex-row overflow-hidden rounded-2xl border border-primary/20 bg-surface p-0.5"
               : "flex-row flex-wrap gap-2"
           }
         >
@@ -100,8 +100,8 @@ export function ChoiceField<T extends string | number | boolean>({
                         selected
                           ? activeColorClass
                           : hasFilledSurface
-                            ? "border-secondary/20 bg-surface"
-                            : "border-secondary/20 bg-[#FFFFFF]"
+                            ? "border-primary/20 bg-surface"
+                            : "border-primary/20 bg-[#FFFFFF]"
                       }`
                 }
                 onPress={() => handlePress(option.value)}

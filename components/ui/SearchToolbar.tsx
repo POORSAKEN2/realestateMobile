@@ -58,13 +58,13 @@ function FilterButton({
       accessibilityRole="button"
       activeOpacity={0.8}
       className={`relative h-12 min-w-12 items-center justify-center rounded-2xl ${
-        compact ? "" : hasActiveFilters ? "bg-secondary" : "bg-secondary/10"
+        compact ? "" : hasActiveFilters ? "bg-secondary" : "bg-primary/10"
       }`}
       onPress={onPress}
     >
       <MaterialCommunityIcons
         name="tune-variant"
-        color={!compact && hasActiveFilters ? "#FFFFFF" : "#634CE4"}
+        color={!compact && hasActiveFilters ? "#FFFFFF" : "#8A77F4"}
         size={21}
       />
 
@@ -131,7 +131,7 @@ export function SearchToolbar({
 
   return (
     <View
-      className={`rounded-3xl border border-secondary/20 bg-white p-3 shadow-sm shadow-secondary/10 ${className}`}
+      className={`rounded-3xl border border-primary/20 bg-white p-3 shadow-sm shadow-primary/10 ${className}`}
     >
       <View className="flex-row gap-2">
         <SearchField

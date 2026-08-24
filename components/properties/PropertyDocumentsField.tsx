@@ -24,13 +24,13 @@ export function PropertyDocumentsField({
   onRemove: (index: number) => void;
 }) {
   return (
-    <View className="gap-4 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+    <View className="gap-4 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/20">
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary/20">
             <MaterialCommunityIcons
               name="file-document-outline"
-              color="#634CE4"
+              color="#8A77F4"
               size={22}
             />
           </View>
@@ -66,21 +66,21 @@ export function PropertyDocumentsField({
             Attached documents
           </Text>
           {isLoadingExistingDocuments ? (
-            <View className="h-14 justify-center rounded-2xl border border-secondary/20 bg-white px-3">
-              <ActivityIndicator color="#634CE4" />
+            <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-white px-3">
+              <ActivityIndicator color="#8A77F4" />
             </View>
           ) : existingDocuments.length > 0 ? (
             existingDocuments.map((document) => (
               <TouchableOpacity
                 key={document.id}
                 activeOpacity={0.8}
-                className="flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
+                className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
                 onPress={() => openPropertyDocument(document)}
               >
-                <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
+                <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                   <MaterialCommunityIcons
                     name="file-eye-outline"
-                    color="#634CE4"
+                    color="#8A77F4"
                     size={18}
                   />
                 </View>
@@ -97,13 +97,13 @@ export function PropertyDocumentsField({
                 </View>
                 <MaterialCommunityIcons
                   name="open-in-new"
-                  color={document.url ? "#634CE4" : "#BEE3DB"}
+                  color={document.url ? "#8A77F4" : "#BEE3DB"}
                   size={17}
                 />
               </TouchableOpacity>
             ))
           ) : (
-            <View className="rounded-2xl border border-dashed border-secondary/20 bg-white px-3 py-4">
+            <View className="rounded-2xl border border-dashed border-primary/20 bg-white px-3 py-4">
               <Text className="text-center font-ralewayBold text-xs text-description">
                 No documents attached yet.
               </Text>
@@ -120,12 +120,12 @@ export function PropertyDocumentsField({
           {documents.map((document, index) => (
             <View
               key={`${document.name}-${document.size ?? index}`}
-              className="flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
+              className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
             >
-              <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
+              <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                 <MaterialCommunityIcons
                   name="file-document-outline"
-                  color="#634CE4"
+                  color="#8A77F4"
                   size={18}
                 />
               </View>

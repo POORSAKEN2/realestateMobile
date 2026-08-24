@@ -3,8 +3,8 @@ import { ActivityIndicator, Text, View } from "react-native";
 
 export function BookingCalendarLoading() {
   return (
-    <View className="items-center rounded-[24px] border border-secondary/20 bg-white p-8 shadow-sm shadow-secondary/10">
-      <ActivityIndicator color="#634CE4" />
+    <View className="items-center rounded-[24px] border border-primary/20 bg-white p-8 shadow-sm shadow-primary/10">
+      <ActivityIndicator color="#8A77F4" />
       <Text className="mt-3 font-ralewayBold text-sm text-slate-700">
         Loading calendar
       </Text>
@@ -14,9 +14,9 @@ export function BookingCalendarLoading() {
 
 export function BookingCalendarEmpty() {
   return (
-    <View className="items-center rounded-[24px] border border-dashed border-secondary/20 bg-white p-8">
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10">
-        <Ionicons name="calendar-outline" color="#634CE4" size={28} />
+    <View className="items-center rounded-[24px] border border-dashed border-primary/20 bg-white p-8">
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+        <Ionicons name="calendar-outline" color="#8A77F4" size={28} />
       </View>
       <Text className="mt-4 text-center font-ralewayBold text-base text-textPrimary">
         No bookable buildings yet

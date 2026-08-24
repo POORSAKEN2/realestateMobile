@@ -156,10 +156,10 @@ export function FloorPlanWorkspace({
         ref={contentScrollRef}
         refreshControl={
           <RefreshControl
-            colors={["#634CE4"]}
+            colors={["#8A77F4"]}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            tintColor="#634CE4"
+            tintColor="#8A77F4"
           />
         }
         showsVerticalScrollIndicator={false}
@@ -222,10 +222,10 @@ export function FloorPlanWorkspace({
             </Text>
           </View>
           <TouchableOpacity
-            className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-secondary/10 px-4"
+            className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary/10 px-4"
             onPress={onAddArea}
           >
-            <Feather name="plus" color="#634CE4" size={17} />
+            <Feather name="plus" color="#8A77F4" size={17} />
             <Text className="font-ralewayBold text-xs text-primary">
               Add Area
             </Text>
@@ -233,10 +233,10 @@ export function FloorPlanWorkspace({
         </View>
 
         {roomGuidance ? (
-          <View className="flex-row items-start gap-2 rounded-2xl border border-secondary/20 bg-secondary/10 p-3">
+          <View className="flex-row items-start gap-2 rounded-2xl border border-primary/20 bg-primary/10 p-3">
             <MaterialCommunityIcons
               name="information-outline"
-              color="#634CE4"
+              color="#8A77F4"
               size={18}
             />
             <Text className="min-w-0 flex-1 text-xs leading-5 text-slate-600">

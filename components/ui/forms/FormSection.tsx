@@ -33,13 +33,13 @@ export function FormSection({
         <View
           className={
             isCard
-              ? "h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10"
-              : "h-9 w-9 items-center justify-center rounded-xl bg-secondary/10"
+              ? "h-12 w-12 items-center justify-center rounded-2xl bg-primary/10"
+              : "h-9 w-9 items-center justify-center rounded-xl bg-primary/10"
           }
         >
           <MaterialCommunityIcons
             name={icon}
-            color="#634CE4"
+            color="#8A77F4"
             size={isCard ? 22 : 19}
           />
         </View>

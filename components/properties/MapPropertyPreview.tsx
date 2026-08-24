@@ -15,7 +15,7 @@ export function MapPropertyPreview({
   const images = getPropertyImages(property);
 
   return (
-    <View className="absolute bottom-6 left-4 right-4 flex-row items-center gap-3 rounded-3xl border border-secondary/20 bg-white p-3 shadow-xl shadow-secondary/20">
+    <View className="absolute bottom-6 left-4 right-4 flex-row items-center gap-3 rounded-3xl border border-primary/20 bg-white p-3 shadow-xl shadow-primary/20">
       <View className="h-[74px] w-[74px] items-center justify-center overflow-hidden rounded-[18px] bg-slate-200">
         {images.length ? (
           <ScrollView
@@ -58,10 +58,10 @@ export function MapPropertyPreview({
           <TouchableOpacity
             accessibilityLabel="Close selected property"
             activeOpacity={0.8}
-            className="h-7 w-7 items-center justify-center rounded-full bg-secondary/10"
+            className="h-7 w-7 items-center justify-center rounded-full bg-primary/10"
             onPress={onClose}
           >
-            <MaterialCommunityIcons name="close" color="#634CE4" size={18} />
+            <MaterialCommunityIcons name="close" color="#8A77F4" size={18} />
           </TouchableOpacity>
         </View>
         <Text

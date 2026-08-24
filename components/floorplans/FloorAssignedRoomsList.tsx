@@ -31,7 +31,7 @@ function AssignedRoomsEmptyState({
         <TouchableOpacity
           accessibilityRole="button"
           activeOpacity={0.8}
-          className="mt-4 rounded-xl bg-secondary/15 px-4 py-3"
+          className="mt-4 rounded-xl bg-primary/15 px-4 py-3"
           onPress={onClearFilters}
         >
           <Text className="font-ralewayBold text-xs text-primary">

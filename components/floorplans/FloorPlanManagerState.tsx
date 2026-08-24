@@ -21,7 +21,7 @@ export function MissingPropertyState({ onBack }: { onBack: () => void }) {
 export function FloorPlanLoadingState() {
   return (
     <View className="flex-1 items-center justify-center">
-      <ActivityIndicator color="#634CE4" size="large" />
+      <ActivityIndicator color="#8A77F4" size="large" />
       <Text className="mt-3 text-sm text-slate-500">
         Loading floor plans...
       </Text>
@@ -62,8 +62,8 @@ export function EmptyFloorPlanState({
 
   return (
     <View className="flex-1 items-center justify-center px-8">
-      <View className="h-20 w-20 items-center justify-center rounded-[28px] bg-secondary/10">
-        <MaterialCommunityIcons name="layers-plus" color="#634CE4" size={36} />
+      <View className="h-20 w-20 items-center justify-center rounded-[28px] bg-primary/10">
+        <MaterialCommunityIcons name="layers-plus" color="#8A77F4" size={36} />
       </View>
       <Text className="mt-5 text-center font-ralewayBold text-xl text-textPrimary">
         {canCreate

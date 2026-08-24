@@ -308,7 +308,7 @@ export default function DashboardScreen() {
             activeOpacity={0.8}
             accessibilityLabel="Open property map"
             accessibilityRole="button"
-            className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary"
+            className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
             onPress={() => router.navigate(appRoutes.secondary.map)}
           >
             <Feather name="map" color={colors.whitePrimary} size={18} />
@@ -335,8 +335,8 @@ export default function DashboardScreen() {
             contentContainerStyle={{ paddingBottom: 140 }}
             ItemSeparatorComponent={() => <View className="h-3" />}
             ListEmptyComponent={
-              <View className="items-center justify-center rounded-2xl border border-dashed border-secondary/30 bg-secondary/10 px-4 py-6">
-                <Feather name="search" size={22} color={colors.secondary} />
+              <View className="items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-primary/10 px-4 py-6">
+                <Feather name="search" size={22} color={colors.primary} />
                 <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
                   No assets found
                 </Text>
@@ -344,10 +344,10 @@ export default function DashboardScreen() {
             }
             refreshControl={
               <RefreshControl
-                colors={[colors.secondary]}
+                colors={[colors.primary]}
                 onRefresh={refreshDashboard}
                 refreshing={isRefreshing}
-                tintColor={colors.secondary}
+                tintColor={colors.primary}
               />
             }
             renderItem={({ item: property }) => (
@@ -362,7 +362,7 @@ export default function DashboardScreen() {
                   activeOpacity={0.86}
                   accessibilityRole="button"
                   accessibilityLabel={`View images for ${property.title}`}
-                  className="relative h-20 w-20 overflow-hidden rounded-xl bg-secondary/10"
+                  className="relative h-20 w-20 overflow-hidden rounded-xl bg-primary/10"
                   onPress={(event) => {
                     event.stopPropagation();
                     setImageGalleryProperty(property);
