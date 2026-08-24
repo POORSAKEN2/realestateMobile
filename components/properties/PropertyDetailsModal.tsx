@@ -201,7 +201,7 @@ export function PropertyDetailsModal({
                     ))}
                   </View>
                 ) : null}
-                <Text className="self-start rounded-md bg-secondary px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
+                <Text className="self-start rounded-md bg-primary px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
                   {formatPropertyStatus(property.status)}
                 </Text>
                 <Text

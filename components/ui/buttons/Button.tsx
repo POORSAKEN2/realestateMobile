@@ -17,7 +17,7 @@ export function Button({
 }: ButtonProps) {
   const buttonClassName =
     variant === "primary"
-      ? "bg-secondary active:opacity-90"
+      ? "bg-primary active:opacity-90"
       : "border border-primary bg-whitePrimary active:bg-primary/10";
 
   const textClassName =

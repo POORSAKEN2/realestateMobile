@@ -58,6 +58,7 @@ export function BottomSheetHost({ children }: PropsWithChildren) {
 export type BottomSheetModalProps = PropsWithChildren<{
   backdropAccessibilityLabel?: string;
   backdropClassName?: string;
+  bottomInsetMode?: "edge" | "safe-area";
   closeOnBackdropPress?: boolean;
   keyboardAvoiding?: boolean;
   onClose: () => void;
@@ -69,6 +70,7 @@ export type BottomSheetModalProps = PropsWithChildren<{
 export function BottomSheetModal({
   backdropAccessibilityLabel = "Close bottom sheet",
   backdropClassName = "bg-slate-950/40",
+  bottomInsetMode = "edge",
   children,
   closeOnBackdropPress = true,
   keyboardAvoiding = false,
@@ -158,7 +160,7 @@ export function BottomSheetModal({
         pointerEvents={visible ? "auto" : "none"}
         style={{
           marginBottom:
-            Platform.OS === "ios"
+            Platform.OS === "ios" && bottomInsetMode === "edge"
               ? -Math.max(insets.bottom - BOTTOM_SHEET_EDGE_INSET, 0)
               : 0,
           transform: [{ translateY: sheetTranslateY }],

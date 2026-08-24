@@ -51,7 +51,7 @@ export function PropertyListMessage({
       <TouchableOpacity
         accessibilityRole="button"
         activeOpacity={0.85}
-        className="mt-5 min-h-11 items-center justify-center rounded-2xl bg-secondary px-5"
+        className="mt-5 min-h-11 items-center justify-center rounded-2xl bg-primary px-5"
         onPress={onAction}
       >
         <Text className="font-ralewayExtraBold text-sm text-white">

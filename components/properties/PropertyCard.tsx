@@ -52,7 +52,7 @@ function PropertyAction({
       accessibilityRole="button"
       activeOpacity={0.8}
       className={`min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl px-3 ${
-        primary ? "bg-secondary" : "bg-primary/10"
+        primary ? "bg-primary" : "bg-primary/10"
       }`}
       onPress={(event) => {
         event.stopPropagation();

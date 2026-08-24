@@ -105,7 +105,7 @@ export function BookingDaySchedule({
           activeOpacity={0.8}
           accessibilityLabel={`Add booking on ${dayLabel}`}
           accessibilityRole="button"
-          className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-secondary"
+          className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
           onPress={() => onCreate(date)}
         >
           <Ionicons name="add" color="#FFFFFF" size={20} />

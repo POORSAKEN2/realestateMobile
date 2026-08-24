@@ -82,7 +82,7 @@ export function DocumentsToolbar({
                 activeOpacity={0.82}
                 className={`min-h-11 justify-center rounded-2xl border px-4 ${
                   isSelected
-                    ? "border-primary bg-secondary"
+                    ? "border-primary bg-primary"
                     : "border-primary/20 bg-white"
                 }`}
                 onPress={() => onChangeCategory(option)}

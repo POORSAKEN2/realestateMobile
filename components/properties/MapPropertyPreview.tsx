@@ -72,7 +72,7 @@ export function MapPropertyPreview({
           {property.country ? `, ${property.country}` : ""}
         </Text>
         <View className="mt-2.5 flex-row items-center gap-2">
-          <View className="rounded-full bg-secondary px-2.5 py-1">
+          <View className="rounded-full bg-primary px-2.5 py-1">
             <Text className="font-ralewayBlack text-[10px] uppercase text-white">
               {formatStatus(property.status)}
             </Text>

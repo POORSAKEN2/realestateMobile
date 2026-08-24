@@ -24,7 +24,7 @@ export function ChoiceField<T extends string | number | boolean>({
   onChange,
   emptyText,
   isMultiSelect = false,
-  activeColorClass = "border-primary bg-secondary",
+  activeColorClass = "border-primary bg-primary",
   variant = "pill",
 }: ChoiceFieldProps<T>) {
   const isSegmented = variant === "segmented";
@@ -92,7 +92,7 @@ export function ChoiceField<T extends string | number | boolean>({
                 className={
                   isSegmented
                     ? `h-14 flex-1 items-center justify-center rounded-[14px] ${
-                        selected ? "bg-secondary" : "bg-transparent"
+                        selected ? "bg-primary" : "bg-transparent"
                       }`
                     : `min-h-11 justify-center border px-3.5 py-2.5 ${
                         hasFilledSurface ? "rounded-2xl" : "rounded-full"

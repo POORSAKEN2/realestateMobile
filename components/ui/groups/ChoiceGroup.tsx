@@ -41,11 +41,11 @@ export function ChoiceGroup<T extends string>({
             className={
               isSegmented
                 ? `h-14 flex-1 items-center justify-center rounded-[14px] ${
-                    selected ? "bg-secondary" : "bg-transparent"
+                    selected ? "bg-primary" : "bg-transparent"
                   }`
                 : `min-h-11 items-center justify-center rounded-full border px-3.5 py-2.5 ${
                     selected
-                      ? "border-primary bg-secondary"
+                      ? "border-primary bg-primary"
                       : "border-primary/20 bg-primary/10"
                   }`
             }

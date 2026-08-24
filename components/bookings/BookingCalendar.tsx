@@ -189,7 +189,7 @@ function CalendarDay({
       <View
         className={`h-9 w-9 items-center justify-center rounded-full ${
           isSelected
-            ? "bg-secondary"
+            ? "bg-primary"
             : isToday
               ? "border border-primary bg-primary/10"
               : "bg-transparent"

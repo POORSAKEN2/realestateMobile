@@ -247,7 +247,7 @@ export function DocumentFormModal({
                           activeOpacity={0.8}
                           className={`min-h-11 justify-center rounded-2xl border px-4 ${
                             isSelected
-                              ? "border-primary bg-secondary"
+                              ? "border-primary bg-primary"
                               : "border-primary/20 bg-primary/10"
                           }`}
                           onPress={() => onChangeForm({ ...form, category })}

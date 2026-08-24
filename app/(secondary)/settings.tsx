@@ -186,7 +186,7 @@ export default function SettingsScreen() {
 
             <TouchableOpacity
               activeOpacity={0.82}
-              className="mt-4 h-12 flex-row items-center justify-center rounded-2xl bg-secondary"
+              className="mt-4 h-12 flex-row items-center justify-center rounded-2xl bg-primary"
               onPress={() => {
                 setOnboardingCompleted(false);
                 router.replace("/(onboarding)/screen-1");
@@ -252,7 +252,7 @@ export default function SettingsScreen() {
             <TouchableOpacity
               activeOpacity={0.82}
               className={`mt-5 h-14 flex-row items-center justify-center rounded-2xl ${
-                isSaving ? "bg-secondary/60" : "bg-secondary"
+                isSaving ? "bg-primary/60" : "bg-primary"
               }`}
               disabled={isSaving}
               onPress={handleChangePassword}

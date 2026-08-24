@@ -40,7 +40,7 @@ export function PropertyImagesField({
             images.length ? "Add property images" : "Choose property images"
           }
           accessibilityRole="button"
-          className="min-h-11 justify-center rounded-2xl bg-secondary px-4 py-2.5"
+          className="min-h-11 justify-center rounded-2xl bg-primary px-4 py-2.5"
           onPress={onPick}
         >
           <Text className="font-ralewayExtraBold text-xs text-[#FFFFFF]">

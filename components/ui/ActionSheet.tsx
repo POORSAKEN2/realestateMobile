@@ -18,12 +18,16 @@ export type ActionSheetItem = {
 
 export function ActionSheet({
   actions,
+  bottomInsetMode = "edge",
+  comfortableBottomPadding = false,
   onClose,
   subtitle,
   title,
   visible,
 }: {
   actions: ActionSheetItem[];
+  bottomInsetMode?: "edge" | "safe-area";
+  comfortableBottomPadding?: boolean;
   onClose: () => void;
   subtitle?: string;
   title: string;
@@ -50,13 +54,16 @@ export function ActionSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title}`}
+      bottomInsetMode={bottomInsetMode}
       onClose={onClose}
       onDismiss={handleDismiss}
       visible={visible}
     >
       <SafeAreaView
         accessibilityViewIsModal
-        className="rounded-t-[28px] bg-white px-5 pb-4 pt-5"
+        className={`rounded-t-[28px] bg-white px-5 pt-5 ${
+          comfortableBottomPadding ? "pb-8" : "pb-4"
+        }`}
         edges={["bottom"]}
       >
         <View className="mb-4 flex-row items-start gap-3">

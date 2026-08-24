@@ -11,6 +11,7 @@ import {
 import { FloorAreaCard } from "./FloorAreaCard";
 import { FloorPlanCanvas } from "./FloorPlanCanvas";
 import { FloorPlanIconButton } from "./FloorPlanIconButton";
+import { DropdownField } from "../ui/fields/DropdownField";
 import type {
   FloorArea,
   FloorPlan,
@@ -71,11 +72,22 @@ export function FloorPlanWorkspace({
   refreshing: boolean;
 }) {
   const contentScrollRef = useRef<ScrollView>(null);
+  const [selectedAreaId, setSelectedAreaId] = useState(
+    activeFloor.areas[0]?.id ?? "",
+  );
   const [zoomedAreaId, setZoomedAreaId] = useState<string | null>(null);
 
   useEffect(() => {
     setZoomedAreaId(null);
   }, [activeFloor.id]);
+
+  useEffect(() => {
+    setSelectedAreaId((current) =>
+      activeFloor.areas.some((area) => area.id === current)
+        ? current
+        : (activeFloor.areas[0]?.id ?? ""),
+    );
+  }, [activeFloor.areas, activeFloor.id]);
 
   useEffect(() => {
     if (
@@ -111,6 +123,22 @@ export function FloorPlanWorkspace({
     onToggleAreaVisibility(area.id);
   }
 
+  const selectedArea =
+    activeFloor.areas.find((area) => area.id === selectedAreaId) ??
+    activeFloor.areas[0] ??
+    null;
+  const selectedAreaIndex = selectedArea
+    ? activeFloor.areas.findIndex((area) => area.id === selectedArea.id)
+    : -1;
+  const areaOptions = activeFloor.areas.map((area) => {
+    const roomCount = rooms.filter((room) => room.areaId === area.id).length;
+
+    return {
+      label: `${area.label} · ${roomCount} ${roomCount === 1 ? "room" : "rooms"}`,
+      value: area.id,
+    };
+  });
+
   return (
     <>
       <ScrollView
@@ -145,6 +173,42 @@ export function FloorPlanWorkspace({
           </TouchableOpacity>
         ))}
       </ScrollView>
+
+      <View className="mt-4">
+        <View className="mb-2 flex-row items-center justify-between gap-3">
+          <View className="min-w-0 flex-1">
+            <Text className="font-ralewayBold text-sm text-textPrimary">
+              Floor area
+            </Text>
+            <Text className="mt-0.5 text-xs text-slate-500">
+              Select an area to view and manage it.
+            </Text>
+          </View>
+          <TouchableOpacity
+            accessibilityLabel="Add floor area"
+            accessibilityRole="button"
+            className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary/10 px-4"
+            onPress={onAddArea}
+          >
+            <Feather name="plus" color="#8A77F4" size={17} />
+            <Text className="font-ralewayBold text-xs text-primary">
+              Add Area
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <DropdownField
+          disabled={areaOptions.length === 0}
+          dynamicSheetHeight
+          label="floor area"
+          onSelect={setSelectedAreaId}
+          options={areaOptions}
+          placeholder="No floor areas"
+          sheetBottomInsetMode="safe-area"
+          subtitle={`Choose an area from ${activeFloor.name}.`}
+          value={selectedArea?.id ?? ""}
+          variant="compact"
+        />
+      </View>
 
       <ScrollView
         className="-mx-6 mt-4 flex-1"
@@ -210,28 +274,6 @@ export function FloorPlanWorkspace({
           onSaveShape={onSaveShape}
         />
 
-        <View className="flex-row items-center justify-between">
-          <View>
-            <Text className="font-ralewayBold text-lg text-textPrimary">
-              Floor areas
-            </Text>
-            <Text className="mt-0.5 text-xs text-slate-500">
-              {activeFloor.image
-                ? "One saved shape per area."
-                : "Upload this floor's plan image before mapping areas."}
-            </Text>
-          </View>
-          <TouchableOpacity
-            className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary/10 px-4"
-            onPress={onAddArea}
-          >
-            <Feather name="plus" color="#8A77F4" size={17} />
-            <Text className="font-ralewayBold text-xs text-primary">
-              Add Area
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         {roomGuidance ? (
           <View className="flex-row items-start gap-2 rounded-2xl border border-primary/20 bg-primary/10 p-3">
             <MaterialCommunityIcons
@@ -245,26 +287,25 @@ export function FloorPlanWorkspace({
           </View>
         ) : null}
 
-        {activeFloor.areas.length ? (
-          activeFloor.areas.map((area, index) => (
-            <FloorAreaCard
-              area={area}
-              canDraw={Boolean(activeFloor.image)}
-              color={getFloorAreaColor(index)}
-              hidden={hiddenAreaIds.has(area.id)}
-              key={area.id}
-              onDelete={() => onDeleteArea(area)}
-              onDraw={(mode) => startAreaDrawing(area.id, mode)}
-              onManageRooms={
-                showRoomActions ? () => onManageRooms(area) : undefined
-              }
-              onRename={() => onRenameArea(area)}
-              onToggleVisibility={() => toggleAreaVisibility(area)}
-              onToggleZoom={() => toggleAreaZoom(area)}
-              roomCount={rooms.filter((room) => room.areaId === area.id).length}
-              zoomed={zoomedAreaId === area.id}
-            />
-          ))
+        {selectedArea ? (
+          <FloorAreaCard
+            area={selectedArea}
+            canDraw={Boolean(activeFloor.image)}
+            color={getFloorAreaColor(selectedAreaIndex)}
+            hidden={hiddenAreaIds.has(selectedArea.id)}
+            onDelete={() => onDeleteArea(selectedArea)}
+            onDraw={(mode) => startAreaDrawing(selectedArea.id, mode)}
+            onManageRooms={
+              showRoomActions ? () => onManageRooms(selectedArea) : undefined
+            }
+            onRename={() => onRenameArea(selectedArea)}
+            onToggleVisibility={() => toggleAreaVisibility(selectedArea)}
+            onToggleZoom={() => toggleAreaZoom(selectedArea)}
+            roomCount={
+              rooms.filter((room) => room.areaId === selectedArea.id).length
+            }
+            zoomed={zoomedAreaId === selectedArea.id}
+          />
         ) : (
           <View className="items-center rounded-[24px] border border-dashed border-slate-300 bg-white px-6 py-8">
             <MaterialCommunityIcons
@@ -276,7 +317,7 @@ export function FloorPlanWorkspace({
               No areas identified
             </Text>
             <Text className="mt-1 text-center text-xs text-slate-500">
-              Add area, then draw rectangle or polygon on plan.
+              Add an area, then select it here to map and manage it.
             </Text>
           </View>
         )}

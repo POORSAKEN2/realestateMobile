@@ -65,10 +65,10 @@ export function PropertyPortfolioSummary({
 
   return (
     <View
-      className="rounded-3xl bg-secondary shadow-2xl shadow-primary/30"
+      className="rounded-3xl bg-primary shadow-2xl shadow-primary/30"
       style={portfolioSummaryShadow}
     >
-      <View className="overflow-hidden rounded-3xl bg-secondary p-5">
+      <View className="overflow-hidden rounded-3xl bg-primary p-5">
         <View className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-primary/40" />
 
         <View className="flex-row items-start justify-between gap-4">

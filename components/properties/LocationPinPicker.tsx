@@ -118,7 +118,7 @@ export function LocationPinPicker({
         }}
         activeOpacity={0.85}
         className={`h-12 flex-row items-center justify-center gap-2 rounded-2xl ${
-          markerCoordinate ? "bg-secondary" : "bg-textPrimary/10"
+          markerCoordinate ? "bg-primary" : "bg-textPrimary/10"
         }`}
         disabled={!markerCoordinate || isResolvingPinLocation}
         onPress={usePinLocation}
@@ -280,7 +280,7 @@ export function LocationPinPicker({
           <View className="absolute bottom-8 left-5 right-5">
             <TouchableOpacity
               activeOpacity={0.85}
-              className="h-14 items-center justify-center rounded-2xl bg-secondary"
+              className="h-14 items-center justify-center rounded-2xl bg-primary"
               onPress={() => setIsMapVisible(false)}
             >
               <Text className="font-ralewayExtraBold text-base text-[#FFFFFF]">

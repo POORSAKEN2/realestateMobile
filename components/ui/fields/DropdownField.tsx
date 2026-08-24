@@ -1,9 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  useWindowDimensions,
+} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons"; // Or your specific icon import
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomSheetModal } from "../BottomSheetModal";
+
+const DROPDOWN_OPTION_HEIGHT = 56;
+const DROPDOWN_OPTION_GAP = 8;
+const DROPDOWN_SHEET_CHROME_HEIGHT = 168;
 
 export interface DropdownOption<T extends string = string> {
   value: T;
@@ -12,6 +22,7 @@ export interface DropdownOption<T extends string = string> {
 
 interface DropdownProps<T extends string> {
   disabled?: boolean;
+  dynamicSheetHeight?: boolean;
   label: string;
   placeholder?: string;
   subtitle?: string;
@@ -19,12 +30,14 @@ interface DropdownProps<T extends string> {
   options: readonly DropdownOption<T>[];
   required?: boolean;
   onSelect: (value: T) => void;
+  sheetBottomInsetMode?: "edge" | "safe-area";
   variant?: "compact" | "default" | "filled";
   wrapperClassName?: string;
 }
 
 export function DropdownField<T extends string>({
   disabled = false,
+  dynamicSheetHeight = false,
   label,
   placeholder = "Select an option",
   subtitle,
@@ -32,15 +45,27 @@ export function DropdownField<T extends string>({
   required,
   options,
   onSelect,
+  sheetBottomInsetMode = "edge",
   variant = "default",
   wrapperClassName = "",
 }: DropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
+  const { height } = useWindowDimensions();
   const isFilledVariant = variant === "filled";
   const isCompactVariant = variant === "compact";
 
   const selectedLabel =
     options.find((option) => option.value === value)?.label || value;
+  const optionListHeight =
+    options.length * DROPDOWN_OPTION_HEIGHT +
+    Math.max(0, options.length - 1) * DROPDOWN_OPTION_GAP;
+  const dynamicOptionListHeight = Math.min(
+    optionListHeight,
+    Math.max(
+      DROPDOWN_OPTION_HEIGHT,
+      height * 0.72 - DROPDOWN_SHEET_CHROME_HEIGHT,
+    ),
+  );
 
   function handleSelect(selectedValue: T) {
     onSelect(selectedValue);
@@ -95,20 +120,24 @@ export function DropdownField<T extends string>({
       <BottomSheetModal
         backdropAccessibilityLabel={`Close ${label} options`}
         backdropClassName="bg-[#000000]/35"
+        bottomInsetMode={sheetBottomInsetMode}
         onClose={() => setIsOpen(false)}
         visible={isOpen}
       >
         <SafeAreaView
           className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-[#FFFFFF] px-5 pb-4 pt-5"
-          edges={["bottom"]}
+          edges={["bottom", "left", "right"]}
         >
-          <View className="mb-4 flex-row items-center justify-between">
-            <View>
+          <View className="mb-4 flex-row items-start justify-between gap-3">
+            <View className="min-w-0 flex-1">
               <Text className="font-ralewayExtraBold text-lg text-textPrimary">
                 Select {label}
               </Text>
               {subtitle ? (
-                <Text className="mt-1 font-ralewayBold text-xs text-[#6F6D6D]">
+                <Text
+                  className="mt-1 font-ralewayBold text-xs text-[#6F6D6D]"
+                  numberOfLines={2}
+                >
                   {subtitle}
                 </Text>
               ) : null}
@@ -124,40 +153,49 @@ export function DropdownField<T extends string>({
             </TouchableOpacity>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <View className="gap-2">
-              {options.map((option) => {
-                const isSelected = option.value === value;
+          <ScrollView
+            bounces={false}
+            contentContainerStyle={{ gap: DROPDOWN_OPTION_GAP }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+            style={
+              dynamicSheetHeight
+                ? { height: dynamicOptionListHeight }
+                : undefined
+            }
+          >
+            {options.map((option) => {
+              const isSelected = option.value === value;
 
-                return (
-                  <TouchableOpacity
-                    key={option.value}
-                    activeOpacity={0.85}
-                    className={`min-h-14 flex-row items-center justify-between rounded-lg border px-4 ${
-                      isSelected
-                        ? "border-primary bg-primary/10"
-                        : "border-textPrimary/10 bg-[#FFFFFF]"
+              return (
+                <TouchableOpacity
+                  key={option.value}
+                  activeOpacity={0.85}
+                  className={`h-14 flex-row items-center justify-between rounded-lg border px-4 ${
+                    isSelected
+                      ? "border-primary bg-primary/10"
+                      : "border-textPrimary/10 bg-[#FFFFFF]"
+                  }`}
+                  onPress={() => handleSelect(option.value)}
+                >
+                  <Text
+                    className={`min-w-0 flex-1 font-ralewayBold text-base ${
+                      isSelected ? "text-secondary" : "text-textPrimary"
                     }`}
-                    onPress={() => handleSelect(option.value)}
+                    numberOfLines={1}
                   >
-                    <Text
-                      className={`font-ralewayBold text-base ${
-                        isSelected ? "text-secondary" : "text-textPrimary"
-                      }`}
-                    >
-                      {option.label}
-                    </Text>
-                    {isSelected ? (
-                      <MaterialCommunityIcons
-                        name="check"
-                        color="#8A77F4"
-                        size={21}
-                      />
-                    ) : null}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+                    {option.label}
+                  </Text>
+                  {isSelected ? (
+                    <MaterialCommunityIcons
+                      name="check"
+                      color="#8A77F4"
+                      size={21}
+                    />
+                  ) : null}
+                </TouchableOpacity>
+              );
+            })}
           </ScrollView>
         </SafeAreaView>
       </BottomSheetModal>

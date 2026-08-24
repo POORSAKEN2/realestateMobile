@@ -58,7 +58,7 @@ function FilterButton({
       accessibilityRole="button"
       activeOpacity={0.8}
       className={`relative h-12 min-w-12 items-center justify-center rounded-2xl ${
-        compact ? "" : hasActiveFilters ? "bg-secondary" : "bg-primary/10"
+        compact ? "" : hasActiveFilters ? "bg-primary" : "bg-primary/10"
       }`}
       onPress={onPress}
     >
@@ -77,7 +77,7 @@ function FilterButton({
       ) : hasActiveFilters ? (
         <View
           className={`absolute right-1 top-1 h-2 w-2 rounded-full ${
-            compact ? "bg-secondary" : "bg-white"
+            compact ? "bg-primary" : "bg-white"
           }`}
         />
       ) : null}
