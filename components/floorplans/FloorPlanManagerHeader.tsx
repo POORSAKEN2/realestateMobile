@@ -8,10 +8,8 @@ export function FloorPlanManagerHeader({
   canAddFloor,
   floorCount,
   guidance,
-  notice,
   onAddFloor,
   onBack,
-  onClearNotice,
   propertyTitle,
   roomCount,
   showRoomSummary,
@@ -20,10 +18,8 @@ export function FloorPlanManagerHeader({
   canAddFloor: boolean;
   floorCount: number;
   guidance: string;
-  notice: string;
   onAddFloor: () => void;
   onBack: () => void;
-  onClearNotice: () => void;
   propertyTitle: string;
   roomCount: number;
   showRoomSummary: boolean;
@@ -88,20 +84,6 @@ export function FloorPlanManagerHeader({
       <Text className="mt-2 px-1 text-xs leading-5 text-slate-500">
         {guidance}
       </Text>
-
-      {notice ? (
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="mt-3 flex-row items-center gap-2 rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3"
-          onPress={onClearNotice}
-        >
-          <Feather name="check-circle" color="#0D9488" size={16} />
-          <Text className="min-w-0 flex-1 font-ralewayBold text-xs text-teal-800">
-            {notice}
-          </Text>
-          <Feather name="x" color="#0D9488" size={15} />
-        </TouchableOpacity>
-      ) : null}
     </>
   );
 }

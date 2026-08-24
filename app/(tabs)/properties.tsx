@@ -31,7 +31,6 @@ import AddButton from "../../components/ui/buttons/AddButton";
 import { appRoutes } from "../../constants/navigation";
 
 type PropertyListItem =
-  | { kind: "search" }
   | { kind: "property"; property: Property }
   | { kind: "loading" }
   | { kind: "error" }
@@ -96,20 +95,17 @@ export default function PropertiesScreen() {
     });
   }, [properties, searchQuery, statusFilter]);
   const propertyListItems = useMemo<PropertyListItem[]>(() => {
-    if (isLoading) return [{ kind: "search" }, { kind: "loading" }];
-    if (isError) return [{ kind: "search" }, { kind: "error" }];
+    if (isLoading) return [{ kind: "loading" }];
+    if (isError) return [{ kind: "error" }];
 
     const propertyItems = filteredProperties.map((property) => ({
       kind: "property" as const,
       property,
     }));
 
-    return [
-      { kind: "search" },
-      ...(propertyItems.length > 0
-        ? propertyItems
-        : [{ kind: "empty" as const }]),
-    ];
+    return propertyItems.length > 0
+      ? propertyItems
+      : [{ kind: "empty" as const }];
   }, [filteredProperties, isError, isLoading]);
 
   const filteredLocationSuggestions = useMemo(() => {
@@ -146,6 +142,26 @@ export default function PropertiesScreen() {
           />
         </View>
 
+        <View className="z-10 pb-4">
+          <PropertyListToolbar
+            onChangeSearch={setSearchQuery}
+            onChangeStatus={setStatusFilter}
+            resultLabel={
+              isLoading
+                ? "Loading properties"
+                : isError
+                  ? "Properties unavailable"
+                  : `${filteredProperties.length} ${
+                      filteredProperties.length === 1
+                        ? "property"
+                        : "properties"
+                    }`
+            }
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+          />
+        </View>
+
         <FlatList
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
           data={propertyListItems}
@@ -154,30 +170,6 @@ export default function PropertiesScreen() {
             item.kind === "property" ? item.property.id : item.kind
           }
           renderItem={({ item }) => {
-            if (item.kind === "search") {
-              return (
-                <View className="z-10 bg-white pb-3 shadow-[#000000] drop-shadow-md">
-                  <PropertyListToolbar
-                    onChangeSearch={setSearchQuery}
-                    onChangeStatus={setStatusFilter}
-                    resultLabel={
-                      isLoading
-                        ? "Loading properties"
-                        : isError
-                          ? "Properties unavailable"
-                          : `${filteredProperties.length} ${
-                              filteredProperties.length === 1
-                                ? "property"
-                                : "properties"
-                            }`
-                    }
-                    searchQuery={searchQuery}
-                    statusFilter={statusFilter}
-                  />
-                </View>
-              );
-            }
-
             if (item.kind === "loading") {
               return (
                 <View className="gap-4">
@@ -265,7 +257,6 @@ export default function PropertiesScreen() {
             />
           }
           showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[0]}
         />
       </View>
 

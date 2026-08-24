@@ -20,6 +20,7 @@ export const appRoutes = {
     map: "/(secondary)/mapCanvas",
     notifications: "/(secondary)/notificationScreen",
     floorPlans: "/(secondary)/floorplans",
+    floorAreas: "/(secondary)/floor-areas",
     assignedRooms: "/(secondary)/assigned-rooms",
   },
 } as const;
@@ -31,6 +32,7 @@ const moduleRoutes: Record<string, Href> = {
   documents: appRoutes.secondary.documents,
   expenses: appRoutes.primary.expenses,
   floorplans: appRoutes.secondary.floorPlans,
+  "floor-areas": appRoutes.secondary.floorAreas,
   leases: appRoutes.secondary.leases,
   mapCanvas: appRoutes.secondary.map,
   notificationScreen: appRoutes.secondary.notifications,

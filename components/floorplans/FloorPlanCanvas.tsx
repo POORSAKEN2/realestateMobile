@@ -39,7 +39,10 @@ export function FloorPlanCanvas({
   image,
   isSaving,
   onCancelDrawing,
+  onEmptyImagePress,
   onSaveShape,
+  showAreaShapes = true,
+  showShapeCaption = true,
 }: {
   areas: FloorArea[];
   drawingArea: FloorArea | null;
@@ -49,7 +52,10 @@ export function FloorPlanCanvas({
   image?: string;
   isSaving: boolean;
   onCancelDrawing: () => void;
+  onEmptyImagePress?: () => void;
   onSaveShape: (points: FloorPlanPoint[]) => void;
+  showAreaShapes?: boolean;
+  showShapeCaption?: boolean;
 }) {
   const [canvas, setCanvas] = useState({ width: 0, height: 0 });
   const [draftPoints, setDraftPoints] = useState<FloorPlanPoint[]>([]);
@@ -87,13 +93,12 @@ export function FloorPlanCanvas({
   }
 
   function handlePress(event: GestureResponderEvent) {
-    if (
-      !image ||
-      !drawingArea ||
-      !drawingMode ||
-      !canvas.width ||
-      !canvas.height
-    ) {
+    if (!image) {
+      onEmptyImagePress?.();
+      return;
+    }
+
+    if (!drawingArea || !drawingMode || !canvas.width || !canvas.height) {
       return;
     }
 
@@ -115,8 +120,11 @@ export function FloorPlanCanvas({
         accessibilityLabel={
           drawingMode
             ? `Draw ${drawingMode} for ${drawingArea?.label ?? "area"}`
-            : "Floor plan preview"
+            : !image && onEmptyImagePress
+              ? "Choose floor plan image"
+              : "Floor plan preview"
         }
+        accessibilityRole={!image && onEmptyImagePress ? "button" : undefined}
         className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100"
         onLayout={handleLayout}
         onPress={handlePress}
@@ -130,7 +138,9 @@ export function FloorPlanCanvas({
               Add floor plan image
             </Text>
             <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
-              Upload this floor's plan image before drawing area shapes.
+              {onEmptyImagePress
+                ? "Tap here to choose an image for this floor."
+                : "Upload this floor's plan image before drawing area shapes."}
             </Text>
           </View>
         ) : null}
@@ -152,28 +162,34 @@ export function FloorPlanCanvas({
               y={0}
             />
 
-            {areas.map((area, index) => {
-              if (
-                hiddenAreaIds.has(area.id) ||
-                area.points.length < 3 ||
-                area.id === drawingArea?.id
-              ) {
-                return null;
-              }
-              const color = getFloorAreaColor(index);
+            {showAreaShapes
+              ? areas.map((area, index) => {
+                  if (
+                    hiddenAreaIds.has(area.id) ||
+                    area.points.length < 3 ||
+                    area.id === drawingArea?.id
+                  ) {
+                    return null;
+                  }
+                  const color = getFloorAreaColor(index);
 
-              return (
-                <Polygon
-                  fill={color}
-                  fillOpacity={0.28}
-                  key={area.id}
-                  points={pointList(area.points, canvas.width, canvas.height)}
-                  stroke={color}
-                  strokeWidth={2.5}
-                  vectorEffect="non-scaling-stroke"
-                />
-              );
-            })}
+                  return (
+                    <Polygon
+                      fill={color}
+                      fillOpacity={0.28}
+                      key={area.id}
+                      points={pointList(
+                        area.points,
+                        canvas.width,
+                        canvas.height,
+                      )}
+                      stroke={color}
+                      strokeWidth={2.5}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  );
+                })
+              : null}
 
             {drawingArea && displayedDraftPoints.length ? (
               <>
@@ -267,14 +283,14 @@ export function FloorPlanCanvas({
             </TouchableOpacity>
           </View>
         </View>
-      ) : (
+      ) : showShapeCaption ? (
         <View className="flex-row items-center justify-center gap-2 border-t border-slate-200 bg-white px-4 py-3">
           <View className="h-2 w-2 rounded-full bg-teal-500" />
           <Text className="text-center text-xs text-slate-500">
             Area shapes use plan-relative coordinates.
           </Text>
         </View>
-      )}
+      ) : null}
     </View>
   );
 }

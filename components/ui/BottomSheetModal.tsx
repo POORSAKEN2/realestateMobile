@@ -188,7 +188,7 @@ export function BottomSheetModal({
   return (
     <Modal
       animationType="none"
-      navigationBarTranslucent
+      navigationBarTranslucent={Platform.OS === "android"}
       onDismiss={onDismiss}
       onRequestClose={onClose}
       statusBarTranslucent={
