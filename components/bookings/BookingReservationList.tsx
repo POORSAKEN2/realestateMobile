@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
+import { SkeletonBlock, SkeletonGroup } from "../ui/Skeleton";
 import type { TransientBooking } from "../../types";
 import {
   formatDisplayDate,
@@ -29,6 +30,38 @@ export function BookingReservationList({
     .slice()
     .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
+  if (isLoading) {
+    return (
+      <SkeletonGroup
+        accessibilityLabel="Loading reservations"
+        className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10"
+      >
+        <View className="flex-row items-end justify-between gap-3">
+          <View className="min-w-0 flex-1 gap-2">
+            <SkeletonBlock className="h-5 w-36" />
+            <SkeletonBlock className="h-3 w-28" />
+          </View>
+          <SkeletonBlock className="h-3 w-12" />
+        </View>
+
+        {Array.from({ length: 3 }, (_, index) => (
+          <View
+            className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
+            key={index}
+          >
+            <SkeletonBlock className="h-12 w-12 rounded-xl bg-primary/10" />
+            <View className="min-w-0 flex-1 gap-2">
+              <SkeletonBlock className="h-4 w-2/3" />
+              <SkeletonBlock className="h-3 w-full" />
+              <SkeletonBlock className="h-5 w-16 rounded-full bg-primary/10" />
+            </View>
+            <SkeletonBlock className="h-5 w-3 rounded-full" />
+          </View>
+        ))}
+      </SkeletonGroup>
+    );
+  }
+
   return (
     <View className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-end justify-between gap-3">
@@ -45,11 +78,7 @@ export function BookingReservationList({
         </Text>
       </View>
 
-      {isLoading ? (
-        <Text className="font-ralewaySemiBold text-sm text-slate-500">
-          Loading reservations...
-        </Text>
-      ) : sortedBookings.length > 0 ? (
+      {sortedBookings.length > 0 ? (
         sortedBookings.map((booking) => (
           <ReservationCard
             booking={booking}

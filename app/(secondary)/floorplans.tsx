@@ -98,6 +98,7 @@ export default function FloorPlansScreen() {
   const propertyTitle =
     property?.title || firstParam(params.propertyTitle) || "Property";
   const isLoading =
+    propertyQuery.isLoading ||
     controller.queries.floorPlans.isLoading ||
     controller.queries.rooms.isLoading;
   const isError =

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { View } from "react-native";
 
 export function SkeletonBlock({ className = "" }: { className?: string }) {
@@ -35,7 +35,7 @@ export function SkeletonList({
   return (
     <>
       {Array.from({ length: count }, (_, index) => (
-        <View key={index}>{renderItem(index)}</View>
+        <Fragment key={index}>{renderItem(index)}</Fragment>
       ))}
     </>
   );
@@ -44,7 +44,7 @@ export function SkeletonList({
 export function SkeletonMetricCard({ className = "" }: { className?: string }) {
   return (
     <View
-      className={`min-h-[132px] rounded-[24px] border border-slate-200 bg-white p-4 ${className}`}
+      className={`min-h-[132px] rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10 ${className}`}
     >
       <SkeletonBlock className="h-10 w-10 rounded-2xl" />
       <SkeletonBlock className="mt-4 h-5 w-3/4" />
@@ -62,7 +62,7 @@ export function SkeletonListCard({
 }) {
   return (
     <View
-      className={`flex-row items-center gap-3 rounded-[22px] border border-slate-200 bg-white p-4 ${className}`}
+      className={`flex-row items-center gap-3 rounded-[22px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10 ${className}`}
     >
       {leading ? <SkeletonBlock className="h-12 w-12 rounded-2xl" /> : null}
       <View className="min-w-0 flex-1 gap-2">

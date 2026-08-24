@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
+import { SkeletonBlock } from "../ui/Skeleton";
 import type { PropertyDocument } from "../../types";
 import {
   formatSelectedDocumentSize,
@@ -66,8 +67,13 @@ export function PropertyDocumentsField({
             Attached documents
           </Text>
           {isLoadingExistingDocuments ? (
-            <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-white px-3">
-              <ActivityIndicator color="#8A77F4" />
+            <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3">
+              <SkeletonBlock className="h-10 w-10 rounded-xl bg-primary/10" />
+              <View className="min-w-0 flex-1 gap-2">
+                <SkeletonBlock className="h-4 w-2/3" />
+                <SkeletonBlock className="h-3 w-1/2" />
+              </View>
+              <SkeletonBlock className="h-5 w-5 rounded-lg" />
             </View>
           ) : existingDocuments.length > 0 ? (
             existingDocuments.map((document) => (

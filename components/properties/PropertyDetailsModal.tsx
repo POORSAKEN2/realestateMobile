@@ -28,6 +28,7 @@ import {
 import { getPropertyImages } from "../../utils/properties/propertyPresentation";
 import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
+import { SkeletonBlock } from "../ui/Skeleton";
 import { PropertyFloorSummary } from "./PropertyFloorSummary";
 
 export function PropertyDetailsModal({
@@ -294,7 +295,13 @@ export function PropertyDetailsModal({
 
               <DetailsSection title="Current Tenants">
                 {isLoading ? (
-                  <View className="h-16 rounded-2xl bg-white" />
+                  <View className="rounded-2xl border border-primary/20 bg-white p-3">
+                    <View className="flex-row items-center justify-between gap-3">
+                      <SkeletonBlock className="h-4 w-1/2" />
+                      <SkeletonBlock className="h-5 w-16 rounded-full bg-primary/10" />
+                    </View>
+                    <SkeletonBlock className="mt-2 h-3 w-3/4" />
+                  </View>
                 ) : propertyLeases.length ? (
                   propertyLeases.map((lease) => {
                     const lessee =
@@ -335,7 +342,14 @@ export function PropertyDetailsModal({
 
               <DetailsSection title="Property Documents">
                 {isLoading ? (
-                  <View className="h-16 rounded-2xl bg-white" />
+                  <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3">
+                    <SkeletonBlock className="h-10 w-10 rounded-xl bg-primary/10" />
+                    <View className="min-w-0 flex-1 gap-2">
+                      <SkeletonBlock className="h-4 w-2/3" />
+                      <SkeletonBlock className="h-3 w-1/2" />
+                    </View>
+                    <SkeletonBlock className="h-5 w-5 rounded-lg" />
+                  </View>
                 ) : propertyDocuments.length ? (
                   propertyDocuments.map((document) => (
                     <TouchableOpacity
@@ -443,9 +457,13 @@ function CountMetric({
           {label}
         </Text>
       </View>
-      <Text className="mt-2 font-ralewayExtraBold text-2xl text-textPrimary">
-        {loading ? "..." : value}
-      </Text>
+      {loading ? (
+        <SkeletonBlock className="mt-3 h-7 w-12 bg-primary/15" />
+      ) : (
+        <Text className="mt-2 font-ralewayExtraBold text-2xl text-textPrimary">
+          {value}
+        </Text>
+      )}
     </View>
   );
 }

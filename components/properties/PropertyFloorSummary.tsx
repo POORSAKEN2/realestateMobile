@@ -1,6 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { Text, TouchableOpacity, View } from "react-native";
 
+import { SkeletonBlock } from "../ui/Skeleton";
 import type { FloorPlan, PropertyRoom } from "../../types";
 import type { FloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 
@@ -57,7 +58,17 @@ export function PropertyFloorSummary({
 
       <View className="mt-3 gap-2">
         {isLoading ? (
-          <View className="h-20 rounded-2xl bg-zinc-50" />
+          <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-3">
+            <SkeletonBlock className="h-10 w-10 rounded-xl bg-primary/10" />
+            <View className="min-w-0 flex-1 gap-2">
+              <SkeletonBlock className="h-4 w-2/3" />
+              <SkeletonBlock className="h-3 w-1/2" />
+            </View>
+            <View className="items-end gap-2">
+              <SkeletonBlock className="h-2.5 w-12" />
+              <SkeletonBlock className="h-2.5 w-14 bg-primary/15" />
+            </View>
+          </View>
         ) : floorPlans.length ? (
           floorPlans.map((floor) => {
             const areaIds = new Set(floor.areas.map((area) => area.id));

@@ -1,5 +1,7 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+
+import { SkeletonBlock, SkeletonGroup } from "../ui/Skeleton";
 import type { FloorManagerMode } from "../../utils/properties/floorManagerPolicy";
 
 export function MissingPropertyState({ onBack }: { onBack: () => void }) {
@@ -20,12 +22,47 @@ export function MissingPropertyState({ onBack }: { onBack: () => void }) {
 
 export function FloorPlanLoadingState() {
   return (
-    <View className="flex-1 items-center justify-center">
-      <ActivityIndicator color="#8A77F4" size="large" />
-      <Text className="mt-3 text-sm text-slate-500">
-        Loading floor plans...
-      </Text>
-    </View>
+    <SkeletonGroup
+      accessibilityLabel="Loading floor plans"
+      className="mt-4 flex-1"
+    >
+      <View className="flex-row gap-2">
+        <SkeletonBlock className="h-11 w-24 rounded-2xl bg-primary/20" />
+        <SkeletonBlock className="h-11 w-24 rounded-2xl" />
+      </View>
+
+      <View className="mt-4 flex-row items-center justify-between gap-3">
+        <View className="min-w-0 flex-1 gap-2">
+          <SkeletonBlock className="h-4 w-24" />
+          <SkeletonBlock className="h-3 w-48 max-w-full" />
+        </View>
+        <SkeletonBlock className="h-11 w-24 rounded-2xl bg-primary/10" />
+      </View>
+      <SkeletonBlock className="mt-2 h-14 w-full rounded-2xl" />
+
+      <View className="mt-4 flex-row items-center justify-between rounded-2xl border border-primary/20 bg-white p-3">
+        <View className="min-w-0 flex-1 gap-2">
+          <SkeletonBlock className="h-5 w-28" />
+          <SkeletonBlock className="h-3 w-20" />
+        </View>
+        <View className="flex-row gap-1">
+          {Array.from({ length: 3 }, (_, index) => (
+            <SkeletonBlock
+              className="h-10 w-10 rounded-xl bg-primary/10"
+              key={index}
+            />
+          ))}
+        </View>
+      </View>
+
+      <View className="mt-4 overflow-hidden rounded-[24px] border border-primary/20 bg-white p-3">
+        <SkeletonBlock className="h-52 w-full rounded-2xl bg-primary/10" />
+        <View className="mt-3 flex-row items-center justify-center gap-2">
+          <SkeletonBlock className="h-2.5 w-2.5 rounded-full bg-primary/20" />
+          <SkeletonBlock className="h-3 w-48 max-w-full" />
+        </View>
+      </View>
+    </SkeletonGroup>
   );
 }
 

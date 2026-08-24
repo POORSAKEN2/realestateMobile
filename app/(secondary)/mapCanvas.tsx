@@ -1,17 +1,12 @@
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { useMemo } from "react";
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { MapPropertyPreview } from "../../components/properties/MapPropertyPreview";
 import { AdaptiveMap } from "../../components/ui/maps/AdaptiveMap";
+import { SkeletonBlock, SkeletonGroup } from "../../components/ui/Skeleton";
 import { colors } from "../../constants/colors";
 import { useProperties } from "../../hooks/api/useProperties";
 import { usePropertyMap } from "../../hooks/properties/usePropertyMap";
@@ -82,10 +77,14 @@ export default function MapCanvasScreen() {
           </View>
           <View style={styles.summaryContent}>
             <Text style={styles.summaryLabel}>Portfolio Map</Text>
-            <Text style={styles.summaryValue}>
-              {mappedProperties.length} mapped{" "}
-              {mappedProperties.length === 1 ? "property" : "properties"}
-            </Text>
+            {isLoading ? (
+              <SkeletonBlock className="mt-2 h-4 w-28 bg-primary/20" />
+            ) : (
+              <Text style={styles.summaryValue}>
+                {mappedProperties.length} mapped{" "}
+                {mappedProperties.length === 1 ? "property" : "properties"}
+              </Text>
+            )}
           </View>
         </View>
 
@@ -102,11 +101,15 @@ export default function MapCanvasScreen() {
 
       {isLoading ? (
         <View style={styles.centerPanel}>
-          <ActivityIndicator color={colors.primary} size="large" />
-          <Text style={styles.centerTitle}>Loading properties</Text>
-          <Text style={styles.centerText}>
-            Fetching your listed properties for the map.
-          </Text>
+          <SkeletonGroup
+            accessibilityLabel="Loading portfolio map"
+            className="w-full items-center"
+          >
+            <SkeletonBlock className="h-12 w-12 rounded-2xl bg-primary/10" />
+            <SkeletonBlock className="mt-4 h-5 w-40 bg-primary/20" />
+            <SkeletonBlock className="mt-3 h-3 w-full" />
+            <SkeletonBlock className="mt-2 h-3 w-3/4" />
+          </SkeletonGroup>
         </View>
       ) : null}
 

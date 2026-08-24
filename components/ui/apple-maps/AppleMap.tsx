@@ -8,7 +8,6 @@ import {
   type RefAttributes,
 } from "react";
 import {
-  ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
@@ -19,6 +18,7 @@ import {
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 
 import { useAppleMapsAuthorization } from "../../../hooks/maps/useAppleMapsAuthorization";
+import { SkeletonBlock, SkeletonGroup } from "../Skeleton";
 import { APPLE_MAP_MESSAGE_SOURCE, mapHtml } from "./mapHtml";
 
 export type AppleMapCoordinate = { lat: number; lng: number };
@@ -245,8 +245,17 @@ export function AppleMap({
       />
       {!ready && !error ? (
         <View pointerEvents="none" style={styles.loading}>
-          <ActivityIndicator color="#8A77F4" size="large" />
-          <Text style={styles.loadingText}>Loading Apple Maps...</Text>
+          <SkeletonGroup
+            accessibilityLabel="Loading map"
+            className="w-full items-center px-8"
+          >
+            <SkeletonBlock className="h-16 w-16 rounded-full bg-primary/20" />
+            <View className="mt-4 w-full max-w-64 rounded-3xl bg-white p-4">
+              <SkeletonBlock className="h-4 w-2/3 bg-primary/20" />
+              <SkeletonBlock className="mt-3 h-3 w-full" />
+              <SkeletonBlock className="mt-2 h-3 w-3/4" />
+            </View>
+          </SkeletonGroup>
         </View>
       ) : null}
       {error ? (
@@ -275,7 +284,6 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: "#F4F4F5",
   },
-  loadingText: { color: "#6F6D6D", fontSize: 13, fontWeight: "600" },
   fallback: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
