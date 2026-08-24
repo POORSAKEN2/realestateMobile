@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
+import { colors } from "../../constants/colors";
 import { onboardingScreens } from "../../constants/onboarding";
 import { Screen } from "../ui/Screen";
 import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
@@ -27,33 +28,33 @@ export function OnboardingSeven() {
                   </Text>
                 </View>
 
-                <View className="h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-teal-200 bg-teal-50 shadow-sm">
+                <View className="h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-success/25 bg-successSurface shadow-sm">
                   <FontAwesome6
                     name="location-crosshairs"
                     size={20}
-                    color="black"
+                    color={colors.text}
                   />
                 </View>
               </View>
 
-              <View className="shadow-inner relative h-24 w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+              <View className="shadow-inner relative h-24 w-full overflow-hidden rounded-2xl border border-textPrimary/10 bg-surface">
                 <View className="absolute inset-0">
-                  <View className="absolute left-6 top-0 h-full w-px bg-slate-300/60" />
-                  <View className="absolute left-12 top-0 h-full w-px bg-slate-300/60" />
-                  <View className="absolute left-20 top-0 h-full w-px bg-slate-300/60" />
-                  <View className="absolute right-10 top-0 h-full w-px bg-slate-300/60" />
-                  <View className="absolute left-0 top-6 h-px w-full bg-slate-300/60" />
-                  <View className="absolute left-0 top-12 h-px w-full bg-slate-300/60" />
-                  <View className="absolute bottom-6 left-0 h-px w-full bg-slate-300/60" />
+                  <View className="absolute left-6 top-0 h-full w-px bg-description/20" />
+                  <View className="absolute left-12 top-0 h-full w-px bg-description/20" />
+                  <View className="absolute left-20 top-0 h-full w-px bg-description/20" />
+                  <View className="absolute right-10 top-0 h-full w-px bg-description/20" />
+                  <View className="absolute left-0 top-6 h-px w-full bg-description/20" />
+                  <View className="absolute left-0 top-12 h-px w-full bg-description/20" />
+                  <View className="absolute bottom-6 left-0 h-px w-full bg-description/20" />
                 </View>
-                <View className="absolute left-7 top-5 h-8 w-16 rounded-full border border-teal-500/25 bg-teal-500/10" />
-                <View className="absolute bottom-5 right-7 h-7 w-20 rounded-full border border-sky-500/20 bg-sky-500/10" />
+                <View className="absolute left-7 top-5 h-8 w-16 rounded-full border border-success/25 bg-success/10" />
+                <View className="absolute bottom-5 right-7 h-7 w-20 rounded-full border border-info/20 bg-info/10" />
                 <View className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-5 -translate-y-5 items-center justify-center rounded-full bg-blackPrimary shadow-xl">
                   <Feather name="map-pin" size={20} color="#FFFFFF" />
                 </View>
               </View>
 
-              <View className="rounded-2xl border border-slate-200 bg-whitePrimary/80 p-3 shadow-sm">
+              <View className="rounded-2xl border border-textPrimary/10 bg-whitePrimary/80 p-3 shadow-sm">
                 <View className="flex-row items-center gap-2">
                   <Feather name="navigation" size={14} color="#8A77F4" />
                   <Text className="font-ralewaySemiBold text-xs text-textPrimary">
@@ -83,7 +84,7 @@ export function OnboardingSeven() {
             <OnboardingControls
               activeIndex={6}
               buttonTitle="Get Started"
-              dotClassName="bg-cyan-300"
+              dotClassName="bg-info"
               fullWidthButton
               showSkip={false}
             />

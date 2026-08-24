@@ -56,7 +56,7 @@ export function RegistrationStepLayout({
           <Pressable
             accessibilityLabel="Go to the previous registration step"
             accessibilityRole="button"
-            className="h-11 w-11 items-center justify-center rounded-full border border-[#dfe5e5] bg-white active:bg-[#edf2f2]"
+            className="h-11 w-11 items-center justify-center rounded-full border border-accent bg-white active:bg-surface"
             hitSlop={8}
             onPress={onBack}
           >
@@ -74,7 +74,7 @@ export function RegistrationStepLayout({
               className={`h-1 flex-1 rounded-full ${
                 REGISTRATION_STEPS.indexOf(step) <= stepIndex
                   ? "bg-primary"
-                  : "bg-[#dfe5e5]"
+                  : "bg-accent"
               }`}
             />
           ))}
@@ -101,7 +101,7 @@ export function RegistrationStepLayout({
             <View
               className={`mt-6 flex-row rounded-[12px] border px-4 py-3 ${
                 feedback.tone === "error"
-                  ? "border-rose-200 bg-rose-50"
+                  ? "border-danger/20 bg-dangerSurface"
                   : "border-primary bg-primary/10"
               }`}
             >
@@ -110,11 +110,11 @@ export function RegistrationStepLayout({
                   feedback.tone === "error" ? "alert-circle" : "check-circle"
                 }
                 size={18}
-                color={feedback.tone === "error" ? "#e11d48" : "#8A77F4"}
+                color={feedback.tone === "error" ? "#B42318" : "#8A77F4"}
               />
               <Text
                 className={`ml-3 flex-1 text-sm leading-5 ${
-                  feedback.tone === "error" ? "text-rose-700" : "text-secondary"
+                  feedback.tone === "error" ? "text-danger" : "text-secondary"
                 }`}
               >
                 {feedback.message}

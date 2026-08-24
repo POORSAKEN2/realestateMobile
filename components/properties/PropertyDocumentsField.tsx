@@ -55,7 +55,7 @@ export function PropertyDocumentsField({
           className="min-h-11 justify-center rounded-2xl bg-primary px-4 py-2.5"
           onPress={onPick}
         >
-          <Text className="font-ralewayExtraBold text-xs text-[#FFFFFF]">
+          <Text className="font-ralewayExtraBold text-xs text-whitePrimary">
             {documents.length > 0 ? "Add More" : "Choose"}
           </Text>
         </TouchableOpacity>
@@ -150,7 +150,7 @@ export function PropertyDocumentsField({
                 activeOpacity={0.8}
                 accessibilityLabel={`Remove ${document.name}`}
                 accessibilityRole="button"
-                className="h-11 w-11 items-center justify-center rounded-full bg-[#FFFFFF]"
+                className="h-11 w-11 items-center justify-center rounded-full bg-whitePrimary"
                 onPress={() => onRemove(index)}
               >
                 <MaterialCommunityIcons

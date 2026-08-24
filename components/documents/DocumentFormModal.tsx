@@ -185,9 +185,9 @@ export function DocumentFormModal({
                 <View
                   accessibilityLiveRegion="assertive"
                   accessibilityRole="alert"
-                  className="rounded-2xl bg-red-50 px-4 py-3"
+                  className="rounded-2xl bg-dangerSurface px-4 py-3"
                 >
-                  <Text className="font-ralewayBold text-sm text-red-700">
+                  <Text className="font-ralewayBold text-sm text-danger">
                     {formError}
                   </Text>
                 </View>
@@ -217,7 +217,7 @@ export function DocumentFormModal({
                   <TextInput
                     accessibilityLabel="Document name, required"
                     className={`min-h-14 rounded-2xl border bg-primary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
-                      errors.name ? "border-red-400" : "border-primary/20"
+                      errors.name ? "border-danger" : "border-primary/20"
                     }`}
                     onChangeText={(name) => onChangeForm({ ...form, name })}
                     placeholder="Document name"
@@ -227,7 +227,7 @@ export function DocumentFormModal({
                   {errors.name ? (
                     <Text
                       accessibilityLiveRegion="assertive"
-                      className="font-ralewaySemiBold text-xs text-red-600"
+                      className="font-ralewaySemiBold text-xs text-danger"
                     >
                       {errors.name}
                     </Text>
@@ -325,7 +325,7 @@ function FieldLabel({
   return (
     <Text className="font-ralewaySemiBold text-sm text-description">
       {label}
-      {required ? <Text className="text-red-600"> *</Text> : null}
+      {required ? <Text className="text-danger"> *</Text> : null}
     </Text>
   );
 }

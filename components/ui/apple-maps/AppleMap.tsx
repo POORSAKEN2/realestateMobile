@@ -275,21 +275,21 @@ export function AppleMap({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F4F4F5" },
-  webView: { flex: 1, backgroundColor: "#F4F4F5" },
+  container: { flex: 1, backgroundColor: "#FAF9F9" },
+  webView: { flex: 1, backgroundColor: "#FAF9F9" },
   loading: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    backgroundColor: "#F4F4F5",
+    backgroundColor: "#FAF9F9",
   },
   fallback: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
-    backgroundColor: "#F4F4F5",
+    backgroundColor: "#FAF9F9",
   },
   errorText: {
     color: "#B42318",

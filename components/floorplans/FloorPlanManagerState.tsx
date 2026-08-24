@@ -137,11 +137,11 @@ export function FloorPlanErrorState({
 }) {
   return (
     <View className="flex-1 items-center justify-center px-6">
-      <Feather name="cloud-off" color="#64748B" size={30} />
+      <Feather name="cloud-off" color="#6F6D6D" size={30} />
       <Text className="mt-3 font-ralewayBold text-lg text-textPrimary">
         {title}
       </Text>
-      <Text className="mt-1 text-center text-sm text-slate-500">
+      <Text className="mt-1 text-center text-sm text-description">
         Check connection and try again.
       </Text>
       <TouchableOpacity
@@ -177,7 +177,7 @@ export function EmptyFloorPlanState({
             : "Add first floor"
           : "Floor plans unavailable"}
       </Text>
-      <Text className="mt-2 text-center text-sm leading-6 text-slate-500">
+      <Text className="mt-2 text-center text-sm leading-6 text-description">
         {canCreate
           ? isMinimal
             ? "This property usually needs no mapped layout. Add one when a visual plan still helps."

@@ -70,7 +70,7 @@ function FilterButton({
 
       {activeFilterCount > 0 ? (
         <View className="absolute right-0 top-0 h-5 min-w-5 items-center justify-center rounded-full bg-white px-1">
-          <Text className="font-ralewayExtraBold text-[10px] text-secondary">
+          <Text className="font-ralewayExtraBold text-[10px] text-primary">
             {activeFilterCount}
           </Text>
         </View>
@@ -150,7 +150,7 @@ export function SearchToolbar({
           {resultLabel ? (
             <Text
               accessibilityLiveRegion="polite"
-              className="min-w-0 flex-1 font-ralewayBold text-xs text-slate-600"
+              className="min-w-0 flex-1 font-ralewayBold text-xs text-description"
               numberOfLines={1}
             >
               {resultLabel}
@@ -161,7 +161,7 @@ export function SearchToolbar({
           {footerAccessory ??
             (filterLabel ? (
               <Text
-                className="min-w-0 flex-1 text-right font-ralewaySemiBold text-xs text-slate-600"
+                className="min-w-0 flex-1 text-right font-ralewaySemiBold text-xs text-description"
                 numberOfLines={1}
               >
                 {filterLabel}

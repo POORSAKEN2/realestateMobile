@@ -70,27 +70,30 @@ function TenantCardSkeleton() {
 function TenantLoadingState() {
   return (
     <SkeletonGroup accessibilityLabel="Loading tenant dashboard">
-      <View className="mt-6 gap-3">
-        <View className="min-h-32 flex-row items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-300/40">
-          <SkeletonBlock className="h-14 w-14 rounded-full bg-primary/10" />
-          <View className="min-w-0 flex-1 gap-3">
-            <SkeletonBlock className="h-4 w-32" />
-            <SkeletonBlock className="h-8 w-3/5 bg-primary/15" />
+      <View className="mt-6 flex-row gap-3">
+        <View className="min-h-[248px] flex-1 items-start justify-between overflow-hidden rounded-2xl border border-primary/25 bg-secondary p-4 shadow-sm shadow-secondary/25">
+          <View className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-accent/10" />
+          <View className="absolute -bottom-10 -left-8 h-28 w-28 rounded-full bg-primary/25" />
+          <SkeletonBlock className="h-14 w-14 rounded-2xl bg-accent/20" />
+          <View className="w-full gap-3">
+            <SkeletonBlock className="h-3 w-24 bg-accent/25" />
+            <SkeletonBlock className="h-9 w-4/5 bg-white/30" />
+            <SkeletonBlock className="h-12 w-full rounded-xl bg-accent/10" />
           </View>
         </View>
 
-        <View className="flex-row gap-3">
+        <View className="flex-1 gap-3">
           {Array.from({ length: 2 }, (_, index) => (
             <View
-              className="min-h-24 flex-1 flex-row items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-300/40"
+              className="min-h-0 flex-1 justify-center rounded-2xl border border-textPrimary/10 bg-white p-3 shadow-sm shadow-textPrimary/10"
               key={index}
             >
-              <SkeletonBlock className="h-11 w-11 rounded-full bg-primary/10" />
-              <View className="min-w-0 flex-1 gap-2">
-                <SkeletonBlock className="h-3 w-full" />
-                <SkeletonBlock className="h-6 w-3/4 bg-primary/15" />
-                <SkeletonBlock className="h-3 w-1/2" />
+              <View className="flex-row items-center gap-2">
+                <SkeletonBlock className="h-8 w-8 rounded-full bg-primary/10" />
+                <SkeletonBlock className="h-3 flex-1" />
               </View>
+              <SkeletonBlock className="mt-2 h-5 w-3/4 bg-primary/15" />
+              <SkeletonBlock className="mt-1 h-2.5 w-1/2" />
             </View>
           ))}
         </View>
@@ -229,6 +232,7 @@ export function TenantsScreen({
               icon="cash-outline"
               isLoading={false}
               label="Monthly revenue"
+              layout="split"
               metrics={[
                 {
                   detail: `${linkedTenantCount} linked`,
@@ -244,6 +248,7 @@ export function TenantsScreen({
                   value: `${linkedTenantCount} of ${tenants.length}`,
                 },
               ]}
+              supportingText="Combined monthly rent from linked leases."
               value={formatCurrency(tenantMonthlyRent)}
             />
 

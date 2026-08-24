@@ -54,9 +54,9 @@ export function ChoiceGroup<T extends string>({
             <Text
               className={`${isSegmented ? "font-ralewaySemiBold text-base" : "font-ralewayBold text-xs"} ${
                 selected
-                  ? "text-[#FFFFFF]"
+                  ? "text-whitePrimary"
                   : isSegmented
-                    ? "text-slate-600"
+                    ? "text-description"
                     : "text-textPrimary"
               }`}
             >
@@ -74,8 +74,8 @@ export function ChoiceGroup<T extends string>({
         <Text
           className={
             isSegmented
-              ? "font-ralewaySemiBold text-sm text-slate-600"
-              : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-[#6F6D6D]"
+              ? "font-ralewaySemiBold text-sm text-description"
+              : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description"
           }
         >
           {label}

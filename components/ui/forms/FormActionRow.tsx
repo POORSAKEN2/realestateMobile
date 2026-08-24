@@ -43,7 +43,7 @@ export function FormActionRow({
           disabled={isCancelDisabled}
           onPress={onCancel}
         >
-          <Text className="font-ralewayBold text-base text-secondary">
+          <Text className="font-ralewayBold text-base text-primary">
             {cancelText}
           </Text>
         </TouchableOpacity>

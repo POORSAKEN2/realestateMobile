@@ -75,7 +75,7 @@ export default function FloorPlansScreen() {
 
   if (!propertyId) {
     return (
-      <Screen className="bg-[#F5F7FC]">
+      <Screen className="bg-surface">
         <MissingPropertyState onBack={() => router.back()} />
       </Screen>
     );
@@ -113,7 +113,7 @@ export default function FloorPlansScreen() {
   }
 
   return (
-    <Screen className="bg-[#F5F7FC]">
+    <Screen className="bg-surface">
       <View className="flex-1">
         <FloorPlanManagerHeader
           canAddFloor={policy.canCreateFloorPlans}

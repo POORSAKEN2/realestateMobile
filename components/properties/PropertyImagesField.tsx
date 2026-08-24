@@ -43,7 +43,7 @@ export function PropertyImagesField({
           className="min-h-11 justify-center rounded-2xl bg-primary px-4 py-2.5"
           onPress={onPick}
         >
-          <Text className="font-ralewayExtraBold text-xs text-[#FFFFFF]">
+          <Text className="font-ralewayExtraBold text-xs text-whitePrimary">
             {images.length ? "Add" : "Choose"}
           </Text>
         </TouchableOpacity>
@@ -76,7 +76,7 @@ export function PropertyImagesField({
                   activeOpacity={0.8}
                   accessibilityLabel={`Remove ${image.name}`}
                   accessibilityRole="button"
-                  className="h-11 w-11 items-center justify-center rounded-full bg-[#FFFFFF]"
+                  className="h-11 w-11 items-center justify-center rounded-full bg-whitePrimary"
                   onPress={() => onRemove(index)}
                 >
                   <MaterialCommunityIcons

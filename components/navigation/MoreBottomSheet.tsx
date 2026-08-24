@@ -171,7 +171,7 @@ function MenuItemCard({
       accessibilityLabel={`Open ${item.label}`}
       activeOpacity={0.78}
       onPress={onPress}
-      className="min-h-[78px] flex-row items-center rounded-[22px] border border-slate-200 bg-white px-4 py-3"
+      className="min-h-[78px] flex-row items-center rounded-[22px] border border-textPrimary/10 bg-white px-4 py-3"
     >
       <View className="mr-3 h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
         <MenuItemIcon icon={item.icon} />
@@ -192,14 +192,14 @@ function MenuItemCard({
           ) : null}
         </View>
         <Text
-          className="mt-0.5 font-ralewayMedium text-xs text-slate-500"
+          className="mt-0.5 font-ralewayMedium text-xs text-description"
           numberOfLines={1}
         >
           {item.supportingText}
         </Text>
       </View>
 
-      <Ionicons name="chevron-forward" color="#94A3B8" size={18} />
+      <Ionicons name="chevron-forward" color="#6F6D6D" size={18} />
     </TouchableOpacity>
   );
 }
@@ -282,14 +282,14 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
       <View className="flex-1 justify-end">
         <Animated.View
           pointerEvents={visible ? "auto" : "none"}
-          className="absolute inset-0 bg-slate-950/40"
+          className="absolute inset-0 bg-textPrimary/40"
           style={{ opacity: backdropOpacity }}
         >
           <Pressable className="absolute inset-0" onPress={onClose} />
         </Animated.View>
 
         <Animated.View
-          className="rounded-t-[30px] bg-white px-5 pt-2.5 shadow-2xl shadow-slate-950/20"
+          className="rounded-t-[30px] bg-white px-5 pt-2.5 shadow-2xl shadow-textPrimary/20"
           style={{
             height: Math.min(height - Math.max(insets.top, 20) - 12, 760),
             opacity: sheetOpacity,
@@ -297,11 +297,11 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
             transform: [{ translateY }],
           }}
         >
-          <View className="mb-[18px] h-[5px] w-11 self-center rounded-full bg-slate-300" />
+          <View className="mb-[18px] h-[5px] w-11 self-center rounded-full bg-description/20" />
 
           <View className="mb-[18px] flex-row items-center justify-between">
             <View>
-              <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-[0.8px] text-slate-500">
+              <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-[0.8px] text-description">
                 Menu
               </Text>
               <Text className="mt-1 font-ralewayExtraBold text-[22px] text-blackPrimary">
@@ -313,9 +313,9 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
               accessibilityLabel="Close menu"
               activeOpacity={0.75}
               onPress={onClose}
-              className="h-10 w-10 items-center justify-center rounded-[18px] border border-slate-200 bg-slate-50"
+              className="h-10 w-10 items-center justify-center rounded-[18px] border border-textPrimary/10 bg-surface"
             >
-              <Ionicons name="close" color="#475569" size={20} />
+              <Ionicons name="close" color="#6F6D6D" size={20} />
             </TouchableOpacity>
           </View>
 
@@ -326,7 +326,7 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
           >
             {menuSections.map((section) => (
               <View key={section.title} className="gap-3">
-                <Text className="px-1 font-ralewayExtraBold text-[11px] uppercase tracking-[1.6px] text-slate-500">
+                <Text className="px-1 font-ralewayExtraBold text-[11px] uppercase tracking-[1.6px] text-description">
                   {section.title}
                 </Text>
                 {section.items.map((item) => (

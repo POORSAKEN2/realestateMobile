@@ -46,7 +46,7 @@ export function DateTimePickerModal({
       maximumDate: picker.maximumDate,
       minimumDate: picker.minimumDate,
       mode: picker.mode,
-      negativeButton: { textColor: colors.secondary },
+      negativeButton: { textColor: colors.primary },
       onChange: (event: DateTimePickerEvent, selectedValue?: Date) => {
         if (event.type === "set" && selectedValue) {
           picker.onConfirm(selectedValue);
@@ -54,7 +54,7 @@ export function DateTimePickerModal({
         picker.onClose();
       },
       onError: picker.onClose,
-      positiveButton: { textColor: colors.secondary },
+      positiveButton: { textColor: colors.primary },
       value: picker.value,
     });
 

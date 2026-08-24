@@ -49,7 +49,7 @@ export function FloorAreaCardActions({
   onManageRooms?: () => void;
 }) {
   return (
-    <View className="mt-4 flex-row gap-2 border-t border-slate-100 pt-3">
+    <View className="mt-4 flex-row gap-2 border-t border-textPrimary/10 pt-3">
       <FloorAreaActionButton
         disabled={!canDraw}
         icon={canDraw ? "vector-combine" : "image-off-outline"}

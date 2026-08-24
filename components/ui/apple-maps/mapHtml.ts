@@ -51,7 +51,7 @@ export function mapHtml({
         height: 100%;
         margin: 0;
         overflow: hidden;
-        background: #f4f4f5;
+        background: #faf9f9;
       }
       #map {
         touch-action: none;

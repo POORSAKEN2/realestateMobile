@@ -48,7 +48,7 @@ export function LeaseCard({
                   isActive
                     ? "bg-accent"
                     : isExpired
-                      ? "bg-rose-50"
+                      ? "bg-dangerSurface"
                       : "bg-primary/10"
                 }`}
               >
@@ -57,7 +57,7 @@ export function LeaseCard({
                     isActive
                       ? "text-textPrimary"
                       : isExpired
-                        ? "text-rose-600"
+                        ? "text-danger"
                         : "text-description"
                   }`}
                 >
@@ -101,9 +101,9 @@ export function LeaseCard({
                 event.stopPropagation();
                 onDelete();
               }}
-              className="rounded-full p-1.5 hover:bg-red-50"
+              className="rounded-full p-1.5 hover:bg-dangerSurface"
             >
-              <Ionicons name="trash" size={16} color="#EF4444" />
+              <Ionicons name="trash" size={16} color="#B42318" />
             </TouchableOpacity>
           </View>
         </View>

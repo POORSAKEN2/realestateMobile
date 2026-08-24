@@ -37,8 +37,8 @@ export default function MapCanvasScreen() {
         coordinate: getPropertyCoordinate(property),
         color:
           selectedProperty?.id === property.id
-            ? colors.secondary
-            : colors.primary,
+            ? colors.primary
+            : colors.secondary,
         description: property.location,
         title: property.title,
       })),
@@ -117,7 +117,7 @@ export default function MapCanvasScreen() {
         <View style={styles.centerPanel}>
           <MaterialCommunityIcons
             name="map-marker-alert-outline"
-            color="#DC2626"
+            color="#B42318"
             size={34}
           />
           <Text style={styles.centerTitle}>Map data unavailable</Text>
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   summaryLabel: {
-    color: "#64748B",
+    color: "#6F6D6D",
     fontFamily: "Raleway_900Black",
     fontSize: 11,
     textTransform: "uppercase",
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   centerText: {
-    color: "#64748B",
+    color: "#6F6D6D",
     fontSize: 13,
     lineHeight: 20,
     marginTop: 6,

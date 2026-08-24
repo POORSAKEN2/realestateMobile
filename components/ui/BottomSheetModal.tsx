@@ -69,7 +69,7 @@ export type BottomSheetModalProps = PropsWithChildren<{
 
 export function BottomSheetModal({
   backdropAccessibilityLabel = "Close bottom sheet",
-  backdropClassName = "bg-slate-950/40",
+  backdropClassName = "bg-textPrimary/40",
   bottomInsetMode = "edge",
   children,
   closeOnBackdropPress = true,

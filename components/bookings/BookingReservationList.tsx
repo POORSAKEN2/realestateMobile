@@ -69,11 +69,11 @@ export function BookingReservationList({
           <Text className="font-ralewayBold text-lg text-textPrimary">
             All reservations
           </Text>
-          <Text className="mt-1 font-ralewaySemiBold text-xs text-slate-500">
+          <Text className="mt-1 font-ralewaySemiBold text-xs text-description">
             {buildingTitle ?? "Select a building"}
           </Text>
         </View>
-        <Text className="font-ralewayExtraBold text-xs text-slate-400">
+        <Text className="font-ralewayExtraBold text-xs text-description">
           {bookings.length} total
         </Text>
       </View>
@@ -88,12 +88,12 @@ export function BookingReservationList({
         ))
       ) : (
         <View className="items-center rounded-2xl border border-dashed border-primary/20 p-6">
-          <Text className="text-center font-ralewayExtraBold text-sm text-slate-800">
+          <Text className="text-center font-ralewayExtraBold text-sm text-textPrimary">
             {hasActiveFilters
               ? "No matching reservations"
               : "No reservations found"}
           </Text>
-          <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
+          <Text className="mt-1 text-center text-xs leading-5 text-description">
             {hasActiveFilters
               ? "Change the search or filters to see more reservations."
               : "Select an available day to add your first booking."}
@@ -123,7 +123,7 @@ function ReservationCard({
       onPress={() => onPress(booking)}
     >
       <View className="w-12 items-center rounded-xl bg-primary/10 py-2">
-        <Text className="font-ralewayExtraBold text-[10px] uppercase text-slate-400">
+        <Text className="font-ralewayExtraBold text-[10px] uppercase text-description">
           {monthFormatter.format(startDate)}
         </Text>
         <Text className="font-ralewayBold text-lg text-textPrimary">
@@ -137,7 +137,7 @@ function ReservationCard({
         >
           {booking.guestName}
         </Text>
-        <Text className="mt-1 font-ralewaySemiBold text-xs text-slate-500">
+        <Text className="mt-1 font-ralewaySemiBold text-xs text-description">
           Room {booking.roomNumber} · {formatDisplayDate(booking.startDate)}–
           {formatDisplayDate(booking.endDate)}
         </Text>
@@ -151,7 +151,7 @@ function ReservationCard({
           </Text>
         </View>
       </View>
-      <Ionicons name="chevron-forward" color="#94A3B8" size={18} />
+      <Ionicons name="chevron-forward" color="#6F6D6D" size={18} />
     </TouchableOpacity>
   );
 }

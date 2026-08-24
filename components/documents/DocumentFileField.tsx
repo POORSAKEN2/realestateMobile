@@ -19,10 +19,10 @@ export function DocumentFileField({
   return (
     <View className="gap-2">
       <Text className="font-ralewaySemiBold text-sm text-description">
-        File{!editingDocument ? <Text className="text-red-600"> *</Text> : null}
+        File{!editingDocument ? <Text className="text-danger"> *</Text> : null}
       </Text>
       <View
-        className={`flex-row items-center gap-2 rounded-2xl border border-dashed bg-primary/10 p-2 ${error ? "border-red-400" : "border-primary/30"}`}
+        className={`flex-row items-center gap-2 rounded-2xl border border-dashed bg-primary/10 p-2 ${error ? "border-danger" : "border-primary/30"}`}
       >
         <TouchableOpacity
           accessibilityLabel={
@@ -79,7 +79,7 @@ export function DocumentFileField({
       {error ? (
         <Text
           accessibilityLiveRegion="assertive"
-          className="font-ralewaySemiBold text-xs text-red-600"
+          className="font-ralewaySemiBold text-xs text-danger"
         >
           {error}
         </Text>

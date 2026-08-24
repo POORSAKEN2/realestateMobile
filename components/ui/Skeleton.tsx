@@ -2,7 +2,7 @@ import { Fragment, type ReactNode } from "react";
 import { View } from "react-native";
 
 export function SkeletonBlock({ className = "" }: { className?: string }) {
-  return <View className={`rounded-lg bg-slate-200 ${className}`} />;
+  return <View className={`rounded-lg bg-textPrimary/10 ${className}`} />;
 }
 
 export function SkeletonGroup({

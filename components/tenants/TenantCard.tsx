@@ -83,9 +83,9 @@ export function TenantCard({
                 event.stopPropagation();
                 onDelete();
               }}
-              className="rounded-full p-1.5 hover:bg-red-50"
+              className="rounded-full p-1.5 hover:bg-dangerSurface"
             >
-              <Ionicons name="trash" size={16} color="#EF4444" />
+              <Ionicons name="trash" size={16} color="#B42318" />
             </TouchableOpacity>
           </View>
         </View>

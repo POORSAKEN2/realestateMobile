@@ -78,12 +78,12 @@ export function DropdownField<T extends string>({
         <Text
           className={
             isFilledVariant
-              ? "font-ralewaySemiBold text-sm text-slate-600"
-              : "font-ralewayBold text-xs text-slate-600"
+              ? "font-ralewaySemiBold text-sm text-description"
+              : "font-ralewayBold text-xs text-description"
           }
         >
           {label}
-          <Text className="text-red-600">{required ? " *" : ""}</Text>
+          <Text className="text-danger">{required ? " *" : ""}</Text>
         </Text>
       ) : null}
 
@@ -94,10 +94,10 @@ export function DropdownField<T extends string>({
         accessibilityState={{ disabled }}
         className={
           isCompactVariant
-            ? `h-11 flex-row items-center justify-between rounded-xl border border-slate-200 bg-white px-3 ${disabled ? "opacity-50" : ""}`
+            ? `h-11 flex-row items-center justify-between rounded-xl border border-textPrimary/10 bg-white px-3 ${disabled ? "opacity-50" : ""}`
             : isFilledVariant
-              ? `h-14 flex-row items-center justify-between rounded-2xl border border-slate-200 bg-surface px-4 ${disabled ? "opacity-50" : ""}`
-              : `h-14 flex-row items-center justify-between rounded-xl border border-textPrimary/10 bg-[#FFFFFF] px-4 shadow-sm ${disabled ? "opacity-50" : ""}`
+              ? `h-14 flex-row items-center justify-between rounded-2xl border border-textPrimary/10 bg-surface px-4 ${disabled ? "opacity-50" : ""}`
+              : `h-14 flex-row items-center justify-between rounded-xl border border-textPrimary/10 bg-whitePrimary px-4 shadow-sm ${disabled ? "opacity-50" : ""}`
         }
         disabled={disabled}
         onPress={() => setIsOpen(true)}
@@ -119,13 +119,13 @@ export function DropdownField<T extends string>({
 
       <BottomSheetModal
         backdropAccessibilityLabel={`Close ${label} options`}
-        backdropClassName="bg-[#000000]/35"
+        backdropClassName="bg-textPrimary/35"
         bottomInsetMode={sheetBottomInsetMode}
         onClose={() => setIsOpen(false)}
         visible={isOpen}
       >
         <SafeAreaView
-          className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-[#FFFFFF] px-5 pb-4 pt-5"
+          className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-whitePrimary px-5 pb-4 pt-5"
           edges={["bottom", "left", "right"]}
         >
           <View className="mb-4 flex-row items-start justify-between gap-3">
@@ -135,7 +135,7 @@ export function DropdownField<T extends string>({
               </Text>
               {subtitle ? (
                 <Text
-                  className="mt-1 font-ralewayBold text-xs text-[#6F6D6D]"
+                  className="mt-1 font-ralewayBold text-xs text-description"
                   numberOfLines={2}
                 >
                   {subtitle}
@@ -174,13 +174,13 @@ export function DropdownField<T extends string>({
                   className={`h-14 flex-row items-center justify-between rounded-lg border px-4 ${
                     isSelected
                       ? "border-primary bg-primary/10"
-                      : "border-textPrimary/10 bg-[#FFFFFF]"
+                      : "border-textPrimary/10 bg-whitePrimary"
                   }`}
                   onPress={() => handleSelect(option.value)}
                 >
                   <Text
                     className={`min-w-0 flex-1 font-ralewayBold text-base ${
-                      isSelected ? "text-secondary" : "text-textPrimary"
+                      isSelected ? "text-primary" : "text-textPrimary"
                     }`}
                     numberOfLines={1}
                   >

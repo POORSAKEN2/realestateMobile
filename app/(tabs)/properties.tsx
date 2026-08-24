@@ -132,7 +132,7 @@ export default function PropertiesScreen() {
   }
 
   return (
-    <Screen bottomInset="tab-bar" className="bg-[#F5F7FC]">
+    <Screen bottomInset="tab-bar" className="bg-surface">
       <View className="flex-1">
         <View className="px-1 pb-5">
           <ModuleHeader

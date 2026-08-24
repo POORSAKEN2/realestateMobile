@@ -95,19 +95,19 @@ export function PropertyFloorSummary({
                   </View>
                   <View className="min-w-0 flex-1">
                     <Text
-                      className="font-ralewayBold text-sm text-zinc-950"
+                      className="font-ralewayBold text-sm text-textPrimary"
                       numberOfLines={1}
                     >
                       {floor.name}
                     </Text>
-                    <Text className="mt-0.5 text-[11px] text-zinc-500">
+                    <Text className="mt-0.5 text-[11px] text-description">
                       {floor.areas.length}{" "}
                       {floor.areas.length === 1 ? "area" : "areas"} ·{" "}
                       {floorRooms.length} rooms
                     </Text>
                   </View>
                   <View className="items-end">
-                    <Text className="font-ralewayBold text-[9px] text-teal-700">
+                    <Text className="font-ralewayBold text-[9px] text-success">
                       {vacant} vacant
                     </Text>
                     <Text className="mt-1 font-ralewayBold text-[9px] text-secondary">
@@ -124,7 +124,7 @@ export function PropertyFloorSummary({
             className="items-center rounded-2xl border border-dashed border-primary/20 bg-primary/5 px-4 py-5"
             onPress={onManage}
           >
-            <Text className="font-ralewayBold text-xs text-zinc-600">
+            <Text className="font-ralewayBold text-xs text-description">
               {policy.floorSummaryProminence === "primary"
                 ? "No floors yet. Add first floor plan."
                 : "Floor plan optional. Add one when a visual layout helps."}

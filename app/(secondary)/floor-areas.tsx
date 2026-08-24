@@ -74,7 +74,7 @@ export default function FloorAreasScreen() {
 
   if (!propertyId) {
     return (
-      <Screen className="bg-[#F5F7FC]">
+      <Screen className="bg-surface">
         <MissingPropertyState onBack={() => router.back()} />
       </Screen>
     );
@@ -113,7 +113,7 @@ export default function FloorAreasScreen() {
   }
 
   return (
-    <Screen className="bg-[#F5F7FC]">
+    <Screen className="bg-surface">
       <View className="flex-1">
         <FloorAreaManagerHeader
           canAddArea={Boolean(controller.activeFloor) && !isLoading && !isError}

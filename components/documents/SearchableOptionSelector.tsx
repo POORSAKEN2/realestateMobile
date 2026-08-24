@@ -156,7 +156,7 @@ function OptionRow({
     >
       <Text
         className={`min-w-0 flex-1 font-ralewaySemiBold text-sm ${
-          isSelected ? "text-secondary" : "text-textPrimary"
+          isSelected ? "text-primary" : "text-textPrimary"
         }`}
         numberOfLines={1}
       >

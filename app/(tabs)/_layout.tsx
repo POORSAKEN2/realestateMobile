@@ -17,7 +17,7 @@ export default function TabsLayout() {
           headerStyle: { backgroundColor: colors.whitePrimary },
           headerTintColor: colors.black,
           tabBarActiveTintColor: colors.primary,
-          tabBarInactiveTintColor: "#94A3B8",
+          tabBarInactiveTintColor: colors.muted,
           tabBarLabelStyle: {
             fontFamily: "Raleway_800ExtraBold",
             fontSize: 11,
@@ -27,12 +27,12 @@ export default function TabsLayout() {
           },
           tabBarStyle: {
             backgroundColor: colors.whitePrimary,
-            borderTopColor: "#E2E8F0",
+            borderTopColor: "#BEE3DB",
             borderTopWidth: 1,
             height: Platform.OS === "ios" ? 96 : 80,
             paddingBottom: 8,
             paddingTop: 6,
-            shadowColor: "#0F172A",
+            shadowColor: "#1E1F45",
             shadowOffset: { width: 0, height: -4 },
             shadowOpacity: 0.08,
             shadowRadius: 24,

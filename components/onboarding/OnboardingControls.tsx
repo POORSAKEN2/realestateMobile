@@ -43,7 +43,7 @@ export function OnboardingControls({
   activeIndex,
   nextHref,
   buttonTitle,
-  dotClassName = "bg-teal-400",
+  dotClassName = "bg-success",
   fullWidthButton = false,
   showSkip = true,
 }: OnboardingControlsProps) {

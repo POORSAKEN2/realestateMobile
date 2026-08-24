@@ -1,4 +1,5 @@
 import type { Property } from "../../types";
+import { colors } from "../../constants/colors";
 import { MAX_PROPERTY_IMAGES } from "./propertyForm";
 
 export type PropertyStatusTone = {
@@ -11,29 +12,29 @@ export type MappedProperty = Property & { lat: number; lng: number };
 
 const STATUS_TONES: Record<Property["status"], PropertyStatusTone> = {
   IDLE: {
-    backgroundClassName: "bg-slate-100",
-    dotClassName: "bg-slate-500",
-    textClassName: "text-slate-700",
+    backgroundClassName: "bg-surface",
+    dotClassName: "bg-description/50",
+    textClassName: "text-description",
   },
   PERSONAL_USE: {
-    backgroundClassName: "bg-violet-50",
-    dotClassName: "bg-violet-500",
-    textClassName: "text-violet-700",
+    backgroundClassName: "bg-primary/10",
+    dotClassName: "bg-primary",
+    textClassName: "text-primary",
   },
   PRE_LEASED: {
-    backgroundClassName: "bg-blue-50",
-    dotClassName: "bg-blue-500",
-    textClassName: "text-blue-700",
+    backgroundClassName: "bg-infoSurface",
+    dotClassName: "bg-info",
+    textClassName: "text-info",
   },
   REVENUE_GENERATING: {
-    backgroundClassName: "bg-emerald-50",
-    dotClassName: "bg-emerald-500",
-    textClassName: "text-emerald-700",
+    backgroundClassName: "bg-successSurface",
+    dotClassName: "bg-success",
+    textClassName: "text-success",
   },
   UNDER_CONSTRUCTION: {
-    backgroundClassName: "bg-amber-50",
-    dotClassName: "bg-amber-500",
-    textClassName: "text-amber-700",
+    backgroundClassName: "bg-warningSurface",
+    dotClassName: "bg-warning",
+    textClassName: "text-warning",
   },
 };
 
@@ -68,9 +69,9 @@ export function getPropertyCoordinate(property: MappedProperty) {
 }
 
 export function getPropertyMarkerColor(status: Property["status"]) {
-  if (status === "UNDER_CONSTRUCTION") return "#EA580C";
-  if (status === "PRE_LEASED") return "#0891B2";
-  if (status === "REVENUE_GENERATING") return "#16A34A";
-  if (status === "PERSONAL_USE") return "#C026D3";
-  return "#2563EB";
+  if (status === "UNDER_CONSTRUCTION") return colors.warning;
+  if (status === "PRE_LEASED") return colors.info;
+  if (status === "REVENUE_GENERATING") return colors.success;
+  if (status === "PERSONAL_USE") return colors.primary;
+  return colors.info;
 }

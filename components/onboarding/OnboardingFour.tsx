@@ -23,24 +23,24 @@ export function OnboardingFour() {
 
         <View className="w-full flex-1 items-center justify-center">
           <View
-            className="h-80 w-80 overflow-hidden rounded-[32px] border border-slate-100 bg-whitePrimary p-6"
+            className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary p-6"
             style={analyticsCardShadow}
           >
-            <View className="absolute inset-0 bg-rose-50/35" />
-            {/* <View className="absolute -right-12 -top-14 h-32 w-32 rounded-full bg-rose-100/70" /> */}
-            {/* <View className="absolute -bottom-14 -left-12 h-36 w-36 rounded-full bg-amber-100/80" /> */}
+            <View className="absolute inset-0 bg-dangerSurface" />
+            {/* <View className="absolute -right-12 -top-14 h-32 w-32 rounded-full bg-dangerSurface" /> */}
+            {/* <View className="absolute -bottom-14 -left-12 h-36 w-36 rounded-full bg-warningSurface" /> */}
 
             <View className="flex-row items-start justify-between">
               <View>
                 <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Analytics
                 </Text>
-                <Text className="text-textPrimaryPrimary mt-2 font-ralewayBold text-3xl">
+                <Text className="mt-2 font-ralewayBold text-3xl text-textPrimary">
                   Cash flow
                 </Text>
               </View>
 
-              <View className="h-11 w-11 items-center justify-center rounded-2xl border border-rose-100 bg-whitePrimary/90 shadow-sm">
+              <View className="h-11 w-11 items-center justify-center rounded-2xl border border-danger/20 bg-whitePrimary/90 shadow-sm">
                 <Feather name="trending-up" size={20} color="#1E1F45" />
               </View>
             </View>
@@ -58,7 +58,7 @@ export function OnboardingFour() {
                 <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Return
                 </Text>
-                <Text className="mt-1 font-ralewayBold text-lg text-teal-700">
+                <Text className="mt-1 font-ralewayBold text-lg text-success">
                   +18%
                 </Text>
               </View>
@@ -66,7 +66,7 @@ export function OnboardingFour() {
                 <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Expenses
                 </Text>
-                <Text className="mt-1 font-ralewayBold text-lg text-rose-700">
+                <Text className="mt-1 font-ralewayBold text-lg text-danger">
                   42k
                 </Text>
               </View>
@@ -87,7 +87,7 @@ export function OnboardingFour() {
 
           <OnboardingControls
             activeIndex={3}
-            dotClassName="bg-amber-300"
+            dotClassName="bg-warning"
             nextHref="/(onboarding)/screen-5"
           />
         </View>

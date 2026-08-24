@@ -1,6 +1,8 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { TextInput, View } from "react-native";
 
+import { colors } from "../../constants/colors";
+
 export type EmailVerificationCodeInputHandle = {
   focusFirst: () => void;
 };
@@ -67,14 +69,14 @@ export const EmailVerificationCodeInput = forwardRef<
           }}
           accessibilityLabel={`Email verification code digit ${index + 1}`}
           autoComplete="off"
-          selectionColor={"#634ce4"}
+          selectionColor={colors.primary}
           caretHidden={Boolean(digit)}
           className={`h-14 flex-1 rounded-[12px] border-[1.5px] text-center font-ralewayBold text-xl text-textPrimary ${
             focusedIndex === index
               ? "border-primary bg-primary/10"
               : digit
                 ? "border-primary bg-primary/10"
-                : "border-[#dfe3e3] bg-white"
+                : "border-accent bg-white"
           }`}
           keyboardType="number-pad"
           maxLength={values.length}

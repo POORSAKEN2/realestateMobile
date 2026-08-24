@@ -43,7 +43,7 @@ export function SearchFilterSheet({
             <Text className="font-ralewayExtraBold text-xl text-textPrimary">
               {title}
             </Text>
-            <Text className="mt-1 text-sm text-slate-600">{description}</Text>
+            <Text className="mt-1 text-sm text-description">{description}</Text>
           </View>
           <TouchableOpacity
             accessibilityLabel={`Close ${title.toLowerCase()}`}

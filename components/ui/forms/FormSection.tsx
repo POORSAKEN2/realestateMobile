@@ -23,8 +23,8 @@ export function FormSection({
     <View
       className={
         isCard
-          ? "gap-5 rounded-[24px] border border-slate-200 bg-white p-4 shadow-sm shadow-slate-900/5"
-          : "gap-4 border-b border-slate-200 pb-6"
+          ? "gap-5 rounded-[24px] border border-textPrimary/10 bg-white p-4 shadow-sm shadow-textPrimary/5"
+          : "gap-4 border-b border-textPrimary/10 pb-6"
       }
     >
       <View
@@ -54,7 +54,7 @@ export function FormSection({
             {title}
           </Text>
           {description ? (
-            <Text className="mt-1 text-sm leading-5 text-slate-600">
+            <Text className="mt-1 text-sm leading-5 text-description">
               {description}
             </Text>
           ) : null}

@@ -8,7 +8,7 @@ export function PropertyListSkeleton() {
     <View
       accessibilityLabel="Loading properties"
       accessibilityRole="progressbar"
-      className="overflow-hidden rounded-3xl border border-slate-200 bg-white"
+      className="overflow-hidden rounded-3xl border border-textPrimary/10 bg-white"
     >
       <SkeletonBlock className="h-36 w-full" />
       <View className="gap-3 p-4">
@@ -45,7 +45,7 @@ export function PropertyListMessage({
       <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-textPrimary">
         {title}
       </Text>
-      <Text className="mt-1 text-center text-sm leading-5 text-slate-600">
+      <Text className="mt-1 text-center text-sm leading-5 text-description">
         {description}
       </Text>
       <TouchableOpacity

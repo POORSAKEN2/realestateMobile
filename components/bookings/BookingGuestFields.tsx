@@ -74,14 +74,14 @@ export function BookingGuestFields({
             <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               {isAddingGuest ? "Entering a new guest" : "Guest not listed?"}
             </Text>
-            <Text className="mt-0.5 text-xs leading-4 text-slate-600">
+            <Text className="mt-0.5 text-xs leading-4 text-description">
               {isAddingGuest
                 ? "Use the fields below to add their details."
                 : "Create a guest while making this booking."}
             </Text>
           </View>
         </View>
-        <Text className="ml-3 font-ralewayExtraBold text-xs text-secondary">
+        <Text className="ml-3 font-ralewayExtraBold text-xs text-primary">
           {isAddingGuest ? "Cancel" : "Add"}
         </Text>
       </TouchableOpacity>

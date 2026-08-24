@@ -252,7 +252,7 @@ export default function PropertyImageGallery({
             </Text>
           </View>
           {images.length > 1 ? (
-            <View className="flex-row items-center gap-1.5 rounded-full bg-black/45 px-3 py-2.5">
+            <View className="flex-row items-center gap-1.5 rounded-full bg-blackPrimary/45 px-3 py-2.5">
               {images.map((image, index) => (
                 <View
                   className={`rounded-full ${

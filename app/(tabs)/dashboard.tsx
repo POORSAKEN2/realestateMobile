@@ -151,7 +151,7 @@ export default function DashboardScreen() {
         }}
       />
 
-      <View className="absolute right-3.5 top-3.5 h-2.5 w-2.5 rounded-full border border-white/95 bg-red-500 shadow-sm shadow-red-900/40" />
+      <View className="absolute right-3.5 top-3.5 h-2.5 w-2.5 rounded-full border border-white/95 bg-danger shadow-sm shadow-danger/20" />
     </>
   );
   const iosNotificationGlassContent = (
@@ -374,7 +374,7 @@ export default function DashboardScreen() {
                     resizeMode="cover"
                   />
                   {getPropertyImages(property).length > 1 ? (
-                    <View className="absolute bottom-1.5 right-1.5 rounded-full bg-black/55 px-1.5 py-0.5">
+                    <View className="absolute bottom-1.5 right-1.5 rounded-full bg-blackPrimary/55 px-1.5 py-0.5">
                       <Text className="font-ralewayBold text-[9px] text-white">
                         {getPropertyImages(property).length}
                       </Text>

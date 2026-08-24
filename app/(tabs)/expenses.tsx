@@ -44,7 +44,7 @@ function ExpenseLoadingState() {
         <SkeletonList
           count={3}
           renderItem={() => (
-            <View className="h-44 w-40 rounded-[24px] border border-slate-200 bg-white p-4">
+            <View className="h-44 w-40 rounded-[24px] border border-textPrimary/10 bg-white p-4">
               <View className="flex-row items-center justify-between">
                 <SkeletonBlock className="h-10 w-10 rounded-2xl" />
                 <SkeletonBlock className="h-4 w-12" />

@@ -38,7 +38,7 @@ export function ModuleEmptyState({
       <Text className="mt-3 font-ralewayExtraBold text-base text-textPrimary">
         {title}
       </Text>
-      <Text className="mt-1 text-center text-sm leading-5 text-[#6F6D6D]">
+      <Text className="mt-1 text-center text-sm leading-5 text-description">
         {description}
       </Text>
     </View>

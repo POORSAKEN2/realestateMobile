@@ -95,9 +95,9 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
             className={
               isCardAppearance
                 ? compactHeader
-                  ? "border-b border-slate-100 bg-white px-5 py-3"
+                  ? "border-b border-textPrimary/10 bg-white px-5 py-3"
                   : "bg-white px-6 pb-5 pt-6"
-                : "border-b border-slate-200 bg-white px-5 py-4"
+                : "border-b border-textPrimary/10 bg-white px-5 py-4"
             }
           >
             <View className="flex-row items-center">
@@ -129,9 +129,9 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                     className={
                       isCardAppearance
                         ? compactHeader
-                          ? "mt-0.5 font-ralewayMedium text-sm leading-5 text-slate-500"
-                          : "mt-2 font-ralewayMedium text-base leading-6 text-slate-500"
-                        : "mt-1 font-ralewayMedium text-sm text-[#6F6D6D]"
+                          ? "mt-0.5 font-ralewayMedium text-sm leading-5 text-description"
+                          : "mt-2 font-ralewayMedium text-base leading-6 text-description"
+                        : "mt-1 font-ralewayMedium text-sm text-description"
                     }
                     numberOfLines={2}
                   >
@@ -147,7 +147,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 accessibilityRole="button"
                 activeOpacity={0.8}
                 className={`h-11 w-11 items-center justify-center rounded-full ${
-                  isCardAppearance ? "bg-transparent" : "bg-slate-100"
+                  isCardAppearance ? "bg-transparent" : "bg-surface"
                 }`}
                 disabled={isPending}
                 onPress={handleClose}
@@ -170,17 +170,17 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
             ref={scrollRef}
           >
             {formError ? (
-              <View className="flex-row items-start gap-3 rounded-2xl border border-[#B42318]/20 bg-[#FEF3F2] p-4">
+              <View className="flex-row items-start gap-3 rounded-2xl border border-danger/20 bg-dangerSurface p-4">
                 <Ionicons
                   name="alert-circle-outline"
                   color="#B42318"
                   size={20}
                 />
                 <View className="min-w-0 flex-1">
-                  <Text className="font-ralewayBold text-sm text-[#B42318]">
+                  <Text className="font-ralewayBold text-sm text-danger">
                     Please review the form
                   </Text>
-                  <Text className="mt-1 text-xs leading-5 text-[#7A271A]">
+                  <Text className="mt-1 text-xs leading-5 text-danger">
                     {formError}
                   </Text>
                 </View>

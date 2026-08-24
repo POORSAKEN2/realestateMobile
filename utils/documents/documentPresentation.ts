@@ -4,6 +4,7 @@ import type {
   Property,
   PropertyDocument,
 } from "../../types";
+import { colors } from "../../constants/colors";
 
 export const DOCUMENT_CATEGORIES: DocumentCategory[] = [
   "Leases",
@@ -45,23 +46,23 @@ type CategoryPresentation = {
 
 const categoryPresentation: Record<DocumentCategory, CategoryPresentation> = {
   Leases: {
-    backgroundColor: "#FAF9F9",
-    color: "#634CE4",
+    backgroundColor: colors.surface,
+    color: colors.secondary,
     label: "LEASE",
   },
   Compliance: {
-    backgroundColor: "#BEE3DB",
-    color: "#1E1F45",
+    backgroundColor: colors.accent,
+    color: colors.text,
     label: "COMPLIANCE",
   },
   Maintenance: {
-    backgroundColor: "#8A77F4",
-    color: "#FFFFFF",
+    backgroundColor: colors.primary,
+    color: colors.whitePrimary,
     label: "MAINTENANCE",
   },
   Contracts: {
-    backgroundColor: "#634CE4",
-    color: "#FFFFFF",
+    backgroundColor: colors.secondary,
+    color: colors.whitePrimary,
     label: "CONTRACT",
   },
 };
@@ -69,8 +70,8 @@ const categoryPresentation: Record<DocumentCategory, CategoryPresentation> = {
 export function getCategoryPresentation(category: string) {
   return (
     categoryPresentation[category as DocumentCategory] ?? {
-      backgroundColor: "#FAF9F9",
-      color: "#1E1F45",
+      backgroundColor: colors.surface,
+      color: colors.text,
       label: category.toUpperCase(),
     }
   );
@@ -78,23 +79,23 @@ export function getCategoryPresentation(category: string) {
 
 const documentTypePresentation = {
   PDF: {
-    backgroundColor: "#FDECEC",
-    color: "#D32F2F",
+    backgroundColor: colors.dangerSurface,
+    color: colors.danger,
     icon: "file-pdf-box",
   },
   DOCX: {
-    backgroundColor: "#E8F0FB",
-    color: "#2B579A",
+    backgroundColor: colors.infoSurface,
+    color: colors.info,
     icon: "file-word-outline",
   },
   JPG: {
-    backgroundColor: "#FEF3C7",
-    color: "#B45309",
+    backgroundColor: colors.warningSurface,
+    color: colors.warning,
     icon: "file-jpg-box",
   },
   PNG: {
-    backgroundColor: "#D1FAE5",
-    color: "#047857",
+    backgroundColor: colors.successSurface,
+    color: colors.success,
     icon: "file-png-box",
   },
 } as const satisfies Record<

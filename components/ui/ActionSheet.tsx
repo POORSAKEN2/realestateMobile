@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { colors } from "../../constants/colors";
 import { BottomSheetModal } from "./BottomSheetModal";
 
 export type ActionSheetItem = {
@@ -75,7 +76,7 @@ export function ActionSheet({
               {title}
             </Text>
             {subtitle ? (
-              <Text className="mt-1 text-sm leading-5 text-slate-500">
+              <Text className="mt-1 text-sm leading-5 text-description">
                 {subtitle}
               </Text>
             ) : null}
@@ -84,16 +85,16 @@ export function ActionSheet({
             accessibilityLabel={`Close ${title}`}
             accessibilityRole="button"
             activeOpacity={0.8}
-            className="h-11 w-11 items-center justify-center rounded-full bg-slate-100"
+            className="h-11 w-11 items-center justify-center rounded-full bg-surface"
             onPress={onClose}
           >
-            <MaterialCommunityIcons name="close" color="#334155" size={20} />
+            <MaterialCommunityIcons name="close" color="#1E1F45" size={20} />
           </TouchableOpacity>
         </View>
 
         <View className="gap-2">
           {actions.map((action) => {
-            const color = action.destructive ? "#DC2626" : "#634CE4";
+            const color = action.destructive ? "#B42318" : colors.primary;
 
             return (
               <TouchableOpacity
@@ -106,7 +107,7 @@ export function ActionSheet({
                 }}
                 activeOpacity={0.8}
                 className={`min-h-16 flex-row items-center gap-3 rounded-2xl px-4 py-3 ${
-                  action.destructive ? "bg-red-50" : "bg-primary/10"
+                  action.destructive ? "bg-dangerSurface" : "bg-primary/10"
                 } ${action.disabled ? "opacity-50" : ""}`}
                 disabled={action.disabled}
                 key={action.label}
@@ -114,7 +115,7 @@ export function ActionSheet({
               >
                 <View
                   className={`h-10 w-10 items-center justify-center rounded-xl ${
-                    action.destructive ? "bg-red-100" : "bg-primary/10"
+                    action.destructive ? "bg-dangerSurface" : "bg-primary/10"
                   }`}
                 >
                   <MaterialCommunityIcons
@@ -126,13 +127,13 @@ export function ActionSheet({
                 <View className="min-w-0 flex-1">
                   <Text
                     className={`font-ralewayBold text-sm ${
-                      action.destructive ? "text-red-700" : "text-slate-700"
+                      action.destructive ? "text-danger" : "text-textPrimary"
                     }`}
                   >
                     {action.label}
                   </Text>
                   {action.description ? (
-                    <Text className="mt-0.5 text-xs leading-4 text-slate-500">
+                    <Text className="mt-0.5 text-xs leading-4 text-description">
                       {action.description}
                     </Text>
                   ) : null}
@@ -140,13 +141,13 @@ export function ActionSheet({
                 {action.selected === undefined ? (
                   <MaterialCommunityIcons
                     name="chevron-right"
-                    color={action.destructive ? "#F87171" : "#94A3B8"}
+                    color={action.destructive ? "#B42318" : "#6F6D6D"}
                     size={20}
                   />
                 ) : action.selected ? (
                   <MaterialCommunityIcons
                     name="check-circle"
-                    color="#634CE4"
+                    color={colors.primary}
                     size={21}
                   />
                 ) : null}

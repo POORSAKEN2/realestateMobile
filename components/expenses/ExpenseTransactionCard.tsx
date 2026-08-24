@@ -32,15 +32,15 @@ export function ExpenseTransactionCard({
   const isPaid = expense.status === "Paid";
   const isCancelled = expense.status === "Cancelled";
   const statusContainerClass = isPaid
-    ? "bg-[#E8F7EC]"
+    ? "bg-accent"
     : isCancelled
-      ? "bg-slate-100"
-      : "bg-[#FFF6DD]";
+      ? "bg-surface"
+      : "bg-warningSurface";
   const statusTextClass = isPaid
-    ? "text-[#1D8B4C]"
+    ? "text-success"
     : isCancelled
-      ? "text-slate-500"
-      : "text-[#B67A18]";
+      ? "text-description"
+      : "text-warning";
 
   return (
     <Pressable

@@ -59,7 +59,7 @@ export function BookingCalendar({
           <Text className="font-ralewayBold text-lg text-textPrimary">
             {monthFormatter.format(currentMonth)}
           </Text>
-          <Text className="mt-0.5 font-ralewaySemiBold text-xs text-slate-500">
+          <Text className="mt-0.5 font-ralewaySemiBold text-xs text-description">
             Select a day to see its schedule
           </Text>
         </View>
@@ -71,7 +71,7 @@ export function BookingCalendar({
             className="h-11 justify-center rounded-full bg-primary/10 px-3"
             onPress={onGoToToday}
           >
-            <Text className="font-ralewayExtraBold text-xs text-secondary">
+            <Text className="font-ralewayExtraBold text-xs text-primary">
               Today
             </Text>
           </TouchableOpacity>
@@ -92,7 +92,7 @@ export function BookingCalendar({
         {weekdayLabels.map((day) => (
           <Text
             key={day}
-            className="flex-1 text-center font-ralewayExtraBold text-[11px] uppercase tracking-wide text-slate-400"
+            className="flex-1 text-center font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description"
           >
             {day.slice(0, 1)}
           </Text>
@@ -118,7 +118,7 @@ export function BookingCalendar({
         {BOOKING_CALENDAR_LEGEND.map((item) => (
           <View className="flex-row items-center gap-1.5" key={item.label}>
             <View className={`h-2 w-2 rounded-full ${item.colorClassName}`} />
-            <Text className="font-ralewayBold text-[11px] text-slate-500">
+            <Text className="font-ralewayBold text-[11px] text-description">
               {item.label}
             </Text>
           </View>
@@ -201,9 +201,9 @@ function CalendarDay({
               ? "text-white"
               : isCurrentMonth
                 ? isToday
-                  ? "text-secondary"
-                  : "text-slate-800"
-                : "text-slate-300"
+                  ? "text-primary"
+                  : "text-textPrimary"
+                : "text-description/60"
           }`}
         >
           {day.getDate()}
@@ -217,7 +217,9 @@ function CalendarDay({
               <View
                 key={booking.id}
                 className={`h-1.5 w-1.5 rounded-full ${
-                  booking.status === "Cancelled" ? "bg-slate-300" : "bg-accent"
+                  booking.status === "Cancelled"
+                    ? "bg-description/20"
+                    : "bg-accent"
                 }`}
               />
             ))

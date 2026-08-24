@@ -67,14 +67,14 @@ export function ProfileSummaryCard({
         >
           {name.trim() || "Your name"}
         </Text>
-        <Text className="mt-1 text-sm text-slate-500" numberOfLines={1}>
+        <Text className="mt-1 text-sm text-description" numberOfLines={1}>
           {email || jobTitle.trim() || "Real estate professional"}
         </Text>
       </View>
 
       <View className="mt-5 rounded-2xl border border-primary/20 bg-primary/5 p-4">
         <View className="flex-row items-center justify-between">
-          <Text className="font-ralewayBold text-sm text-slate-700">
+          <Text className="font-ralewayBold text-sm text-textPrimary">
             Profile completion
           </Text>
           <Text className="font-ralewayBold text-sm text-secondary">
@@ -87,7 +87,7 @@ export function ProfileSummaryCard({
             style={{ width: `${completion.percent}%` }}
           />
         </View>
-        <Text className="mt-3 text-xs leading-5 text-slate-500">
+        <Text className="mt-3 text-xs leading-5 text-description">
           {completion.nextMissingItem
             ? `Add your ${completion.nextMissingItem} to help complete your profile.`
             : "All key profile details are complete."}

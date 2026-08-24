@@ -42,24 +42,24 @@ export default function DefaultLocationScreen() {
   }
 
   return (
-    <Screen bottomInset="safe-area" className="bg-slate-50">
+    <Screen bottomInset="safe-area" className="bg-surface">
       <Stack.Screen options={{ headerShown: false }} />
       <View className="flex-1">
         <View className="pb-6 pt-4">
-          <View className="h-14 w-14 items-center justify-center rounded-2xl bg-[#0f766e]">
+          <View className="h-14 w-14 items-center justify-center rounded-2xl bg-success">
             <MaterialCommunityIcons
               name="map-marker-radius"
               color="#FFFFFF"
               size={28}
             />
           </View>
-          <Text className="mt-6 font-ralewayExtraBold text-xs uppercase tracking-widest text-slate-500">
+          <Text className="mt-6 font-ralewayExtraBold text-xs uppercase tracking-widest text-description">
             Default Location
           </Text>
-          <Text className="mt-2 font-ralewayExtraBold text-3xl text-slate-950">
+          <Text className="mt-2 font-ralewayExtraBold text-3xl text-textPrimary">
             Choose your portfolio country
           </Text>
-          <Text className="mt-3 text-base leading-6 text-slate-500">
+          <Text className="mt-3 text-base leading-6 text-description">
             Terrane will use this country for property lists, map defaults, and
             new property forms.
           </Text>
@@ -78,31 +78,31 @@ export default function DefaultLocationScreen() {
                 activeOpacity={0.85}
                 className={`min-h-20 flex-row items-center justify-between rounded-2xl border px-4 ${
                   selected
-                    ? "border-[#0f766e] bg-[#0f766e]/10"
-                    : "border-slate-200 bg-white"
+                    ? "border-success bg-success/10"
+                    : "border-textPrimary/10 bg-white"
                 }`}
                 onPress={() => setSelectedId(item.id)}
               >
                 <View className="min-w-0 flex-1">
                   <Text
                     className={`font-ralewayExtraBold text-base ${
-                      selected ? "text-[#0f766e]" : "text-slate-950"
+                      selected ? "text-success" : "text-textPrimary"
                     }`}
                   >
                     {item.label}
                   </Text>
-                  <Text className="mt-1 text-sm text-slate-500">
+                  <Text className="mt-1 text-sm text-description">
                     Start map and property views in {item.country}
                   </Text>
                 </View>
                 <View
                   className={`h-10 w-10 items-center justify-center rounded-full ${
-                    selected ? "bg-[#0f766e]" : "bg-slate-100"
+                    selected ? "bg-success" : "bg-surface"
                   }`}
                 >
                   <MaterialCommunityIcons
                     name={selected ? "check" : "map-marker-outline"}
-                    color={selected ? "#FFFFFF" : "#64748B"}
+                    color={selected ? "#FFFFFF" : "#6F6D6D"}
                     size={20}
                   />
                 </View>
@@ -116,7 +116,7 @@ export default function DefaultLocationScreen() {
           <TouchableOpacity
             activeOpacity={0.85}
             className={`h-14 flex-row items-center justify-center rounded-2xl ${
-              isSaving ? "bg-[#5eead4]" : "bg-[#0f766e]"
+              isSaving ? "bg-accent" : "bg-success"
             }`}
             disabled={isSaving}
             onPress={handleContinue}

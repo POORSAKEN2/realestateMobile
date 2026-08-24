@@ -38,7 +38,7 @@ export function ProfileField({
   const [isFocused, setIsFocused] = useState(false);
 
   const borderClassName = error
-    ? "border-red-400 bg-red-50/40"
+    ? "border-danger bg-dangerSurface"
     : isFocused
       ? "border-primary bg-white"
       : "border-primary/20 bg-primary/5";
@@ -50,7 +50,7 @@ export function ProfileField({
           {label}
         </Text>
         {required ? (
-          <Text className="ml-1 text-red-500" accessibilityLabel="required">
+          <Text className="ml-1 text-danger" accessibilityLabel="required">
             *
           </Text>
         ) : null}
@@ -61,7 +61,7 @@ export function ProfileField({
       >
         <Ionicons
           name={icon}
-          color={error ? "#DC2626" : isFocused ? "#8A77F4" : "#64748B"}
+          color={error ? "#B42318" : isFocused ? "#8A77F4" : "#6F6D6D"}
           size={20}
         />
         <TextInput
@@ -72,7 +72,7 @@ export function ProfileField({
           onBlur={() => setIsFocused(false)}
           onFocus={() => setIsFocused(true)}
           placeholder={placeholder}
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor="#6F6D6D"
           {...inputProps}
         />
         {value ? (
@@ -83,7 +83,7 @@ export function ProfileField({
             onPress={() => onChangeText("")}
             className="h-8 w-8 items-center justify-center"
           >
-            <Ionicons name="close-circle" color="#CBD5E1" size={19} />
+            <Ionicons name="close-circle" color="#BEE3DB" size={19} />
           </TouchableOpacity>
         ) : null}
       </View>
@@ -91,7 +91,7 @@ export function ProfileField({
       {error ? (
         <Text
           accessibilityLiveRegion="polite"
-          className="mt-2 text-xs text-red-600"
+          className="mt-2 text-xs text-danger"
         >
           {error}
         </Text>

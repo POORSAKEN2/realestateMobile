@@ -83,7 +83,7 @@ export function BookingCalendarEmpty() {
       <Text className="mt-4 text-center font-ralewayBold text-base text-textPrimary">
         No bookable buildings yet
       </Text>
-      <Text className="mt-1 text-center text-sm leading-5 text-slate-500">
+      <Text className="mt-1 text-center text-sm leading-5 text-description">
         Enable transient bookings in a property form to start using this
         calendar.
       </Text>

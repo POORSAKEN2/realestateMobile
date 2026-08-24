@@ -16,7 +16,7 @@ type DateTimePickerModalProps = {
 
 const inputStyle: CSSProperties = {
   backgroundColor: "#FAF9F9",
-  border: "1px solid #E2E8F0",
+  border: "1px solid #BEE3DB",
   borderRadius: 16,
   color: colors.text,
   fontSize: 16,

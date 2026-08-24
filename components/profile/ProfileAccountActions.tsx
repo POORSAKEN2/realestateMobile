@@ -35,12 +35,12 @@ export function ProfileAccountActions({
         accessibilityLabel="Sign out"
         activeOpacity={0.7}
         onPress={onSignOut}
-        className="mt-3 min-h-14 flex-row items-center rounded-2xl bg-red-50 px-4"
+        className="mt-3 min-h-14 flex-row items-center rounded-2xl bg-dangerSurface px-4"
       >
         <View className="h-9 w-9 items-center justify-center rounded-xl bg-white">
-          <Ionicons name="log-out-outline" color="#DC2626" size={19} />
+          <Ionicons name="log-out-outline" color="#B42318" size={19} />
         </View>
-        <Text className="ml-3 flex-1 font-ralewayBold text-sm text-red-600">
+        <Text className="ml-3 flex-1 font-ralewayBold text-sm text-danger">
           Sign out
         </Text>
       </TouchableOpacity>

@@ -40,7 +40,7 @@ export function DocumentSortSheet({
             >
               <Text
                 className={`min-w-0 flex-1 font-ralewayBold text-sm ${
-                  isSelected ? "text-secondary" : "text-textPrimary"
+                  isSelected ? "text-primary" : "text-textPrimary"
                 }`}
               >
                 {option.label}
@@ -147,14 +147,14 @@ export function DeleteDocumentSheet({
           disabled={isDeleting}
           onPress={onCancel}
         >
-          <Text className="font-ralewayBold text-base text-secondary">
+          <Text className="font-ralewayBold text-base text-primary">
             Cancel
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="min-h-14 flex-1 items-center justify-center rounded-2xl bg-red-600"
+          className="min-h-14 flex-1 items-center justify-center rounded-2xl bg-danger"
           disabled={isDeleting}
           onPress={() => document && onConfirm(document)}
         >

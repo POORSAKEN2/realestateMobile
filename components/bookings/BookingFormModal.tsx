@@ -170,7 +170,7 @@ export function BookingFormModal({
               />
             </View>
             <View className="min-w-0 flex-1">
-              <Text className="font-ralewayBold text-xs text-slate-500">
+              <Text className="font-ralewayBold text-xs text-description">
                 Booking location
               </Text>
               <Text className="mt-0.5 font-ralewayExtraBold text-sm text-textPrimary">
@@ -215,7 +215,7 @@ export function BookingFormModal({
           <BookingAvailabilityMessage conflict={conflict} />
         ) : (
           <View className="rounded-2xl bg-primary/5 p-4">
-            <Text className="text-sm leading-5 text-slate-600">
+            <Text className="text-sm leading-5 text-description">
               Select a room and stay window to check availability.
             </Text>
           </View>
@@ -240,26 +240,26 @@ export function BookingFormModal({
       </FormSection>
 
       {mode === "edit" && editingBooking?.status === "Booked" ? (
-        <View className="gap-3 rounded-[24px] border border-rose-500/20 bg-rose-50 p-4">
+        <View className="gap-3 rounded-[24px] border border-danger/20 bg-dangerSurface p-4">
           <View>
-            <Text className="font-ralewayExtraBold text-sm text-rose-700">
+            <Text className="font-ralewayExtraBold text-sm text-danger">
               Cancel this booking
             </Text>
-            <Text className="mt-1 text-xs leading-5 text-rose-700/80">
+            <Text className="mt-1 text-xs leading-5 text-danger">
               The reservation will remain in your records as cancelled.
             </Text>
           </View>
           <TouchableOpacity
             accessibilityRole="button"
             activeOpacity={0.85}
-            className="h-12 items-center justify-center rounded-2xl border border-rose-500/20 bg-white"
+            className="h-12 items-center justify-center rounded-2xl border border-danger/20 bg-white"
             disabled={isCancelling}
             onPress={onCancelBooking}
           >
             {isCancelling ? (
-              <ActivityIndicator color="#DC2626" />
+              <ActivityIndicator color="#B42318" />
             ) : (
-              <Text className="font-ralewayExtraBold text-rose-600">
+              <Text className="font-ralewayExtraBold text-danger">
                 Cancel Booking
               </Text>
             )}

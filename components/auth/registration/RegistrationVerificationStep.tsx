@@ -74,7 +74,7 @@ export function RegistrationVerificationStep({
       >
         <Text
           className={`font-ralewayBold text-sm ${
-            isResendDisabled ? "text-[#9ba7a7]" : "text-primary"
+            isResendDisabled ? "text-description" : "text-primary"
           }`}
         >
           {isRequestingCode

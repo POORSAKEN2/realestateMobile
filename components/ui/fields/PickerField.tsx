@@ -45,12 +45,12 @@ export function PickerField({
       <Text
         className={
           isFilledVariant
-            ? "font-ralewaySemiBold text-sm text-slate-600"
-            : "font-ralewayBold text-xs text-slate-600"
+            ? "font-ralewaySemiBold text-sm text-description"
+            : "font-ralewayBold text-xs text-description"
         }
       >
         {label}
-        <Text className="text-red-600">{required ? " *" : ""}</Text>
+        <Text className="text-danger">{required ? " *" : ""}</Text>
       </Text>
 
       <TouchableOpacity
@@ -59,15 +59,15 @@ export function PickerField({
         accessibilityRole="button"
         className={`h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
           isFilledVariant
-            ? "border-slate-200 bg-surface"
-            : "border-textPrimary/10 bg-[#FFFFFF] shadow-sm"
+            ? "border-textPrimary/10 bg-surface"
+            : "border-textPrimary/10 bg-whitePrimary shadow-sm"
         }`}
         onPress={onPress}
       >
         <Text
           className={`text-base ${
             isFilledVariant ? "min-w-0 flex-1 font-ralewayMedium" : ""
-          } ${value ? "text-textPrimary" : "text-[#6F6D6D]"}`}
+          } ${value ? "text-textPrimary" : "text-description"}`}
           numberOfLines={isFilledVariant ? 1 : undefined}
         >
           {value || placeholder}
@@ -92,8 +92,8 @@ export function PickerModalShell({
 }: PickerModalShellProps) {
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent visible>
-      <View className="flex-1 justify-center bg-black/40 px-5">
-        <View className="rounded-3xl border border-primary/20 bg-[#FFFFFF] p-5 shadow-xl shadow-primary/10">
+      <View className="flex-1 justify-center bg-blackPrimary/40 px-5">
+        <View className="rounded-3xl border border-primary/20 bg-whitePrimary p-5 shadow-xl shadow-primary/10">
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               {title}
@@ -117,7 +117,7 @@ export function PickerModalShell({
                 className="rounded-full bg-primary/10 px-3 py-1.5"
                 onPress={onConfirm}
               >
-                <Text className="font-ralewayExtraBold text-xs text-secondary">
+                <Text className="font-ralewayExtraBold text-xs text-primary">
                   Done
                 </Text>
               </TouchableOpacity>

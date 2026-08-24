@@ -328,7 +328,7 @@ export function PropertyDetailsModal({
                               {lease.startDate} to {lease.endDate}
                             </Text>
                           </View>
-                          <Text className="rounded-full bg-primary/10 px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-secondary">
+                          <Text className="rounded-full bg-accent px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-textPrimary">
                             {lease.status}
                           </Text>
                         </View>

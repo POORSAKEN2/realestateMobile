@@ -79,7 +79,7 @@ export function LocationPinPicker({
     <View className="gap-3 rounded-2xl border border-primary/20 bg-white p-4">
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="font-ralewayBold text-xs text-slate-600">
+          <Text className="font-ralewayBold text-xs text-description">
             Pin Location
           </Text>
           <Text className="mt-1 font-ralewayExtraBold text-sm text-textPrimary">
@@ -107,7 +107,7 @@ export function LocationPinPicker({
         onPress={() => setIsMapVisible(true)}
       >
         <MaterialCommunityIcons name="map-search" color="#8A77F4" size={19} />
-        <Text className="font-ralewayExtraBold text-sm text-secondary">
+        <Text className="font-ralewayExtraBold text-sm text-primary">
           {markerCoordinate ? "Update Pin on Map" : "Pin Property on Map"}
         </Text>
       </TouchableOpacity>
@@ -128,20 +128,20 @@ export function LocationPinPicker({
         ) : (
           <MaterialCommunityIcons
             name="map-marker-check-outline"
-            color={markerCoordinate ? "#FFFFFF" : "#8E8E93"}
+            color={markerCoordinate ? "#FFFFFF" : "#6F6D6D"}
             size={19}
           />
         )}
         <Text
           className={`font-ralewayExtraBold text-sm ${
-            markerCoordinate ? "text-[#FFFFFF]" : "text-[#8E8E93]"
+            markerCoordinate ? "text-whitePrimary" : "text-description"
           }`}
         >
           {isResolvingPinLocation ? "Finding City..." : "Set Location from Pin"}
         </Text>
       </TouchableOpacity>
       {pinLocationError ? (
-        <Text className="text-center font-ralewayBold text-xs text-[#B42318]">
+        <Text className="text-center font-ralewayBold text-xs text-danger">
           {pinLocationError}
         </Text>
       ) : null}
@@ -150,7 +150,7 @@ export function LocationPinPicker({
         onRequestClose={() => setIsMapVisible(false)}
         visible={isMapVisible}
       >
-        <View className="flex-1 bg-[#FFFFFF]">
+        <View className="flex-1 bg-whitePrimary">
           {isMapVisible ? (
             <AdaptiveMap
               onMapPress={handleMapCoordinateChange}
@@ -160,10 +160,10 @@ export function LocationPinPicker({
               viewportRevision={viewportRevision}
             />
           ) : null}
-          <View className="absolute left-5 right-8 top-16 rounded-3xl border border-primary/20 bg-[#FFFFFF] px-4 py-6 shadow-sm shadow-primary/10">
+          <View className="absolute left-5 right-8 top-16 rounded-3xl border border-primary/20 bg-whitePrimary px-4 py-6 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between gap-3">
               <View className="min-w-0 flex-1">
-                <Text className="font-ralewayBold text-xs text-slate-600">
+                <Text className="font-ralewayBold text-xs text-description">
                   Property Pin
                 </Text>
                 <Text className="m-1 font-ralewayExtraBold text-sm text-textPrimary">
@@ -186,7 +186,7 @@ export function LocationPinPicker({
                 />
               </TouchableOpacity>
             </View>
-            <View className="mt-3 h-14 flex-row items-center gap-2 overflow-hidden rounded-2xl bg-[#F4F4F5] px-3">
+            <View className="mt-3 h-14 flex-row items-center gap-2 overflow-hidden rounded-2xl bg-surface px-3">
               <MaterialCommunityIcons
                 name="magnify"
                 color="#6F6D6D"
@@ -203,7 +203,7 @@ export function LocationPinPicker({
                   onFocus={() => setIsSearchFocused(true)}
                   onSubmitEditing={search}
                   placeholder="Search address or place"
-                  placeholderTextColor="#8E8E93"
+                  placeholderTextColor="#6F6D6D"
                   ref={searchInputRef}
                   returnKeyType="search"
                   value={searchQuery}
@@ -241,12 +241,12 @@ export function LocationPinPicker({
               </TouchableOpacity>
             </View>
             {searchError ? (
-              <Text className="mt-2 font-ralewayBold text-xs text-[#B42318]">
+              <Text className="mt-2 font-ralewayBold text-xs text-danger">
                 {searchError}
               </Text>
             ) : null}
             {searchResults.length > 0 ? (
-              <View className="mt-2 overflow-hidden rounded-2xl border border-primary/20 bg-[#FFFFFF]">
+              <View className="mt-2 overflow-hidden rounded-2xl border border-primary/20 bg-whitePrimary">
                 {searchResults.map((result, index) => (
                   <TouchableOpacity
                     activeOpacity={0.75}
@@ -273,7 +273,7 @@ export function LocationPinPicker({
                 ))}
               </View>
             ) : null}
-            <Text className="mt-2 text-xs text-slate-600">
+            <Text className="mt-2 text-xs text-description">
               Search and geocoding provided by Apple Maps
             </Text>
           </View>
@@ -283,7 +283,7 @@ export function LocationPinPicker({
               className="h-14 items-center justify-center rounded-2xl bg-primary"
               onPress={() => setIsMapVisible(false)}
             >
-              <Text className="font-ralewayExtraBold text-base text-[#FFFFFF]">
+              <Text className="font-ralewayExtraBold text-base text-whitePrimary">
                 Done
               </Text>
             </TouchableOpacity>

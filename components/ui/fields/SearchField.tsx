@@ -34,17 +34,17 @@ export function SearchField({
       className={`h-12 min-w-0 flex-row items-center rounded-2xl px-3.5 ${
         variant === "outlined"
           ? "border border-primary/20 bg-white"
-          : "bg-slate-100"
+          : "bg-surface"
       } ${wrapperClassName}`}
     >
-      <MaterialCommunityIcons name="magnify" color="#475569" size={20} />
+      <MaterialCommunityIcons name="magnify" color="#6F6D6D" size={20} />
       <TextInput
         autoCapitalize="none"
         autoCorrect={false}
         className="ml-2 min-w-0 flex-1 text-base text-textPrimary"
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#64748B"
+        placeholderTextColor="#6F6D6D"
         returnKeyType="search"
         value={value}
         {...inputProps}
@@ -59,7 +59,7 @@ export function SearchField({
         >
           <MaterialCommunityIcons
             name="close-circle"
-            color="#64748B"
+            color="#6F6D6D"
             size={19}
           />
         </TouchableOpacity>

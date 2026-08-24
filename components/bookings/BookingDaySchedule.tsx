@@ -37,7 +37,7 @@ export function BookingDaySchedule({
     <View className="gap-3 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between gap-3">
         <View className="min-w-0 flex-1">
-          <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-slate-400">
+          <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-description">
             Day schedule
           </Text>
           <Text className="mt-1 font-ralewayBold text-lg text-textPrimary">
@@ -74,13 +74,13 @@ export function BookingDaySchedule({
                 >
                   {booking.guestName}
                 </Text>
-                <Text className="mt-0.5 font-ralewaySemiBold text-xs text-slate-500">
+                <Text className="mt-0.5 font-ralewaySemiBold text-xs text-description">
                   Room {booking.roomNumber} ·{" "}
                   {formatDisplayTime(booking.checkInTime)}–
                   {formatDisplayTime(booking.checkOutTime)}
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" color="#94A3B8" size={18} />
+              <Ionicons name="chevron-forward" color="#6F6D6D" size={18} />
             </TouchableOpacity>
           ))}
         </View>
@@ -90,10 +90,10 @@ export function BookingDaySchedule({
             <Ionicons name="sparkles-outline" color="#8A77F4" size={18} />
           </View>
           <View className="min-w-0 flex-1">
-            <Text className="font-ralewayExtraBold text-sm text-slate-800">
+            <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               No stays scheduled
             </Text>
-            <Text className="mt-0.5 text-xs leading-5 text-slate-500">
+            <Text className="mt-0.5 text-xs leading-5 text-description">
               This day has no visible reservations.
             </Text>
           </View>

@@ -13,7 +13,7 @@ interface ChoiceFieldProps<T> {
   onChange: (value: T | T[]) => void;
   emptyText?: string;
   isMultiSelect?: boolean;
-  activeColorClass?: string; // Optional: Override default active blue color (e.g., 'bg-emerald-600 border-emerald-600')
+  activeColorClass?: string; // Optional: Override default active blue color (e.g., 'bg-success border-success')
   variant?: "pill" | "filled" | "segmented";
 }
 
@@ -55,8 +55,8 @@ export function ChoiceField<T extends string | number | boolean>({
       <Text
         className={
           hasFilledSurface
-            ? "font-ralewaySemiBold text-sm text-slate-600"
-            : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-[#6F6D6D]"
+            ? "font-ralewaySemiBold text-sm text-description"
+            : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description"
         }
       >
         {label}
@@ -66,11 +66,11 @@ export function ChoiceField<T extends string | number | boolean>({
         <View
           className={`rounded-2xl border border-dashed p-4 ${
             hasFilledSurface
-              ? "border-slate-300 bg-surface"
-              : "border-textPrimary/20 bg-[#FFFFFF]/90"
+              ? "border-textPrimary/20 bg-surface"
+              : "border-textPrimary/20 bg-whitePrimary/90"
           }`}
         >
-          <Text className="font-ralewaySemiBold text-sm text-[#6F6D6D]">
+          <Text className="font-ralewaySemiBold text-sm text-description">
             {emptyText ?? "No options available."}
           </Text>
         </View>
@@ -101,7 +101,7 @@ export function ChoiceField<T extends string | number | boolean>({
                           ? activeColorClass
                           : hasFilledSurface
                             ? "border-primary/20 bg-surface"
-                            : "border-primary/20 bg-[#FFFFFF]"
+                            : "border-primary/20 bg-whitePrimary"
                       }`
                 }
                 onPress={() => handlePress(option.value)}
@@ -109,9 +109,9 @@ export function ChoiceField<T extends string | number | boolean>({
                 <Text
                   className={`${isSegmented ? "font-ralewaySemiBold text-sm" : "font-ralewayBold text-xs"} ${
                     selected
-                      ? "text-[#FFFFFF]"
+                      ? "text-whitePrimary"
                       : hasFilledSurface
-                        ? "text-slate-600"
+                        ? "text-description"
                         : "text-textPrimary"
                   }`}
                 >
