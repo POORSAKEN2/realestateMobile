@@ -35,7 +35,7 @@ export function FloorAreaManagerHeader({
         />
       }
       supportingText={`${propertyTitle} · ${floorName}`}
-      title="Floor Areas"
+      title="Areas"
     />
   );
 }
