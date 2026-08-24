@@ -2,10 +2,7 @@ import { useMemo, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Screen, type ScreenBottomInset } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
-import {
-  ModuleEmptyState,
-  ModuleLoadingState,
-} from "../../components/ui/ModuleState";
+import { ModuleEmptyState } from "../../components/ui/ModuleState";
 import { TenantDetailsModal } from "../../components/tenants/TenantDetailsModal";
 import { TenantCard } from "../../components/tenants/TenantCard";
 import { AddEditModal } from "../../components/ui/AddEditModal";
@@ -16,6 +13,11 @@ import { SecondaryBackButton } from "../../components/navigation/SecondaryBackBu
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { OverviewMetricCard } from "../../components/ui/OverviewMetricCard";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
+import {
+  SkeletonBlock,
+  SkeletonGroup,
+  SkeletonList,
+} from "../../components/ui/Skeleton";
 import {
   formatSearchResultLabel,
   SearchToolbar,
@@ -35,6 +37,82 @@ type TenantsScreenProps = {
   bottomInset?: ScreenBottomInset;
   showBackButton?: boolean;
 };
+
+function TenantCardSkeleton() {
+  return (
+    <View className="rounded-3xl border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+      <View className="flex-row items-start gap-3.5">
+        <SkeletonBlock className="h-12 w-12 rounded-full bg-primary/10" />
+        <View className="min-w-0 flex-1 gap-2 pt-1">
+          <SkeletonBlock className="h-5 w-3/5 bg-primary/15" />
+          <SkeletonBlock className="h-3 w-4/5" />
+        </View>
+        <SkeletonBlock className="h-9 w-20 rounded-full bg-primary/10" />
+      </View>
+
+      <SkeletonBlock className="my-4 h-px w-full bg-primary/10" />
+
+      <View className="flex-row gap-5">
+        <View className="flex-1 gap-2">
+          <SkeletonBlock className="h-3 w-24" />
+          <SkeletonBlock className="h-6 w-28 bg-primary/15" />
+        </View>
+        <SkeletonBlock className="h-10 w-px bg-primary/10" />
+        <View className="flex-1 gap-2">
+          <SkeletonBlock className="h-3 w-20" />
+          <SkeletonBlock className="h-4 w-full" />
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function TenantLoadingState() {
+  return (
+    <SkeletonGroup accessibilityLabel="Loading tenant dashboard">
+      <View className="mt-6 gap-3">
+        <View className="min-h-32 flex-row items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-300/40">
+          <SkeletonBlock className="h-14 w-14 rounded-full bg-primary/10" />
+          <View className="min-w-0 flex-1 gap-3">
+            <SkeletonBlock className="h-4 w-32" />
+            <SkeletonBlock className="h-8 w-3/5 bg-primary/15" />
+          </View>
+        </View>
+
+        <View className="flex-row gap-3">
+          {Array.from({ length: 2 }, (_, index) => (
+            <View
+              className="min-h-24 flex-1 flex-row items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm shadow-slate-300/40"
+              key={index}
+            >
+              <SkeletonBlock className="h-11 w-11 rounded-full bg-primary/10" />
+              <View className="min-w-0 flex-1 gap-2">
+                <SkeletonBlock className="h-3 w-full" />
+                <SkeletonBlock className="h-6 w-3/4 bg-primary/15" />
+                <SkeletonBlock className="h-3 w-1/2" />
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      <View className="mt-6 rounded-3xl border border-primary/20 bg-white p-3 shadow-sm shadow-primary/10">
+        <View className="flex-row gap-2">
+          <SkeletonBlock className="h-12 flex-1 rounded-2xl" />
+          <SkeletonBlock className="h-12 w-12 rounded-2xl bg-primary/10" />
+        </View>
+        <View className="mt-3 flex-row items-center justify-between px-1">
+          <SkeletonBlock className="h-3 w-16" />
+          <SkeletonBlock className="h-3 w-20" />
+        </View>
+      </View>
+
+      <View className="mt-6 gap-4">
+        <SkeletonList count={3} renderItem={() => <TenantCardSkeleton />} />
+      </View>
+    </SkeletonGroup>
+  );
+}
 
 export function TenantsScreen({
   bottomInset,
@@ -112,82 +190,81 @@ export function TenantsScreen({
 
   return (
     <Screen bottomInset={bottomInset} className="bg-surface">
-      <View className="flex-1 gap-6">
-        {/* --- TOP HEADER: Title & Global Action --- */}
-        <View className="px-1">
-          <ModuleHeader
-            action={<AddButton onPress={openCreateForm} />}
-            eyebrow="CRM Dashboard"
-            leading={
-              showBackButton ? (
-                <SecondaryBackButton
-                  accessibilityLabel="Back from tenants"
-                  variant="secondary"
-                />
-              ) : undefined
-            }
-            title="Tenants"
-          />
-        </View>
-
-        <OverviewMetricCard
-          icon="cash-outline"
-          isLoading={isLoading}
-          label="Monthly revenue"
-          metrics={[
-            {
-              detail: `${linkedTenantCount} linked`,
-              icon: "people",
-              label: "Total capacity",
-              value: String(tenants.length),
-            },
-            {
-              detail: `${Math.round(linkedTenantPercentage)}%`,
-              icon: "link",
-              label: "Linked Tenants",
-              progress: linkedTenantPercentage,
-              value: `${linkedTenantCount} of ${tenants.length}`,
-            },
-          ]}
-          value={formatCurrency(tenantMonthlyRent)}
-        />
-
-        <SearchToolbar
-          accessibilityLabel="Search tenants"
-          activeFilterCount={activeFilterCount}
-          clearAccessibilityLabel="Clear tenant search"
-          filterAccessibilityLabel={`Filter tenants, ${filterLabel}`}
-          filterLabel={filterLabel}
-          onChangeText={setSearchQuery}
-          onFilterPress={() => setIsFilterVisible(true)}
-          placeholder="Name, email, phone, or unit"
-          resultLabel={formatSearchResultLabel({
-            filteredCount: visibleTenants.length,
-            isLoading,
-            singular: "tenant",
-            totalCount: tenants.length,
-          })}
-          value={searchQuery}
-        />
-
-        {isLoading ? (
-          <ModuleLoadingState
-            description="Organizing tenant profiles and linked lease activity."
-            title="Loading tenants"
-          />
-        ) : (
-          <ScrollView
-            refreshControl={
-              <RefreshControl
-                colors={[colors.primary]}
-                onRefresh={refresh}
-                refreshing={isRefreshing}
-                tintColor={colors.primary}
+      <View className="px-1">
+        <ModuleHeader
+          action={<AddButton onPress={openCreateForm} />}
+          eyebrow="CRM Dashboard"
+          leading={
+            showBackButton ? (
+              <SecondaryBackButton
+                accessibilityLabel="Back from tenants"
+                variant="secondary"
               />
-            }
-            showsVerticalScrollIndicator={false}
-          >
-            <View className="gap-4 pb-8">
+            ) : undefined
+          }
+          title="Tenants"
+        />
+      </View>
+
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          paddingBottom: bottomInset === "tab-bar" ? 116 : 32,
+        }}
+        refreshControl={
+          <RefreshControl
+            colors={[colors.primary]}
+            onRefresh={refresh}
+            refreshing={isRefreshing}
+            tintColor={colors.primary}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {isLoading ? (
+          <TenantLoadingState />
+        ) : (
+          <View className="mt-6 gap-6">
+            <OverviewMetricCard
+              icon="cash-outline"
+              isLoading={false}
+              label="Monthly revenue"
+              metrics={[
+                {
+                  detail: `${linkedTenantCount} linked`,
+                  icon: "people",
+                  label: "Total capacity",
+                  value: String(tenants.length),
+                },
+                {
+                  detail: `${Math.round(linkedTenantPercentage)}%`,
+                  icon: "link",
+                  label: "Linked Tenants",
+                  progress: linkedTenantPercentage,
+                  value: `${linkedTenantCount} of ${tenants.length}`,
+                },
+              ]}
+              value={formatCurrency(tenantMonthlyRent)}
+            />
+
+            <SearchToolbar
+              accessibilityLabel="Search tenants"
+              activeFilterCount={activeFilterCount}
+              clearAccessibilityLabel="Clear tenant search"
+              filterAccessibilityLabel={`Filter tenants, ${filterLabel}`}
+              filterLabel={filterLabel}
+              onChangeText={setSearchQuery}
+              onFilterPress={() => setIsFilterVisible(true)}
+              placeholder="Name, email, phone, or unit"
+              resultLabel={formatSearchResultLabel({
+                filteredCount: visibleTenants.length,
+                singular: "tenant",
+                totalCount: tenants.length,
+              })}
+              value={searchQuery}
+            />
+
+            <View className="gap-4">
               {visibleTenants.map((tenant) => {
                 const tenantLeases = getTenantLeases(tenant.id);
                 const monthlyRent = tenantLeases.reduce(
@@ -225,9 +302,9 @@ export function TenantsScreen({
                 />
               ) : null}
             </View>
-          </ScrollView>
+          </View>
         )}
-      </View>
+      </ScrollView>
 
       <TenantFilterSheet
         filters={filters}

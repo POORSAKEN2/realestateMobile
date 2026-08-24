@@ -1,5 +1,6 @@
 import AddButton from "../ui/buttons/AddButton";
 import { ModuleHeader } from "../ui/ModuleHeader";
+import { SecondaryBackButton } from "../navigation/SecondaryBackButton";
 
 type ExpenseHeaderProps = {
   onAddExpense: () => void;
@@ -17,6 +18,12 @@ export function ExpenseHeader({ onAddExpense }: ExpenseHeaderProps) {
         />
       }
       eyebrow="Portfolio Operations"
+      leading={
+        <SecondaryBackButton
+          accessibilityLabel="Back from expenses"
+          variant="secondary"
+        />
+      }
       title="Expenses"
     />
   );
