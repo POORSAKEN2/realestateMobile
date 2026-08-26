@@ -384,7 +384,7 @@ function CalendarDay({
             </Text>
           </View>
         ) : isInVisiblePeriod && activeBookingCount === 1 ? (
-          <View className="h-2 w-2 rounded-full bg-textPrimary" />
+          <View className="h-2 w-2 rounded-full bg-secondary" />
         ) : null}
       </View>
     </TouchableOpacity>

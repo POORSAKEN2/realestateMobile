@@ -34,13 +34,22 @@ export async function fetchLeases(accessToken?: string) {
   return unwrapCollection(response).map(normalizeLease);
 }
 
-function toApiPayload(payload: LeasePayload) {
+function toApiPayload(
+  payload: LeasePayload,
+  { includeContractTerms = true }: { includeContractTerms?: boolean } = {},
+) {
   return {
+    amendment_effective_date: payload.amendmentEffectiveDate,
+    amendment_reason: payload.amendmentReason,
     property_id: payload.propertyId,
     client_id: payload.lesseeId,
-    start_date: payload.startDate,
-    end_date: payload.endDate,
-    monthly_rent: payload.monthlyRent,
+    ...(includeContractTerms
+      ? {
+          start_date: payload.startDate,
+          end_date: payload.endDate,
+          monthly_rent: payload.monthlyRent,
+        }
+      : {}),
     room_number: payload.roomNumber || undefined,
     status: payload.status || "Active",
   };
@@ -60,9 +69,15 @@ export async function updateLease(
 ) {
   const response = await apiClient.put<
     ApiEnvelope<Record<string, any>> | Record<string, any>
-  >(`/leases/${id}`, toApiPayload(payload), {
-    headers: authHeaders(accessToken),
-  });
+  >(
+    `/leases/${id}`,
+    toApiPayload(payload, {
+      includeContractTerms: Boolean(payload.amendmentReason),
+    }),
+    {
+      headers: authHeaders(accessToken),
+    },
+  );
   return normalizeLease(unwrapData(response));
 }
 

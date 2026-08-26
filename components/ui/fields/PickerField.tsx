@@ -17,6 +17,7 @@ interface PickerFieldProps {
   className?: string; // Overrides for container
   style?: ViewProps["style"];
   variant?: "default" | "filled";
+  disabled?: boolean;
 }
 
 interface PickerModalShellProps {
@@ -39,6 +40,7 @@ export function PickerField({
   className = "gap-2",
   style,
   variant = "default",
+  disabled = false,
 }: PickerFieldProps) {
   const isFilledVariant = variant === "filled";
 
@@ -59,11 +61,13 @@ export function PickerField({
         activeOpacity={0.85}
         accessibilityLabel={`${label}${required ? ", required" : ""}`}
         accessibilityRole="button"
+        accessibilityState={{ disabled }}
         className={`h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
           isFilledVariant
             ? "border-textPrimary/10 bg-surface"
             : "border-textPrimary/10 bg-whitePrimary shadow-sm"
-        }`}
+        } ${disabled ? "opacity-60" : ""}`}
+        disabled={disabled}
         onPress={onPress}
       >
         <Text

@@ -55,6 +55,8 @@ export type DocumentUpdatePayload = {
 };
 
 export type LeasePayload = {
+  amendmentEffectiveDate?: string;
+  amendmentReason?: string;
   propertyId: string;
   lesseeId: string;
   startDate: string;
