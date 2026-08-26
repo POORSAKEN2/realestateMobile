@@ -55,18 +55,18 @@ export function BookingGuestFields({
         accessibilityRole="button"
         className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 py-3 ${
           isAddingGuest
-            ? "border-secondary/30 bg-secondary/10"
-            : "border-secondary/20 bg-secondary/5"
+            ? "border-primary/30 bg-primary/10"
+            : "border-primary/20 bg-primary/5"
         }`}
         onPress={onToggleAddingGuest}
       >
         <View className="min-w-0 flex-1 flex-row items-center gap-3">
-          <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/10">
+          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
             <MaterialCommunityIcons
               name={
                 isAddingGuest ? "account-check-outline" : "account-plus-outline"
               }
-              color="#634CE4"
+              color="#8A77F4"
               size={19}
             />
           </View>
@@ -74,20 +74,20 @@ export function BookingGuestFields({
             <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               {isAddingGuest ? "Entering a new guest" : "Guest not listed?"}
             </Text>
-            <Text className="mt-0.5 text-xs leading-4 text-slate-600">
+            <Text className="mt-0.5 text-xs leading-4 text-description">
               {isAddingGuest
                 ? "Use the fields below to add their details."
                 : "Create a guest while making this booking."}
             </Text>
           </View>
         </View>
-        <Text className="ml-3 font-ralewayExtraBold text-xs text-secondary">
+        <Text className="ml-3 font-ralewayExtraBold text-xs text-primary">
           {isAddingGuest ? "Cancel" : "Add"}
         </Text>
       </TouchableOpacity>
 
       {isAddingGuest ? (
-        <View className="gap-4 rounded-2xl border border-secondary/20 bg-secondary/5 p-4">
+        <View className="gap-4 rounded-2xl border border-primary/20 bg-primary/5 p-4">
           <BaseField
             label="Guest name"
             onChangeText={(value) => onUpdateForm("guestName", value)}

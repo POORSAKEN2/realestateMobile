@@ -32,16 +32,16 @@ export function BaseField({
 
   // 2. Resolve conflicting style classes between modules
   const labelClassName = isFilledVariant
-    ? "font-ralewaySemiBold text-sm text-slate-600"
-    : "text-xs font-ralewayBold text-slate-600";
+    ? "font-ralewaySemiBold text-sm text-description"
+    : "text-xs font-ralewayBold text-description";
 
   const containerClassName = isFilledVariant
-    ? `rounded-2xl border border-slate-200 bg-surface px-4 ${
+    ? `rounded-2xl border border-textPrimary/10 bg-surface px-4 ${
         multiline ? "min-h-24 py-3" : "h-14"
       }`
     : isIconVariant
-      ? "h-14 flex-row items-center rounded-xl border border-slate-200 bg-white px-4 shadow-sm shadow-slate-900/5"
-      : `rounded-xl border border-textPrimary/10 bg-[#FFFFFF] px-4 ${
+      ? "h-14 flex-row items-center rounded-xl border border-textPrimary/10 bg-white px-4 shadow-sm shadow-textPrimary/5"
+      : `rounded-xl border border-textPrimary/10 bg-whitePrimary px-4 ${
           multiline ? "min-h-28 py-4" : "h-14"
         }`;
 
@@ -51,7 +51,7 @@ export function BaseField({
       ? "ml-3 flex-1 text-base font-ralewayBold text-textPrimary"
       : "flex-1 text-base text-textPrimary";
 
-  const resolvedPlaceholderColor = isIconVariant ? "#94A3B8" : "#6F6D6D";
+  const resolvedPlaceholderColor = isIconVariant ? "#6F6D6D" : "#6F6D6D";
 
   // 3. Smart fallbacks for specific business logic (e.g., Tenants auto-capitalize)
   const resolvedAutoCapitalize = autoCapitalize
@@ -66,11 +66,11 @@ export function BaseField({
     >
       <Text className={labelClassName}>
         {label}
-        <Text className="text-red-600">{required ? " *" : ""}</Text>
+        <Text className="text-danger">{required ? " *" : ""}</Text>
       </Text>
 
       <View className={containerClassName}>
-        {icon && <Ionicons name={icon} color="#64748B" size={19} />}
+        {icon && <Ionicons name={icon} color="#6F6D6D" size={19} />}
 
         <TextInput
           accessibilityLabel={`${label}${required ? ", required" : ""}`}

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
+import { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -18,6 +19,11 @@ import {
 import { Screen } from "../../components/ui/Screen";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import {
+  SkeletonGroup,
+  SkeletonList,
+  SkeletonListCard,
+} from "../../components/ui/Skeleton";
 import { colors } from "../../constants/colors";
 import { resolveModuleRoute } from "../../constants/navigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -25,23 +31,23 @@ import type { AppNotification } from "../../types";
 
 const severityStyles = {
   SUCCESS: {
-    bg: "#ECFDF5",
-    text: "#047857",
+    bg: colors.successSurface,
+    text: colors.success,
     icon: "checkmark-circle" as const,
   },
   WARNING: {
-    bg: "#FFFBEB",
-    text: "#B45309",
+    bg: colors.warningSurface,
+    text: colors.warning,
     icon: "warning" as const,
   },
   CRITICAL: {
-    bg: "#FEF2F2",
-    text: "#DC2626",
+    bg: colors.dangerSurface,
+    text: colors.danger,
     icon: "alert-circle" as const,
   },
   INFO: {
-    bg: "#EFF6FF",
-    text: colors.primary,
+    bg: colors.infoSurface,
+    text: colors.info,
     icon: "information-circle" as const,
   },
 };
@@ -79,21 +85,25 @@ function formatTimestamp(value?: string | null) {
 function EmptyState({ onRefresh }: { onRefresh: () => void }) {
   return (
     <View className="flex-1 items-center justify-center px-8 py-20">
-      <View className="mb-5 h-16 w-16 items-center justify-center rounded-full bg-[#EFF6FF]">
-        <Ionicons name="notifications-outline" size={30} color={colors.primary} />
+      <View className="mb-5 h-16 w-16 items-center justify-center rounded-full bg-infoSurface">
+        <Ionicons
+          name="notifications-outline"
+          size={30}
+          color={colors.primary}
+        />
       </View>
-      <Text className="text-center text-xl font-ralewayBold text-[#1d1d1f]">
+      <Text className="text-center font-ralewayBold text-xl text-textPrimary">
         No notifications yet
       </Text>
-      <Text className="mt-2 text-center text-sm leading-6 text-[#6F6D6D]">
+      <Text className="mt-2 text-center text-sm leading-6 text-description">
         Portfolio updates, booking changes, and system alerts will appear here.
       </Text>
       <TouchableOpacity
         activeOpacity={0.82}
-        className="mt-6 rounded-full bg-[#2563EB] px-5 py-3"
+        className="mt-6 rounded-full bg-info px-5 py-3"
         onPress={onRefresh}
       >
-        <Text className="text-sm font-ralewayBold text-white">Refresh</Text>
+        <Text className="font-ralewayBold text-sm text-white">Refresh</Text>
       </TouchableOpacity>
     </View>
   );
@@ -114,8 +124,8 @@ function NotificationRow({
       accessibilityRole="button"
       className={`mb-3 rounded-[24px] border p-4 ${
         notification.isRead
-          ? "border-[#E2E8F0] bg-white"
-          : "border-[#BFDBFE] bg-[#F8FBFF]"
+          ? "border-accent bg-white"
+          : "border-infoSurface bg-infoSurface"
       }`}
       onPress={() => onPress(notification)}
     >
@@ -130,30 +140,37 @@ function NotificationRow({
         <View className="min-w-0 flex-1">
           <View className="flex-row items-start gap-2">
             <Text
-              className="min-w-0 flex-1 text-[15px] font-ralewayBold text-[#1d1d1f]"
+              className="min-w-0 flex-1 font-ralewayBold text-[15px] text-textPrimary"
               numberOfLines={2}
             >
               {notification.title}
             </Text>
             {!notification.isRead ? (
-              <View className="mt-1 h-2.5 w-2.5 rounded-full bg-[#2563EB]" />
+              <View className="mt-1 h-2.5 w-2.5 rounded-full bg-info" />
             ) : null}
           </View>
 
-          <Text className="mt-1 text-sm leading-5 text-[#6F6D6D]" numberOfLines={3}>
+          <Text
+            className="mt-1 text-sm leading-5 text-description"
+            numberOfLines={3}
+          >
             {notification.message}
           </Text>
 
           <View className="mt-3 flex-row items-center justify-between gap-3">
-            <Text className="text-xs font-ralewayBold text-[#94A3B8]">
+            <Text className="font-ralewayBold text-xs text-description">
               {formatTimestamp(notification.timestamp)}
             </Text>
             {notification.actionUrl ? (
               <View className="flex-row items-center gap-1">
-                <Text className="text-xs font-ralewayBold text-[#2563EB]">
+                <Text className="font-ralewayBold text-xs text-info">
                   {notification.actionLabel || "Open"}
                 </Text>
-                <Ionicons name="chevron-forward" size={14} color={colors.primary} />
+                <Ionicons
+                  name="chevron-forward"
+                  size={14}
+                  color={colors.primary}
+                />
               </View>
             ) : null}
           </View>
@@ -168,6 +185,7 @@ export default function NotificationScreen() {
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
   const queryKey = ["notifications", accessToken];
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const notificationsQuery = useQuery({
     queryKey,
@@ -176,7 +194,9 @@ export default function NotificationScreen() {
   });
 
   const notifications = notificationsQuery.data ?? [];
-  const unreadCount = notifications.filter((notification) => !notification.isRead).length;
+  const unreadCount = notifications.filter(
+    (notification) => !notification.isRead,
+  ).length;
 
   const markReadMutation = useMutation({
     mutationFn: (notificationId: string) =>
@@ -184,7 +204,9 @@ export default function NotificationScreen() {
     onSuccess: (updatedNotification) => {
       queryClient.setQueryData<AppNotification[]>(queryKey, (current = []) =>
         current.map((notification) =>
-          notification.id === updatedNotification.id ? updatedNotification : notification,
+          notification.id === updatedNotification.id
+            ? updatedNotification
+            : notification,
         ),
       );
     },
@@ -211,10 +233,20 @@ export default function NotificationScreen() {
     }
   }
 
-  const isInitialLoading = notificationsQuery.isLoading && notifications.length === 0;
+  const isInitialLoading =
+    notificationsQuery.isLoading && notifications.length === 0;
+
+  async function refreshNotifications() {
+    setIsRefreshing(true);
+    try {
+      await notificationsQuery.refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   return (
-    <Screen className="bg-[#F8FAFC]">
+    <Screen className="bg-surface">
       <View className="mb-5">
         <ModuleHeader
           action={
@@ -236,9 +268,7 @@ export default function NotificationScreen() {
                 <Ionicons
                   name="checkmark-done"
                   size={21}
-                  color={
-                    unreadCount > 0 ? colors.primary : colors.description
-                  }
+                  color={unreadCount > 0 ? colors.primary : colors.description}
                 />
               )}
             </TouchableOpacity>
@@ -248,20 +278,22 @@ export default function NotificationScreen() {
             <SecondaryBackButton accessibilityLabel="Back from notifications" />
           }
           supportingText={
-            unreadCount > 0
-              ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}`
-              : "You're all caught up"
+            isInitialLoading
+              ? "Loading activity"
+              : unreadCount > 0
+                ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}`
+                : "You're all caught up"
           }
           title="Notifications"
         />
       </View>
 
       {notificationsQuery.isError ? (
-        <View className="rounded-[24px] border border-rose-100 bg-rose-50 p-4">
-          <Text className="font-ralewayBold text-rose-700">
+        <View className="rounded-[24px] border border-danger/20 bg-dangerSurface p-4">
+          <Text className="font-ralewayBold text-danger">
             Could not load notifications
           </Text>
-          <Text className="mt-1 text-sm leading-5 text-rose-600">
+          <Text className="mt-1 text-sm leading-5 text-danger">
             {notificationsQuery.error instanceof Error
               ? notificationsQuery.error.message
               : "Please try again."}
@@ -270,12 +302,15 @@ export default function NotificationScreen() {
       ) : null}
 
       {isInitialLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text className="mt-3 text-sm font-ralewayBold text-[#6F6D6D]">
-            Loading notifications
-          </Text>
-        </View>
+        <SkeletonGroup
+          accessibilityLabel="Loading notifications"
+          className="flex-1 gap-3"
+        >
+          <SkeletonList
+            count={4}
+            renderItem={() => <SkeletonListCard className="min-h-28" />}
+          />
+        </SkeletonGroup>
       ) : (
         <FlatList
           data={notifications}
@@ -285,13 +320,13 @@ export default function NotificationScreen() {
             paddingBottom: 118,
           }}
           ListEmptyComponent={
-            <EmptyState onRefresh={() => notificationsQuery.refetch()} />
+            <EmptyState onRefresh={() => void refreshNotifications()} />
           }
           refreshControl={
             <RefreshControl
-              refreshing={notificationsQuery.isFetching && !isInitialLoading}
+              refreshing={isRefreshing}
               tintColor={colors.primary}
-              onRefresh={() => notificationsQuery.refetch()}
+              onRefresh={refreshNotifications}
             />
           }
           renderItem={({ item }) => (

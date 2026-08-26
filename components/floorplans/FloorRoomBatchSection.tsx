@@ -74,11 +74,11 @@ export function FloorRoomBatchSection({
           </View>
         </>
       ) : (
-        <View className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-          <Text className="font-ralewayBold text-sm text-amber-800">
+        <View className="rounded-2xl border border-warning/25 bg-warningSurface p-4">
+          <Text className="font-ralewayBold text-sm text-warning">
             New rooms unavailable
           </Text>
-          <Text className="mt-1 text-xs leading-5 text-amber-700">
+          <Text className="mt-1 text-xs leading-5 text-warning">
             Existing rooms remain available to link, review, or unlink.
           </Text>
         </View>

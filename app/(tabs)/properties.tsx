@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
 
 import { PropertyCard } from "../../components/properties/PropertyCard";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
@@ -31,7 +31,6 @@ import AddButton from "../../components/ui/buttons/AddButton";
 import { appRoutes } from "../../constants/navigation";
 
 type PropertyListItem =
-  | { kind: "search" }
   | { kind: "property"; property: Property }
   | { kind: "loading" }
   | { kind: "error" }
@@ -46,6 +45,7 @@ export default function PropertiesScreen() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
   );
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { useList } = useProperties(accessToken);
   const { data: properties = [], isError, isLoading, refetch } = useList();
@@ -95,20 +95,17 @@ export default function PropertiesScreen() {
     });
   }, [properties, searchQuery, statusFilter]);
   const propertyListItems = useMemo<PropertyListItem[]>(() => {
-    if (isLoading) return [{ kind: "search" }, { kind: "loading" }];
-    if (isError) return [{ kind: "search" }, { kind: "error" }];
+    if (isLoading) return [{ kind: "loading" }];
+    if (isError) return [{ kind: "error" }];
 
     const propertyItems = filteredProperties.map((property) => ({
       kind: "property" as const,
       property,
     }));
 
-    return [
-      { kind: "search" },
-      ...(propertyItems.length > 0
-        ? propertyItems
-        : [{ kind: "empty" as const }]),
-    ];
+    return propertyItems.length > 0
+      ? propertyItems
+      : [{ kind: "empty" as const }];
   }, [filteredProperties, isError, isLoading]);
 
   const filteredLocationSuggestions = useMemo(() => {
@@ -125,9 +122,46 @@ export default function PropertiesScreen() {
     [form.classification],
   );
 
+  async function refreshProperties() {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
   return (
-    <Screen bottomInset="tab-bar" className="bg-[#F5F7FC]">
+    <Screen bottomInset="tab-bar" className="bg-surface">
       <View className="flex-1">
+        <View className="px-1 pb-5">
+          <ModuleHeader
+            action={<AddButton title="Add" onPress={openForm} />}
+            eyebrow="Asset Management"
+            title="Properties"
+          />
+        </View>
+
+        <View className="z-10 pb-4">
+          <PropertyListToolbar
+            onChangeSearch={setSearchQuery}
+            onChangeStatus={setStatusFilter}
+            resultLabel={
+              isLoading
+                ? "Loading properties"
+                : isError
+                  ? "Properties unavailable"
+                  : `${filteredProperties.length} ${
+                      filteredProperties.length === 1
+                        ? "property"
+                        : "properties"
+                    }`
+            }
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+          />
+        </View>
+
         <FlatList
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
           data={propertyListItems}
@@ -135,40 +169,7 @@ export default function PropertiesScreen() {
           keyExtractor={(item) =>
             item.kind === "property" ? item.property.id : item.kind
           }
-          ListHeaderComponent={
-            <View className="px-1 pb-5">
-              <ModuleHeader
-                action={<AddButton title="Add" onPress={openForm} />}
-                eyebrow="Asset Management"
-                title="Properties"
-              />
-            </View>
-          }
           renderItem={({ item }) => {
-            if (item.kind === "search") {
-              return (
-                <View className="z-10 bg-white pb-3 shadow-[#000000] drop-shadow-md">
-                  <PropertyListToolbar
-                    onChangeSearch={setSearchQuery}
-                    onChangeStatus={setStatusFilter}
-                    resultLabel={
-                      isLoading
-                        ? "Loading properties"
-                        : isError
-                          ? "Properties unavailable"
-                          : `${filteredProperties.length} ${
-                              filteredProperties.length === 1
-                                ? "property"
-                                : "properties"
-                            }`
-                    }
-                    searchQuery={searchQuery}
-                    statusFilter={statusFilter}
-                  />
-                </View>
-              );
-            }
-
             if (item.kind === "loading") {
               return (
                 <View className="gap-4">
@@ -239,7 +240,7 @@ export default function PropertiesScreen() {
                   item.property.isTransientBookable
                     ? () =>
                         router.push({
-                          pathname: appRoutes.primary.bookings,
+                          pathname: appRoutes.secondary.bookings,
                           params: { propertyId: item.property.id },
                         })
                     : undefined
@@ -247,8 +248,15 @@ export default function PropertiesScreen() {
               />
             );
           }}
+          refreshControl={
+            <RefreshControl
+              colors={["#8A77F4"]}
+              onRefresh={refreshProperties}
+              refreshing={isRefreshing}
+              tintColor="#8A77F4"
+            />
+          }
           showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[1]}
         />
       </View>
 

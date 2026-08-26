@@ -8,10 +8,8 @@ export function FloorPlanManagerHeader({
   canAddFloor,
   floorCount,
   guidance,
-  notice,
   onAddFloor,
   onBack,
-  onClearNotice,
   propertyTitle,
   roomCount,
   showRoomSummary,
@@ -20,10 +18,8 @@ export function FloorPlanManagerHeader({
   canAddFloor: boolean;
   floorCount: number;
   guidance: string;
-  notice: string;
   onAddFloor: () => void;
   onBack: () => void;
-  onClearNotice: () => void;
   propertyTitle: string;
   roomCount: number;
   showRoomSummary: boolean;
@@ -37,19 +33,19 @@ export function FloorPlanManagerHeader({
             accessibilityLabel="Add floor"
             accessibilityRole="button"
             className={`h-11 flex-row items-center gap-1.5 rounded-2xl px-3.5 ${
-              canAddFloor ? "bg-primary" : "bg-slate-200"
+              canAddFloor ? "bg-primary" : "bg-textPrimary/10"
             }`}
             disabled={!canAddFloor}
             onPress={onAddFloor}
           >
             <Feather
               name="plus"
-              color={canAddFloor ? "#FFFFFF" : "#94A3B8"}
+              color={canAddFloor ? "#FFFFFF" : "#6F6D6D"}
               size={17}
             />
             <Text
               className={`font-ralewayBold text-xs ${
-                canAddFloor ? "text-white" : "text-slate-400"
+                canAddFloor ? "text-white" : "text-description"
               }`}
             >
               Floor
@@ -85,23 +81,9 @@ export function FloorPlanManagerHeader({
         ) : null}
       </View>
 
-      <Text className="mt-2 px-1 text-xs leading-5 text-slate-500">
+      <Text className="mt-2 px-1 text-xs leading-5 text-description">
         {guidance}
       </Text>
-
-      {notice ? (
-        <TouchableOpacity
-          activeOpacity={0.8}
-          className="mt-3 flex-row items-center gap-2 rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3"
-          onPress={onClearNotice}
-        >
-          <Feather name="check-circle" color="#0D9488" size={16} />
-          <Text className="min-w-0 flex-1 font-ralewayBold text-xs text-teal-800">
-            {notice}
-          </Text>
-          <Feather name="x" color="#0D9488" size={15} />
-        </TouchableOpacity>
-      ) : null}
     </>
   );
 }
@@ -114,10 +96,10 @@ function SummaryPill({
   label: string;
 }) {
   return (
-    <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-2.5">
-      <MaterialCommunityIcons name={icon} color="#634CE4" size={15} />
+    <View className="min-w-0 flex-1 flex-row items-center justify-center gap-1.5 rounded-xl border border-textPrimary/10 bg-white px-2 py-2.5">
+      <MaterialCommunityIcons name={icon} color="#8A77F4" size={15} />
       <Text
-        className="font-ralewayBold text-[10px] text-slate-700"
+        className="font-ralewayBold text-[10px] text-textPrimary"
         numberOfLines={1}
       >
         {label}

@@ -1,79 +1,87 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
 
+import {
+  SearchFilterActions,
+  SearchFilterSection,
+  SearchFilterSheet,
+} from "../ui/SearchFilterSheet";
+import { RadioOptionList } from "../ui/groups/RadioOptionList";
 import type { Property } from "../../types";
 import type { StatusFilter } from "../../utils/bookings/bookingCalendar";
-import { BuildingChoices } from "./BuildingChoices";
 
-const STATUS_OPTIONS = [
+const statusOptions = [
   { label: "Confirmed", value: "Booked" },
-  { label: "All", value: "All" },
+  { label: "All statuses", value: "All" },
 ] as const;
 
-type BookingFiltersProps = {
-  buildings: Property[];
-  selectedBuilding?: Property;
-  selectedStatus: StatusFilter;
-  onSelectBuilding: (id: string) => void;
-  onSelectStatus: (status: StatusFilter) => void;
+type BookingFilters = {
+  propertyId: string;
+  status: StatusFilter;
 };
 
-export function BookingFilters({
+export function BookingFilterSheet({
   buildings,
-  selectedBuilding,
+  onApply,
+  onClose,
+  selectedBuildingId,
   selectedStatus,
-  onSelectBuilding,
-  onSelectStatus,
-}: BookingFiltersProps) {
+  visible,
+}: {
+  buildings: Property[];
+  onApply: (filters: BookingFilters) => void;
+  onClose: () => void;
+  selectedBuildingId: string;
+  selectedStatus: StatusFilter;
+  visible: boolean;
+}) {
+  const [draft, setDraft] = useState<BookingFilters>({
+    propertyId: selectedBuildingId,
+    status: selectedStatus,
+  });
+
+  useEffect(() => {
+    if (!visible) return;
+    setDraft({ propertyId: selectedBuildingId, status: selectedStatus });
+  }, [selectedBuildingId, selectedStatus, visible]);
+
   return (
-    <View className="gap-3 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
-      <View className="flex-row items-start justify-between gap-3">
-        <View className="min-w-0 flex-1">
-          <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wider text-slate-400">
-            Property calendar
-          </Text>
-          <Text
-            className="mt-1 font-ralewayBold text-lg text-textPrimary"
-            numberOfLines={1}
-          >
-            {selectedBuilding?.title ?? "No building selected"}
-          </Text>
-        </View>
-        <View className="flex-row rounded-full bg-secondary/10 p-1">
-          {STATUS_OPTIONS.map((option) => {
-            const selected = selectedStatus === option.value;
-
-            return (
-              <TouchableOpacity
-                key={option.value}
-                activeOpacity={0.78}
-                accessibilityLabel={`Show ${option.label.toLowerCase()} reservations`}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                className={`h-11 justify-center rounded-full px-3 ${
-                  selected ? "bg-secondary" : "bg-transparent"
-                }`}
-                onPress={() => onSelectStatus(option.value)}
-              >
-                <Text
-                  className={`font-ralewayExtraBold text-xs ${
-                    selected ? "text-white" : "text-slate-600"
-                  }`}
-                >
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
-
-      {buildings.length > 0 ? (
-        <BuildingChoices
-          buildings={buildings}
-          onSelect={onSelectBuilding}
-          selectedId={selectedBuilding?.id ?? ""}
+    <SearchFilterSheet
+      description="Choose a property calendar and reservation status."
+      footer={
+        <SearchFilterActions
+          onApply={() => onApply(draft)}
+          onReset={() =>
+            setDraft({
+              propertyId: buildings[0]?.id ?? "",
+              status: "Booked",
+            })
+          }
         />
-      ) : null}
-    </View>
+      }
+      onClose={onClose}
+      title="Filter bookings"
+      visible={visible}
+    >
+      <SearchFilterSection label="Property calendar">
+        <RadioOptionList
+          onSelect={(propertyId) =>
+            setDraft((current) => ({ ...current, propertyId }))
+          }
+          options={buildings.map((building) => ({
+            label: building.title,
+            value: building.id,
+          }))}
+          value={draft.propertyId}
+        />
+      </SearchFilterSection>
+
+      <SearchFilterSection label="Reservation status">
+        <RadioOptionList
+          onSelect={(status) => setDraft((current) => ({ ...current, status }))}
+          options={statusOptions}
+          value={draft.status}
+        />
+      </SearchFilterSection>
+    </SearchFilterSheet>
   );
 }

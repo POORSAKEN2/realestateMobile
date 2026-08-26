@@ -40,12 +40,12 @@ export function FloorRoomLinkSection({
           Link existing room
         </Text>
       </View>
-      <Text className="mt-2 text-xs leading-5 text-slate-500">
+      <Text className="mt-2 text-xs leading-5 text-description">
         Assign an unassigned room from {floorName ?? "this floor"} to this area.
       </Text>
 
       {roomOptions.length ? (
-        <View className="mt-3 flex-row items-end gap-3 rounded-2xl border border-slate-200 bg-white p-3">
+        <View className="mt-3 flex-row items-end gap-3 rounded-2xl border border-textPrimary/10 bg-white p-3">
           <DropdownField
             label="Unassigned room"
             onSelect={onSelect}
@@ -65,11 +65,11 @@ export function FloorRoomLinkSection({
           />
         </View>
       ) : (
-        <View className="mt-3 items-center rounded-2xl border border-dashed border-slate-300 px-4 py-5">
-          <Text className="font-ralewayBold text-sm text-slate-700">
+        <View className="mt-3 items-center rounded-2xl border border-dashed border-textPrimary/20 px-4 py-5">
+          <Text className="font-ralewayBold text-sm text-textPrimary">
             No unassigned rooms on this floor
           </Text>
-          <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
+          <Text className="mt-1 text-center text-xs leading-5 text-description">
             Create a room or unassign one from another area first.
           </Text>
         </View>

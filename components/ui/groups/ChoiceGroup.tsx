@@ -25,7 +25,7 @@ export function ChoiceGroup<T extends string>({
     <View
       className={
         isSegmented
-          ? "flex-row overflow-hidden rounded-2xl border border-secondary/20 bg-surface p-0.5"
+          ? "flex-row overflow-hidden rounded-2xl border border-primary/20 bg-surface p-0.5"
           : "flex-row flex-wrap gap-2"
       }
     >
@@ -41,12 +41,12 @@ export function ChoiceGroup<T extends string>({
             className={
               isSegmented
                 ? `h-14 flex-1 items-center justify-center rounded-[14px] ${
-                    selected ? "bg-secondary" : "bg-transparent"
+                    selected ? "bg-primary" : "bg-transparent"
                   }`
                 : `min-h-11 items-center justify-center rounded-full border px-3.5 py-2.5 ${
                     selected
-                      ? "border-secondary bg-secondary"
-                      : "border-secondary/20 bg-secondary/10"
+                      ? "border-primary bg-primary"
+                      : "border-primary/20 bg-primary/10"
                   }`
             }
             onPress={() => onSelect(choice.value)}
@@ -54,9 +54,9 @@ export function ChoiceGroup<T extends string>({
             <Text
               className={`${isSegmented ? "font-ralewaySemiBold text-base" : "font-ralewayBold text-xs"} ${
                 selected
-                  ? "text-[#FFFFFF]"
+                  ? "text-whitePrimary"
                   : isSegmented
-                    ? "text-slate-600"
+                    ? "text-description"
                     : "text-textPrimary"
               }`}
             >
@@ -74,8 +74,8 @@ export function ChoiceGroup<T extends string>({
         <Text
           className={
             isSegmented
-              ? "font-ralewaySemiBold text-sm text-slate-600"
-              : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-[#6F6D6D]"
+              ? "font-ralewaySemiBold text-sm text-description"
+              : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description"
           }
         >
           {label}

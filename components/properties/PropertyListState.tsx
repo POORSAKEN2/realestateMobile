@@ -1,16 +1,14 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
-function SkeletonBlock({ className }: { className: string }) {
-  return <View className={`bg-slate-200 ${className}`} />;
-}
+import { SkeletonBlock } from "../ui/Skeleton";
 
 export function PropertyListSkeleton() {
   return (
     <View
       accessibilityLabel="Loading properties"
       accessibilityRole="progressbar"
-      className="overflow-hidden rounded-3xl border border-slate-200 bg-white"
+      className="overflow-hidden rounded-3xl border border-textPrimary/10 bg-white"
     >
       <SkeletonBlock className="h-36 w-full" />
       <View className="gap-3 p-4">
@@ -40,20 +38,20 @@ export function PropertyListMessage({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-3xl border border-dashed border-secondary/20 bg-white p-8">
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10">
-        <MaterialCommunityIcons name={icon} color="#634CE4" size={28} />
+    <View className="items-center rounded-3xl border border-dashed border-primary/20 bg-white p-8">
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+        <MaterialCommunityIcons name={icon} color="#8A77F4" size={28} />
       </View>
       <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-textPrimary">
         {title}
       </Text>
-      <Text className="mt-1 text-center text-sm leading-5 text-slate-600">
+      <Text className="mt-1 text-center text-sm leading-5 text-description">
         {description}
       </Text>
       <TouchableOpacity
         accessibilityRole="button"
         activeOpacity={0.85}
-        className="mt-5 min-h-11 items-center justify-center rounded-2xl bg-secondary px-5"
+        className="mt-5 min-h-11 items-center justify-center rounded-2xl bg-primary px-5"
         onPress={onAction}
       >
         <Text className="font-ralewayExtraBold text-sm text-white">

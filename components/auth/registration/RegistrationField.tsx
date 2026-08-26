@@ -47,13 +47,13 @@ export function RegistrationField({
       </Text>
       <View
         className={`h-14 flex-row items-center rounded-[14px] border-[1.5px] bg-white pl-4 ${
-          isFocused ? "border-primary" : "border-[#dfe5e5]"
+          isFocused ? "border-primary" : "border-accent"
         }`}
       >
         <Feather
           name={icon}
           size={19}
-          color={isFocused ? "#634CE4" : "#6F6D6D"}
+          color={isFocused ? "#8A77F4" : "#6F6D6D"}
         />
         <TextInput
           autoCapitalize={autoCapitalize}
@@ -64,7 +64,7 @@ export function RegistrationField({
           onChangeText={onChangeText}
           onFocus={() => setIsFocused(true)}
           placeholder={placeholder}
-          placeholderTextColor="#8a9696"
+          placeholderTextColor="#6F6D6D"
           returnKeyType={returnKeyType}
           secureTextEntry={secure && !isValueVisible}
           textContentType={textContentType}

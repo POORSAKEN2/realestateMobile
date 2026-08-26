@@ -4,7 +4,16 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import type { Lessee, Property, PropertyDocument } from "../../types";
-import type { DocumentAdvancedFilters } from "../../utils/documents/documentPresentation";
+import {
+  DOCUMENT_CATEGORIES,
+  type DocumentAdvancedFilters,
+  type DocumentCategoryFilter,
+} from "../../utils/documents/documentPresentation";
+import { RadioOptionList } from "../ui/groups/RadioOptionList";
+import {
+  SearchFilterActions,
+  SearchFilterSection,
+} from "../ui/SearchFilterSheet";
 import {
   SearchableOptionSelector,
   SelectionField,
@@ -21,6 +30,7 @@ const documentTypes: Array<PropertyDocument["type"] | "All"> = [
 ];
 
 export function DocumentFilterSheet({
+  category,
   filters,
   lessees,
   onApply,
@@ -28,23 +38,29 @@ export function DocumentFilterSheet({
   properties,
   visible,
 }: {
+  category: DocumentCategoryFilter;
   filters: DocumentAdvancedFilters;
   lessees: Lessee[];
-  onApply: (filters: DocumentAdvancedFilters) => void;
+  onApply: (
+    filters: DocumentAdvancedFilters,
+    category: DocumentCategoryFilter,
+  ) => void;
   onClose: () => void;
   properties: Property[];
   visible: boolean;
 }) {
   const [draft, setDraft] = useState(filters);
+  const [draftCategory, setDraftCategory] = useState(category);
   const [selectorMode, setSelectorMode] = useState<SelectorMode>(null);
   const [selectorQuery, setSelectorQuery] = useState("");
 
   useEffect(() => {
     if (!visible) return;
     setDraft(filters);
+    setDraftCategory(category);
     setSelectorMode(null);
     setSelectorQuery("");
-  }, [filters, visible]);
+  }, [category, filters, visible]);
 
   const propertyOptions = useMemo(
     () => properties.map(({ id, title }) => ({ id, label: title })),
@@ -80,7 +96,6 @@ export function DocumentFilterSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close document filters"
-      backdropClassName="bg-textPrimary/45"
       onClose={handleClose}
       visible={visible}
     >
@@ -89,7 +104,7 @@ export function DocumentFilterSheet({
         className="max-h-[90%] min-h-[520px] rounded-t-[30px] bg-white"
       >
         <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
+          <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
         </View>
 
         {selectorMode ? (
@@ -116,7 +131,7 @@ export function DocumentFilterSheet({
           />
         ) : (
           <>
-            <View className="flex-row items-center justify-between border-b border-secondary/20 px-5 pb-4">
+            <View className="flex-row items-center justify-between border-b border-primary/20 px-5 pb-4">
               <Text
                 accessibilityRole="header"
                 className="font-ralewayExtraBold text-xl text-textPrimary"
@@ -127,12 +142,12 @@ export function DocumentFilterSheet({
                 accessibilityLabel="Close filters"
                 accessibilityRole="button"
                 activeOpacity={0.75}
-                className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
+                className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
                 onPress={onClose}
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#634CE4"
+                  color="#8A77F4"
                   size={21}
                 />
               </TouchableOpacity>
@@ -153,66 +168,41 @@ export function DocumentFilterSheet({
                 value={selectedTenant?.label ?? "All tenants"}
               />
 
-              <View className="gap-2">
-                <Text className="font-ralewayBold text-xs uppercase tracking-wide text-description">
-                  File type
-                </Text>
-                <View className="flex-row flex-wrap gap-2">
-                  {documentTypes.map((type) => {
-                    const isSelected = draft.type === type;
-                    return (
-                      <TouchableOpacity
-                        key={type}
-                        accessibilityRole="radio"
-                        accessibilityState={{ checked: isSelected }}
-                        activeOpacity={0.8}
-                        className={`min-h-11 justify-center rounded-2xl border px-4 ${
-                          isSelected
-                            ? "border-secondary bg-secondary"
-                            : "border-secondary/20 bg-white"
-                        }`}
-                        onPress={() =>
-                          setDraft((current) => ({ ...current, type }))
-                        }
-                      >
-                        <Text
-                          className={`font-ralewayBold text-xs ${
-                            isSelected ? "text-white" : "text-textPrimary"
-                          }`}
-                        >
-                          {type === "All" ? "All types" : type}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
+              <SearchFilterSection label="Category">
+                <RadioOptionList
+                  onSelect={setDraftCategory}
+                  options={[
+                    { label: "All categories", value: "All" },
+                    ...DOCUMENT_CATEGORIES.map((item) => ({
+                      label: item,
+                      value: item,
+                    })),
+                  ]}
+                  value={draftCategory}
+                />
+              </SearchFilterSection>
+
+              <SearchFilterSection label="File type">
+                <RadioOptionList
+                  onSelect={(type) =>
+                    setDraft((current) => ({ ...current, type }))
+                  }
+                  options={documentTypes.map((type) => ({
+                    label: type === "All" ? "All types" : type,
+                    value: type,
+                  }))}
+                  value={draft.type}
+                />
+              </SearchFilterSection>
             </ScrollView>
 
-            <View className="flex-row gap-3 border-t border-secondary/20 px-4 pb-20 pt-4">
-              <TouchableOpacity
-                accessibilityRole="button"
-                activeOpacity={0.82}
-                className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-secondary/10"
-                onPress={() =>
-                  setDraft({ propertyId: "", lesseeId: "", type: "All" })
-                }
-              >
-                <Text className="font-ralewayExtraBold text-sm text-textPrimary">
-                  Reset
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                accessibilityRole="button"
-                activeOpacity={0.82}
-                className="min-h-12 flex-[2] items-center justify-center rounded-2xl bg-secondary"
-                onPress={() => onApply(draft)}
-              >
-                <Text className="font-ralewayExtraBold text-sm text-white">
-                  Apply filters
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <SearchFilterActions
+              onApply={() => onApply(draft, draftCategory)}
+              onReset={() => {
+                setDraft({ propertyId: "", lesseeId: "", type: "All" });
+                setDraftCategory("All");
+              }}
+            />
           </>
         )}
       </View>

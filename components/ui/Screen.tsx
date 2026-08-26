@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 import { View } from "react-native";
 import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 
-export type ScreenBottomInset = "safe-area" | "tab-bar";
+export type ScreenBottomInset = "none" | "safe-area" | "tab-bar";
 
 type ScreenProps = PropsWithChildren<{
   className?: string;
@@ -10,20 +10,18 @@ type ScreenProps = PropsWithChildren<{
 }>;
 
 const SCREEN_EDGES: Edge[] = ["top", "right", "bottom", "left"];
-const TAB_SCREEN_EDGES: Edge[] = ["top", "right", "left"];
+const TOP_SCREEN_EDGES: Edge[] = ["top", "right", "left"];
 
 export function Screen({
-  bottomInset = "safe-area",
+  bottomInset = "none",
   children,
   className = "",
 }: ScreenProps) {
   const usesTabBarInset = bottomInset === "tab-bar";
+  const edges = bottomInset === "safe-area" ? SCREEN_EDGES : TOP_SCREEN_EDGES;
 
   return (
-    <SafeAreaView
-      className={`flex-1 bg-surface ${className}`}
-      edges={usesTabBarInset ? TAB_SCREEN_EDGES : SCREEN_EDGES}
-    >
+    <SafeAreaView className={`flex-1 bg-surface ${className}`} edges={edges}>
       <View className={`flex-1 px-6 pt-6 ${usesTabBarInset ? "" : "pb-6"}`}>
         {children}
       </View>

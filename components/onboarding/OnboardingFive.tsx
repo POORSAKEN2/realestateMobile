@@ -8,23 +8,23 @@ import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
 const folderRows = [
   {
     label: "Properties",
-    iconColor: "#634CE4",
-    iconBg: "bg-teal-50",
-    lineClassName: "bg-teal-700/55",
+    iconColor: "#8A77F4",
+    iconBg: "bg-successSurface",
+    lineClassName: "bg-success",
     meta: "18 files",
   },
   {
     label: "Bookings",
-    iconColor: "#0369A1",
-    iconBg: "bg-sky-50",
-    lineClassName: "bg-sky-700/50",
+    iconColor: "#2563EB",
+    iconBg: "bg-infoSurface",
+    lineClassName: "bg-info",
     meta: "6 pending",
   },
   {
     label: "Documents",
-    iconColor: "#7C3AED",
-    iconBg: "bg-violet-50",
-    lineClassName: "bg-violet-700/45",
+    iconColor: "#8A77F4",
+    iconBg: "bg-primary/10",
+    lineClassName: "bg-primary/45",
     meta: "Updated",
   },
 ];
@@ -38,21 +38,21 @@ export function OnboardingFive() {
         <OnboardingProgress activeIndex={4} />
 
         <View className="w-full flex-1 items-center justify-center">
-          <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-slate-100 bg-whitePrimary/95 p-5 shadow-2xl">
+          <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary/95 p-5 shadow-2xl">
             <View className="absolute inset-0">
-              <View className="absolute left-6 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-12 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-20 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-28 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute right-16 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute right-8 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-0 top-7 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-14 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-24 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-36 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-48 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-60 h-px w-full bg-slate-200/70" />
-              <View className="absolute bottom-8 left-0 h-px w-full bg-slate-200/70" />
+              <View className="absolute left-6 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-12 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-20 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-28 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute right-16 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute right-8 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-0 top-7 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-14 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-24 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-36 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-48 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-60 h-px w-full bg-textPrimary/10" />
+              <View className="absolute bottom-8 left-0 h-px w-full bg-textPrimary/10" />
             </View>
 
             <View className="flex-row items-center justify-between">
@@ -65,8 +65,8 @@ export function OnboardingFive() {
                 </Text>
               </View>
 
-              <View className="h-10 w-10 items-center justify-center rounded-2xl border border-teal-200 bg-teal-50 shadow-sm">
-                <Feather name="archive" size={18} color="#634CE4" />
+              <View className="h-10 w-10 items-center justify-center rounded-2xl border border-success/25 bg-successSurface shadow-sm">
+                <Feather name="archive" size={18} color="#8A77F4" />
               </View>
             </View>
 
@@ -78,7 +78,7 @@ export function OnboardingFive() {
                 >
                   <View className="flex-row items-center gap-3">
                     <View
-                      className={`h-12 w-12 items-center justify-center rounded-2xl border border-slate-100 ${row.iconBg}`}
+                      className={`h-12 w-12 items-center justify-center rounded-2xl border border-textPrimary/10 ${row.iconBg}`}
                     >
                       <Feather name="folder" size={24} color={row.iconColor} />
                     </View>
@@ -96,7 +96,7 @@ export function OnboardingFive() {
                         <View
                           className={`h-2 w-4/5 rounded-full ${row.lineClassName}`}
                         />
-                        <View className="h-2 w-3/5 rounded-full bg-slate-300/80" />
+                        <View className="h-2 w-3/5 rounded-full bg-description/20" />
                       </View>
                     </View>
                   </View>
@@ -110,20 +110,20 @@ export function OnboardingFive() {
           <Text className="mt-3 text-center text-4xl font-ralewayExtraBold leading-tight text-white">
             {item.title}
           </Text>
-          <Text className="mt-4 text-center text-base leading-7 text-slate-300">
+          <Text className="mt-4 text-center text-base leading-7 text-description/60">
             {item.description}
           </Text>
         </View>
 
         <OnboardingControls
           activeIndex={4}
-          dotClassName="bg-violet-300"
+          dotClassName="bg-primary/50"
           nextHref="/(onboarding)/screen-6"
         /> */}
 
         <View className="gap-8">
           <View className=" mb-5">
-            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-black">
+            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight text-blackPrimary">
               {item.title}
             </Text>
 
@@ -134,7 +134,7 @@ export function OnboardingFive() {
 
           <OnboardingControls
             activeIndex={4}
-            dotClassName="bg-violet-300"
+            dotClassName="bg-primary/50"
             nextHref="/(onboarding)/screen-6"
           />
         </View>

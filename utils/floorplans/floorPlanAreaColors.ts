@@ -1,10 +1,12 @@
+import { colors } from "../../constants/colors";
+
 const FLOOR_AREA_COLORS = [
-  "#634CE4",
-  "#0D9488",
-  "#E11D48",
-  "#D97706",
-  "#2563EB",
-  "#7C3AED",
+  colors.secondary,
+  colors.success,
+  colors.danger,
+  colors.warning,
+  colors.info,
+  colors.primary,
 ] as const;
 
 export function getFloorAreaColor(index: number) {

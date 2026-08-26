@@ -39,7 +39,10 @@ export function FloorPlanCanvas({
   image,
   isSaving,
   onCancelDrawing,
+  onEmptyImagePress,
   onSaveShape,
+  showAreaShapes = true,
+  showShapeCaption = true,
 }: {
   areas: FloorArea[];
   drawingArea: FloorArea | null;
@@ -49,7 +52,10 @@ export function FloorPlanCanvas({
   image?: string;
   isSaving: boolean;
   onCancelDrawing: () => void;
+  onEmptyImagePress?: () => void;
   onSaveShape: (points: FloorPlanPoint[]) => void;
+  showAreaShapes?: boolean;
+  showShapeCaption?: boolean;
 }) {
   const [canvas, setCanvas] = useState({ width: 0, height: 0 });
   const [draftPoints, setDraftPoints] = useState<FloorPlanPoint[]>([]);
@@ -87,13 +93,12 @@ export function FloorPlanCanvas({
   }
 
   function handlePress(event: GestureResponderEvent) {
-    if (
-      !image ||
-      !drawingArea ||
-      !drawingMode ||
-      !canvas.width ||
-      !canvas.height
-    ) {
+    if (!image) {
+      onEmptyImagePress?.();
+      return;
+    }
+
+    if (!drawingArea || !drawingMode || !canvas.width || !canvas.height) {
       return;
     }
 
@@ -110,27 +115,32 @@ export function FloorPlanCanvas({
   const canSave = drawingStrategy?.canSave(draftPoints) ?? false;
 
   return (
-    <View className="overflow-hidden rounded-[28px] border border-slate-200 bg-slate-200">
+    <View className="overflow-hidden rounded-[28px] border border-textPrimary/10 bg-textPrimary/10">
       <Pressable
         accessibilityLabel={
           drawingMode
             ? `Draw ${drawingMode} for ${drawingArea?.label ?? "area"}`
-            : "Floor plan preview"
+            : !image && onEmptyImagePress
+              ? "Choose floor plan image"
+              : "Floor plan preview"
         }
-        className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100"
+        accessibilityRole={!image && onEmptyImagePress ? "button" : undefined}
+        className="relative aspect-[4/3] w-full overflow-hidden bg-surface"
         onLayout={handleLayout}
         onPress={handlePress}
       >
         {!image ? (
           <View className="flex-1 items-center justify-center px-8">
             <View className="h-14 w-14 items-center justify-center rounded-2xl bg-white">
-              <Feather name="image" color="#634CE4" size={24} />
+              <Feather name="image" color="#8A77F4" size={24} />
             </View>
-            <Text className="mt-3 text-center font-ralewayBold text-sm text-slate-700">
+            <Text className="mt-3 text-center font-ralewayBold text-sm text-textPrimary">
               Add floor plan image
             </Text>
-            <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
-              Upload this floor's plan image before drawing area shapes.
+            <Text className="mt-1 text-center text-xs leading-5 text-description">
+              {onEmptyImagePress
+                ? "Tap here to choose an image for this floor."
+                : "Upload this floor's plan image before drawing area shapes."}
             </Text>
           </View>
         ) : null}
@@ -152,41 +162,47 @@ export function FloorPlanCanvas({
               y={0}
             />
 
-            {areas.map((area, index) => {
-              if (
-                hiddenAreaIds.has(area.id) ||
-                area.points.length < 3 ||
-                area.id === drawingArea?.id
-              ) {
-                return null;
-              }
-              const color = getFloorAreaColor(index);
+            {showAreaShapes
+              ? areas.map((area, index) => {
+                  if (
+                    hiddenAreaIds.has(area.id) ||
+                    area.points.length < 3 ||
+                    area.id === drawingArea?.id
+                  ) {
+                    return null;
+                  }
+                  const color = getFloorAreaColor(index);
 
-              return (
-                <Polygon
-                  fill={color}
-                  fillOpacity={0.28}
-                  key={area.id}
-                  points={pointList(area.points, canvas.width, canvas.height)}
-                  stroke={color}
-                  strokeWidth={2.5}
-                  vectorEffect="non-scaling-stroke"
-                />
-              );
-            })}
+                  return (
+                    <Polygon
+                      fill={color}
+                      fillOpacity={0.28}
+                      key={area.id}
+                      points={pointList(
+                        area.points,
+                        canvas.width,
+                        canvas.height,
+                      )}
+                      stroke={color}
+                      strokeWidth={2.5}
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  );
+                })
+              : null}
 
             {drawingArea && displayedDraftPoints.length ? (
               <>
                 {displayedDraftPoints.length >= 3 ? (
                   <Polygon
-                    fill="#634CE4"
+                    fill="#8A77F4"
                     fillOpacity={0.26}
                     points={pointList(
                       displayedDraftPoints,
                       canvas.width,
                       canvas.height,
                     )}
-                    stroke="#634CE4"
+                    stroke="#8A77F4"
                     strokeDasharray="7 5"
                     strokeWidth={3}
                     vectorEffect="non-scaling-stroke"
@@ -199,7 +215,7 @@ export function FloorPlanCanvas({
                       canvas.width,
                       canvas.height,
                     )}
-                    stroke="#634CE4"
+                    stroke="#8A77F4"
                     strokeDasharray="7 5"
                     strokeWidth={3}
                     vectorEffect="non-scaling-stroke"
@@ -212,7 +228,7 @@ export function FloorPlanCanvas({
                     fill="#FFFFFF"
                     key={`${point.x}:${point.y}:${index}`}
                     r={6}
-                    stroke="#634CE4"
+                    stroke="#8A77F4"
                     strokeWidth={3}
                     vectorEffect="non-scaling-stroke"
                   />
@@ -224,20 +240,20 @@ export function FloorPlanCanvas({
       </Pressable>
 
       {drawingArea && drawingMode ? (
-        <View className="border-t border-slate-200 bg-white p-4">
+        <View className="border-t border-textPrimary/10 bg-white p-4">
           <Text className="font-ralewayBold text-sm text-textPrimary">
             {drawingStrategy?.instruction}
           </Text>
-          <Text className="mt-1 text-xs text-slate-500">
+          <Text className="mt-1 text-xs text-description">
             Drawing {drawingArea.label}. Existing shape replaced after save.
           </Text>
           <View className="mt-3 flex-row gap-2">
             <TouchableOpacity
-              className="h-11 flex-1 items-center justify-center rounded-xl border border-slate-200"
+              className="h-11 flex-1 items-center justify-center rounded-xl border border-textPrimary/10"
               disabled={isSaving}
               onPress={() => setDraftPoints([])}
             >
-              <Text className="font-ralewayBold text-xs text-slate-700">
+              <Text className="font-ralewayBold text-xs text-textPrimary">
                 Clear
               </Text>
             </TouchableOpacity>
@@ -252,14 +268,14 @@ export function FloorPlanCanvas({
             </TouchableOpacity>
             <TouchableOpacity
               className={`h-11 flex-1 items-center justify-center rounded-xl ${
-                canSave ? "bg-primary" : "bg-slate-200"
+                canSave ? "bg-primary" : "bg-textPrimary/10"
               }`}
               disabled={!canSave || isSaving}
               onPress={() => onSaveShape(displayedDraftPoints)}
             >
               <Text
                 className={`font-ralewayBold text-xs ${
-                  canSave ? "text-white" : "text-slate-400"
+                  canSave ? "text-white" : "text-description"
                 }`}
               >
                 {isSaving ? "Saving..." : "Save shape"}
@@ -267,14 +283,14 @@ export function FloorPlanCanvas({
             </TouchableOpacity>
           </View>
         </View>
-      ) : (
-        <View className="flex-row items-center justify-center gap-2 border-t border-slate-200 bg-white px-4 py-3">
-          <View className="h-2 w-2 rounded-full bg-teal-500" />
-          <Text className="text-center text-xs text-slate-500">
+      ) : showShapeCaption ? (
+        <View className="flex-row items-center justify-center gap-2 border-t border-textPrimary/10 bg-white px-4 py-3">
+          <View className="h-2 w-2 rounded-full bg-success" />
+          <Text className="text-center text-xs text-description">
             Area shapes use plan-relative coordinates.
           </Text>
         </View>
-      )}
+      ) : null}
     </View>
   );
 }

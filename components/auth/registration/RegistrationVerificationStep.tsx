@@ -35,11 +35,11 @@ export function RegistrationVerificationStep({
 
   return (
     <View>
-      <View className="mb-7 flex-row items-center rounded-[14px] bg-secondary/10 px-4 py-3">
+      <View className="mb-7 flex-row items-center rounded-[14px] bg-primary/10 px-4 py-3">
         {isRequestingCode ? (
-          <ActivityIndicator color="#634CE4" />
+          <ActivityIndicator color="#8A77F4" />
         ) : (
-          <Feather name="mail" size={18} color="#634CE4" />
+          <Feather name="mail" size={18} color="#8A77F4" />
         )}
         <View className="ml-3 flex-1">
           <Text className="text-xs text-description">
@@ -74,7 +74,7 @@ export function RegistrationVerificationStep({
       >
         <Text
           className={`font-ralewayBold text-sm ${
-            isResendDisabled ? "text-[#9ba7a7]" : "text-primary"
+            isResendDisabled ? "text-description" : "text-primary"
           }`}
         >
           {isRequestingCode

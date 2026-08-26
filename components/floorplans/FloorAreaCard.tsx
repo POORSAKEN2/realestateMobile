@@ -43,13 +43,13 @@ export function FloorAreaCard({
 
   return (
     <>
-      <View className="rounded-[24px] border border-slate-200 bg-white p-4">
+      <View className="rounded-[24px] border border-textPrimary/10 bg-white p-4">
         <View className="flex-row items-start gap-3">
           <View
             className="mt-1 h-4 w-4 rounded-full border-[3px]"
             style={{
-              backgroundColor: hasShape ? `${color}33` : "#E2E8F0",
-              borderColor: hasShape ? color : "#94A3B8",
+              backgroundColor: hasShape ? `${color}33` : "#BEE3DB",
+              borderColor: hasShape ? color : "#6F6D6D",
             }}
           />
           <View className="min-w-0 flex-1">
@@ -62,19 +62,19 @@ export function FloorAreaCard({
               </Text>
               <View
                 className={`rounded-full px-2 py-1 ${
-                  hasShape ? "bg-teal-50" : "bg-amber-50"
+                  hasShape ? "bg-successSurface" : "bg-warningSurface"
                 }`}
               >
                 <Text
                   className={`font-ralewayBold text-[9px] uppercase ${
-                    hasShape ? "text-teal-700" : "text-amber-700"
+                    hasShape ? "text-success" : "text-warning"
                   }`}
                 >
                   {hasShape ? "Mapped" : "Unmapped"}
                 </Text>
               </View>
             </View>
-            <Text className="mt-1 text-xs text-slate-500">
+            <Text className="mt-1 text-xs text-description">
               {onManageRooms
                 ? `${roomCount} ${roomCount === 1 ? "room" : "rooms"} · `
                 : ""}

@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
+
+import { SkeletonGroup, SkeletonList, SkeletonListCard } from "./Skeleton";
 
 export function ModuleLoadingState({
   description,
@@ -9,22 +11,15 @@ export function ModuleLoadingState({
   title: string;
 }) {
   return (
-    <View className="flex-1 justify-center rounded-[28px] border border-textPrimary/10 bg-white p-6 shadow-sm">
-      <View className="items-center">
-        <ActivityIndicator color="#634CE4" />
-        <Text className="mt-3 text-sm font-ralewayBold text-textPrimary">
-          {title}
-        </Text>
-        <Text className="mt-1 text-center text-xs leading-5 text-[#6F6D6D]">
-          {description}
-        </Text>
-      </View>
-      <View className="mt-6 gap-3">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <View className="h-16 rounded-2xl bg-textPrimary/5" key={index} />
-        ))}
-      </View>
-    </View>
+    <SkeletonGroup
+      accessibilityLabel={`${title}. ${description}`}
+      className="flex-1 gap-3"
+    >
+      <SkeletonList
+        count={3}
+        renderItem={() => <SkeletonListCard className="min-h-24" />}
+      />
+    </SkeletonGroup>
   );
 }
 
@@ -39,9 +34,11 @@ export function ModuleEmptyState({
 }) {
   return (
     <View className="items-center rounded-[28px] border border-dashed border-textPrimary/20 bg-white/95 p-8 shadow-sm">
-      <Ionicons name={icon} color="#634CE4" size={38} />
-      <Text className="mt-3 text-base font-ralewayExtraBold text-textPrimary">{title}</Text>
-      <Text className="mt-1 text-center text-sm leading-5 text-[#6F6D6D]">
+      <Ionicons name={icon} color="#8A77F4" size={38} />
+      <Text className="mt-3 font-ralewayExtraBold text-base text-textPrimary">
+        {title}
+      </Text>
+      <Text className="mt-1 text-center text-sm leading-5 text-description">
         {description}
       </Text>
     </View>

@@ -9,16 +9,21 @@ import {
   BookingCalendarEmpty,
   BookingCalendarLoading,
   BookingDaySchedule,
-  BookingFilters,
+  BookingFilterSheet,
   BookingFormModal,
   BookingReservationList,
+  BookingViewToggle,
+  type BookingViewMode,
 } from "../../components/bookings";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
+import { SearchToolbar } from "../../components/ui/SearchToolbar";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useClients } from "../../hooks/api/useClients";
+import { usePropertyRoomsQuery } from "../../hooks/api/useFloorPlans";
 import { useBookingCalendar, useBookingForm } from "../../hooks/bookings";
 import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "../../hooks/useSnackbar";
@@ -34,7 +39,10 @@ export default function BookingsScreen() {
   const requestedPropertyId = getParamValue(params.propertyId);
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("Booked");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [viewMode, setViewMode] = useState<BookingViewMode>("month");
 
   const { useList } = useProperties();
   const {
@@ -52,6 +60,10 @@ export default function BookingsScreen() {
     enabled: Boolean(accessToken),
   });
   const { data: guests = [] } = useClients(accessToken);
+  const { data: selectedBuildingRooms = [] } = usePropertyRoomsQuery(
+    selectedPropertyId,
+    accessToken,
+  );
 
   const buildingOptions = useMemo(
     () =>
@@ -91,15 +103,40 @@ export default function BookingsScreen() {
       bookings.filter((booking) => booking.propertyId === selectedPropertyId),
     [bookings, selectedPropertyId],
   );
-  const visibleBookings = useMemo(
+  const visibleBookings = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return selectedBuildingBookings.filter((booking) => {
+      const matchesStatus =
+        statusFilter === "All" || booking.status === statusFilter;
+      const matchesSearch =
+        !query ||
+        [
+          booking.guestName,
+          booking.guestEmail,
+          booking.guestPhone,
+          booking.roomNumber,
+          booking.notes,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(query);
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [searchQuery, selectedBuildingBookings, statusFilter]);
+  const calendarBookings = useMemo(
     () =>
-      selectedBuildingBookings.filter((booking) =>
-        statusFilter === "All" ? true : booking.status === statusFilter,
-      ),
+      statusFilter === "All"
+        ? selectedBuildingBookings
+        : selectedBuildingBookings.filter(
+            (booking) => booking.status === statusFilter,
+          ),
     [selectedBuildingBookings, statusFilter],
   );
   const calendar = useBookingCalendar({
-    bookings: visibleBookings,
+    bookings: calendarBookings,
     availabilityBookings: selectedBuildingBookings,
   });
   const bookingSnackbar = useSnackbar();
@@ -116,6 +153,12 @@ export default function BookingsScreen() {
     },
   });
   const isLoading = isLoadingProperties || isLoadingBookings;
+  const activeBookingFilterCount = [
+    statusFilter !== "Booked",
+    Boolean(
+      selectedPropertyId && selectedPropertyId !== buildingOptions[0]?.id,
+    ),
+  ].filter(Boolean).length;
 
   async function refreshBookings() {
     setIsRefreshing(true);
@@ -127,7 +170,7 @@ export default function BookingsScreen() {
   }
 
   return (
-    <Screen bottomInset="tab-bar" className="bg-surface">
+    <Screen bottomInset="safe-area" className="bg-surface">
       <View className="flex-1 gap-5">
         <View className="px-1">
           <ModuleHeader
@@ -143,6 +186,12 @@ export default function BookingsScreen() {
               />
             }
             eyebrow="Short Stay"
+            leading={
+              <SecondaryBackButton
+                accessibilityLabel="Back from bookings"
+                variant="primary"
+              />
+            }
             title="Bookings"
           />
         </View>
@@ -150,60 +199,94 @@ export default function BookingsScreen() {
         <ScrollView
           refreshControl={
             <RefreshControl
-              colors={["#634CE4"]}
+              colors={["#8A77F4"]}
               onRefresh={refreshBookings}
               refreshing={isRefreshing}
-              tintColor="#634CE4"
+              tintColor="#8A77F4"
             />
           }
           showsVerticalScrollIndicator={false}
         >
           <View className="gap-4 pb-8">
-            <BookingFilters
-              buildings={buildingOptions}
-              onSelectBuilding={setSelectedPropertyId}
-              onSelectStatus={setStatusFilter}
-              selectedBuilding={selectedBuilding}
-              selectedStatus={statusFilter}
+            <BookingViewToggle value={viewMode} onChange={setViewMode} />
+
+            <SearchToolbar
+              accessibilityLabel="Search bookings"
+              activeFilterCount={activeBookingFilterCount}
+              clearAccessibilityLabel="Clear booking search"
+              filterAccessibilityLabel="Filter bookings"
+              onChangeText={(value) => {
+                setSearchQuery(value);
+                if (value.trim()) setViewMode("agenda");
+              }}
+              onFilterPress={() => setIsFilterVisible(true)}
+              placeholder="Guest, room, email, or phone"
+              value={searchQuery}
             />
 
-            {isLoading ? (
-              <BookingCalendarLoading />
-            ) : buildingOptions.length === 0 ? (
+            {buildingOptions.length === 0 && !isLoading ? (
               <BookingCalendarEmpty />
+            ) : viewMode !== "agenda" ? (
+              isLoading ? (
+                <BookingCalendarLoading mode={viewMode} />
+              ) : (
+                <>
+                  <BookingCalendar
+                    availabilityBookings={selectedBuildingBookings}
+                    bookings={calendarBookings}
+                    currentMonth={calendar.currentMonth}
+                    mode={viewMode}
+                    onChangePeriod={calendar.changePeriod}
+                    onGoToToday={calendar.goToToday}
+                    onSelectDay={calendar.selectDay}
+                    propertyTitle={selectedBuilding?.title}
+                    roomCount={
+                      selectedBuildingRooms.filter(
+                        (room) => room.status !== "Maintenance",
+                      ).length
+                    }
+                    selectedDate={calendar.selectedDate}
+                  />
+                  <BookingDaySchedule
+                    availability={calendar.selectedDayAvailability}
+                    bookings={calendar.selectedDayBookings}
+                    canCreate={calendar.canCreateOnSelectedDay}
+                    date={calendar.selectedDate}
+                    onCreate={(date) =>
+                      bookingForm.openCreate(selectedPropertyId, date)
+                    }
+                    onOpenBooking={bookingForm.openEdit}
+                  />
+                </>
+              )
             ) : (
-              <>
-                <BookingCalendar
-                  availabilityBookings={selectedBuildingBookings}
-                  bookings={visibleBookings}
-                  currentMonth={calendar.currentMonth}
-                  onChangeMonth={calendar.changeMonth}
-                  onGoToToday={calendar.goToToday}
-                  onSelectDay={calendar.selectDay}
-                  selectedDate={calendar.selectedDate}
-                />
-                <BookingDaySchedule
-                  availability={calendar.selectedDayAvailability}
-                  bookings={calendar.selectedDayBookings}
-                  canCreate={calendar.canCreateOnSelectedDay}
-                  date={calendar.selectedDate}
-                  onCreate={(date) =>
-                    bookingForm.openCreate(selectedPropertyId, date)
-                  }
-                  onOpenBooking={bookingForm.openEdit}
-                />
-              </>
+              <BookingReservationList
+                bookings={visibleBookings}
+                buildingTitle={selectedBuilding?.title}
+                hasActiveFilters={
+                  Boolean(searchQuery.trim()) ||
+                  visibleBookings.length !== selectedBuildingBookings.length
+                }
+                isLoading={isLoading}
+                onOpenBooking={bookingForm.openEdit}
+              />
             )}
-
-            <BookingReservationList
-              bookings={visibleBookings}
-              buildingTitle={selectedBuilding?.title}
-              isLoading={isLoading}
-              onOpenBooking={bookingForm.openEdit}
-            />
           </View>
         </ScrollView>
       </View>
+
+      <BookingFilterSheet
+        buildings={buildingOptions}
+        onApply={(filters) => {
+          setSelectedPropertyId(filters.propertyId);
+          setStatusFilter(filters.status);
+          setIsFilterVisible(false);
+        }}
+        onClose={() => setIsFilterVisible(false)}
+        selectedBuildingId={selectedPropertyId}
+        selectedStatus={statusFilter}
+        visible={isFilterVisible}
+      />
 
       <BookingFormModal
         buildings={buildingOptions}

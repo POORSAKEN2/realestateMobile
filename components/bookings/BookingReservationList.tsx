@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
+import { SkeletonBlock, SkeletonGroup } from "../ui/Skeleton";
 import type { TransientBooking } from "../../types";
 import {
   formatDisplayDate,
@@ -13,6 +14,7 @@ const monthFormatter = new Intl.DateTimeFormat("en-US", { month: "short" });
 type BookingReservationListProps = {
   bookings: TransientBooking[];
   buildingTitle?: string;
+  hasActiveFilters?: boolean;
   isLoading: boolean;
   onOpenBooking: (booking: TransientBooking) => void;
 };
@@ -20,6 +22,7 @@ type BookingReservationListProps = {
 export function BookingReservationList({
   bookings,
   buildingTitle,
+  hasActiveFilters = false,
   isLoading,
   onOpenBooking,
 }: BookingReservationListProps) {
@@ -27,27 +30,55 @@ export function BookingReservationList({
     .slice()
     .sort((a, b) => b.startDate.localeCompare(a.startDate));
 
+  if (isLoading) {
+    return (
+      <SkeletonGroup
+        accessibilityLabel="Loading reservations"
+        className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10"
+      >
+        <View className="flex-row items-end justify-between gap-3">
+          <View className="min-w-0 flex-1 gap-2">
+            <SkeletonBlock className="h-5 w-36" />
+            <SkeletonBlock className="h-3 w-28" />
+          </View>
+          <SkeletonBlock className="h-3 w-12" />
+        </View>
+
+        {Array.from({ length: 3 }, (_, index) => (
+          <View
+            className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
+            key={index}
+          >
+            <SkeletonBlock className="h-12 w-12 rounded-xl bg-primary/10" />
+            <View className="min-w-0 flex-1 gap-2">
+              <SkeletonBlock className="h-4 w-2/3" />
+              <SkeletonBlock className="h-3 w-full" />
+              <SkeletonBlock className="h-5 w-16 rounded-full bg-primary/10" />
+            </View>
+            <SkeletonBlock className="h-5 w-3 rounded-full" />
+          </View>
+        ))}
+      </SkeletonGroup>
+    );
+  }
+
   return (
-    <View className="mb-16 gap-3 rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+    <View className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-end justify-between gap-3">
         <View>
           <Text className="font-ralewayBold text-lg text-textPrimary">
             All reservations
           </Text>
-          <Text className="mt-1 font-ralewaySemiBold text-xs text-slate-500">
+          <Text className="mt-1 font-ralewaySemiBold text-xs text-description">
             {buildingTitle ?? "Select a building"}
           </Text>
         </View>
-        <Text className="font-ralewayExtraBold text-xs text-slate-400">
+        <Text className="font-ralewayExtraBold text-xs text-description">
           {bookings.length} total
         </Text>
       </View>
 
-      {isLoading ? (
-        <Text className="font-ralewaySemiBold text-sm text-slate-500">
-          Loading reservations...
-        </Text>
-      ) : sortedBookings.length > 0 ? (
+      {sortedBookings.length > 0 ? (
         sortedBookings.map((booking) => (
           <ReservationCard
             booking={booking}
@@ -56,12 +87,16 @@ export function BookingReservationList({
           />
         ))
       ) : (
-        <View className="items-center rounded-2xl border border-dashed border-secondary/20 p-6">
-          <Text className="text-center font-ralewayExtraBold text-sm text-slate-800">
-            No reservations found
+        <View className="items-center rounded-2xl border border-dashed border-primary/20 p-6">
+          <Text className="text-center font-ralewayExtraBold text-sm text-textPrimary">
+            {hasActiveFilters
+              ? "No matching reservations"
+              : "No reservations found"}
           </Text>
-          <Text className="mt-1 text-center text-xs leading-5 text-slate-500">
-            Select an available day to add your first booking.
+          <Text className="mt-1 text-center text-xs leading-5 text-description">
+            {hasActiveFilters
+              ? "Change the search or filters to see more reservations."
+              : "Select an available day to add your first booking."}
           </Text>
         </View>
       )}
@@ -84,11 +119,11 @@ function ReservationCard({
       activeOpacity={0.78}
       accessibilityLabel={`Open ${status.label} booking for ${booking.guestName}`}
       accessibilityRole="button"
-      className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
+      className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
       onPress={() => onPress(booking)}
     >
-      <View className="w-12 items-center rounded-xl bg-secondary/10 py-2">
-        <Text className="font-ralewayExtraBold text-[10px] uppercase text-slate-400">
+      <View className="w-12 items-center rounded-xl bg-primary/10 py-2">
+        <Text className="font-ralewayExtraBold text-[10px] uppercase text-description">
           {monthFormatter.format(startDate)}
         </Text>
         <Text className="font-ralewayBold text-lg text-textPrimary">
@@ -102,7 +137,7 @@ function ReservationCard({
         >
           {booking.guestName}
         </Text>
-        <Text className="mt-1 font-ralewaySemiBold text-xs text-slate-500">
+        <Text className="mt-1 font-ralewaySemiBold text-xs text-description">
           Room {booking.roomNumber} · {formatDisplayDate(booking.startDate)}–
           {formatDisplayDate(booking.endDate)}
         </Text>
@@ -116,7 +151,7 @@ function ReservationCard({
           </Text>
         </View>
       </View>
-      <Ionicons name="chevron-forward" color="#94A3B8" size={18} />
+      <Ionicons name="chevron-forward" color="#6F6D6D" size={18} />
     </TouchableOpacity>
   );
 }

@@ -9,12 +9,13 @@ import { PaginatedApiData } from "../../types/api/common";
 export interface PaginatedResult<T> {
   data: T[];
   isLoading: boolean;
+  isFetching: boolean;
   isError: boolean;
   error: Error | null;
   fetchNextPage: () => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
-  refetch: () => void;
+  refetch: () => Promise<unknown>;
 }
 
 export function usePaginatedQuery<TData, TError extends Error = Error>(
@@ -29,7 +30,7 @@ export function usePaginatedQuery<TData, TError extends Error = Error>(
       number
     >,
     "queryKey" | "queryFn" | "initialPageParam" | "getNextPageParam"
-  >
+  >,
 ): PaginatedResult<TData> {
   const queryInfo = useInfiniteQuery({
     queryKey,
@@ -56,6 +57,7 @@ export function usePaginatedQuery<TData, TError extends Error = Error>(
   return {
     data: flattenedData,
     isLoading: queryInfo.isLoading,
+    isFetching: queryInfo.isFetching,
     isError: queryInfo.isError,
     error: queryInfo.error,
     fetchNextPage: () => {

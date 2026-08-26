@@ -13,6 +13,7 @@ import {
   Easing,
   KeyboardAvoidingView,
   Modal,
+  PanResponder,
   Platform,
   Pressable,
   StyleSheet,
@@ -20,6 +21,8 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { MODAL_OVERLAY_CLASS_NAME } from "../../constants/modal";
 
 type HostedSheet = {
   content: ReactNode;
@@ -33,6 +36,8 @@ type BottomSheetHostValue = {
 
 const BottomSheetHostContext = createContext<BottomSheetHostValue | null>(null);
 const BOTTOM_SHEET_EDGE_INSET = 8;
+const PULL_DOWN_DISMISS_DISTANCE = 88;
+const PULL_DOWN_DISMISS_VELOCITY = 0.8;
 
 export function BottomSheetHost({ children }: PropsWithChildren) {
   const [activeSheet, setActiveSheet] = useState<HostedSheet | null>(null);
@@ -57,7 +62,7 @@ export function BottomSheetHost({ children }: PropsWithChildren) {
 
 export type BottomSheetModalProps = PropsWithChildren<{
   backdropAccessibilityLabel?: string;
-  backdropClassName?: string;
+  bottomInsetMode?: "edge" | "safe-area";
   closeOnBackdropPress?: boolean;
   keyboardAvoiding?: boolean;
   onClose: () => void;
@@ -68,7 +73,7 @@ export type BottomSheetModalProps = PropsWithChildren<{
 
 export function BottomSheetModal({
   backdropAccessibilityLabel = "Close bottom sheet",
-  backdropClassName = "bg-slate-950/40",
+  bottomInsetMode = "edge",
   children,
   closeOnBackdropPress = true,
   keyboardAvoiding = false,
@@ -82,6 +87,7 @@ export function BottomSheetModal({
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const [isMounted, setIsMounted] = useState(visible);
+  const onCloseRef = useRef(onClose);
   const onDismissRef = useRef(onDismiss);
   const backdropOpacity = useRef(new Animated.Value(visible ? 1 : 0)).current;
   const sheetTranslateY = useRef(
@@ -89,11 +95,51 @@ export function BottomSheetModal({
   ).current;
   const renderedChildren = useRef(children);
 
+  onCloseRef.current = onClose;
   onDismissRef.current = onDismiss;
 
   if (visible) {
     renderedChildren.current = children;
   }
+
+  const pullDownResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: (_, gesture) =>
+          gesture.dy > 6 && gesture.dy > Math.abs(gesture.dx),
+        onPanResponderMove: (_, gesture) => {
+          sheetTranslateY.setValue(Math.max(gesture.dy, 0));
+        },
+        onPanResponderRelease: (_, gesture) => {
+          if (
+            gesture.dy >= PULL_DOWN_DISMISS_DISTANCE ||
+            gesture.vy >= PULL_DOWN_DISMISS_VELOCITY
+          ) {
+            onCloseRef.current();
+            return;
+          }
+
+          Animated.spring(sheetTranslateY, {
+            damping: 24,
+            stiffness: 280,
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        },
+        onPanResponderTerminate: () => {
+          Animated.spring(sheetTranslateY, {
+            damping: 24,
+            stiffness: 280,
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        },
+        onPanResponderTerminationRequest: () => false,
+        onShouldBlockNativeResponder: () => true,
+      }),
+    [sheetTranslateY],
+  );
 
   useEffect(() => {
     if (visible) {
@@ -138,7 +184,7 @@ export function BottomSheetModal({
       enabled={keyboardAvoiding}
     >
       <Animated.View
-        className={`absolute inset-0 ${backdropClassName}`}
+        className={`absolute inset-0 ${MODAL_OVERLAY_CLASS_NAME}`}
         pointerEvents={visible ? "auto" : "none"}
         style={{ opacity: backdropOpacity }}
       >
@@ -158,12 +204,20 @@ export function BottomSheetModal({
         pointerEvents={visible ? "auto" : "none"}
         style={{
           marginBottom:
-            Platform.OS === "ios"
+            Platform.OS === "ios" && bottomInsetMode === "edge"
               ? -Math.max(insets.bottom - BOTTOM_SHEET_EDGE_INSET, 0)
               : 0,
           transform: [{ translateY: sheetTranslateY }],
         }}
       >
+        <View
+          {...pullDownResponder.panHandlers}
+          accessible={false}
+          className="absolute top-0 z-10 h-5 w-24 items-center self-center pt-1.5"
+          hitSlop={{ bottom: 8 }}
+        >
+          <View className="h-1 w-10 rounded-full bg-description/25" />
+        </View>
         {renderedChildren.current}
       </Animated.View>
     </KeyboardAvoidingView>
@@ -186,7 +240,7 @@ export function BottomSheetModal({
   return (
     <Modal
       animationType="none"
-      navigationBarTranslucent
+      navigationBarTranslucent={Platform.OS === "android"}
       onDismiss={onDismiss}
       onRequestClose={onClose}
       statusBarTranslucent={

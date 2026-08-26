@@ -11,7 +11,6 @@ import {
 import {
   DocumentActionSheet,
   DeleteDocumentSheet,
-  DocumentSortSheet,
 } from "../../components/documents/DocumentSheets";
 import { DocumentCard } from "../../components/documents/DocumentCard";
 import { DocumentModuleState } from "../../components/documents/DocumentModuleState";
@@ -37,12 +36,10 @@ import {
 import {
   buildDocumentLookup,
   countAdvancedFilters,
-  DOCUMENT_SORT_OPTIONS,
   EMPTY_DOCUMENT_FILTERS,
   filterAndSortDocuments,
   type DocumentAdvancedFilters,
   type DocumentCategoryFilter,
-  type DocumentSort,
 } from "../../utils/documents/documentPresentation";
 
 export default function DocumentsScreen() {
@@ -65,9 +62,7 @@ export default function DocumentsScreen() {
   const [filters, setFilters] = useState<DocumentAdvancedFilters>(
     EMPTY_DOCUMENT_FILTERS,
   );
-  const [sort, setSort] = useState<DocumentSort>("newest");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [isSortVisible, setIsSortVisible] = useState(false);
   const [actionTarget, setActionTarget] = useState<PropertyDocument | null>(
     null,
   );
@@ -97,22 +92,12 @@ export default function DocumentsScreen() {
         lesseeLookup,
         propertyLookup,
         searchQuery,
-        sort,
+        sort: "newest",
       }),
-    [
-      category,
-      documents,
-      filters,
-      lesseeLookup,
-      propertyLookup,
-      searchQuery,
-      sort,
-    ],
+    [category, documents, filters, lesseeLookup, propertyLookup, searchQuery],
   );
-  const activeFilterCount = countAdvancedFilters(filters);
-  const sortLabel =
-    DOCUMENT_SORT_OPTIONS.find(({ value }) => value === sort)?.label ??
-    "Newest";
+  const activeFilterCount =
+    countAdvancedFilters(filters) + Number(category !== "All");
   const isFiltered = Boolean(
     searchQuery.trim() || category !== "All" || activeFilterCount,
   );
@@ -214,6 +199,12 @@ export default function DocumentsScreen() {
 
   return (
     <Screen className="bg-surface">
+      <DocumentsHeader
+        documentCount={documents.length}
+        isLoading={isLoading}
+        onUpload={openCreateForm}
+      />
+
       <FlatList
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
@@ -221,21 +212,12 @@ export default function DocumentsScreen() {
         ItemSeparatorComponent={() => <View className="h-3" />}
         keyExtractor={(document) => document.id}
         ListHeaderComponent={
-          <View className="gap-6 pb-5">
-            <DocumentsHeader
-              documentCount={documents.length}
-              onUpload={openCreateForm}
-            />
+          <View className="pb-5 pt-6">
             <DocumentsToolbar
               activeFilterCount={activeFilterCount}
-              category={category}
-              onChangeCategory={setCategory}
               onChangeSearch={setSearchQuery}
               onOpenFilters={() => setIsFilterVisible(true)}
-              onOpenSort={() => setIsSortVisible(true)}
-              resultCount={visibleDocuments.length}
               searchQuery={searchQuery}
-              sortLabel={sortLabel}
             />
           </View>
         }
@@ -251,10 +233,10 @@ export default function DocumentsScreen() {
         }
         refreshControl={
           <RefreshControl
-            colors={[colors.secondary]}
+            colors={[colors.primary]}
             onRefresh={() => void refresh()}
             refreshing={isRefreshing && !isLoading}
-            tintColor={colors.secondary}
+            tintColor={colors.primary}
           />
         }
         renderItem={({ item: document }) => (
@@ -276,24 +258,17 @@ export default function DocumentsScreen() {
       />
 
       <DocumentFilterSheet
+        category={category}
         filters={filters}
         lessees={lessees}
-        onApply={(nextFilters) => {
+        onApply={(nextFilters, nextCategory) => {
           setFilters(nextFilters);
+          setCategory(nextCategory);
           setIsFilterVisible(false);
         }}
         onClose={() => setIsFilterVisible(false)}
         properties={properties}
         visible={isFilterVisible}
-      />
-      <DocumentSortSheet
-        onClose={() => setIsSortVisible(false)}
-        onSelect={(nextSort) => {
-          setSort(nextSort);
-          setIsSortVisible(false);
-        }}
-        selectedSort={sort}
-        visible={isSortVisible}
       />
       <DocumentActionSheet
         document={actionTarget}

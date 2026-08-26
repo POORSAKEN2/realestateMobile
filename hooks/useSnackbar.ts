@@ -2,6 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const DEFAULT_AUTO_HIDE_DURATION = 4000;
 
+type SnackbarShowOptions = {
+  autoHideDuration?: number;
+};
+
 export function useSnackbar({
   autoHideDuration = DEFAULT_AUTO_HIDE_DURATION,
 }: {
@@ -22,15 +26,17 @@ export function useSnackbar({
   }, [clearAutoHide]);
 
   const show = useCallback(
-    (nextMessage: string) => {
+    (nextMessage: string, options: SnackbarShowOptions = {}) => {
       clearAutoHide();
       setMessage(nextMessage);
 
-      if (autoHideDuration > 0) {
+      const duration = options.autoHideDuration ?? autoHideDuration;
+
+      if (duration > 0) {
         timeoutRef.current = setTimeout(() => {
           timeoutRef.current = null;
           setMessage("");
-        }, autoHideDuration);
+        }, duration);
       }
     },
     [autoHideDuration, clearAutoHide],

@@ -21,7 +21,7 @@ import PropertyImageGallery from "./PropertyImageGallery";
 function PropertyMetric({ label, value }: { label: string; value: string }) {
   return (
     <View className="min-w-0 flex-1">
-      <Text className="font-ralewaySemiBold text-xs text-slate-600">
+      <Text className="font-ralewaySemiBold text-xs text-description">
         {label}
       </Text>
       <Text
@@ -52,7 +52,7 @@ function PropertyAction({
       accessibilityRole="button"
       activeOpacity={0.8}
       className={`min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl px-3 ${
-        primary ? "bg-secondary" : "bg-secondary/10"
+        primary ? "bg-primary" : "bg-primary/10"
       }`}
       onPress={(event) => {
         event.stopPropagation();
@@ -61,12 +61,12 @@ function PropertyAction({
     >
       <MaterialCommunityIcons
         name={icon}
-        color={primary ? "#FFFFFF" : "#634CE4"}
+        color={primary ? "#FFFFFF" : "#8A77F4"}
         size={17}
       />
       <Text
         className={`font-ralewayExtraBold text-xs ${
-          primary ? "text-white" : "text-secondary"
+          primary ? "text-white" : "text-primary"
         }`}
       >
         {label}
@@ -110,7 +110,7 @@ export function PropertyCard({
       accessibilityLabel={`View overview for ${property.title}`}
       accessibilityRole="button"
       activeOpacity={0.9}
-      className="w-full overflow-hidden rounded-3xl border border-secondary/20 bg-white shadow-sm shadow-secondary/10"
+      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-sm shadow-primary/10"
       onPress={onOpenDetails}
     >
       <TouchableOpacity
@@ -121,7 +121,7 @@ export function PropertyCard({
         }
         accessibilityRole="button"
         activeOpacity={propertyImages.length ? 0.92 : 1}
-        className="relative h-40 w-full bg-slate-100"
+        className="relative h-40 w-full bg-surface"
         disabled={!propertyImages.length}
         onLayout={(event) => setImageWidth(event.nativeEvent.layout.width)}
         onPress={(event: GestureResponderEvent) => {
@@ -143,7 +143,7 @@ export function PropertyCard({
           >
             {propertyImages.map((image, index) => (
               <Image
-                className="h-full bg-slate-100"
+                className="h-full bg-surface"
                 key={`${image}:${index}`}
                 resizeMode="cover"
                 source={{ uri: image }}
@@ -155,23 +155,23 @@ export function PropertyCard({
           <View className="flex-1 items-center justify-center">
             <MaterialCommunityIcons
               name="image-off-outline"
-              color="#64748B"
+              color="#6F6D6D"
               size={30}
             />
-            <Text className="mt-2 font-ralewayBold text-xs text-slate-600">
+            <Text className="mt-2 font-ralewayBold text-xs text-description">
               No property image
             </Text>
           </View>
         )}
 
         <View className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1.5 shadow-sm">
-          <Text className="font-ralewayBold text-xs text-slate-800">
+          <Text className="font-ralewayBold text-xs text-textPrimary">
             {property.type ?? "Property"}
           </Text>
         </View>
 
         {propertyImages.length > 1 ? (
-          <View className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1.5">
+          <View className="absolute bottom-3 right-3 rounded-full bg-blackPrimary/60 px-2.5 py-1.5">
             <Text className="font-ralewayBold text-xs text-white">
               {activeImageIndex + 1} of {propertyImages.length}
             </Text>
@@ -198,11 +198,11 @@ export function PropertyCard({
             <View className="mt-1 flex-row items-center gap-1.5">
               <MaterialCommunityIcons
                 name="map-marker-outline"
-                color="#64748B"
+                color="#6F6D6D"
                 size={16}
               />
               <Text
-                className="min-w-0 flex-1 font-ralewaySemiBold text-sm text-slate-600"
+                className="min-w-0 flex-1 font-ralewaySemiBold text-sm text-description"
                 numberOfLines={1}
               >
                 {property.location}
@@ -225,11 +225,11 @@ export function PropertyCard({
           </View>
         </View>
 
-        <View className="mt-4 flex-row gap-3 rounded-2xl bg-secondary/5 p-3.5">
+        <View className="mt-4 flex-row gap-3 rounded-2xl bg-primary/5 p-3.5">
           <PropertyMetric label="Value" value={formatPeso(property.value)} />
-          <View className="w-px bg-secondary/10" />
+          <View className="w-px bg-primary/10" />
           <PropertyMetric label="ROI" value={`${property.roi.toFixed(1)}%`} />
-          <View className="w-px bg-secondary/10" />
+          <View className="w-px bg-primary/10" />
           <PropertyMetric label="Occupancy" value={`${occupancy}%`} />
         </View>
 
@@ -239,21 +239,21 @@ export function PropertyCard({
           activeOpacity={0.82}
           className={`mt-4 flex-row items-center gap-3 rounded-2xl border p-3.5 ${
             floorManagerPolicy.floorSummaryProminence === "primary"
-              ? "border-secondary/25 bg-secondary/10"
-              : "border-secondary/20 bg-white"
+              ? "border-primary/25 bg-primary/10"
+              : "border-primary/20 bg-white"
           }`}
           onPress={(event) => {
             event.stopPropagation();
             onOpenFloorPlans();
           }}
         >
-          <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary/10">
+          <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
             <MaterialCommunityIcons
               name="floor-plan"
               color={
                 floorManagerPolicy.floorSummaryProminence === "primary"
-                  ? "#634CE4"
-                  : "#64748B"
+                  ? "#8A77F4"
+                  : "#6F6D6D"
               }
               size={21}
             />
@@ -263,14 +263,14 @@ export function PropertyCard({
               className={`font-ralewayBold text-xs uppercase ${
                 floorManagerPolicy.floorSummaryProminence === "primary"
                   ? "text-secondary"
-                  : "text-slate-600"
+                  : "text-description"
               }`}
             >
               {floorManagerPolicy.floorSummaryProminence === "primary"
                 ? "Floor summary"
                 : "Optional layout"}
             </Text>
-            <Text className="mt-1 text-xs text-slate-600">
+            <Text className="mt-1 text-xs text-description">
               {floorPlans.length
                 ? `${floorPlans.length} ${floorPlans.length === 1 ? "floor" : "floors"} · ${floorAreaCount} ${floorAreaCount === 1 ? "area" : "areas"}`
                 : floorManagerPolicy.floorSummaryProminence === "primary"
@@ -282,8 +282,8 @@ export function PropertyCard({
             name="chevron-right"
             color={
               floorManagerPolicy.floorSummaryProminence === "primary"
-                ? "#634CE4"
-                : "#64748B"
+                ? "#8A77F4"
+                : "#6F6D6D"
             }
             size={21}
           />
@@ -298,10 +298,10 @@ export function PropertyCard({
               >
                 <MaterialCommunityIcons
                   name="bed-king-outline"
-                  color="#475569"
+                  color="#6F6D6D"
                   size={18}
                 />
-                <Text className="font-ralewayBold text-sm text-slate-700">
+                <Text className="font-ralewayBold text-sm text-textPrimary">
                   {property.bedrooms}
                 </Text>
               </View>
@@ -313,10 +313,10 @@ export function PropertyCard({
               >
                 <MaterialCommunityIcons
                   name="shower"
-                  color="#475569"
+                  color="#6F6D6D"
                   size={18}
                 />
-                <Text className="font-ralewayBold text-sm text-slate-700">
+                <Text className="font-ralewayBold text-sm text-textPrimary">
                   {property.bathrooms}
                 </Text>
               </View>

@@ -47,10 +47,10 @@ export function PropertyCoreFields({
 
   return (
     <>
-      <View className="flex-row items-start gap-3 rounded-2xl border border-secondary bg-secondary/10 px-4 py-3.5">
+      <View className="flex-row items-start gap-3 rounded-2xl border border-primary bg-primary/10 px-4 py-3.5">
         <MaterialCommunityIcons
           name="information-outline"
-          color="#634CE4"
+          color="#8A77F4"
           size={20}
         />
         <Text className="min-w-0 flex-1 font-ralewayMedium text-sm leading-5 text-secondary">
@@ -102,7 +102,7 @@ export function PropertyCoreFields({
 
         {filteredLocationSuggestions.length > 0 ? (
           <View className="gap-2">
-            <Text className="font-ralewayBold text-xs text-slate-600">
+            <Text className="font-ralewayBold text-xs text-description">
               Quick choices
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -111,10 +111,10 @@ export function PropertyCoreFields({
                   key={location}
                   activeOpacity={0.8}
                   accessibilityRole="button"
-                  className="min-h-11 justify-center rounded-full border border-secondary/20 bg-secondary/10 px-3.5 py-2.5"
+                  className="min-h-11 justify-center rounded-full border border-primary/20 bg-primary/10 px-3.5 py-2.5"
                   onPress={() => selectLocation(location)}
                 >
-                  <Text className="font-ralewayBold text-xs text-secondary">
+                  <Text className="font-ralewayBold text-xs text-primary">
                     {location}
                   </Text>
                 </TouchableOpacity>
@@ -258,13 +258,13 @@ export function PropertyCoreFields({
           variant="filled"
         />
 
-        <View className="rounded-2xl border border-secondary/20 bg-secondary/5 p-4">
+        <View className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
           <View className="flex-row items-center justify-between gap-4">
             <View className="min-w-0 flex-1 flex-row items-center gap-3">
-              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
+              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
                 <MaterialCommunityIcons
                   name="calendar-clock"
-                  color="#634CE4"
+                  color="#8A77F4"
                   size={21}
                 />
               </View>
@@ -272,7 +272,7 @@ export function PropertyCoreFields({
                 <Text className="font-ralewayExtraBold text-sm text-textPrimary">
                   Allow short-term bookings
                 </Text>
-                <Text className="mt-1 text-xs leading-4 text-[#6F6D6D]">
+                <Text className="mt-1 text-xs leading-4 text-description">
                   Guests can reserve this property for short stays.
                 </Text>
               </View>
@@ -283,7 +283,7 @@ export function PropertyCoreFields({
                 updateForm("isTransientBookable", value)
               }
               thumbColor="#FFFFFF"
-              trackColor={{ false: "#8E8E93", true: "#634CE4" }}
+              trackColor={{ false: "#6F6D6D", true: "#8A77F4" }}
               value={form.isTransientBookable}
             />
           </View>

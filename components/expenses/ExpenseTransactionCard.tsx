@@ -32,32 +32,32 @@ export function ExpenseTransactionCard({
   const isPaid = expense.status === "Paid";
   const isCancelled = expense.status === "Cancelled";
   const statusContainerClass = isPaid
-    ? "bg-[#E8F7EC]"
+    ? "bg-accent"
     : isCancelled
-      ? "bg-slate-100"
-      : "bg-[#FFF6DD]";
+      ? "bg-surface"
+      : "bg-warningSurface";
   const statusTextClass = isPaid
-    ? "text-[#1D8B4C]"
+    ? "text-success"
     : isCancelled
-      ? "text-slate-500"
-      : "text-[#B67A18]";
+      ? "text-description"
+      : "text-warning";
 
   return (
     <Pressable
       accessibilityLabel={`${expense.category}, ${expense.description ?? "Expense"}, ${formattedAmount}, ${expense.status}`}
-      className="min-h-[84px] flex-row items-center rounded-[20px] border border-secondary/20 bg-white px-3.5 py-3"
+      className="min-h-[84px] flex-row items-center rounded-[20px] border border-primary/20 bg-white px-3.5 py-3"
       style={{
-        shadowColor: "#634CE4",
+        shadowColor: "#8A77F4",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.07,
         shadowRadius: 4,
         elevation: 2,
       }}
     >
-      <View className="mr-3 h-11 w-11 items-center justify-center rounded-[14px] bg-secondary/10 ">
+      <View className="mr-3 h-11 w-11 items-center justify-center rounded-[14px] bg-primary/10 ">
         <MaterialCommunityIcons
           name={getExpenseIcon(expense.category)}
-          color="#634CE4"
+          color="#8A77F4"
           size={21}
         />
       </View>

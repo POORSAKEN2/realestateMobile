@@ -1,7 +1,13 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { FloorAssignedRoomsSection } from "../../components/floorplans/FloorAssignedRoomsSection";
 import { BackButton } from "../../components/ui/buttons/BackButton";
@@ -41,11 +47,21 @@ export default function AssignedRoomsScreen() {
   const roomsQuery = usePropertyRoomsQuery(propertyId, session?.accessToken);
   const commands = usePropertyRoomCommands(propertyId, session?.accessToken);
   const [notice, setNotice] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const rooms = useMemo(
     () => (roomsQuery.data ?? []).filter((room) => room.areaId === areaId),
     [areaId, roomsQuery.data],
   );
   const isBusy = commands.update.isPending;
+
+  async function refreshRooms() {
+    setIsRefreshing(true);
+    try {
+      await roomsQuery.refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   async function updateStatus(room: PropertyRoom, status: PropertyRoomStatus) {
     if (room.status === status) return;
@@ -83,11 +99,11 @@ export default function AssignedRoomsScreen() {
 
   if (!propertyId || !areaId) {
     return (
-      <Screen className="bg-[#F5F7FC]">
+      <Screen className="bg-surface">
         <View className="flex-1 items-center justify-center px-6">
           <MaterialCommunityIcons
             name="door-closed-cancel"
-            color="#94A3B8"
+            color="#6F6D6D"
             size={32}
           />
           <Text className="mt-3 font-ralewayBold text-lg text-textPrimary">
@@ -105,11 +121,11 @@ export default function AssignedRoomsScreen() {
   }
 
   return (
-    <Screen className="bg-[#F5F7FC]">
+    <Screen className="bg-surface">
       <View className="flex-1">
         <ModuleHeader
           action={
-            <View className="min-w-11 items-center justify-center rounded-full bg-secondary/10 px-3 py-2">
+            <View className="min-w-11 items-center justify-center rounded-full bg-primary/10 px-3 py-2">
               <Text className="font-ralewayBold text-sm text-primary">
                 {rooms.length}
               </Text>
@@ -130,14 +146,14 @@ export default function AssignedRoomsScreen() {
         {notice ? (
           <TouchableOpacity
             activeOpacity={0.8}
-            className="mt-4 flex-row items-center gap-2 rounded-2xl border border-teal-100 bg-teal-50 px-4 py-3"
+            className="mt-4 flex-row items-center gap-2 rounded-2xl border border-success/25 bg-successSurface px-4 py-3"
             onPress={() => setNotice("")}
           >
-            <Feather name="check-circle" color="#0D9488" size={16} />
-            <Text className="min-w-0 flex-1 font-ralewayBold text-xs text-teal-800">
+            <Feather name="check-circle" color="#0F6B55" size={16} />
+            <Text className="min-w-0 flex-1 font-ralewayBold text-xs text-success">
               {notice}
             </Text>
-            <Feather name="x" color="#0D9488" size={15} />
+            <Feather name="x" color="#0F6B55" size={15} />
           </TouchableOpacity>
         ) : null}
 
@@ -150,11 +166,11 @@ export default function AssignedRoomsScreen() {
           </View>
         ) : roomsQuery.isError ? (
           <View className="flex-1 items-center justify-center px-6">
-            <Feather name="cloud-off" color="#64748B" size={30} />
+            <Feather name="cloud-off" color="#6F6D6D" size={30} />
             <Text className="mt-3 font-ralewayBold text-lg text-textPrimary">
               Assigned rooms unavailable
             </Text>
-            <Text className="mt-1 text-center text-sm text-slate-500">
+            <Text className="mt-1 text-center text-sm text-description">
               Check connection and try again.
             </Text>
             <TouchableOpacity
@@ -172,6 +188,14 @@ export default function AssignedRoomsScreen() {
               paddingHorizontal: 24,
             }}
             keyboardShouldPersistTaps="handled"
+            refreshControl={
+              <RefreshControl
+                colors={["#8A77F4"]}
+                onRefresh={refreshRooms}
+                refreshing={isRefreshing}
+                tintColor="#8A77F4"
+              />
+            }
             showsVerticalScrollIndicator={false}
           >
             <FloorAssignedRoomsSection

@@ -13,7 +13,7 @@ interface ChoiceFieldProps<T> {
   onChange: (value: T | T[]) => void;
   emptyText?: string;
   isMultiSelect?: boolean;
-  activeColorClass?: string; // Optional: Override default active blue color (e.g., 'bg-emerald-600 border-emerald-600')
+  activeColorClass?: string; // Optional: Override default active blue color (e.g., 'bg-success border-success')
   variant?: "pill" | "filled" | "segmented";
 }
 
@@ -24,7 +24,7 @@ export function ChoiceField<T extends string | number | boolean>({
   onChange,
   emptyText,
   isMultiSelect = false,
-  activeColorClass = "border-secondary bg-secondary",
+  activeColorClass = "border-primary bg-primary",
   variant = "pill",
 }: ChoiceFieldProps<T>) {
   const isSegmented = variant === "segmented";
@@ -55,8 +55,8 @@ export function ChoiceField<T extends string | number | boolean>({
       <Text
         className={
           hasFilledSurface
-            ? "font-ralewaySemiBold text-sm text-slate-600"
-            : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-[#6F6D6D]"
+            ? "font-ralewaySemiBold text-sm text-description"
+            : "font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description"
         }
       >
         {label}
@@ -66,11 +66,11 @@ export function ChoiceField<T extends string | number | boolean>({
         <View
           className={`rounded-2xl border border-dashed p-4 ${
             hasFilledSurface
-              ? "border-slate-300 bg-surface"
-              : "border-textPrimary/20 bg-[#FFFFFF]/90"
+              ? "border-textPrimary/20 bg-surface"
+              : "border-textPrimary/20 bg-whitePrimary/90"
           }`}
         >
-          <Text className="font-ralewaySemiBold text-sm text-[#6F6D6D]">
+          <Text className="font-ralewaySemiBold text-sm text-description">
             {emptyText ?? "No options available."}
           </Text>
         </View>
@@ -78,7 +78,7 @@ export function ChoiceField<T extends string | number | boolean>({
         <View
           className={
             isSegmented
-              ? "flex-row overflow-hidden rounded-2xl border border-secondary/20 bg-surface p-0.5"
+              ? "flex-row overflow-hidden rounded-2xl border border-primary/20 bg-surface p-0.5"
               : "flex-row flex-wrap gap-2"
           }
         >
@@ -92,7 +92,7 @@ export function ChoiceField<T extends string | number | boolean>({
                 className={
                   isSegmented
                     ? `h-14 flex-1 items-center justify-center rounded-[14px] ${
-                        selected ? "bg-secondary" : "bg-transparent"
+                        selected ? "bg-primary" : "bg-transparent"
                       }`
                     : `min-h-11 justify-center border px-3.5 py-2.5 ${
                         hasFilledSurface ? "rounded-2xl" : "rounded-full"
@@ -100,8 +100,8 @@ export function ChoiceField<T extends string | number | boolean>({
                         selected
                           ? activeColorClass
                           : hasFilledSurface
-                            ? "border-secondary/20 bg-surface"
-                            : "border-secondary/20 bg-[#FFFFFF]"
+                            ? "border-primary/20 bg-surface"
+                            : "border-primary/20 bg-whitePrimary"
                       }`
                 }
                 onPress={() => handlePress(option.value)}
@@ -109,9 +109,9 @@ export function ChoiceField<T extends string | number | boolean>({
                 <Text
                   className={`${isSegmented ? "font-ralewaySemiBold text-sm" : "font-ralewayBold text-xs"} ${
                     selected
-                      ? "text-[#FFFFFF]"
+                      ? "text-whitePrimary"
                       : hasFilledSurface
-                        ? "text-slate-600"
+                        ? "text-description"
                         : "text-textPrimary"
                   }`}
                 >

@@ -3,16 +3,17 @@ import {
   Image,
   ImageBackground,
   Text,
-  TextInput,
   View,
   TouchableOpacity,
   Dimensions,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { GlassView } from "expo-glass-effect";
 import { useMemo, useState } from "react";
 import { Screen } from "../../components/ui/Screen";
+import { SearchToolbar } from "../../components/ui/SearchToolbar";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
 import { useProperties } from "../../hooks/api/useProperties";
@@ -25,6 +26,11 @@ import PropertyImageGallery from "../../components/properties/PropertyImageGalle
 import { PortfolioAssetFilterSheet } from "../../components/properties/PortfolioAssetFilterSheet";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import { PropertyPortfolioSummary } from "../../components/properties/PropertyPortfolioSummary";
+import {
+  SkeletonGroup,
+  SkeletonList,
+  SkeletonListCard,
+} from "../../components/ui/Skeleton";
 import {
   capitalizeWords,
   filterAndSortProperties,
@@ -64,10 +70,11 @@ export default function DashboardScreen() {
   const [assetSortOrder, setAssetSortOrder] = useState<AssetSortOrder>("desc");
   const [assetStatusFilter, setAssetStatusFilter] =
     useState<AssetStatusFilter>("ALL");
-  const hasCustomAssetFilters =
-    assetStatusFilter !== "ALL" ||
-    assetSortBy !== "value" ||
-    assetSortOrder !== "desc";
+  const activeAssetFilterCount = [
+    assetStatusFilter !== "ALL",
+    assetSortBy !== "value",
+    assetSortOrder !== "desc",
+  ].filter(Boolean).length;
   const [imageGalleryProperty, setImageGalleryProperty] =
     useState<Property | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
@@ -78,7 +85,9 @@ export default function DashboardScreen() {
     data: properties = [],
     isError: isPropertiesError,
     isLoading: isLoadingProperties,
+    refetch: refetchProperties,
   } = useList();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { height } = Dimensions.get("window");
   const heroHeight = Math.min(Math.max(height * 0.24, 192), 224);
   const portfolioValue = useMemo(
@@ -142,7 +151,7 @@ export default function DashboardScreen() {
         }}
       />
 
-      <View className="absolute right-3.5 top-3.5 h-2.5 w-2.5 rounded-full border border-white/95 bg-red-500 shadow-sm shadow-red-900/40" />
+      <View className="absolute right-3.5 top-3.5 h-2.5 w-2.5 rounded-full border border-white/95 bg-danger shadow-sm shadow-danger/20" />
     </>
   );
   const iosNotificationGlassContent = (
@@ -163,6 +172,15 @@ export default function DashboardScreen() {
       {notificationIcon}
     </>
   );
+
+  async function refreshDashboard() {
+    setIsRefreshing(true);
+    try {
+      await refetchProperties();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
 
   return (
     <Screen bottomInset="tab-bar" className="flex-1 bg-surface">
@@ -273,38 +291,23 @@ export default function DashboardScreen() {
         <Text className="font-ralewayBold">Portfolio Assets</Text>
 
         <View className="mt-3 flex-row items-center gap-3">
-          <View className="h-14 min-w-0 flex-1 flex-row items-center gap-3 rounded-[22px] border border-secondary/20 bg-white px-4 shadow-xl shadow-secondary/10">
-            <Feather name="search" size={20} color={colors.secondary} />
-
-            <TextInput
-              accessibilityLabel="Search portfolio assets"
-              className="h-full min-w-0 flex-1 p-0 font-ralewaySemiBold text-sm text-textPrimary"
-              placeholder="Location or asset"
-              placeholderTextColor={colors.description}
-              returnKeyType="search"
-              value={assetSearchQuery}
-              onChangeText={setAssetSearchQuery}
-            />
-
-            <TouchableOpacity
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Open portfolio asset filters"
-              onPress={() => setShowAssetFilters(true)}
-              className="relative h-10 w-8 items-center justify-center"
-            >
-              <Feather name="sliders" size={18} color={colors.secondary} />
-              {hasCustomAssetFilters ? (
-                <View className="absolute right-0 top-1.5 h-2 w-2 rounded-full bg-secondary" />
-              ) : null}
-            </TouchableOpacity>
-          </View>
+          <SearchToolbar
+            accessibilityLabel="Search portfolio assets"
+            activeFilterCount={activeAssetFilterCount}
+            className="flex-1"
+            clearAccessibilityLabel="Clear portfolio asset search"
+            filterAccessibilityLabel="Open portfolio asset filters"
+            onChangeText={setAssetSearchQuery}
+            onFilterPress={() => setShowAssetFilters(true)}
+            placeholder="Location or asset"
+            value={assetSearchQuery}
+          />
 
           <TouchableOpacity
             activeOpacity={0.8}
             accessibilityLabel="Open property map"
             accessibilityRole="button"
-            className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary"
+            className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
             onPress={() => router.navigate(appRoutes.secondary.map)}
           >
             <Feather name="map" color={colors.whitePrimary} size={18} />
@@ -314,21 +317,38 @@ export default function DashboardScreen() {
 
       <View className="mt-4 flex-1">
         {isLoadingProperties ? (
-          <View className="gap-3">
-            {Array.from({ length: 2 }).map((_, index) => (
-              <View
-                key={index}
-                className="h-24 rounded-2xl border border-secondary/20 bg-secondary/10"
-              />
-            ))}
-          </View>
-        ) : visibleAssets.length > 0 ? (
+          <SkeletonGroup
+            accessibilityLabel="Loading portfolio assets"
+            className="gap-3"
+          >
+            <SkeletonList
+              count={2}
+              renderItem={() => <SkeletonListCard className="min-h-24" />}
+            />
+          </SkeletonGroup>
+        ) : (
           <FlatList
             data={visibleAssets}
             keyExtractor={(property) => property.id}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 140 }}
             ItemSeparatorComponent={() => <View className="h-3" />}
+            ListEmptyComponent={
+              <View className="items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-primary/10 px-4 py-6">
+                <Feather name="search" size={22} color={colors.primary} />
+                <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
+                  No assets found
+                </Text>
+              </View>
+            }
+            refreshControl={
+              <RefreshControl
+                colors={[colors.primary]}
+                onRefresh={refreshDashboard}
+                refreshing={isRefreshing}
+                tintColor={colors.primary}
+              />
+            }
             renderItem={({ item: property }) => (
               <TouchableOpacity
                 activeOpacity={0.82}
@@ -341,7 +361,7 @@ export default function DashboardScreen() {
                   activeOpacity={0.86}
                   accessibilityRole="button"
                   accessibilityLabel={`View images for ${property.title}`}
-                  className="relative h-20 w-20 overflow-hidden rounded-xl bg-secondary/10"
+                  className="relative h-20 w-20 overflow-hidden rounded-xl bg-primary/10"
                   onPress={(event) => {
                     event.stopPropagation();
                     setImageGalleryProperty(property);
@@ -353,7 +373,7 @@ export default function DashboardScreen() {
                     resizeMode="cover"
                   />
                   {getPropertyImages(property).length > 1 ? (
-                    <View className="absolute bottom-1.5 right-1.5 rounded-full bg-black/55 px-1.5 py-0.5">
+                    <View className="absolute bottom-1.5 right-1.5 rounded-full bg-blackPrimary/55 px-1.5 py-0.5">
                       <Text className="font-ralewayBold text-[9px] text-white">
                         {getPropertyImages(property).length}
                       </Text>
@@ -402,13 +422,6 @@ export default function DashboardScreen() {
               </TouchableOpacity>
             )}
           />
-        ) : (
-          <View className="items-center justify-center rounded-2xl border border-dashed border-secondary/30 bg-secondary/10 px-4 py-6">
-            <Feather name="search" size={22} color={colors.secondary} />
-            <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
-              No assets found
-            </Text>
-          </View>
         )}
       </View>
 

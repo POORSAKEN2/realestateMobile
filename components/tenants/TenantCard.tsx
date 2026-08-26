@@ -26,15 +26,15 @@ export function TenantCard({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onOpen}
-      className="w-full overflow-hidden rounded-3xl border border-secondary/20 bg-white shadow-sm shadow-secondary/10"
+      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-sm shadow-primary/10"
     >
       <View className="p-5">
         {/* --- HEADER: Identity & Actions --- */}
         <View className="flex-row items-start justify-between gap-3">
           {/* Avatar & Info */}
           <View className="min-w-0 flex-1 flex-row gap-3.5">
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-secondary/10">
-              <Ionicons name="person" color="#634CE4" size={20} />
+            <View className="h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <Ionicons name="person" color="#8A77F4" size={20} />
             </View>
 
             <View className="min-w-0 flex-1 pt-0.5">
@@ -46,7 +46,7 @@ export function TenantCard({
                   {tenant.name}
                 </Text>
                 {/* Subtle Inline Badge */}
-                <View className="rounded-md bg-secondary/10 px-2 py-0.5">
+                <View className="rounded-md bg-primary/10 px-2 py-0.5">
                   <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-description">
                     {leaseCount} Lease{leaseCount === 1 ? "" : "s"}
                   </Text>
@@ -66,26 +66,32 @@ export function TenantCard({
           </View>
 
           {/* Quick Actions (Moved to top right to declutter bottom) */}
-          <View className="flex-row items-center gap-1 rounded-full border border-secondary/20 bg-secondary/10 p-1">
+          <View className="flex-row items-center gap-1 rounded-full border border-primary/20 bg-primary/10 p-1">
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={onEdit}
-              className="rounded-full p-1.5 hover:bg-secondary/10"
+              onPress={(event) => {
+                event.stopPropagation();
+                onEdit();
+              }}
+              className="rounded-full p-1.5 hover:bg-primary/10"
             >
-              <Ionicons name="pencil" size={16} color={colors.secondary} />
+              <Ionicons name="pencil" size={16} color={colors.primary} />
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={onDelete}
-              className="rounded-full p-1.5 hover:bg-red-50"
+              onPress={(event) => {
+                event.stopPropagation();
+                onDelete();
+              }}
+              className="rounded-full p-1.5 hover:bg-dangerSurface"
             >
-              <Ionicons name="trash" size={16} color="#EF4444" />
+              <Ionicons name="trash" size={16} color="#B42318" />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* --- DIVIDER --- */}
-        <View className="my-4 h-[1px] w-full bg-secondary/10" />
+        <View className="my-4 h-[1px] w-full bg-primary/10" />
 
         {/* --- METRICS GRID: Rent & Properties Side-by-Side --- */}
         <View className="flex-row items-center justify-between gap-4">
@@ -111,7 +117,7 @@ export function TenantCard({
           </View>
 
           {/* Vertical Separator */}
-          <View className="h-10 w-[1px] bg-secondary/10" />
+          <View className="h-10 w-[1px] bg-primary/10" />
 
           {/* Assets/Properties */}
           <View className="min-w-0 flex-1">

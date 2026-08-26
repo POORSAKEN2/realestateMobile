@@ -1,11 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { SearchField } from "../ui/fields/SearchField";
 
 export type SearchableOption = { id: string; label: string };
 
@@ -27,7 +24,7 @@ export function SelectionField({
         accessibilityLabel={`${label}, ${value}`}
         accessibilityRole="button"
         activeOpacity={0.8}
-        className="min-h-14 flex-row items-center rounded-2xl border border-secondary/20 bg-secondary/10 px-4"
+        className="min-h-14 flex-row items-center rounded-2xl border border-primary/20 bg-primary/10 px-4"
         onPress={onPress}
       >
         <Text
@@ -38,7 +35,7 @@ export function SelectionField({
         </Text>
         <MaterialCommunityIcons
           name="chevron-right"
-          color="#634CE4"
+          color="#8A77F4"
           size={21}
         />
       </TouchableOpacity>
@@ -72,16 +69,16 @@ export function SearchableOptionSelector({
   );
 
   return (
-    <View className="min-h-[500px] bg-surface">
+    <SafeAreaView className="min-h-[500px] bg-surface" edges={["bottom"]}>
       <View className="flex-row items-center gap-3 bg-white px-5 pb-5 pt-2">
         <TouchableOpacity
           accessibilityLabel={backAccessibilityLabel}
           accessibilityRole="button"
           activeOpacity={0.75}
-          className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
+          className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
           onPress={onBack}
         >
-          <MaterialCommunityIcons name="arrow-left" color="#634CE4" size={21} />
+          <MaterialCommunityIcons name="arrow-left" color="#8A77F4" size={21} />
         </TouchableOpacity>
         <Text
           accessibilityRole="header"
@@ -91,22 +88,19 @@ export function SearchableOptionSelector({
         </Text>
       </View>
       <View className="px-5 pt-4">
-        <View className="min-h-14 flex-row items-center gap-3 rounded-2xl bg-secondary/10 px-4">
-          <MaterialCommunityIcons name="magnify" color="#634CE4" size={20} />
-          <TextInput
-            accessibilityLabel={`Search ${title.toLowerCase()}`}
-            autoFocus
-            className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-textPrimary"
-            onChangeText={onChangeQuery}
-            placeholder="Search"
-            placeholderTextColor="#6F6D6D"
-            value={query}
-          />
-        </View>
+        <SearchField
+          accessibilityLabel={`Search ${title.toLowerCase()}`}
+          autoFocus
+          clearAccessibilityLabel={`Clear ${title.toLowerCase()} search`}
+          onChangeText={onChangeQuery}
+          placeholder="Search"
+          value={query}
+          wrapperClassName="h-14 rounded-[22px]"
+        />
       </View>
       <ScrollView
         className="mt-3"
-        contentContainerClassName="gap-2 px-5 pb-20"
+        contentContainerClassName="gap-2 px-5 pb-4"
         keyboardShouldPersistTaps="handled"
       >
         <OptionRow
@@ -128,7 +122,7 @@ export function SearchableOptionSelector({
           </Text>
         ) : null}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -148,21 +142,21 @@ function OptionRow({
       activeOpacity={0.8}
       className={`min-h-14 flex-row items-center rounded-2xl border px-4 ${
         isSelected
-          ? "border-secondary bg-secondary/10"
-          : "border-secondary/20 bg-white"
+          ? "border-primary bg-primary/10"
+          : "border-primary/20 bg-white"
       }`}
       onPress={onPress}
     >
       <Text
         className={`min-w-0 flex-1 font-ralewaySemiBold text-sm ${
-          isSelected ? "text-secondary" : "text-textPrimary"
+          isSelected ? "text-primary" : "text-textPrimary"
         }`}
         numberOfLines={1}
       >
         {label}
       </Text>
       {isSelected ? (
-        <MaterialCommunityIcons name="check-circle" color="#634CE4" size={21} />
+        <MaterialCommunityIcons name="check-circle" color="#8A77F4" size={21} />
       ) : null}
     </TouchableOpacity>
   );

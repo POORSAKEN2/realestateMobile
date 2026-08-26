@@ -34,8 +34,8 @@ module.exports = ({ config }) => {
         {
           android: {
             datePicker: {
-              colorAccent: { light: "#634CE4" },
-              colorControlActivated: { light: "#634CE4" },
+              colorAccent: { light: "#8A77F4" },
+              colorControlActivated: { light: "#8A77F4" },
               colorControlHighlight: { light: "#BEE3DB" },
               textColor: { light: "#1E1F45" },
               textColorPrimary: { light: "#1E1F45" },
@@ -46,7 +46,7 @@ module.exports = ({ config }) => {
             },
             timePicker: {
               background: { light: "#FAF9F9" },
-              headerBackground: { light: "#634CE4" },
+              headerBackground: { light: "#303866" },
               numbersBackgroundColor: { light: "#FAF9F9" },
               numbersSelectorColor: { light: "#8A77F4" },
               numbersTextColor: { light: "#1E1F45" },

@@ -6,9 +6,11 @@ import { ModuleHeader } from "../ui/ModuleHeader";
 
 export function DocumentsHeader({
   documentCount,
+  isLoading = false,
   onUpload,
 }: {
   documentCount: number;
+  isLoading?: boolean;
   onUpload: () => void;
 }) {
   return (
@@ -18,7 +20,7 @@ export function DocumentsHeader({
           accessibilityLabel="Upload document"
           accessibilityRole="button"
           activeOpacity={0.85}
-          className="min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl bg-secondary px-3.5"
+          className="min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl bg-primary px-3.5"
           onPress={onUpload}
         >
           <MaterialCommunityIcons name="plus" color="#FFFFFF" size={20} />
@@ -34,9 +36,11 @@ export function DocumentsHeader({
           variant="secondary"
         />
       }
-      supportingText={`${documentCount} ${
-        documentCount === 1 ? "document" : "documents"
-      }`}
+      supportingText={
+        isLoading
+          ? "Loading library"
+          : `${documentCount} ${documentCount === 1 ? "document" : "documents"}`
+      }
       title="Documents"
     />
   );

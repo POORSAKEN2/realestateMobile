@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ActionSheet, type ActionSheetItem } from "../ui/ActionSheet";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
@@ -33,13 +34,13 @@ export function DocumentSortSheet({
               accessibilityState={{ checked: isSelected }}
               activeOpacity={0.8}
               className={`min-h-14 flex-row items-center rounded-2xl px-4 ${
-                isSelected ? "bg-secondary/10" : "bg-surface"
+                isSelected ? "bg-primary/10" : "bg-surface"
               }`}
               onPress={() => onSelect(option.value)}
             >
               <Text
                 className={`min-w-0 flex-1 font-ralewayBold text-sm ${
-                  isSelected ? "text-secondary" : "text-textPrimary"
+                  isSelected ? "text-primary" : "text-textPrimary"
                 }`}
               >
                 {option.label}
@@ -47,7 +48,7 @@ export function DocumentSortSheet({
               {isSelected ? (
                 <MaterialCommunityIcons
                   name="check-circle"
-                  color="#634CE4"
+                  color="#8A77F4"
                   size={21}
                 />
               ) : null}
@@ -142,25 +143,25 @@ export function DeleteDocumentSheet({
         <TouchableOpacity
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-secondary/10"
+          className="min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white"
           disabled={isDeleting}
           onPress={onCancel}
         >
-          <Text className="font-ralewayExtraBold text-sm text-textPrimary">
+          <Text className="font-ralewayBold text-base text-primary">
             Cancel
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="min-h-12 flex-1 items-center justify-center rounded-2xl bg-red-600"
+          className="min-h-14 flex-1 items-center justify-center rounded-2xl bg-danger"
           disabled={isDeleting}
           onPress={() => document && onConfirm(document)}
         >
           {isDeleting ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text className="font-ralewayExtraBold text-sm text-white">
+            <Text className="font-ralewayBold text-base text-white">
               Delete
             </Text>
           )}
@@ -186,15 +187,15 @@ function BottomSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title}`}
-      backdropClassName="bg-textPrimary/45"
       onClose={onClose}
       visible={visible}
     >
-      <View
+      <SafeAreaView
         accessibilityViewIsModal
-        className="rounded-t-[30px] bg-white px-5 pb-20 pt-3"
+        className="rounded-t-[30px] bg-white px-5 pb-4 pt-3"
+        edges={["bottom"]}
       >
-        <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
+        <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
         <View className="mb-5 flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
             <Text
@@ -216,14 +217,14 @@ function BottomSheet({
             accessibilityLabel="Close"
             accessibilityRole="button"
             activeOpacity={0.75}
-            className="h-11 w-11 items-center justify-center rounded-full bg-secondary/10"
+            className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
             onPress={onClose}
           >
-            <MaterialCommunityIcons name="close" color="#634CE4" size={21} />
+            <MaterialCommunityIcons name="close" color="#8A77F4" size={21} />
           </TouchableOpacity>
         </View>
         {children}
-      </View>
+      </SafeAreaView>
     </BottomSheetModal>
   );
 }

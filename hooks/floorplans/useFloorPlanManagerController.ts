@@ -38,12 +38,14 @@ export function useFloorPlanManagerController({
   accessToken,
   dependencies,
   floorPlanCapability = "optional",
+  initialFloorId,
   propertyId,
   roomCapability = "optional",
 }: {
   accessToken?: string;
   dependencies: FloorPlanManagerDependencies;
   floorPlanCapability?: SpatialCapabilityLevel;
+  initialFloorId?: string;
   propertyId: string;
   roomCapability?: SpatialCapabilityLevel;
 }) {
@@ -84,12 +86,17 @@ export function useFloorPlanManagerController({
       return;
     }
     if (!floorPlans.some((floor) => floor.id === activeFloorId)) {
-      setActiveFloorId(floorPlans[0].id);
+      const initialFloor = floorPlans.find(
+        (floor) => floor.id === initialFloorId,
+      );
+      setActiveFloorId(initialFloor?.id ?? floorPlans[0].id);
     }
-  }, [activeFloorId, floorPlans]);
+  }, [activeFloorId, floorPlans, initialFloorId]);
 
   const activeFloor =
-    floorPlans.find((floor) => floor.id === activeFloorId) ?? floorPlans[0];
+    floorPlans.find((floor) => floor.id === activeFloorId) ??
+    floorPlans.find((floor) => floor.id === initialFloorId) ??
+    floorPlans[0];
   const drawingArea =
     activeFloor?.areas.find((area) => area.id === drawing?.areaId) ?? null;
   const totalAreas = floorPlans.reduce(
@@ -324,6 +331,7 @@ export function useFloorPlanManagerController({
       delete: floorCommands.remove.isPending || areaCommands.remove.isPending,
       floorForm:
         floorCommands.create.isPending || floorCommands.update.isPending,
+      imageUpload: floorCommands.uploadImage.isPending,
       shape: areaCommands.update.isPending,
     },
     queries,

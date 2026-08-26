@@ -44,16 +44,24 @@ export function getAvailabilityForDay(
     ) &&
     !checkingInToday
   ) {
-    return { label: "After 2 PM", bg: "bg-sky-50", text: "text-sky-600" };
+    return { label: "After 2 PM", bg: "bg-infoSurface", text: "text-info" };
   }
   if (dayBookings.some((booking) => booking.endDate === key)) {
-    return { label: "Checkout", bg: "bg-amber-50", text: "text-amber-600" };
+    return {
+      label: "Checkout",
+      bg: "bg-warningSurface",
+      text: "text-turnover",
+    };
   }
   if (dayBookings.length > 0) {
-    return { label: "Occupied", bg: "bg-rose-50", text: "text-rose-600" };
+    return { label: "Occupied", bg: "bg-dangerSurface", text: "text-danger" };
   }
   if (checkingOutToday && !checkingInToday) {
-    return { label: "After 2 PM", bg: "bg-sky-50", text: "text-sky-600" };
+    return { label: "After 2 PM", bg: "bg-infoSurface", text: "text-info" };
   }
-  return { label: "Available", bg: "bg-emerald-50", text: "text-emerald-600" };
+  return {
+    label: "Available",
+    bg: "bg-successSurface",
+    text: "text-success",
+  };
 }

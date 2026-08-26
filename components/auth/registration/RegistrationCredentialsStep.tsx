@@ -47,7 +47,7 @@ export function RegistrationCredentialsStep({
         />
         <Text
           className={`mt-2 text-xs leading-5 ${
-            passwordWarning ? "text-amber-700" : "text-description"
+            passwordWarning ? "text-warning" : "text-description"
           }`}
         >
           {passwordWarning ||

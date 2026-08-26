@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import BrandCombinationVertical from "../../assets/branding/svg/brand-combination-vertical-white.svg";
+import { colors } from "../../constants/colors";
 import { useLogin } from "../../hooks/useLogin";
 
 type FocusedField = "email" | "password" | null;
@@ -70,7 +71,7 @@ export default function LoginScreen() {
   }, []);
 
   return (
-    <View className="flex-1 bg-primary">
+    <View className="flex-1 bg-secondary">
       <Stack.Screen options={{ headerShown: false }} />
       <StatusBar style="light" />
 
@@ -225,7 +226,7 @@ export default function LoginScreen() {
               {error ? (
                 <View
                   accessibilityLiveRegion="polite"
-                  className="mt-5 flex-row items-start rounded-2xl border border-white/20 bg-white/10 px-4 py-3"
+                  className="mt-5 flex-row items-start rounded-2xl border border-accent/25 bg-accent/10 px-4 py-3"
                 >
                   <Feather color="#BEE3DB" name="alert-circle" size={19} />
 
@@ -244,17 +245,17 @@ export default function LoginScreen() {
                   disabled: !canSubmit,
                 }}
                 className={`mt-12 h-14 items-center justify-center rounded-2xl ${
-                  canSubmit ? "bg-white active:opacity-90" : "bg-white/50"
+                  canSubmit ? "bg-accent active:opacity-90" : "bg-accent/40"
                 }`}
                 disabled={!canSubmit}
                 onPress={handleLogin}
               >
                 {isLoading ? (
-                  <ActivityIndicator color="#634CE4" />
+                  <ActivityIndicator color={colors.secondary} />
                 ) : (
                   <Text
                     className={`font-ralewayBold text-base ${
-                      canSubmit ? "text-primary" : "text-primary/50"
+                      canSubmit ? "text-secondary" : "text-secondary/50"
                     }`}
                   >
                     Sign In

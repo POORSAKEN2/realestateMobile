@@ -12,13 +12,13 @@ export function BookingAvailabilityMessage({
     <View
       className={`rounded-2xl border p-4 ${
         conflict
-          ? "border-amber-500/30 bg-amber-50"
-          : "border-emerald-500/30 bg-emerald-50"
+          ? "border-warning/30 bg-warningSurface"
+          : "border-success/25 bg-successSurface"
       }`}
     >
       <Text
-        className={`text-sm font-ralewayBold ${
-          conflict ? "text-amber-700" : "text-emerald-700"
+        className={`font-ralewayBold text-sm ${
+          conflict ? "text-warning" : "text-success"
         }`}
       >
         {conflict

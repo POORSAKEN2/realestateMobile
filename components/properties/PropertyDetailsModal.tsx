@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { appRoutes } from "../../constants/navigation";
 
 import { fetchDocuments, fetchLeases } from "../../api/propertyDetails";
@@ -27,6 +28,7 @@ import {
 import { getPropertyImages } from "../../utils/properties/propertyPresentation";
 import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
+import { SkeletonBlock } from "../ui/Skeleton";
 import { PropertyFloorSummary } from "./PropertyFloorSummary";
 
 export function PropertyDetailsModal({
@@ -39,6 +41,7 @@ export function PropertyDetailsModal({
   property: Property | null;
 }) {
   const { height, width } = Dimensions.get("window");
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const sheetTranslateY = useRef(new Animated.Value(0)).current;
   const swipeDownResponder = useMemo(
@@ -136,7 +139,6 @@ export function PropertyDetailsModal({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close property details"
-      backdropClassName="bg-textPrimary/45"
       onClose={onClose}
       statusBarTranslucent
       visible={Boolean(property)}
@@ -155,11 +157,11 @@ export function PropertyDetailsModal({
             className="h-10 items-center justify-center"
             {...swipeDownResponder.panHandlers}
           >
-            <View className="h-1.5 w-12 rounded-full bg-secondary/30" />
+            <View className="h-1.5 w-12 rounded-full bg-primary/30" />
           </View>
           <ScrollView
             bounces={false}
-            contentContainerClassName="pb-20"
+            contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
             showsVerticalScrollIndicator={false}
           >
             <View className="relative mt-4 h-56 overflow-hidden">
@@ -199,7 +201,7 @@ export function PropertyDetailsModal({
                     ))}
                   </View>
                 ) : null}
-                <Text className="self-start rounded-md bg-secondary px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
+                <Text className="self-start rounded-md bg-primary px-2 py-1 font-ralewayBold text-[10px] uppercase text-white">
                   {formatPropertyStatus(property.status)}
                 </Text>
                 <Text
@@ -292,7 +294,13 @@ export function PropertyDetailsModal({
 
               <DetailsSection title="Current Tenants">
                 {isLoading ? (
-                  <View className="h-16 rounded-2xl bg-white" />
+                  <View className="rounded-2xl border border-primary/20 bg-white p-3">
+                    <View className="flex-row items-center justify-between gap-3">
+                      <SkeletonBlock className="h-4 w-1/2" />
+                      <SkeletonBlock className="h-5 w-16 rounded-full bg-primary/10" />
+                    </View>
+                    <SkeletonBlock className="mt-2 h-3 w-3/4" />
+                  </View>
                 ) : propertyLeases.length ? (
                   propertyLeases.map((lease) => {
                     const lessee =
@@ -300,7 +308,7 @@ export function PropertyDetailsModal({
                       lessees.find((item) => item.id === lease.lesseeId);
                     return (
                       <View
-                        className="rounded-2xl border border-secondary/20 p-3"
+                        className="rounded-2xl border border-primary/20 p-3"
                         key={lease.id}
                       >
                         <View className="flex-row items-start justify-between gap-2">
@@ -319,7 +327,7 @@ export function PropertyDetailsModal({
                               {lease.startDate} to {lease.endDate}
                             </Text>
                           </View>
-                          <Text className="rounded-full bg-secondary/10 px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-secondary">
+                          <Text className="rounded-full bg-accent px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-textPrimary">
                             {lease.status}
                           </Text>
                         </View>
@@ -333,17 +341,24 @@ export function PropertyDetailsModal({
 
               <DetailsSection title="Property Documents">
                 {isLoading ? (
-                  <View className="h-16 rounded-2xl bg-white" />
+                  <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3">
+                    <SkeletonBlock className="h-10 w-10 rounded-xl bg-primary/10" />
+                    <View className="min-w-0 flex-1 gap-2">
+                      <SkeletonBlock className="h-4 w-2/3" />
+                      <SkeletonBlock className="h-3 w-1/2" />
+                    </View>
+                    <SkeletonBlock className="h-5 w-5 rounded-lg" />
+                  </View>
                 ) : propertyDocuments.length ? (
                   propertyDocuments.map((document) => (
                     <TouchableOpacity
                       activeOpacity={0.8}
-                      className="flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3"
+                      className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
                       key={document.id}
                       onPress={() => openPropertyDocument(document)}
                     >
-                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
-                        <Feather name="file-text" color="#634CE4" size={17} />
+                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                        <Feather name="file-text" color="#8A77F4" size={17} />
                       </View>
                       <View className="min-w-0 flex-1">
                         <Text
@@ -361,7 +376,7 @@ export function PropertyDetailsModal({
                       </View>
                       <Feather
                         name="external-link"
-                        color={document.url ? "#634CE4" : "#BEE3DB"}
+                        color={document.url ? "#8A77F4" : "#BEE3DB"}
                         size={15}
                       />
                     </TouchableOpacity>
@@ -371,7 +386,7 @@ export function PropertyDetailsModal({
                 )}
               </DetailsSection>
 
-              <View className="mt-6 flex-row gap-3 border-t border-secondary/20 pt-5">
+              <View className="mt-6 flex-row gap-3 border-t border-primary/20 pt-5">
                 <Attribute
                   icon="maximize-2"
                   label="Total Area"
@@ -403,7 +418,7 @@ function DetailMetric({
   return (
     <View className="w-1/2 p-1.5">
       <View
-        className={`rounded-2xl border border-secondary/20 p-3 ${accent ? "bg-accent/50" : "bg-white"}`}
+        className={`rounded-2xl border border-primary/20 p-3 ${accent ? "bg-accent/50" : "bg-white"}`}
       >
         <Text
           className={`font-ralewayBold text-[10px] uppercase ${accent ? "text-textPrimary/70" : "text-description"}`}
@@ -434,16 +449,20 @@ function CountMetric({
   value: number;
 }) {
   return (
-    <View className="flex-1 rounded-2xl border border-secondary/20 bg-white p-4">
+    <View className="flex-1 rounded-2xl border border-primary/20 bg-white p-4">
       <View className="flex-row items-center gap-2">
-        <Feather name={icon} color="#634CE4" size={16} />
+        <Feather name={icon} color="#8A77F4" size={16} />
         <Text className="font-ralewayBold text-[10px] uppercase text-secondary">
           {label}
         </Text>
       </View>
-      <Text className="mt-2 font-ralewayExtraBold text-2xl text-textPrimary">
-        {loading ? "..." : value}
-      </Text>
+      {loading ? (
+        <SkeletonBlock className="mt-3 h-7 w-12 bg-primary/15" />
+      ) : (
+        <Text className="mt-2 font-ralewayExtraBold text-2xl text-textPrimary">
+          {value}
+        </Text>
+      )}
     </View>
   );
 }
@@ -456,7 +475,7 @@ function DetailsSection({
   title: string;
 }) {
   return (
-    <View className="mt-6 border-t border-secondary/20 pt-5">
+    <View className="mt-6 border-t border-primary/20 pt-5">
       <Text className="font-ralewayBold text-xs uppercase text-description">
         {title}
       </Text>
@@ -467,7 +486,7 @@ function DetailsSection({
 
 function EmptyDetail({ text }: { text: string }) {
   return (
-    <View className="items-center rounded-2xl border border-dashed border-secondary/20 bg-white px-4 py-5">
+    <View className="items-center rounded-2xl border border-dashed border-primary/20 bg-white px-4 py-5">
       <Text className="font-ralewaySemiBold text-xs text-description">
         {text}
       </Text>
@@ -485,9 +504,9 @@ function Attribute({
   value: string;
 }) {
   return (
-    <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-secondary/20 bg-white p-3">
-      <View className="h-9 w-9 items-center justify-center rounded-xl bg-secondary/10">
-        <Feather name={icon} color="#634CE4" size={15} />
+    <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3">
+      <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+        <Feather name={icon} color="#8A77F4" size={15} />
       </View>
       <View className="min-w-0 flex-1">
         <Text className="font-ralewayBold text-[9px] uppercase text-description">

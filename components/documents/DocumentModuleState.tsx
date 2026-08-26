@@ -1,5 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+
+import { SkeletonGroup, SkeletonList, SkeletonListCard } from "../ui/Skeleton";
 
 export function DocumentModuleState({
   isError,
@@ -18,16 +20,12 @@ export function DocumentModuleState({
 }) {
   if (isLoading) {
     return (
-      <View
-        accessibilityLabel="Loading documents"
-        accessibilityRole="progressbar"
-        className="h-52 items-center justify-center rounded-[24px] border border-secondary/20 bg-white"
-      >
-        <ActivityIndicator color="#634CE4" />
-        <Text className="mt-3 font-ralewaySemiBold text-sm text-description">
-          Loading documents
-        </Text>
-      </View>
+      <SkeletonGroup accessibilityLabel="Loading documents" className="gap-3">
+        <SkeletonList
+          count={3}
+          renderItem={() => <SkeletonListCard className="min-h-32" />}
+        />
+      </SkeletonGroup>
     );
   }
 
@@ -80,9 +78,9 @@ function StateCard({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-[24px] border border-dashed border-secondary/30 bg-white p-8">
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-secondary/10">
-        <MaterialCommunityIcons name={icon} color="#634CE4" size={28} />
+    <View className="items-center rounded-[24px] border border-dashed border-primary/30 bg-white p-8">
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+        <MaterialCommunityIcons name={icon} color="#8A77F4" size={28} />
       </View>
       <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-textPrimary">
         {title}
@@ -93,7 +91,7 @@ function StateCard({
       <TouchableOpacity
         accessibilityRole="button"
         activeOpacity={0.85}
-        className="mt-5 min-h-12 justify-center rounded-2xl bg-secondary px-5"
+        className="mt-5 min-h-12 justify-center rounded-2xl bg-primary px-5"
         onPress={onAction}
       >
         <Text className="font-ralewayExtraBold text-sm text-white">

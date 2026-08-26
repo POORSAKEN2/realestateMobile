@@ -8,11 +8,13 @@ import { ExpenseTransactionCard } from "./ExpenseTransactionCard";
 
 type ExpenseTransactionListProps = {
   expenses: Expense[];
+  isFiltered?: boolean;
   onOpenActions: (expense: Expense) => void;
 };
 
 export function ExpenseTransactionList({
   expenses,
+  isFiltered = false,
   onOpenActions,
 }: ExpenseTransactionListProps) {
   return (
@@ -38,17 +40,21 @@ export function ExpenseTransactionList({
             </SwipeActionCard>
           ))
         ) : (
-          <View className="items-center rounded-[20px] border border-dashed border-secondary/20 bg-white px-6 py-10">
+          <View className="items-center rounded-[20px] border border-dashed border-primary/20 bg-white px-6 py-10">
             <MaterialCommunityIcons
               name="receipt-text-outline"
-              color="#634CE4"
+              color="#8A77F4"
               size={30}
             />
             <Text className="mt-3 font-ralewayBold text-sm text-textPrimary">
-              No recent transactions
+              {isFiltered
+                ? "No matching transactions"
+                : "No recent transactions"}
             </Text>
             <Text className="mt-1 text-center font-ralewayMedium text-xs leading-5 text-description">
-              New expenses and approvals will appear here.
+              {isFiltered
+                ? "Try a different search to find another expense."
+                : "New expenses and approvals will appear here."}
             </Text>
           </View>
         )}

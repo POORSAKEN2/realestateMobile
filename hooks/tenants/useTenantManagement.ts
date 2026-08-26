@@ -37,16 +37,19 @@ export function useTenantManagement({
   const [selectedTenant, setSelectedTenant] = useState<Lessee | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Lessee | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const { data: tenants = [], isLoading: isLoadingTenants } =
-    useClients(accessToken);
-  const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
+  const tenantsQuery = useClients(accessToken);
+  const tenants = tenantsQuery.data ?? [];
+  const leasesQuery = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),
     enabled: Boolean(accessToken),
   });
+  const leases = leasesQuery.data ?? [];
   const { useList } = useProperties();
-  const { data: properties = [], isLoading: isLoadingProperties } = useList();
+  const propertiesQuery = useList();
+  const properties = propertiesQuery.data;
 
   const saveMutation = useMutation({
     mutationFn: (payload: LesseePayload) =>
@@ -145,6 +148,19 @@ export function useTenantManagement({
     saveMutation.mutate(result.payload);
   }
 
+  async function refresh() {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        tenantsQuery.refetch(),
+        leasesQuery.refetch(),
+        propertiesQuery.refetch(),
+      ]);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
   const linkedTenantCount = tenants.filter((tenant) =>
     leases.some((lease) => lease.lesseeId === tenant.id),
   ).length;
@@ -160,13 +176,19 @@ export function useTenantManagement({
     getLinkedProperties,
     getTenantLeases,
     isFormOpen,
-    isLoading: isLoadingTenants || isLoadingLeases || isLoadingProperties,
+    isLoading:
+      tenantsQuery.isLoading ||
+      leasesQuery.isLoading ||
+      propertiesQuery.isLoading,
+    isRefreshing,
     leases,
     linkedTenantCount,
     linkedTenantPercentage:
       tenants.length === 0 ? 0 : (linkedTenantCount / tenants.length) * 100,
     openCreateForm,
     openEditForm,
+    properties,
+    refresh,
     saveMutation,
     searchQuery,
     selectedTenant,

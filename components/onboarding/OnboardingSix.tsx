@@ -15,54 +15,54 @@ export function OnboardingSix() {
         <OnboardingProgress activeIndex={5} />
 
         <View className="w-full flex-1 items-center justify-center">
-          <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-slate-100 bg-whitePrimary/95 shadow-2xl">
+          <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary/95 shadow-2xl">
             <View className="absolute inset-0">
-              <View className="absolute left-6 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-12 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-20 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-28 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-40 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-52 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute right-12 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute right-6 top-0 h-full w-px bg-slate-200/70" />
-              <View className="absolute left-0 top-8 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-16 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-28 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-40 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-52 h-px w-full bg-slate-200/70" />
-              <View className="absolute left-0 top-64 h-px w-full bg-slate-200/70" />
-              <View className="absolute bottom-8 left-0 h-px w-full bg-slate-200/70" />
+              <View className="absolute left-6 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-12 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-20 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-28 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-40 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-52 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute right-12 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute right-6 top-0 h-full w-px bg-textPrimary/10" />
+              <View className="absolute left-0 top-8 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-16 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-28 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-40 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-52 h-px w-full bg-textPrimary/10" />
+              <View className="absolute left-0 top-64 h-px w-full bg-textPrimary/10" />
+              <View className="absolute bottom-8 left-0 h-px w-full bg-textPrimary/10" />
             </View>
 
-            <View className="absolute inset-y-0 right-0 w-1/2 bg-slate-100/55" />
+            <View className="absolute inset-y-0 right-0 w-1/2 bg-surface" />
 
             <View className="right-30 absolute top-16 h-60 w-60 items-center justify-center">
               <Image
                 className="h-full w-full opacity-75"
                 resizeMode="contain"
                 source={philippinesMap}
-                tintColor="#E9BF55"
+                tintColor="#805000"
               />
-              <View className="right-50 absolute bottom-20 h-10 w-10 items-center justify-center rounded-full bg-teal-700 shadow-xl">
+              <View className="right-50 absolute bottom-20 h-10 w-10 items-center justify-center rounded-full bg-success shadow-xl">
                 <Feather name="map-pin" size={18} color="#FFFFFF" />
               </View>
-              {/* <View className="absolute bottom-[76px] right-[50px] h-5 w-5 rounded-full border border-white/70 bg-teal-300/50" /> */}
+              {/* <View className="absolute bottom-[76px] right-[50px] h-5 w-5 rounded-full border border-white/70 bg-success" /> */}
             </View>
 
             <View className="absolute right-5 top-12 w-44 rounded-[20px] border border-white/80 bg-whitePrimary/95 p-4 shadow-xl">
               <View className="flex-row items-center gap-2">
-                <View className="h-8 w-8 items-center justify-center rounded-2xl bg-teal-50">
-                  <Feather name="navigation" size={15} color="#634CE4" />
+                <View className="h-8 w-8 items-center justify-center rounded-2xl bg-successSurface">
+                  <Feather name="navigation" size={15} color="#8A77F4" />
                 </View>
-                <Text className="text-textPrimaryPrimary flex-1 font-ralewayBold text-sm">
+                <Text className="flex-1 font-ralewayBold text-sm text-textPrimary">
                   Property Location
                 </Text>
               </View>
               <Text className="mt-3 font-ralewaySemiBold text-xs leading-5 text-textPrimary">
                 Calapan, Oriental Mindoro
               </Text>
-              <View className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                <View className="h-full w-3/4 rounded-full bg-teal-500" />
+              <View className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface">
+                <View className="h-full w-3/4 rounded-full bg-success" />
               </View>
             </View>
 
@@ -70,7 +70,7 @@ export function OnboardingSix() {
               <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                 Region
               </Text>
-              <Text className="text-textPrimaryPrimary mt-1 font-ralewayBold text-sm">
+              <Text className="mt-1 font-ralewayBold text-sm text-textPrimary">
                 Philippines
               </Text>
             </View>
@@ -90,7 +90,7 @@ export function OnboardingSix() {
 
           <OnboardingControls
             activeIndex={5}
-            dotClassName="bg-lime-300"
+            dotClassName="bg-accent"
             nextHref="/(onboarding)/screen-7"
           />
         </View>

@@ -1,7 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   ScrollView,
   Text,
   TextInput,
@@ -26,6 +25,8 @@ import {
   SelectionField,
 } from "./SearchableOptionSelector";
 import { FormSection } from "../ui/forms/FormSection";
+import { FormActionRow } from "../ui/forms/FormActionRow";
+import { ModalActionFooter } from "../ui/ModalActionFooter";
 import { DocumentFileField } from "./DocumentFileField";
 
 type SelectorMode = "property" | "tenant" | null;
@@ -107,7 +108,6 @@ export function DocumentFormModal({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close document form"
-      backdropClassName="bg-textPrimary/45"
       closeOnBackdropPress={false}
       keyboardAvoiding
       onClose={handleClose}
@@ -118,7 +118,7 @@ export function DocumentFormModal({
         className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-surface"
       >
         <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-secondary/30" />
+          <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
         </View>
 
         {selectorMode ? (
@@ -170,7 +170,7 @@ export function DocumentFormModal({
               >
                 <MaterialCommunityIcons
                   name="close"
-                  color="#634CE4"
+                  color="#8A77F4"
                   size={21}
                 />
               </TouchableOpacity>
@@ -184,9 +184,9 @@ export function DocumentFormModal({
                 <View
                   accessibilityLiveRegion="assertive"
                   accessibilityRole="alert"
-                  className="rounded-2xl bg-red-50 px-4 py-3"
+                  className="rounded-2xl bg-dangerSurface px-4 py-3"
                 >
-                  <Text className="font-ralewayBold text-sm text-red-700">
+                  <Text className="font-ralewayBold text-sm text-danger">
                     {formError}
                   </Text>
                 </View>
@@ -215,8 +215,8 @@ export function DocumentFormModal({
                   <FieldLabel label="Name" required />
                   <TextInput
                     accessibilityLabel="Document name, required"
-                    className={`min-h-14 rounded-2xl border bg-secondary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
-                      errors.name ? "border-red-400" : "border-secondary/20"
+                    className={`min-h-14 rounded-2xl border bg-primary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
+                      errors.name ? "border-danger" : "border-primary/20"
                     }`}
                     onChangeText={(name) => onChangeForm({ ...form, name })}
                     placeholder="Document name"
@@ -226,7 +226,7 @@ export function DocumentFormModal({
                   {errors.name ? (
                     <Text
                       accessibilityLiveRegion="assertive"
-                      className="font-ralewaySemiBold text-xs text-red-600"
+                      className="font-ralewaySemiBold text-xs text-danger"
                     >
                       {errors.name}
                     </Text>
@@ -246,8 +246,8 @@ export function DocumentFormModal({
                           activeOpacity={0.8}
                           className={`min-h-11 justify-center rounded-2xl border px-4 ${
                             isSelected
-                              ? "border-secondary bg-secondary"
-                              : "border-secondary/20 bg-secondary/10"
+                              ? "border-primary bg-primary"
+                              : "border-primary/20 bg-primary/10"
                           }`}
                           onPress={() => onChangeForm({ ...form, category })}
                         >
@@ -280,7 +280,7 @@ export function DocumentFormModal({
                     <FieldLabel label="Version note" />
                     <TextInput
                       accessibilityLabel="Version note"
-                      className="min-h-24 rounded-2xl border border-secondary/20 bg-secondary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary"
+                      className="min-h-24 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary"
                       multiline
                       onChangeText={(revisionComment) =>
                         onChangeForm({ ...form, revisionComment })
@@ -295,40 +295,18 @@ export function DocumentFormModal({
               </FormSection>
             </ScrollView>
 
-            <View className="flex-row gap-3 border-t border-secondary/20 bg-white px-5 pb-20 pt-5">
-              <TouchableOpacity
-                accessibilityLabel="Cancel document form"
-                accessibilityRole="button"
-                activeOpacity={0.85}
-                className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-secondary bg-white ${
-                  isSaving ? "opacity-60" : ""
-                }`}
-                disabled={isSaving}
-                onPress={onClose}
-              >
-                <Text className="font-ralewayBold text-base text-secondary">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                accessibilityRole="button"
-                accessibilityState={{ disabled: !canSubmit }}
-                activeOpacity={0.85}
-                className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-secondary ${
-                  canSubmit ? "" : "opacity-40"
-                }`}
-                disabled={!canSubmit}
-                onPress={onSubmit}
-              >
-                {isSaving ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text className="font-ralewayBold text-base text-white">
-                    {editingDocument ? "Save changes" : "Upload document"}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
+            <ModalActionFooter>
+              <FormActionRow
+                appearance="card"
+                isPending={isSaving}
+                onCancel={onClose}
+                onSubmit={onSubmit}
+                submitDisabled={!canSubmit}
+                submitText={
+                  editingDocument ? "Save changes" : "Upload document"
+                }
+              />
+            </ModalActionFooter>
           </>
         )}
       </View>
@@ -346,7 +324,7 @@ function FieldLabel({
   return (
     <Text className="font-ralewaySemiBold text-sm text-description">
       {label}
-      {required ? <Text className="text-red-600"> *</Text> : null}
+      {required ? <Text className="text-danger"> *</Text> : null}
     </Text>
   );
 }

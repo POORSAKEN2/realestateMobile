@@ -28,7 +28,7 @@ export function OnboardingThree() {
           <View className="absolute left-4 right-4 top-2 h-6 rounded-full bg-white/60" />
 
           <View className="flex-row items-center gap-2.5">
-            <View className="h-9 w-9 items-center justify-center rounded-2xl border border-white/70 bg-teal-700">
+            <View className="h-9 w-9 items-center justify-center rounded-2xl border border-white/70 bg-success">
               <Text className="font-ralewayExtraBold text-xs text-whitePrimary">
                 JD
               </Text>
@@ -41,8 +41,8 @@ export function OnboardingThree() {
                 Juan De La Cruz
               </Text>
             </View>
-            <View className="rounded-full border border-teal-100 bg-teal-50/90 px-2.5 py-1">
-              <Text className="font-ralewayExtraBold text-[9px] uppercase tracking-widest text-teal-800">
+            <View className="rounded-full border border-success/25 bg-successSurface px-2.5 py-1">
+              <Text className="font-ralewayExtraBold text-[9px] uppercase tracking-widest text-success">
                 Active
               </Text>
             </View>
@@ -68,17 +68,17 @@ export function OnboardingThree() {
                 </Text>
               </View>
               <View className="flex-[1.6] rounded-2xl px-2.5 py-2">
-                <Text className="font-ralewayBold text-[9px] uppercase tracking-widest text-teal-700">
+                <Text className="font-ralewayBold text-[9px] uppercase tracking-widest text-success">
                   Monthly Rent
                 </Text>
-                <Text className="font-ralewayExtraBold text-xs text-teal-900">
+                <Text className="font-ralewayExtraBold text-xs text-success">
                   50,000
                 </Text>
               </View>
             </View>
 
-            <View className="rounded-2xl border border-sky-100/90 bg-sky-50/80 px-2.5 py-2">
-              <Text className="font-ralewayBold text-[9px] uppercase tracking-widest text-sky-700">
+            <View className="rounded-2xl border border-info/20 bg-infoSurface px-2.5 py-2">
+              <Text className="font-ralewayBold text-[9px] uppercase tracking-widest text-info">
                 Lease Term
               </Text>
               <Text className="font-ralewayExtraBold text-[11px] leading-4 text-textPrimary">
@@ -113,7 +113,7 @@ export function OnboardingThree() {
 
           <OnboardingControls
             activeIndex={2}
-            dotClassName="bg-amber-300"
+            dotClassName="bg-warning"
             nextHref="/(onboarding)/screen-4"
           />
         </View>

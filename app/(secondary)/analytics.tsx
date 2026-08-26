@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useMemo } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { useMemo, useState } from "react";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 import Svg, {
   Circle,
   Defs,
@@ -16,6 +16,7 @@ import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
+import { SkeletonBlock, SkeletonGroup } from "../../components/ui/Skeleton";
 import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
 import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
@@ -89,7 +90,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
       : "";
 
   return (
-    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+    <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between">
         <View>
           <Text className="font-ralewayBold text-base text-textPrimary">
@@ -99,12 +100,12 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
             Total value trend
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
-          <Feather name="activity" size={18} color={colors.secondary} />
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+          <Feather name="activity" size={18} color={colors.primary} />
         </View>
       </View>
 
-      <View className="mt-4 items-center overflow-hidden rounded-3xl bg-secondary/10">
+      <View className="mt-4 items-center overflow-hidden rounded-3xl bg-primary/10">
         {sortedHistory.length > 0 ? (
           <>
             <Svg
@@ -122,21 +123,17 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
                 >
                   <Stop
                     offset="0"
-                    stopColor={colors.secondary}
+                    stopColor={colors.primary}
                     stopOpacity="0.24"
                   />
-                  <Stop
-                    offset="1"
-                    stopColor={colors.secondary}
-                    stopOpacity="0"
-                  />
+                  <Stop offset="1" stopColor={colors.primary} stopOpacity="0" />
                 </LinearGradient>
               </Defs>
               <Path d={areaPath} fill="url(#performanceFill)" />
               <Polyline
                 points={linePoints}
                 fill="none"
-                stroke={colors.secondary}
+                stroke={colors.primary}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={4}
@@ -148,7 +145,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
                   cy={point.y}
                   r={5}
                   fill={colors.whitePrimary}
-                  stroke={colors.secondary}
+                  stroke={colors.primary}
                   strokeWidth={3}
                 />
               ))}
@@ -185,7 +182,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
   let cumulativePercent = 0;
 
   return (
-    <View className="mt-4 rounded-[28px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
+    <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between">
         <View className="min-w-0 flex-1 pr-4">
           <Text className="font-ralewayBold text-base uppercase text-textPrimary">
@@ -195,11 +192,11 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
             Allocation by asset category
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
           <MaterialCommunityIcons
             name="chart-donut"
             size={19}
-            color={colors.secondary}
+            color={colors.primary}
           />
         </View>
       </View>
@@ -241,7 +238,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
               })}
             </Svg>
           ) : (
-            <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-secondary/10">
+            <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-primary/10">
               <Text className="font-ralewaySemiBold text-xs text-description">
                 No assets
               </Text>
@@ -301,12 +298,105 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
   );
 }
 
+function AnalyticsLoadingState() {
+  return (
+    <SkeletonGroup accessibilityLabel="Loading portfolio analytics">
+      <View className="mt-6 flex-row flex-wrap">
+        {Array.from({ length: 4 }, (_, index) => (
+          <View className="w-1/2 p-1.5" key={index}>
+            <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+              <SkeletonBlock className="h-10 w-10 rounded-2xl bg-primary/10" />
+              <SkeletonBlock className="mt-4 h-5 w-4/5 bg-primary/15" />
+              <View className="mt-2 gap-1.5">
+                <SkeletonBlock className="h-2.5 w-3/4" />
+                <SkeletonBlock className="h-2.5 w-1/2" />
+              </View>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+        <View className="flex-row items-center justify-between">
+          <View className="gap-2">
+            <SkeletonBlock className="h-5 w-44" />
+            <SkeletonBlock className="h-3 w-24" />
+          </View>
+          <SkeletonBlock className="h-10 w-10 rounded-2xl bg-primary/10" />
+        </View>
+        <View className="mt-4 h-48 overflow-hidden rounded-3xl bg-primary/10 px-5 pb-4 pt-5">
+          <View className="flex-1 flex-row items-end justify-between gap-3">
+            {["h-1/3", "h-1/2", "h-2/5", "h-3/4", "h-3/5", "h-full"].map(
+              (height, index) => (
+                <SkeletonBlock
+                  className={`w-3 rounded-full bg-primary/20 ${height}`}
+                  key={index}
+                />
+              ),
+            )}
+          </View>
+          <View className="mt-4 flex-row justify-between">
+            {Array.from({ length: 6 }, (_, index) => (
+              <SkeletonBlock
+                className="h-2 w-6 rounded-full bg-primary/20"
+                key={index}
+              />
+            ))}
+          </View>
+        </View>
+      </View>
+
+      <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+        <View className="flex-row items-center justify-between">
+          <View className="min-w-0 flex-1 gap-2 pr-4">
+            <SkeletonBlock className="h-5 w-44 max-w-full" />
+            <SkeletonBlock className="h-3 w-36" />
+          </View>
+          <SkeletonBlock className="h-10 w-10 rounded-2xl bg-primary/10" />
+        </View>
+        <View className="mt-5 flex-row items-center gap-5">
+          <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-primary/10">
+            <View className="h-28 w-28 items-center justify-center rounded-full bg-white">
+              <SkeletonBlock className="h-5 w-8 bg-primary/15" />
+              <SkeletonBlock className="mt-2 h-2.5 w-14" />
+            </View>
+          </View>
+          <View className="min-w-0 flex-1 gap-3">
+            {Array.from({ length: 4 }, (_, index) => (
+              <View className="gap-1.5" key={index}>
+                <View className="flex-row items-center gap-2">
+                  <SkeletonBlock className="h-2.5 w-2.5 rounded-full bg-primary/20" />
+                  <SkeletonBlock className="h-3 flex-1" />
+                  <SkeletonBlock className="h-3 w-7" />
+                </View>
+                <SkeletonBlock className="ml-[18px] h-2 w-12" />
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    </SkeletonGroup>
+  );
+}
+
 export default function AnalyticsScreen() {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
-  const { stats, history, isLoadingStats } = usePortfolioAnalytics(accessToken);
+  const {
+    stats,
+    history,
+    isLoading: isLoadingAnalytics,
+    isLoadingStats,
+    refetch: refetchAnalytics,
+  } = usePortfolioAnalytics(accessToken);
   const { useList } = useProperties();
-  const { data: properties = [] } = useList();
+  const {
+    data: properties = [],
+    isLoading: isLoadingProperties,
+    refetch: refetchProperties,
+  } = useList();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const isInitialLoading = isLoadingAnalytics || isLoadingProperties;
 
   const metricCards = useMemo<MetricCard[]>(
     () => [
@@ -359,56 +449,80 @@ export default function AnalyticsScreen() {
       }));
   }, [properties]);
 
+  async function refreshAnalytics() {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([refetchAnalytics(), refetchProperties()]);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }
+
   return (
     <Screen className="bg-surface">
+      <ModuleHeader
+        action={
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 shadow-md shadow-primary/20">
+            <Feather name="bar-chart-2" size={22} color={colors.primary} />
+          </View>
+        }
+        eyebrow="Portfolio Intelligence"
+        leading={
+          <SecondaryBackButton
+            accessibilityLabel="Back from analytics"
+            variant="secondary"
+          />
+        }
+        title="Analytics"
+      />
+
       <ScrollView
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
+        refreshControl={
+          <RefreshControl
+            colors={[colors.primary]}
+            onRefresh={refreshAnalytics}
+            refreshing={isRefreshing}
+            tintColor={colors.primary}
+          />
+        }
       >
-        <ModuleHeader
-          action={
-            <View className="h-12 w-12 items-center justify-center rounded-2xl bg-secondary/10 shadow-md shadow-secondary/20">
-              <Feather name="bar-chart-2" size={22} color={colors.secondary} />
-            </View>
-          }
-          eyebrow="Portfolio Intelligence"
-          leading={
-            <SecondaryBackButton
-              accessibilityLabel="Back from analytics"
-              variant="secondary"
-            />
-          }
-          title="Analytics"
-        />
-
-        <View className="mt-6 flex-row flex-wrap">
-          {metricCards.map((card) => (
-            <View key={card.label} className="w-1/2 p-1.5">
-              <View className="min-h-[132px] rounded-[24px] border border-secondary/20 bg-white p-4 shadow-sm shadow-secondary/10">
-                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-secondary/10">
-                  <Feather
-                    name={card.icon}
-                    size={18}
-                    color={colors.secondary}
-                  />
+        {isInitialLoading ? (
+          <AnalyticsLoadingState />
+        ) : (
+          <>
+            <View className="mt-6 flex-row flex-wrap">
+              {metricCards.map((card) => (
+                <View key={card.label} className="w-1/2 p-1.5">
+                  <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+                    <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                      <Feather
+                        name={card.icon}
+                        size={18}
+                        color={colors.primary}
+                      />
+                    </View>
+                    <Text
+                      className="mt-4 font-ralewayBold text-lg text-textPrimary"
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                    >
+                      {card.value}
+                    </Text>
+                    <Text className="mt-1 font-ralewaySemiBold text-[11px] uppercase leading-4 text-description">
+                      {card.label}
+                    </Text>
+                  </View>
                 </View>
-                <Text
-                  className="mt-4 font-ralewayBold text-lg text-textPrimary"
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                >
-                  {card.value}
-                </Text>
-                <Text className="mt-1 font-ralewaySemiBold text-[11px] uppercase leading-4 text-description">
-                  {card.label}
-                </Text>
-              </View>
+              ))}
             </View>
-          ))}
-        </View>
 
-        <PerformanceChart history={history} />
-        <DistributionChart slices={distributionSlices} />
+            <PerformanceChart history={history} />
+            <DistributionChart slices={distributionSlices} />
+          </>
+        )}
       </ScrollView>
     </Screen>
   );
