@@ -4,7 +4,7 @@ import type { TransientBooking } from "../../types";
 export const BOOKING_CALENDAR_LEGEND = [
   {
     label: "Booked",
-    markerClassName: "h-2 w-2 rounded-full bg-textPrimary",
+    markerClassName: "h-2 w-2 rounded-full bg-secondary",
   },
   {
     label: "Turnover",

@@ -2,7 +2,12 @@ import type { Lease, LeasePayload } from "../../types";
 
 const DEFAULT_DURATION_MONTHS = 12;
 
+export type LeaseEditMode = "typo" | "amendment";
+
 export type LeaseFormState = {
+  amendmentDate: string;
+  amendmentReason: string;
+  editMode: LeaseEditMode;
   propertyId: string;
   lesseeId: string;
   startDate: string;
@@ -85,6 +90,9 @@ export function calculateLeaseDurationMonths(
 
 export function createEmptyLeaseForm(): LeaseFormState {
   return {
+    amendmentDate: formatLeaseDateValue(new Date()),
+    amendmentReason: "",
+    editMode: "typo",
     propertyId: "",
     lesseeId: "",
     startDate: formatLeaseDateValue(new Date()),
@@ -97,6 +105,9 @@ export function createEmptyLeaseForm(): LeaseFormState {
 
 export function createLeaseForm(lease: Lease): LeaseFormState {
   return {
+    amendmentDate: formatLeaseDateValue(new Date()),
+    amendmentReason: "",
+    editMode: "typo",
     propertyId: lease.propertyId,
     lesseeId: lease.lesseeId,
     startDate: lease.startDate,
@@ -109,7 +120,10 @@ export function createLeaseForm(lease: Lease): LeaseFormState {
   };
 }
 
-export function getLeaseFormResult(form: LeaseFormState): LeaseFormResult {
+export function getLeaseFormResult(
+  form: LeaseFormState,
+  editingLease?: Lease | null,
+): LeaseFormResult {
   if (!form.propertyId) {
     return { isValid: false, error: "Please select a property." };
   }
@@ -143,15 +157,40 @@ export function getLeaseFormResult(form: LeaseFormState): LeaseFormResult {
   }
 
   const endDate = calculateLeaseEndDate(form.startDate, durationMonths);
+  const isTypoFix = Boolean(editingLease && form.editMode === "typo");
+
+  const amendmentReason = form.amendmentReason.trim();
+  if (editingLease && form.editMode === "amendment") {
+    if (!amendmentReason) {
+      return {
+        isValid: false,
+        error: "Reason of amendment is required.",
+      };
+    }
+    if (!form.amendmentDate || !getValidLeaseDate(form.amendmentDate)) {
+      return {
+        isValid: false,
+        error: "Please select a valid amendment date.",
+      };
+    }
+  }
 
   return {
     isValid: true,
     payload: {
+      amendmentEffectiveDate:
+        editingLease && form.editMode === "amendment"
+          ? form.amendmentDate
+          : undefined,
+      amendmentReason:
+        editingLease && form.editMode === "amendment"
+          ? amendmentReason
+          : undefined,
       propertyId: form.propertyId,
       lesseeId: form.lesseeId,
-      startDate: form.startDate,
-      endDate,
-      monthlyRent,
+      startDate: isTypoFix ? editingLease!.startDate : form.startDate,
+      endDate: isTypoFix ? editingLease!.endDate : endDate,
+      monthlyRent: isTypoFix ? editingLease!.monthlyRent : monthlyRent,
       roomNumber: form.roomNumber.trim(),
       status: form.status,
     },

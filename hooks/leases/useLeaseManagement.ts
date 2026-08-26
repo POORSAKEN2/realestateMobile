@@ -14,6 +14,7 @@ import {
   createLeaseForm,
   formatLeaseDateValue,
   getLeaseFormResult,
+  type LeaseEditMode,
   type LeaseFormState,
 } from "../../utils/leases/leaseForm";
 import { useProperties } from "../api/useProperties";
@@ -39,6 +40,8 @@ export function useLeaseManagement({
   const [deleteTarget, setDeleteTarget] = useState<Lease | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isAmendmentDatePickerOpen, setIsAmendmentDatePickerOpen] =
+    useState(false);
   const [isStartDatePickerOpen, setIsStartDatePickerOpen] = useState(false);
 
   const leasesQuery = useQuery({
@@ -115,6 +118,26 @@ export function useLeaseManagement({
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  function changeEditMode(mode: LeaseEditMode) {
+    setForm((current) => {
+      if (mode !== "typo" || !editingLease) {
+        return { ...current, editMode: mode };
+      }
+
+      const original = createLeaseForm(editingLease);
+      return {
+        ...current,
+        durationMonths: original.durationMonths,
+        editMode: mode,
+        monthlyRent: original.monthlyRent,
+        startDate: original.startDate,
+      };
+    });
+    setFormError("");
+    setIsAmendmentDatePickerOpen(false);
+    setIsStartDatePickerOpen(false);
+  }
+
   function openCreateForm() {
     setEditingLease(null);
     setForm({
@@ -123,6 +146,7 @@ export function useLeaseManagement({
       lesseeId: lessees[0]?.id ?? "",
     });
     setFormError("");
+    setIsAmendmentDatePickerOpen(false);
     setIsStartDatePickerOpen(false);
     setIsFormOpen(true);
   }
@@ -131,6 +155,7 @@ export function useLeaseManagement({
     setEditingLease(lease);
     setForm(createLeaseForm(lease));
     setFormError("");
+    setIsAmendmentDatePickerOpen(false);
     setIsStartDatePickerOpen(false);
     setIsFormOpen(true);
   }
@@ -140,7 +165,12 @@ export function useLeaseManagement({
     setEditingLease(null);
     setForm(createEmptyLeaseForm());
     setFormError("");
+    setIsAmendmentDatePickerOpen(false);
     setIsStartDatePickerOpen(false);
+  }
+
+  function handleAmendmentDateConfirm(selectedDate: Date) {
+    updateForm("amendmentDate", formatLeaseDateValue(selectedDate));
   }
 
   function handleStartDateConfirm(selectedDate: Date) {
@@ -148,12 +178,18 @@ export function useLeaseManagement({
   }
 
   function openStartDatePicker() {
+    setIsAmendmentDatePickerOpen(false);
     setIsStartDatePickerOpen(true);
+  }
+
+  function openAmendmentDatePicker() {
+    setIsStartDatePickerOpen(false);
+    setIsAmendmentDatePickerOpen(true);
   }
 
   function submit() {
     setFormError("");
-    const result = getLeaseFormResult(form);
+    const result = getLeaseFormResult(form, editingLease);
     if (!result.isValid) {
       setFormError(result.error);
       return;
@@ -186,6 +222,8 @@ export function useLeaseManagement({
     activeLeaseCount,
     activeLeasePercentage:
       leases.length === 0 ? 0 : (activeLeaseCount / leases.length) * 100,
+    changeEditMode,
+    closeAmendmentDatePicker: () => setIsAmendmentDatePickerOpen(false),
     closeStartDatePicker: () => setIsStartDatePickerOpen(false),
     deleteMutation,
     deleteTarget,
@@ -193,7 +231,9 @@ export function useLeaseManagement({
     filteredLeases,
     form,
     formError,
+    handleAmendmentDateConfirm,
     handleStartDateConfirm,
+    isAmendmentDatePickerOpen,
     isFormOpen,
     isLoading:
       leasesQuery.isLoading ||
@@ -205,6 +245,7 @@ export function useLeaseManagement({
     lesseeOptions,
     lessees,
     monthlyRevenue,
+    openAmendmentDatePicker,
     openCreateForm,
     openEditForm,
     openStartDatePicker,

@@ -199,7 +199,7 @@ export default function PropertyImageGallery({
             activeOpacity={0.85}
             accessibilityLabel="Close image gallery"
             accessibilityRole="button"
-            className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
+            className="h-12 w-12 items-center justify-center rounded-2xl "
             onPress={handleClose}
           >
             <MaterialCommunityIcons name="close" color="#FFFFFF" size={24} />

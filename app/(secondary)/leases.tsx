@@ -8,6 +8,7 @@ import {
 } from "../../components/ui/ModuleState";
 import { TenantDetailsModal } from "../../components/tenants/TenantDetailsModal";
 import { LeaseCard } from "../../components/leases/LeaseCard";
+import { LeaseEditModeFields } from "../../components/leases/LeaseEditModeFields";
 import { AddEditModal } from "../../components/ui/AddEditModal";
 import { BaseField } from "../../components/ui/fields/BaseField";
 import { ChoiceField } from "../../components/ui/fields/ChoiceField";
@@ -60,6 +61,8 @@ export default function LeasesScreen() {
   const {
     activeLeaseCount,
     activeLeasePercentage,
+    changeEditMode,
+    closeAmendmentDatePicker,
     closeForm,
     closeStartDatePicker,
     deleteMutation,
@@ -68,7 +71,9 @@ export default function LeasesScreen() {
     filteredLeases,
     form,
     formError,
+    handleAmendmentDateConfirm,
     handleStartDateConfirm,
+    isAmendmentDatePickerOpen,
     isFormOpen,
     isLoading,
     isRefreshing,
@@ -77,6 +82,7 @@ export default function LeasesScreen() {
     lesseeOptions,
     lessees,
     monthlyRevenue,
+    openAmendmentDatePicker,
     openCreateForm,
     openEditForm,
     openStartDatePicker,
@@ -139,6 +145,7 @@ export default function LeasesScreen() {
           icon="cash-outline"
           isLoading={isLoading}
           label="Monthly revenue"
+          layout="split"
           metrics={[
             {
               detail: `${activeLeaseCount} active`,
@@ -154,6 +161,7 @@ export default function LeasesScreen() {
               value: `${activeLeaseCount} of ${leases.length}`,
             },
           ]}
+          supportingText="Combined monthly rent across all lease files."
           value={formatCurrency(monthlyRevenue)}
         />
 
@@ -259,6 +267,23 @@ export default function LeasesScreen() {
         formError={formError}
         showCancelAction
       >
+        {editingLease ? (
+          <FormSection
+            description="Choose whether this update corrects a typo or changes the contract terms."
+            icon="file-edit-outline"
+            title="Lease update"
+            variant="card"
+          >
+            <LeaseEditModeFields
+              amendmentDateLabel={formatLeaseDateLabel(form.amendmentDate)}
+              form={form}
+              onChangeMode={changeEditMode}
+              onChangeReason={(reason) => updateForm("amendmentReason", reason)}
+              onOpenAmendmentDate={openAmendmentDatePicker}
+            />
+          </FormSection>
+        ) : null}
+
         <FormSection
           description="Choose the property and tenant connected by this lease."
           icon="account-switch-outline"
@@ -289,9 +314,19 @@ export default function LeasesScreen() {
           title="Terms & status"
           variant="card"
         >
+          {editingLease && form.editMode === "typo" ? (
+            <View className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3.5">
+              <Text className="font-ralewaySemiBold text-xs leading-5 text-description">
+                Contract dates and monthly rent stay locked for typo fixes.
+                Select Amend Contract to update those terms.
+              </Text>
+            </View>
+          ) : null}
+
           <View className="flex-row gap-3">
             <PickerField
               className="min-w-0 flex-1 gap-2"
+              disabled={Boolean(editingLease && form.editMode === "typo")}
               label="Start Date"
               value={formatLeaseDateLabel(form.startDate)}
               placeholder="Select date"
@@ -300,6 +335,7 @@ export default function LeasesScreen() {
             />
             <BaseField
               className="min-w-0 flex-1 gap-2"
+              editable={!editingLease || form.editMode === "amendment"}
               keyboardType="number-pad"
               label="Duration (Months)"
               onChangeText={(value) =>
@@ -308,6 +344,9 @@ export default function LeasesScreen() {
               placeholder="12"
               value={form.durationMonths}
               variant="filled"
+              wrapperClassName={
+                editingLease && form.editMode === "typo" ? "opacity-60" : ""
+              }
             />
           </View>
 
@@ -328,6 +367,7 @@ export default function LeasesScreen() {
           ) : null}
 
           <BaseField
+            editable={!editingLease || form.editMode === "amendment"}
             keyboardType="decimal-pad"
             label="Monthly Rent"
             onChangeText={(value) =>
@@ -336,6 +376,9 @@ export default function LeasesScreen() {
             placeholder="0"
             value={form.monthlyRent}
             variant="filled"
+            wrapperClassName={
+              editingLease && form.editMode === "typo" ? "opacity-60" : ""
+            }
           />
           <BaseField
             label="Room Number"
@@ -352,6 +395,16 @@ export default function LeasesScreen() {
             variant="segmented"
           />
         </FormSection>
+
+        {isAmendmentDatePickerOpen ? (
+          <DateTimePickerModal
+            mode="date"
+            onClose={closeAmendmentDatePicker}
+            onConfirm={handleAmendmentDateConfirm}
+            title="Select Amendment Date"
+            value={parseLeaseDateValue(form.amendmentDate)}
+          />
+        ) : null}
 
         {isStartDatePickerOpen ? (
           <DateTimePickerModal
