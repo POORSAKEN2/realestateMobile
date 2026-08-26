@@ -77,7 +77,7 @@ const menuSections: MenuSection[] = [
       {
         label: "Bookings",
         supportingText: "Manage transient property stays",
-        href: appRoutes.primary.bookings,
+        href: appRoutes.secondary.bookings,
         icon: { family: "Ionicons", name: "calendar-outline" },
       },
     ],

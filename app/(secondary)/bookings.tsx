@@ -15,6 +15,7 @@ import {
   BookingViewToggle,
   type BookingViewMode,
 } from "../../components/bookings";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
@@ -169,7 +170,7 @@ export default function BookingsScreen() {
   }
 
   return (
-    <Screen bottomInset="tab-bar" className="bg-surface">
+    <Screen bottomInset="safe-area" className="bg-surface">
       <View className="flex-1 gap-5">
         <View className="px-1">
           <ModuleHeader
@@ -185,6 +186,12 @@ export default function BookingsScreen() {
               />
             }
             eyebrow="Short Stay"
+            leading={
+              <SecondaryBackButton
+                accessibilityLabel="Back from bookings"
+                variant="primary"
+              />
+            }
             title="Bookings"
           />
         </View>

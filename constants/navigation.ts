@@ -7,12 +7,12 @@ export const appRoutes = {
   primary: {
     dashboard: "/(tabs)/dashboard",
     properties: "/(tabs)/properties",
-    bookings: "/(tabs)/bookings",
     expenses: "/(tabs)/expenses",
     tenants: "/(tabs)/tenants",
   },
   secondary: {
     analytics: "/(secondary)/analytics",
+    bookings: "/(secondary)/bookings",
     leases: "/(secondary)/leases",
     documents: "/(secondary)/documents",
     profile: "/(secondary)/profile",
@@ -27,7 +27,7 @@ export const appRoutes = {
 
 const moduleRoutes: Record<string, Href> = {
   analytics: appRoutes.secondary.analytics,
-  bookings: appRoutes.primary.bookings,
+  bookings: appRoutes.secondary.bookings,
   dashboard: appRoutes.primary.dashboard,
   documents: appRoutes.secondary.documents,
   expenses: appRoutes.primary.expenses,

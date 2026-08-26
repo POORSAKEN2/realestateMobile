@@ -240,7 +240,7 @@ export default function PropertiesScreen() {
                   item.property.isTransientBookable
                     ? () =>
                         router.push({
-                          pathname: appRoutes.primary.bookings,
+                          pathname: appRoutes.secondary.bookings,
                           params: { propertyId: item.property.id },
                         })
                     : undefined
