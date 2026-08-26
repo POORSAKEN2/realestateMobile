@@ -18,13 +18,11 @@ import {
 import AddButton from "../../components/ui/buttons/AddButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
-import {
-  formatSearchResultLabel,
-  SearchToolbar,
-} from "../../components/ui/SearchToolbar";
+import { SearchToolbar } from "../../components/ui/SearchToolbar";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useClients } from "../../hooks/api/useClients";
+import { usePropertyRoomsQuery } from "../../hooks/api/useFloorPlans";
 import { useBookingCalendar, useBookingForm } from "../../hooks/bookings";
 import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "../../hooks/useSnackbar";
@@ -61,6 +59,10 @@ export default function BookingsScreen() {
     enabled: Boolean(accessToken),
   });
   const { data: guests = [] } = useClients(accessToken);
+  const { data: selectedBuildingRooms = [] } = usePropertyRoomsQuery(
+    selectedPropertyId,
+    accessToken,
+  );
 
   const buildingOptions = useMemo(
     () =>
@@ -206,40 +208,36 @@ export default function BookingsScreen() {
               activeFilterCount={activeBookingFilterCount}
               clearAccessibilityLabel="Clear booking search"
               filterAccessibilityLabel="Filter bookings"
-              filterLabel={`${selectedBuilding?.title ?? "No property"} · ${
-                statusFilter === "All" ? "All statuses" : "Confirmed"
-              }`}
               onChangeText={(value) => {
                 setSearchQuery(value);
                 if (value.trim()) setViewMode("agenda");
               }}
               onFilterPress={() => setIsFilterVisible(true)}
               placeholder="Guest, room, email, or phone"
-              resultLabel={formatSearchResultLabel({
-                filteredCount: visibleBookings.length,
-                isLoading,
-                singular: "reservation",
-                totalCount: selectedBuildingBookings.length,
-              })}
               value={searchQuery}
-              variant={viewMode === "month" ? "compact" : "standard"}
             />
 
             {buildingOptions.length === 0 && !isLoading ? (
               <BookingCalendarEmpty />
-            ) : viewMode === "month" ? (
+            ) : viewMode !== "agenda" ? (
               isLoading ? (
-                <BookingCalendarLoading />
+                <BookingCalendarLoading mode={viewMode} />
               ) : (
                 <>
                   <BookingCalendar
                     availabilityBookings={selectedBuildingBookings}
                     bookings={calendarBookings}
                     currentMonth={calendar.currentMonth}
-                    onChangeMonth={calendar.changeMonth}
+                    mode={viewMode}
+                    onChangePeriod={calendar.changePeriod}
                     onGoToToday={calendar.goToToday}
                     onSelectDay={calendar.selectDay}
                     propertyTitle={selectedBuilding?.title}
+                    roomCount={
+                      selectedBuildingRooms.filter(
+                        (room) => room.status !== "Maintenance",
+                      ).length
+                    }
                     selectedDate={calendar.selectedDate}
                   />
                   <BookingDaySchedule

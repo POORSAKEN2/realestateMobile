@@ -1,12 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { SearchField } from "../ui/fields/SearchField";
 
 export type SearchableOption = { id: string; label: string };
 
@@ -92,18 +88,15 @@ export function SearchableOptionSelector({
         </Text>
       </View>
       <View className="px-5 pt-4">
-        <View className="min-h-14 flex-row items-center gap-3 rounded-2xl bg-primary/10 px-4">
-          <MaterialCommunityIcons name="magnify" color="#8A77F4" size={20} />
-          <TextInput
-            accessibilityLabel={`Search ${title.toLowerCase()}`}
-            autoFocus
-            className="min-w-0 flex-1 py-3 font-ralewaySemiBold text-sm text-textPrimary"
-            onChangeText={onChangeQuery}
-            placeholder="Search"
-            placeholderTextColor="#6F6D6D"
-            value={query}
-          />
-        </View>
+        <SearchField
+          accessibilityLabel={`Search ${title.toLowerCase()}`}
+          autoFocus
+          clearAccessibilityLabel={`Clear ${title.toLowerCase()} search`}
+          onChangeText={onChangeQuery}
+          placeholder="Search"
+          value={query}
+          wrapperClassName="h-14 rounded-[22px]"
+        />
       </View>
       <ScrollView
         className="mt-3"

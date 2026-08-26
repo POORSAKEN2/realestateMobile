@@ -5,6 +5,7 @@ import {
 import type { TransientBooking } from "../../types";
 
 export type BookingFormMode = "create" | "edit";
+export type BookingCalendarView = "day" | "week" | "month";
 export type StatusFilter = "Booked" | "All";
 
 export type BookingFormState = {

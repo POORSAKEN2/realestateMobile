@@ -186,7 +186,7 @@ export function LocationPinPicker({
                 />
               </TouchableOpacity>
             </View>
-            <View className="mt-3 h-14 flex-row items-center gap-2 overflow-hidden rounded-2xl bg-surface px-3">
+            <View className="mt-3 h-14 flex-row items-center gap-2 overflow-hidden rounded-[22px] border border-primary/20 bg-white px-3.5">
               <MaterialCommunityIcons
                 name="magnify"
                 color="#6F6D6D"
@@ -225,16 +225,16 @@ export function LocationPinPicker({
               )}
               <TouchableOpacity
                 activeOpacity={0.8}
-                className="h-9 w-9 items-center justify-center rounded-xl bg-primary"
+                className="h-12 w-12 items-center justify-center rounded-2xl"
                 disabled={!searchQuery.trim() || isSearching}
                 onPress={search}
               >
                 {isSearching ? (
-                  <ActivityIndicator color="#FFFFFF" size="small" />
+                  <ActivityIndicator color="#8A77F4" size="small" />
                 ) : (
                   <MaterialCommunityIcons
                     name="arrow-right"
-                    color="#FFFFFF"
+                    color={searchQuery.trim() ? "#8A77F4" : "#94A3B8"}
                     size={19}
                   />
                 )}

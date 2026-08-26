@@ -14,6 +14,7 @@ export const colors = {
   successSurface: "#BEE3DB",
   warning: "#805000",
   warningSurface: "#FFF6DD",
+  turnover: "#B7791F",
   info: "#2563EB",
   infoSurface: "#EFF6FF",
 } as const;

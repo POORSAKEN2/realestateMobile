@@ -301,7 +301,6 @@ export default function DashboardScreen() {
             onFilterPress={() => setShowAssetFilters(true)}
             placeholder="Location or asset"
             value={assetSearchQuery}
-            variant="compact"
           />
 
           <TouchableOpacity

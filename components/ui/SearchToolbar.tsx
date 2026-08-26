@@ -1,4 +1,4 @@
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -18,7 +18,6 @@ type SearchToolbarProps = {
   placeholder: string;
   resultLabel?: string;
   value: string;
-  variant?: "compact" | "standard";
 };
 
 export function formatSearchResultLabel({
@@ -42,13 +41,11 @@ export function formatSearchResultLabel({
 function FilterButton({
   accessibilityLabel,
   activeFilterCount = 0,
-  compact,
   hasActiveFilters,
   onPress,
 }: {
   accessibilityLabel: string;
   activeFilterCount?: number;
-  compact: boolean;
   hasActiveFilters: boolean;
   onPress: () => void;
 }) {
@@ -57,29 +54,19 @@ function FilterButton({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       activeOpacity={0.8}
-      className={`relative h-12 min-w-12 items-center justify-center rounded-2xl ${
-        compact ? "" : hasActiveFilters ? "bg-primary" : "bg-primary/10"
-      }`}
+      className="relative h-12 min-w-12 items-center justify-center rounded-2xl"
       onPress={onPress}
     >
-      <MaterialCommunityIcons
-        name="tune-variant"
-        color={!compact && hasActiveFilters ? "#FFFFFF" : "#8A77F4"}
-        size={21}
-      />
+      <MaterialCommunityIcons name="tune-variant" color="#8A77F4" size={21} />
 
       {activeFilterCount > 0 ? (
-        <View className="absolute right-0 top-0 h-5 min-w-5 items-center justify-center rounded-full bg-white px-1">
-          <Text className="font-ralewayExtraBold text-[10px] text-primary">
+        <View className="absolute right-0 top-0 h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1">
+          <Text className="font-ralewayExtraBold text-[10px] text-white">
             {activeFilterCount}
           </Text>
         </View>
       ) : hasActiveFilters ? (
-        <View
-          className={`absolute right-1 top-1 h-2 w-2 rounded-full ${
-            compact ? "bg-primary" : "bg-white"
-          }`}
-        />
+        <View className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" />
       ) : null}
     </TouchableOpacity>
   );
@@ -99,21 +86,21 @@ export function SearchToolbar({
   placeholder,
   resultLabel,
   value,
-  variant = "standard",
 }: SearchToolbarProps) {
   const filtersActive = hasActiveFilters || activeFilterCount > 0;
   const filterButton = onFilterPress ? (
     <FilterButton
       accessibilityLabel={filterAccessibilityLabel}
       activeFilterCount={activeFilterCount}
-      compact={variant === "compact"}
       hasActiveFilters={filtersActive}
       onPress={onFilterPress}
     />
   ) : null;
 
-  if (variant === "compact") {
-    return (
+  const hasFooter = Boolean(resultLabel || filterLabel || footerAccessory);
+
+  return (
+    <View className={className}>
       <SearchField
         accessibilityLabel={accessibilityLabel}
         clearAccessibilityLabel={clearAccessibilityLabel}
@@ -121,32 +108,11 @@ export function SearchToolbar({
         onChangeText={onChangeText}
         placeholder={placeholder}
         value={value}
-        variant="outlined"
-        wrapperClassName={`h-14 rounded-[22px] ${className}`}
+        wrapperClassName="h-14 rounded-[22px]"
       />
-    );
-  }
-
-  const hasFooter = Boolean(resultLabel || filterLabel || footerAccessory);
-
-  return (
-    <View
-      className={`rounded-3xl border border-primary/20 bg-white p-3 shadow-sm shadow-primary/10 ${className}`}
-    >
-      <View className="flex-row gap-2">
-        <SearchField
-          accessibilityLabel={accessibilityLabel}
-          clearAccessibilityLabel={clearAccessibilityLabel}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          value={value}
-          wrapperClassName="flex-1"
-        />
-        {filterButton}
-      </View>
 
       {hasFooter ? (
-        <View className="mt-3 flex-row items-center justify-between gap-4 px-1">
+        <View className="mt-2.5 flex-row items-center justify-between gap-4 px-1">
           {resultLabel ? (
             <Text
               accessibilityLiveRegion="polite"

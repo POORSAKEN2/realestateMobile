@@ -1,48 +1,33 @@
-import type { Availability } from "./bookingCalendar";
 import { getBookingStatusLabel } from "./bookingCalendar";
 import type { TransientBooking } from "../../types";
 
 export const BOOKING_CALENDAR_LEGEND = [
   {
     label: "Booked",
-    markerClassName: "h-1.5 w-2.5 rounded-full bg-info",
-  },
-  {
-    label: "Open",
-    markerClassName: "h-1.5 w-1.5 rounded-full bg-success",
+    markerClassName: "h-2 w-2 rounded-full bg-textPrimary",
   },
   {
     label: "Turnover",
-    markerClassName: "h-1.5 w-1.5 rotate-45 rounded-[1px] bg-warning",
+    markerClassName: "h-2 w-2 rotate-45 rounded-[1px] bg-turnover",
   },
   {
     label: "Full",
-    markerClassName: "h-1.5 w-1.5 rounded-[1px] bg-danger",
-  },
-  {
-    label: "Cancelled",
-    markerClassName: "h-1.5 w-2.5 rounded-full bg-description/30",
+    markerClassName: "h-2 w-2 rounded-[2px] bg-danger",
   },
 ] as const;
-
-export function getAvailabilityMarkerClass(availability: Availability) {
-  if (availability.label === "Available") {
-    return "h-1.5 w-1.5 rounded-full bg-success";
-  }
-  if (
-    availability.label === "After 2 PM" ||
-    availability.label === "Checkout"
-  ) {
-    return "h-1.5 w-1.5 rotate-45 rounded-[1px] bg-warning";
-  }
-
-  return "h-1.5 w-1.5 rounded-[1px] bg-danger";
-}
 
 export function getBookingStatusPresentation(booking: TransientBooking) {
   const label = getBookingStatusLabel(booking);
 
-  if (label === "Cancelled" || label === "Completed") {
+  if (label === "Cancelled") {
+    return {
+      label,
+      backgroundClassName: "bg-muted/15",
+      textClassName: "text-description",
+    };
+  }
+
+  if (label === "Completed") {
     return {
       label,
       backgroundClassName: "bg-surface",
@@ -53,8 +38,8 @@ export function getBookingStatusPresentation(booking: TransientBooking) {
   if (label === "Upcoming") {
     return {
       label,
-      backgroundClassName: "bg-infoSurface",
-      textClassName: "text-info",
+      backgroundClassName: "bg-textPrimary/10",
+      textClassName: "text-textPrimary",
     };
   }
 
@@ -62,7 +47,7 @@ export function getBookingStatusPresentation(booking: TransientBooking) {
     return {
       label,
       backgroundClassName: "bg-warningSurface",
-      textClassName: "text-warning",
+      textClassName: "text-turnover",
     };
   }
 

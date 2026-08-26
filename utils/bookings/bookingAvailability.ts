@@ -50,7 +50,7 @@ export function getAvailabilityForDay(
     return {
       label: "Checkout",
       bg: "bg-warningSurface",
-      text: "text-warning",
+      text: "text-turnover",
     };
   }
   if (dayBookings.length > 0) {

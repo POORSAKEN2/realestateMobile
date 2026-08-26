@@ -5,7 +5,12 @@ import {
   getAvailabilityForDay,
   getBookingsForDay,
 } from "../../utils/bookings/bookingAvailability";
-import { dateKey, parseDate } from "../../utils/bookings/bookingCalendar";
+import {
+  addDays,
+  dateKey,
+  parseDate,
+  type BookingCalendarView,
+} from "../../utils/bookings/bookingCalendar";
 
 type UseBookingCalendarOptions = {
   bookings: TransientBooking[];
@@ -31,16 +36,6 @@ export function useBookingCalendar({
     selectedDayAvailability.label === "Available" ||
     selectedDayAvailability.label === "After 2 PM";
 
-  function changeMonth(offset: number) {
-    const nextMonth = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth() + offset,
-      1,
-    );
-    setCurrentMonth(nextMonth);
-    setSelectedDate(dateKey(nextMonth));
-  }
-
   function selectDay(day: Date) {
     setSelectedDate(dateKey(day));
     if (
@@ -51,6 +46,31 @@ export function useBookingCalendar({
     }
   }
 
+  function changePeriod(view: BookingCalendarView, offset: number) {
+    if (view === "day" || view === "week") {
+      selectDay(addDays(selectedDay, offset * (view === "week" ? 7 : 1)));
+      return;
+    }
+
+    const nextMonth = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth() + offset,
+      1,
+    );
+    const lastDayOfNextMonth = new Date(
+      nextMonth.getFullYear(),
+      nextMonth.getMonth() + 1,
+      0,
+    ).getDate();
+    selectDay(
+      new Date(
+        nextMonth.getFullYear(),
+        nextMonth.getMonth(),
+        Math.min(selectedDay.getDate(), lastDayOfNextMonth),
+      ),
+    );
+  }
+
   function goToToday() {
     const today = new Date();
     setCurrentMonth(today);
@@ -59,7 +79,7 @@ export function useBookingCalendar({
 
   return {
     canCreateOnSelectedDay,
-    changeMonth,
+    changePeriod,
     currentMonth,
     goToToday,
     selectDay,
