@@ -13,7 +13,7 @@ import {
 } from "../../utils/bookings/bookingCalendar";
 import {
   BOOKING_CALENDAR_LEGEND,
-  getAvailabilityDotClass,
+  getAvailabilityMarkerClass,
 } from "../../utils/bookings/bookingPresentation";
 
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
@@ -30,6 +30,7 @@ type BookingCalendarProps = {
   availabilityBookings: TransientBooking[];
   bookings: TransientBooking[];
   currentMonth: Date;
+  propertyTitle?: string;
   selectedDate: string;
   onChangeMonth: (offset: number) => void;
   onGoToToday: () => void;
@@ -40,6 +41,7 @@ export function BookingCalendar({
   availabilityBookings,
   bookings,
   currentMonth,
+  propertyTitle,
   selectedDate,
   onChangeMonth,
   onGoToToday,
@@ -53,15 +55,20 @@ export function BookingCalendar({
     currentMonth.getMonth() === today.getMonth();
 
   return (
-    <View className="overflow-hidden rounded-[24px] border border-primary/20 bg-white shadow-sm shadow-primary/10">
-      <View className="flex-row items-center gap-2 px-4 pb-3 pt-4">
+    <View className="overflow-hidden rounded-[22px] border border-primary/20 bg-white shadow-sm shadow-primary/10">
+      <View className="flex-row items-center gap-2 px-3 py-3">
         <View className="min-w-0 flex-1">
-          <Text className="font-ralewayBold text-lg text-textPrimary">
+          <Text className="font-ralewayBold text-base text-textPrimary">
             {monthFormatter.format(currentMonth)}
           </Text>
-          <Text className="mt-0.5 font-ralewaySemiBold text-xs text-description">
-            Select a day to see its schedule
-          </Text>
+          {propertyTitle ? (
+            <Text
+              className="mt-0.5 font-ralewaySemiBold text-[11px] text-description"
+              numberOfLines={1}
+            >
+              {propertyTitle}
+            </Text>
+          ) : null}
         </View>
         {!isViewingCurrentMonth ? (
           <TouchableOpacity
@@ -88,18 +95,18 @@ export function BookingCalendar({
         />
       </View>
 
-      <View className="flex-row border-y border-primary/10 bg-primary/5 py-2.5">
+      <View className="flex-row border-y border-primary/10 bg-primary/5 py-2">
         {weekdayLabels.map((day) => (
           <Text
             key={day}
             className="flex-1 text-center font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description"
           >
-            {day.slice(0, 1)}
+            {day.slice(0, 2)}
           </Text>
         ))}
       </View>
 
-      <View className="flex-row flex-wrap px-1 py-2">
+      <View className="flex-row flex-wrap px-1 py-1.5">
         {monthDays.map((day) => (
           <CalendarDay
             availabilityBookings={availabilityBookings}
@@ -114,11 +121,11 @@ export function BookingCalendar({
         ))}
       </View>
 
-      <View className="flex-row flex-wrap gap-x-4 gap-y-2 border-t border-primary/10 px-4 py-3">
+      <View className="flex-row items-center justify-between border-t border-primary/10 px-3 py-2.5">
         {BOOKING_CALENDAR_LEGEND.map((item) => (
-          <View className="flex-row items-center gap-1.5" key={item.label}>
-            <View className={`h-2 w-2 rounded-full ${item.colorClassName}`} />
-            <Text className="font-ralewayBold text-[11px] text-description">
+          <View className="flex-row items-center gap-1" key={item.label}>
+            <View className={item.markerClassName} />
+            <Text className="font-ralewayBold text-[9px] text-description">
               {item.label}
             </Text>
           </View>
@@ -169,6 +176,10 @@ function CalendarDay({
 }) {
   const key = dateKey(day);
   const dayBookings = getBookingsForDay(bookings, day);
+  const activeBookingCount = dayBookings.filter(
+    (booking) => booking.status === "Booked",
+  ).length;
+  const cancelledBookingCount = dayBookings.length - activeBookingCount;
   const availability = getAvailabilityForDay(availabilityBookings, day);
   const isCurrentMonth =
     day.getMonth() === currentMonth.getMonth() &&
@@ -179,15 +190,16 @@ function CalendarDay({
   return (
     <TouchableOpacity
       activeOpacity={0.72}
-      accessibilityLabel={`${spokenDateFormatter.format(day)}. ${availability.label}. ${dayBookings.length} ${dayBookings.length === 1 ? "booking" : "bookings"}.`}
+      accessibilityHint="Shows this day's schedule"
+      accessibilityLabel={`${spokenDateFormatter.format(day)}. ${availability.label}. ${activeBookingCount} active ${activeBookingCount === 1 ? "booking" : "bookings"}.${cancelledBookingCount ? ` ${cancelledBookingCount} cancelled.` : ""}`}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
-      className="h-14 items-center justify-center"
+      className={`h-12 items-center justify-center ${isCurrentMonth ? "" : "opacity-40"}`}
       onPress={() => onPress(day)}
       style={{ width: "14.2857%" }}
     >
       <View
-        className={`h-9 w-9 items-center justify-center rounded-full ${
+        className={`h-7 w-7 items-center justify-center rounded-full ${
           isSelected
             ? "bg-primary"
             : isToday
@@ -209,26 +221,25 @@ function CalendarDay({
           {day.getDate()}
         </Text>
       </View>
-      <View className="mt-0.5 h-2 flex-row items-center justify-center gap-0.5">
-        {dayBookings.length > 0 ? (
-          dayBookings
-            .slice(0, 3)
-            .map((booking) => (
-              <View
-                key={booking.id}
-                className={`h-1.5 w-1.5 rounded-full ${
-                  booking.status === "Cancelled"
-                    ? "bg-description/20"
-                    : "bg-accent"
-                }`}
-              />
-            ))
-        ) : isCurrentMonth ? (
-          <View
-            className={`h-1.5 w-1.5 rounded-full ${getAvailabilityDotClass(
-              availability,
-            )}`}
-          />
+      <View className="mt-0.5 h-3.5 flex-row items-center justify-center gap-1">
+        {activeBookingCount > 0 ? (
+          <View className="h-3.5 min-w-4 items-center justify-center rounded-full bg-info px-1">
+            <Text className="font-ralewayExtraBold text-[8px] leading-[10px] text-white">
+              {activeBookingCount > 9 ? "9+" : activeBookingCount}
+            </Text>
+          </View>
+        ) : cancelledBookingCount > 0 ? (
+          <View className="h-3.5 min-w-4 items-center justify-center rounded-full bg-description/30 px-1">
+            <Text className="font-ralewayExtraBold text-[8px] leading-[10px] text-description">
+              {cancelledBookingCount > 9 ? "9+" : cancelledBookingCount}
+            </Text>
+          </View>
+        ) : null}
+        {activeBookingCount > 0 && cancelledBookingCount > 0 ? (
+          <View className="h-1.5 w-2.5 rounded-full bg-description/30" />
+        ) : null}
+        {isCurrentMonth ? (
+          <View className={getAvailabilityMarkerClass(availability)} />
         ) : null}
       </View>
     </TouchableOpacity>

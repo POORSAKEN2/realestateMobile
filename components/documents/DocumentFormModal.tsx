@@ -108,7 +108,6 @@ export function DocumentFormModal({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close document form"
-      backdropClassName="bg-textPrimary/45"
       closeOnBackdropPress={false}
       keyboardAvoiding
       onClose={handleClose}

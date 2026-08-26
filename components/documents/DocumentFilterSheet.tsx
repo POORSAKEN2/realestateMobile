@@ -96,7 +96,6 @@ export function DocumentFilterSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close document filters"
-      backdropClassName="bg-textPrimary/45"
       onClose={handleClose}
       visible={visible}
     >

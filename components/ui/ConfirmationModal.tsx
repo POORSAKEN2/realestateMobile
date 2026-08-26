@@ -6,6 +6,8 @@ import {
   View,
 } from "react-native";
 
+import { MODAL_OVERLAY_CLASS_NAME } from "../../constants/modal";
+
 export function ConfirmationModal({
   confirmLabel = "Delete",
   description,
@@ -30,7 +32,9 @@ export function ConfirmationModal({
       transparent
       visible={visible}
     >
-      <View className="flex-1 items-center justify-center bg-textPrimary/40 px-6">
+      <View
+        className={`flex-1 items-center justify-center px-6 ${MODAL_OVERLAY_CLASS_NAME}`}
+      >
         <View className="w-full rounded-[28px] bg-white p-6">
           <Text className="font-ralewayExtraBold text-xl text-textPrimary">
             {title}

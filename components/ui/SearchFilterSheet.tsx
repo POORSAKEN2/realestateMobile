@@ -26,7 +26,6 @@ export function SearchFilterSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title.toLowerCase()}`}
-      backdropClassName="bg-textPrimary/45"
       onClose={onClose}
       visible={visible}
     >

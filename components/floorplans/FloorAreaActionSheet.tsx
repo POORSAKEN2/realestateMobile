@@ -49,8 +49,6 @@ export function FloorAreaActionSheet({
   return (
     <ActionSheet
       actions={actions}
-      bottomInsetMode="safe-area"
-      comfortableBottomPadding={view === "shape"}
       onClose={onClose}
       subtitle={
         view === "shape"

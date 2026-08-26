@@ -1,10 +1,18 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "../../constants/colors";
+import { getStandardModalSheetHeight } from "../../constants/modal";
 import { BottomSheetModal } from "./BottomSheetModal";
+import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "./ModalActionFooter";
 
 export type ActionSheetItem = {
   description?: string;
@@ -19,22 +27,20 @@ export type ActionSheetItem = {
 
 export function ActionSheet({
   actions,
-  bottomInsetMode = "edge",
-  comfortableBottomPadding = false,
   onClose,
   subtitle,
   title,
   visible,
 }: {
   actions: ActionSheetItem[];
-  bottomInsetMode?: "edge" | "safe-area";
-  comfortableBottomPadding?: boolean;
   onClose: () => void;
   subtitle?: string;
   title: string;
   visible: boolean;
 }) {
   const pendingAction = useRef<(() => void) | null>(null);
+  const { height } = useWindowDimensions();
+  const maxSheetHeight = getStandardModalSheetHeight(height);
 
   function handleAction(action: ActionSheetItem) {
     if (action.dismissOnPress === false) {
@@ -55,17 +61,16 @@ export function ActionSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title}`}
-      bottomInsetMode={bottomInsetMode}
+      bottomInsetMode="safe-area"
       onClose={onClose}
       onDismiss={handleDismiss}
       visible={visible}
     >
       <SafeAreaView
         accessibilityViewIsModal
-        className={`rounded-t-[28px] bg-white px-5 pt-5 ${
-          comfortableBottomPadding ? "pb-8" : "pb-4"
-        }`}
+        className="overflow-hidden rounded-t-[28px] bg-white px-5 pt-5"
         edges={["bottom"]}
+        style={{ maxHeight: maxSheetHeight }}
       >
         <View className="mb-4 flex-row items-start gap-3">
           <View className="min-w-0 flex-1">
@@ -92,7 +97,16 @@ export function ActionSheet({
           </TouchableOpacity>
         </View>
 
-        <View className="gap-2">
+        <ScrollView
+          bounces={false}
+          contentContainerStyle={{
+            gap: 8,
+            paddingBottom: MODAL_ACTION_FOOTER_CONTENT_HEIGHT,
+          }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          style={{ flexGrow: 0, flexShrink: 1 }}
+        >
           {actions.map((action) => {
             const color = action.destructive ? "#B42318" : colors.primary;
 
@@ -154,7 +168,7 @@ export function ActionSheet({
               </TouchableOpacity>
             );
           })}
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </BottomSheetModal>
   );

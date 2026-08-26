@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors } from "../../constants/colors";
+import { MODAL_OVERLAY_CLASS_NAME } from "../../constants/modal";
 import { appRoutes } from "../../constants/navigation";
 
 type MenuIcon =
@@ -77,7 +78,6 @@ const menuSections: MenuSection[] = [
         label: "Bookings",
         supportingText: "Manage transient property stays",
         href: appRoutes.primary.bookings,
-        badge: "Review scope",
         icon: { family: "Ionicons", name: "calendar-outline" },
       },
     ],
@@ -100,7 +100,6 @@ const menuSections: MenuSection[] = [
       {
         label: "AI Assistant",
         supportingText: "Ask questions and create reports",
-        badge: "All-In",
         icon: { family: "MaterialCommunityIcons", name: "robot-outline" },
       },
     ],
@@ -282,7 +281,7 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
       <View className="flex-1 justify-end">
         <Animated.View
           pointerEvents={visible ? "auto" : "none"}
-          className="absolute inset-0 bg-textPrimary/40"
+          className={`absolute inset-0 ${MODAL_OVERLAY_CLASS_NAME}`}
           style={{ opacity: backdropOpacity }}
         >
           <Pressable className="absolute inset-0" onPress={onClose} />

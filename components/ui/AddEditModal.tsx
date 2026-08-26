@@ -80,6 +80,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
 
   return (
     <Modal
+      allowSwipeDismissal={false}
       animationType="slide"
       onRequestClose={handleClose}
       presentationStyle="formSheet"

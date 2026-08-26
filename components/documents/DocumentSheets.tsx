@@ -187,7 +187,6 @@ function BottomSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title}`}
-      backdropClassName="bg-textPrimary/45"
       onClose={onClose}
       visible={visible}
     >

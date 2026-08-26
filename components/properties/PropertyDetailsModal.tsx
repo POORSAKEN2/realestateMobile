@@ -139,7 +139,6 @@ export function PropertyDetailsModal({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close property details"
-      backdropClassName="bg-textPrimary/45"
       onClose={onClose}
       statusBarTranslucent
       visible={Boolean(property)}

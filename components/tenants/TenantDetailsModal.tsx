@@ -114,7 +114,6 @@ export function TenantDetailsModal({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close tenant details"
-      backdropClassName="bg-textPrimary/45"
       onClose={onClose}
       statusBarTranslucent
       visible={Boolean(tenant)}

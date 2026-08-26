@@ -3,22 +3,40 @@ import { getBookingStatusLabel } from "./bookingCalendar";
 import type { TransientBooking } from "../../types";
 
 export const BOOKING_CALENDAR_LEGEND = [
-  { colorClassName: "bg-info", label: "Reservation" },
-  { colorClassName: "bg-success", label: "Available" },
-  { colorClassName: "bg-warning", label: "Turnover" },
-  { colorClassName: "bg-description/20", label: "Cancelled" },
+  {
+    label: "Booked",
+    markerClassName: "h-1.5 w-2.5 rounded-full bg-info",
+  },
+  {
+    label: "Open",
+    markerClassName: "h-1.5 w-1.5 rounded-full bg-success",
+  },
+  {
+    label: "Turnover",
+    markerClassName: "h-1.5 w-1.5 rotate-45 rounded-[1px] bg-warning",
+  },
+  {
+    label: "Full",
+    markerClassName: "h-1.5 w-1.5 rounded-[1px] bg-danger",
+  },
+  {
+    label: "Cancelled",
+    markerClassName: "h-1.5 w-2.5 rounded-full bg-description/30",
+  },
 ] as const;
 
-export function getAvailabilityDotClass(availability: Availability) {
-  if (availability.label === "Available") return "bg-success";
+export function getAvailabilityMarkerClass(availability: Availability) {
+  if (availability.label === "Available") {
+    return "h-1.5 w-1.5 rounded-full bg-success";
+  }
   if (
     availability.label === "After 2 PM" ||
     availability.label === "Checkout"
   ) {
-    return "bg-warning";
+    return "h-1.5 w-1.5 rotate-45 rounded-[1px] bg-warning";
   }
 
-  return "bg-danger";
+  return "h-1.5 w-1.5 rounded-[1px] bg-danger";
 }
 
 export function getBookingStatusPresentation(booking: TransientBooking) {

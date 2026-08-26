@@ -9,11 +9,11 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons"; // Or your specific icon import
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { getStandardModalSheetHeight } from "../../../constants/modal";
 import { BottomSheetModal } from "../BottomSheetModal";
+import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "../ModalActionFooter";
 
-const DROPDOWN_OPTION_HEIGHT = 56;
 const DROPDOWN_OPTION_GAP = 8;
-const DROPDOWN_SHEET_CHROME_HEIGHT = 168;
 
 export interface DropdownOption<T extends string = string> {
   value: T;
@@ -22,7 +22,6 @@ export interface DropdownOption<T extends string = string> {
 
 interface DropdownProps<T extends string> {
   disabled?: boolean;
-  dynamicSheetHeight?: boolean;
   label: string;
   placeholder?: string;
   subtitle?: string;
@@ -37,7 +36,6 @@ interface DropdownProps<T extends string> {
 
 export function DropdownField<T extends string>({
   disabled = false,
-  dynamicSheetHeight = false,
   label,
   placeholder = "Select an option",
   subtitle,
@@ -53,19 +51,10 @@ export function DropdownField<T extends string>({
   const { height } = useWindowDimensions();
   const isFilledVariant = variant === "filled";
   const isCompactVariant = variant === "compact";
+  const sheetHeight = getStandardModalSheetHeight(height);
 
   const selectedLabel =
     options.find((option) => option.value === value)?.label || value;
-  const optionListHeight =
-    options.length * DROPDOWN_OPTION_HEIGHT +
-    Math.max(0, options.length - 1) * DROPDOWN_OPTION_GAP;
-  const dynamicOptionListHeight = Math.min(
-    optionListHeight,
-    Math.max(
-      DROPDOWN_OPTION_HEIGHT,
-      height * 0.72 - DROPDOWN_SHEET_CHROME_HEIGHT,
-    ),
-  );
 
   function handleSelect(selectedValue: T) {
     onSelect(selectedValue);
@@ -119,14 +108,14 @@ export function DropdownField<T extends string>({
 
       <BottomSheetModal
         backdropAccessibilityLabel={`Close ${label} options`}
-        backdropClassName="bg-textPrimary/35"
         bottomInsetMode={sheetBottomInsetMode}
         onClose={() => setIsOpen(false)}
         visible={isOpen}
       >
         <SafeAreaView
-          className="max-h-[72%] w-full overflow-hidden rounded-t-[28px] bg-whitePrimary px-5 pb-4 pt-5"
+          className="w-full overflow-hidden rounded-t-[28px] bg-whitePrimary px-5 pt-5"
           edges={["bottom", "left", "right"]}
+          style={{ height: sheetHeight }}
         >
           <View className="mb-4 flex-row items-start justify-between gap-3">
             <View className="min-w-0 flex-1">
@@ -155,14 +144,13 @@ export function DropdownField<T extends string>({
 
           <ScrollView
             bounces={false}
-            contentContainerStyle={{ gap: DROPDOWN_OPTION_GAP }}
+            className="flex-1"
+            contentContainerStyle={{
+              gap: DROPDOWN_OPTION_GAP,
+              paddingBottom: MODAL_ACTION_FOOTER_CONTENT_HEIGHT,
+            }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
-            style={
-              dynamicSheetHeight
-                ? { height: dynamicOptionListHeight }
-                : undefined
-            }
           >
             {options.map((option) => {
               const isSelected = option.value === value;

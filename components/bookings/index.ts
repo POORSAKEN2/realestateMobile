@@ -10,4 +10,5 @@ export {
 } from "./BookingModuleState";
 export { BookingReservationList } from "./BookingReservationList";
 export { BookingStayFields } from "./BookingStayFields";
+export { BookingViewToggle, type BookingViewMode } from "./BookingViewToggle";
 export { BuildingChoices } from "./BuildingChoices";

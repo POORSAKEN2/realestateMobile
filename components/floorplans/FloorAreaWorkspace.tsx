@@ -171,7 +171,6 @@ export function FloorAreaWorkspace({
           </Text>
           <DropdownField
             disabled={areaOptions.length === 0}
-            dynamicSheetHeight
             label="floor area"
             onSelect={setSelectedAreaId}
             options={areaOptions}

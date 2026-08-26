@@ -2,6 +2,8 @@ import React from "react";
 import { Modal, View, Text, TouchableOpacity, ViewProps } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+import { MODAL_OVERLAY_CLASS_NAME } from "../../../constants/modal";
+
 interface PickerFieldProps {
   label: string;
   value?: string;
@@ -92,7 +94,9 @@ export function PickerModalShell({
 }: PickerModalShellProps) {
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent visible>
-      <View className="flex-1 justify-center bg-blackPrimary/40 px-5">
+      <View
+        className={`flex-1 justify-center px-5 ${MODAL_OVERLAY_CLASS_NAME}`}
+      >
         <View className="rounded-3xl border border-primary/20 bg-whitePrimary p-5 shadow-xl shadow-primary/10">
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="font-ralewayExtraBold text-sm text-textPrimary">

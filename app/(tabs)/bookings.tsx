@@ -12,6 +12,8 @@ import {
   BookingFilterSheet,
   BookingFormModal,
   BookingReservationList,
+  BookingViewToggle,
+  type BookingViewMode,
 } from "../../components/bookings";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
@@ -41,6 +43,7 @@ export default function BookingsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [viewMode, setViewMode] = useState<BookingViewMode>("month");
 
   const { useList } = useProperties();
   const {
@@ -120,8 +123,17 @@ export default function BookingsScreen() {
       return matchesStatus && matchesSearch;
     });
   }, [searchQuery, selectedBuildingBookings, statusFilter]);
+  const calendarBookings = useMemo(
+    () =>
+      statusFilter === "All"
+        ? selectedBuildingBookings
+        : selectedBuildingBookings.filter(
+            (booking) => booking.status === statusFilter,
+          ),
+    [selectedBuildingBookings, statusFilter],
+  );
   const calendar = useBookingCalendar({
-    bookings: visibleBookings,
+    bookings: calendarBookings,
     availabilityBookings: selectedBuildingBookings,
   });
   const bookingSnackbar = useSnackbar();
@@ -187,6 +199,8 @@ export default function BookingsScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View className="gap-4 pb-8">
+            <BookingViewToggle value={viewMode} onChange={setViewMode} />
+
             <SearchToolbar
               accessibilityLabel="Search bookings"
               activeFilterCount={activeBookingFilterCount}
@@ -195,7 +209,10 @@ export default function BookingsScreen() {
               filterLabel={`${selectedBuilding?.title ?? "No property"} · ${
                 statusFilter === "All" ? "All statuses" : "Confirmed"
               }`}
-              onChangeText={setSearchQuery}
+              onChangeText={(value) => {
+                setSearchQuery(value);
+                if (value.trim()) setViewMode("agenda");
+              }}
               onFilterPress={() => setIsFilterVisible(true)}
               placeholder="Guest, room, email, or phone"
               resultLabel={formatSearchResultLabel({
@@ -205,46 +222,50 @@ export default function BookingsScreen() {
                 totalCount: selectedBuildingBookings.length,
               })}
               value={searchQuery}
+              variant={viewMode === "month" ? "compact" : "standard"}
             />
 
-            {isLoading ? (
-              <BookingCalendarLoading />
-            ) : buildingOptions.length === 0 ? (
+            {buildingOptions.length === 0 && !isLoading ? (
               <BookingCalendarEmpty />
+            ) : viewMode === "month" ? (
+              isLoading ? (
+                <BookingCalendarLoading />
+              ) : (
+                <>
+                  <BookingCalendar
+                    availabilityBookings={selectedBuildingBookings}
+                    bookings={calendarBookings}
+                    currentMonth={calendar.currentMonth}
+                    onChangeMonth={calendar.changeMonth}
+                    onGoToToday={calendar.goToToday}
+                    onSelectDay={calendar.selectDay}
+                    propertyTitle={selectedBuilding?.title}
+                    selectedDate={calendar.selectedDate}
+                  />
+                  <BookingDaySchedule
+                    availability={calendar.selectedDayAvailability}
+                    bookings={calendar.selectedDayBookings}
+                    canCreate={calendar.canCreateOnSelectedDay}
+                    date={calendar.selectedDate}
+                    onCreate={(date) =>
+                      bookingForm.openCreate(selectedPropertyId, date)
+                    }
+                    onOpenBooking={bookingForm.openEdit}
+                  />
+                </>
+              )
             ) : (
-              <>
-                <BookingCalendar
-                  availabilityBookings={selectedBuildingBookings}
-                  bookings={visibleBookings}
-                  currentMonth={calendar.currentMonth}
-                  onChangeMonth={calendar.changeMonth}
-                  onGoToToday={calendar.goToToday}
-                  onSelectDay={calendar.selectDay}
-                  selectedDate={calendar.selectedDate}
-                />
-                <BookingDaySchedule
-                  availability={calendar.selectedDayAvailability}
-                  bookings={calendar.selectedDayBookings}
-                  canCreate={calendar.canCreateOnSelectedDay}
-                  date={calendar.selectedDate}
-                  onCreate={(date) =>
-                    bookingForm.openCreate(selectedPropertyId, date)
-                  }
-                  onOpenBooking={bookingForm.openEdit}
-                />
-              </>
+              <BookingReservationList
+                bookings={visibleBookings}
+                buildingTitle={selectedBuilding?.title}
+                hasActiveFilters={
+                  Boolean(searchQuery.trim()) ||
+                  visibleBookings.length !== selectedBuildingBookings.length
+                }
+                isLoading={isLoading}
+                onOpenBooking={bookingForm.openEdit}
+              />
             )}
-
-            <BookingReservationList
-              bookings={visibleBookings}
-              buildingTitle={selectedBuilding?.title}
-              hasActiveFilters={
-                Boolean(searchQuery.trim()) ||
-                visibleBookings.length !== selectedBuildingBookings.length
-              }
-              isLoading={isLoading}
-              onOpenBooking={bookingForm.openEdit}
-            />
           </View>
         </ScrollView>
       </View>
