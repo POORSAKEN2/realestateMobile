@@ -45,6 +45,11 @@ export type Property = {
   value: number;
   roi: number;
   occupancy?: number;
+  roomCount: number;
+  bedspaceCount: number;
+  vacantBedspaceCount: number;
+  occupiedBedspaceCount: number;
+  maintenanceBedspaceCount: number;
   area?: string;
   utilityScore?: string;
   bedrooms?: number;

@@ -13,6 +13,8 @@ export type LeaseFormState = {
   startDate: string;
   durationMonths: string;
   monthlyRent: string;
+  roomId: string;
+  bedspaceId: string;
   roomNumber: string;
   status: string;
 };
@@ -98,6 +100,8 @@ export function createEmptyLeaseForm(): LeaseFormState {
     startDate: formatLeaseDateValue(new Date()),
     durationMonths: String(DEFAULT_DURATION_MONTHS),
     monthlyRent: "",
+    roomId: "",
+    bedspaceId: "",
     roomNumber: "",
     status: "Active",
   };
@@ -115,6 +119,8 @@ export function createLeaseForm(lease: Lease): LeaseFormState {
       calculateLeaseDurationMonths(lease.startDate, lease.endDate),
     ),
     monthlyRent: String(lease.monthlyRent || ""),
+    roomId: lease.roomId ?? "",
+    bedspaceId: lease.bedspaceId ?? "",
     roomNumber: lease.roomNumber ?? "",
     status: lease.status || "Active",
   };
@@ -191,6 +197,8 @@ export function getLeaseFormResult(
       startDate: isTypoFix ? editingLease!.startDate : form.startDate,
       endDate: isTypoFix ? editingLease!.endDate : endDate,
       monthlyRent: isTypoFix ? editingLease!.monthlyRent : monthlyRent,
+      roomId: form.roomId || null,
+      bedspaceId: form.bedspaceId || null,
       roomNumber: form.roomNumber.trim(),
       status: form.status,
     },

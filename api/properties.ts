@@ -172,6 +172,21 @@ export function normalizeProperty(property: Record<string, any>): Property {
       property?.occupancy !== undefined && property?.occupancy !== null
         ? Number(property.occupancy)
         : undefined,
+    roomCount: Number(property?.roomCount ?? property?.room_count ?? 0),
+    bedspaceCount: Number(
+      property?.bedspaceCount ?? property?.bedspace_count ?? 0,
+    ),
+    vacantBedspaceCount: Number(
+      property?.vacantBedspaceCount ?? property?.vacant_bedspace_count ?? 0,
+    ),
+    occupiedBedspaceCount: Number(
+      property?.occupiedBedspaceCount ?? property?.occupied_bedspace_count ?? 0,
+    ),
+    maintenanceBedspaceCount: Number(
+      property?.maintenanceBedspaceCount ??
+        property?.maintenance_bedspace_count ??
+        0,
+    ),
     area: property?.area ?? property?.total_area ?? property?.totalArea,
     utilityScore: property?.utilityScore ?? property?.utility_score,
     bedrooms:

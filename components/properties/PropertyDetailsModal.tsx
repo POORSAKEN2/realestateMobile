@@ -269,7 +269,47 @@ export function PropertyDetailsModal({
                   loading={isLoading}
                   value={propertyDocuments.length}
                 />
+                <CountMetric
+                  icon="grid"
+                  label="Bedspaces"
+                  loading={floorPlanQueries.rooms.isLoading}
+                  value={property.bedspaceCount}
+                />
               </View>
+
+              <TouchableOpacity
+                accessibilityLabel="Manage property bedspaces"
+                accessibilityRole="button"
+                activeOpacity={0.8}
+                className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/10 p-4"
+                onPress={() => {
+                  onClose();
+                  router.push({
+                    pathname: appRoutes.secondary.bedspaces,
+                    params: {
+                      propertyId: property.id,
+                      propertyTitle: property.title,
+                    },
+                  });
+                }}
+              >
+                <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                  <Feather name="grid" color="#8A77F4" size={17} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="font-ralewayBold text-sm text-textPrimary">
+                    Bedspace inventory
+                  </Text>
+                  <Text className="mt-0.5 text-[11px] text-description">
+                    {property.bedspaceCount > 0
+                      ? `${property.vacantBedspaceCount} vacant · ${property.occupiedBedspaceCount} occupied · ${property.maintenanceBedspaceCount} maintenance`
+                      : (rooms.length || property.roomCount) > 0
+                        ? `${rooms.length || property.roomCount} ${(rooms.length || property.roomCount) === 1 ? "room" : "rooms"} ready for bedspace setup`
+                        : "Add a room before creating bedspaces"}
+                  </Text>
+                </View>
+                <Feather name="chevron-right" color="#8A77F4" size={18} />
+              </TouchableOpacity>
 
               <PropertyFloorSummary
                 floorPlans={floorPlans}
@@ -324,6 +364,9 @@ export function PropertyDetailsModal({
                               numberOfLines={1}
                             >
                               {getLeaseRoomNumber(lease.roomNumber)} |{" "}
+                              {lease.bedspace?.bedspaceNumber
+                                ? `Bedspace ${lease.bedspace.bedspaceNumber} | `
+                                : ""}
                               {lease.startDate} to {lease.endDate}
                             </Text>
                           </View>

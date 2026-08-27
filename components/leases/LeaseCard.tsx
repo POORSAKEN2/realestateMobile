@@ -79,6 +79,11 @@ export function LeaseCard({
               >
                 {property?.title ?? "Unknown Property"}
                 {lease.roomNumber ? ` • Room ${lease.roomNumber}` : ""}
+                {lease.bedspace?.bedspaceNumber
+                  ? ` • Bedspace ${lease.bedspace.bedspaceNumber}`
+                  : lease.bedspaceId
+                    ? " • Bedspace assigned"
+                    : ""}
               </Text>
             </View>
           </View>

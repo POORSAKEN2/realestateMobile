@@ -80,12 +80,14 @@ export function PropertyCard({
   onEdit,
   onOpenDetails,
   onOpenFloorPlans,
+  onOpenBedspaces,
   onOpenBookings,
 }: {
   property: Property;
   onEdit: () => void;
   onOpenDetails: () => void;
   onOpenFloorPlans: () => void;
+  onOpenBedspaces: () => void;
   onOpenBookings?: () => void;
 }) {
   const occupancy = property.occupancy ?? 0;
@@ -234,22 +236,94 @@ export function PropertyCard({
         </View>
 
         <TouchableOpacity
-          accessibilityLabel={`Manage floor plans for ${property.title}`}
+          accessibilityLabel={`Manage bedspaces for ${property.title}`}
           accessibilityRole="button"
           activeOpacity={0.82}
-          className={`mt-4 flex-row items-center gap-3 rounded-2xl border p-3.5 ${
-            floorManagerPolicy.floorSummaryProminence === "primary"
-              ? "border-primary/25 bg-primary/10"
-              : "border-primary/20 bg-white"
-          }`}
+          className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3.5"
           onPress={(event) => {
             event.stopPropagation();
-            onOpenFloorPlans();
+            onOpenBedspaces();
           }}
         >
           <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
             <MaterialCommunityIcons
-              name="floor-plan"
+              name="bed-single-outline"
+              color="#8A77F4"
+              size={21}
+            />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="font-ralewayBold text-xs uppercase text-secondary">
+              Bedspace inventory
+            </Text>
+            <Text className="mt-1 text-xs text-description">
+              {property.bedspaceCount > 0
+                ? `${property.bedspaceCount} total · ${property.vacantBedspaceCount} vacant · ${property.occupiedBedspaceCount} occupied`
+                : property.roomCount > 0
+                  ? `${property.roomCount} ${property.roomCount === 1 ? "room" : "rooms"} available · Set up bedspaces`
+                  : "No rooms available · Add a room first"}
+            </Text>
+            {property.maintenanceBedspaceCount > 0 ? (
+              <Text className="mt-0.5 text-[11px] text-warning">
+                {property.maintenanceBedspaceCount} under maintenance
+              </Text>
+            ) : null}
+          </View>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            color="#8A77F4"
+            size={21}
+          />
+        </TouchableOpacity>
+
+        {floorManagerPolicy.showFloorSummary ? (
+          <TouchableOpacity
+            accessibilityLabel={`Manage floor plans for ${property.title}`}
+            accessibilityRole="button"
+            activeOpacity={0.82}
+            className={`mt-3 flex-row items-center gap-3 rounded-2xl border p-3.5 ${
+              floorManagerPolicy.floorSummaryProminence === "primary"
+                ? "border-primary/25 bg-primary/10"
+                : "border-primary/20 bg-white"
+            }`}
+            onPress={(event) => {
+              event.stopPropagation();
+              onOpenFloorPlans();
+            }}
+          >
+            <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+              <MaterialCommunityIcons
+                name="floor-plan"
+                color={
+                  floorManagerPolicy.floorSummaryProminence === "primary"
+                    ? "#8A77F4"
+                    : "#6F6D6D"
+                }
+                size={21}
+              />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text
+                className={`font-ralewayBold text-xs uppercase ${
+                  floorManagerPolicy.floorSummaryProminence === "primary"
+                    ? "text-secondary"
+                    : "text-description"
+                }`}
+              >
+                {floorManagerPolicy.floorSummaryProminence === "primary"
+                  ? "Floor summary"
+                  : "Optional layout"}
+              </Text>
+              <Text className="mt-1 text-xs text-description">
+                {floorPlans.length
+                  ? `${floorPlans.length} ${floorPlans.length === 1 ? "floor" : "floors"} · ${floorAreaCount} ${floorAreaCount === 1 ? "area" : "areas"}`
+                  : floorManagerPolicy.floorSummaryProminence === "primary"
+                    ? "No floors added yet"
+                    : "Usually not needed · Add anyway"}
+              </Text>
+            </View>
+            <MaterialCommunityIcons
+              name="chevron-right"
               color={
                 floorManagerPolicy.floorSummaryProminence === "primary"
                   ? "#8A77F4"
@@ -257,37 +331,8 @@ export function PropertyCard({
               }
               size={21}
             />
-          </View>
-          <View className="min-w-0 flex-1">
-            <Text
-              className={`font-ralewayBold text-xs uppercase ${
-                floorManagerPolicy.floorSummaryProminence === "primary"
-                  ? "text-secondary"
-                  : "text-description"
-              }`}
-            >
-              {floorManagerPolicy.floorSummaryProminence === "primary"
-                ? "Floor summary"
-                : "Optional layout"}
-            </Text>
-            <Text className="mt-1 text-xs text-description">
-              {floorPlans.length
-                ? `${floorPlans.length} ${floorPlans.length === 1 ? "floor" : "floors"} · ${floorAreaCount} ${floorAreaCount === 1 ? "area" : "areas"}`
-                : floorManagerPolicy.floorSummaryProminence === "primary"
-                  ? "No floors added yet"
-                  : "Usually not needed · Add anyway"}
-            </Text>
-          </View>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            color={
-              floorManagerPolicy.floorSummaryProminence === "primary"
-                ? "#8A77F4"
-                : "#6F6D6D"
-            }
-            size={21}
-          />
-        </TouchableOpacity>
+          </TouchableOpacity>
+        ) : null}
 
         <View className="mt-4 flex-row items-center gap-2">
           <View className="min-w-0 flex-1 flex-row items-center gap-3">

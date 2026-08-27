@@ -8,11 +8,13 @@ import type { PropertyRoom, PropertyRoomStatus } from "../../types";
 
 export function FloorAssignedRoomsSection({
   isBusy,
+  onManageBedspaces,
   onStatusChange,
   onUnassign,
   rooms,
 }: {
   isBusy: boolean;
+  onManageBedspaces: (room: PropertyRoom) => void;
   onStatusChange: (room: PropertyRoom, status: PropertyRoomStatus) => void;
   onUnassign: (room: PropertyRoom) => void;
   rooms: PropertyRoom[];
@@ -38,6 +40,7 @@ export function FloorAssignedRoomsSection({
           hasActiveFilters={viewModel.hasFilters}
           isBusy={isBusy}
           onClearFilters={viewModel.clearFilters}
+          onManageBedspaces={onManageBedspaces}
           onOpenActions={viewModel.openActions}
           totalCount={rooms.length}
         />
@@ -46,6 +49,7 @@ export function FloorAssignedRoomsSection({
       <FloorAssignedRoomActionsSheet
         isBusy={isBusy}
         onClose={viewModel.closeActions}
+        onManageBedspaces={onManageBedspaces}
         onShowStatus={viewModel.showStatusActions}
         onStatusChange={onStatusChange}
         onUnlink={onUnassign}

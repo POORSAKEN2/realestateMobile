@@ -20,6 +20,7 @@ import {
 } from "../../hooks/api/useFloorPlans";
 import { useAuth } from "../../hooks/useAuth";
 import { nativeFloorPlanFeedback } from "../../services/floorplans/deviceFloorPlanServices";
+import { appRoutes } from "../../constants/navigation";
 import type { PropertyRoom, PropertyRoomStatus } from "../../types";
 import {
   getErrorMessage,
@@ -200,6 +201,17 @@ export default function AssignedRoomsScreen() {
           >
             <FloorAssignedRoomsSection
               isBusy={isBusy}
+              onManageBedspaces={(room) =>
+                router.push({
+                  pathname: appRoutes.secondary.bedspaces,
+                  params: {
+                    propertyId,
+                    propertyTitle,
+                    roomId: room.id,
+                    roomNumber: room.roomNumber,
+                  },
+                })
+              }
               onStatusChange={updateStatus}
               onUnassign={unassign}
               rooms={rooms}

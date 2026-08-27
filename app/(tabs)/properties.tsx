@@ -226,6 +226,15 @@ export default function PropertiesScreen() {
                 property={item.property}
                 onEdit={() => openEditForm(item.property)}
                 onOpenDetails={() => setSelectedProperty(item.property)}
+                onOpenBedspaces={() =>
+                  router.push({
+                    pathname: appRoutes.secondary.bedspaces,
+                    params: {
+                      propertyId: item.property.id,
+                      propertyTitle: item.property.title,
+                    },
+                  })
+                }
                 onOpenFloorPlans={() =>
                   router.push({
                     pathname: appRoutes.secondary.floorPlans,

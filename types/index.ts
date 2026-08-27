@@ -1,4 +1,9 @@
 export type {
+  Bedspace,
+  BedspacePayload,
+  BedspaceStatus,
+} from "./domain/bedspaces";
+export type {
   ApiEnvelope,
   ApiErrorResponse,
   PaginatedApiData,

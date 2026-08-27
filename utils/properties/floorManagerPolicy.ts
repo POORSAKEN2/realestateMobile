@@ -14,6 +14,7 @@ export type FloorManagerPolicy = {
   floorSummaryProminence: FloorSummaryProminence;
   mode: FloorManagerMode;
   rooms: SpatialCapabilityLevel;
+  showFloorSummary: boolean;
   showRoomActions: boolean;
 };
 
@@ -135,6 +136,9 @@ export function resolveFloorManagerPolicy({
     rooms: backendCapabilities?.rooms ?? fallback.rooms,
   };
   const hasSpatialData = hasFloorPlans || hasRooms;
+  const floorSummaryIsNormallyShown =
+    capabilities.floorplans === "recommended" ||
+    capabilities.floorplans === "optional";
   const roomsAreNormallyShown =
     capabilities.rooms === "recommended" || capabilities.rooms === "optional";
 
@@ -150,6 +154,7 @@ export function resolveFloorManagerPolicy({
         : "secondary",
     mode: getMode(capabilities),
     rooms: capabilities.rooms,
+    showFloorSummary: floorSummaryIsNormallyShown || hasSpatialData,
     showRoomActions: roomsAreNormallyShown || hasRooms,
   };
 }
