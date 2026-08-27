@@ -163,7 +163,7 @@ export default function PropertiesScreen() {
         </View>
 
         <FlatList
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
           data={propertyListItems}
           ItemSeparatorComponent={() => <View className="h-4" />}
           keyExtractor={(item) =>
