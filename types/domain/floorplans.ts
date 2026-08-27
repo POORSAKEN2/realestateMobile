@@ -34,6 +34,10 @@ export type PropertyRoom = {
   points: FloorPlanPoint[];
   type?: string | null;
   status: PropertyRoomStatus;
+  bedspaceCount: number;
+  vacantBedspaceCount: number;
+  occupiedBedspaceCount: number;
+  maintenanceBedspaceCount: number;
   notes?: string | null;
 };
 

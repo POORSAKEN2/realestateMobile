@@ -1,5 +1,6 @@
 import { apiClient, authHeaders, unwrapCollection, unwrapData } from "./client";
 import { normalizeClient } from "./clients";
+import { normalizeBedspace } from "./bedspaces";
 import type { ApiEnvelope, Lease, LeasePayload } from "../types";
 
 function normalizeLease(lease: Record<string, any>): Lease {
@@ -14,6 +15,9 @@ function normalizeLease(lease: Record<string, any>): Lease {
         lease?.lessee_id ??
         "",
     ),
+    roomId: lease?.roomId ?? lease?.room_id ?? lease?.room?.id ?? null,
+    bedspaceId:
+      lease?.bedspaceId ?? lease?.bedspace_id ?? lease?.bedspace?.id ?? null,
     roomNumber: lease?.roomNumber ?? lease?.room_number ?? null,
     startDate: String(lease?.startDate ?? lease?.start_date ?? "").slice(0, 10),
     endDate: String(lease?.endDate ?? lease?.end_date ?? "").slice(0, 10),
@@ -24,6 +28,7 @@ function normalizeLease(lease: Record<string, any>): Lease {
       : lease?.lessee
         ? normalizeClient(lease.lessee)
         : undefined,
+    bedspace: lease?.bedspace ? normalizeBedspace(lease.bedspace) : undefined,
   };
 }
 
@@ -50,7 +55,9 @@ function toApiPayload(
           monthly_rent: payload.monthlyRent,
         }
       : {}),
-    room_number: payload.roomNumber || undefined,
+    room_number: payload.roomNumber || null,
+    room_id: payload.roomId || null,
+    bedspace_id: payload.bedspaceId || null,
     status: payload.status || "Active",
   };
 }

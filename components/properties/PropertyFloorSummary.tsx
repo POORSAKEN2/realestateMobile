@@ -18,6 +18,8 @@ export function PropertyFloorSummary({
   policy: FloorManagerPolicy;
   rooms: PropertyRoom[];
 }) {
+  if (!policy.showFloorSummary) return null;
+
   const totalAreas = floorPlans.reduce(
     (total, floor) => total + floor.areas.length,
     0,
@@ -83,6 +85,10 @@ export function PropertyFloorSummary({
             const vacant = floorRooms.filter(
               (room) => room.status === "Vacant",
             ).length;
+            const bedspaceCount = floorRooms.reduce(
+              (total, room) => total + room.bedspaceCount,
+              0,
+            );
 
             return (
               <View
@@ -104,6 +110,7 @@ export function PropertyFloorSummary({
                       {floor.areas.length}{" "}
                       {floor.areas.length === 1 ? "area" : "areas"} ·{" "}
                       {floorRooms.length} rooms
+                      {bedspaceCount > 0 ? ` · ${bedspaceCount} bedspaces` : ""}
                     </Text>
                   </View>
                   <View className="items-end">

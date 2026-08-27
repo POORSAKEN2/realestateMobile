@@ -9,6 +9,7 @@ import {
 export function FloorAssignedRoomActionsSheet({
   isBusy,
   onClose,
+  onManageBedspaces,
   onShowStatus,
   onStatusChange,
   onUnlink,
@@ -17,6 +18,7 @@ export function FloorAssignedRoomActionsSheet({
 }: {
   isBusy: boolean;
   onClose: () => void;
+  onManageBedspaces: (room: PropertyRoom) => void;
   onShowStatus: () => void;
   onStatusChange: (room: PropertyRoom, status: PropertyRoomStatus) => void;
   onUnlink: (room: PropertyRoom) => void;
@@ -36,6 +38,13 @@ export function FloorAssignedRoomActionsSheet({
           selected: option.value === room.status,
         }))
       : [
+          {
+            description: `${room.bedspaceCount} configured · manage individual rentals.`,
+            disabled: isBusy,
+            icon: "bed-single-outline",
+            label: "Manage bedspaces",
+            onPress: () => onManageBedspaces(room),
+          },
           {
             description: `Currently ${getRoomStatusLabel(room.status).toLowerCase()}.`,
             disabled: isBusy,

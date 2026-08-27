@@ -1,3 +1,5 @@
+import type { Bedspace } from "./bedspaces";
+
 export type Lessee = {
   id: string;
   tenantId?: string;
@@ -10,12 +12,15 @@ export type Lease = {
   id: string;
   propertyId: string;
   lesseeId: string;
+  roomId?: string | null;
+  bedspaceId?: string | null;
   roomNumber?: string | null;
   startDate: string;
   endDate: string;
   monthlyRent: number;
   status: "Active" | "Expired" | "Terminated" | string;
   lessee?: Lessee;
+  bedspace?: Bedspace;
 };
 
 export type PropertyDocument = {
@@ -62,6 +67,8 @@ export type LeasePayload = {
   startDate: string;
   endDate: string;
   monthlyRent: number;
+  roomId?: string | null;
+  bedspaceId?: string | null;
   roomNumber?: string;
   status?: string;
 };

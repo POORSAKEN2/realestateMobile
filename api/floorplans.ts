@@ -91,6 +91,16 @@ function normalizeRoom(value: Record<string, any>): PropertyRoom {
     points: normalizePoints(value?.points),
     type: value?.type ?? null,
     status: normalizeRoomStatus(value?.status),
+    bedspaceCount: Number(value?.bedspaceCount ?? value?.bedspace_count ?? 0),
+    vacantBedspaceCount: Number(
+      value?.vacantBedspaceCount ?? value?.vacant_bedspace_count ?? 0,
+    ),
+    occupiedBedspaceCount: Number(
+      value?.occupiedBedspaceCount ?? value?.occupied_bedspace_count ?? 0,
+    ),
+    maintenanceBedspaceCount: Number(
+      value?.maintenanceBedspaceCount ?? value?.maintenance_bedspace_count ?? 0,
+    ),
     notes: value?.notes ?? null,
   };
 }

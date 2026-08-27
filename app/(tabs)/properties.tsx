@@ -163,7 +163,7 @@ export default function PropertiesScreen() {
         </View>
 
         <FlatList
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
           data={propertyListItems}
           ItemSeparatorComponent={() => <View className="h-4" />}
           keyExtractor={(item) =>
@@ -226,6 +226,15 @@ export default function PropertiesScreen() {
                 property={item.property}
                 onEdit={() => openEditForm(item.property)}
                 onOpenDetails={() => setSelectedProperty(item.property)}
+                onOpenBedspaces={() =>
+                  router.push({
+                    pathname: appRoutes.secondary.bedspaces,
+                    params: {
+                      propertyId: item.property.id,
+                      propertyTitle: item.property.title,
+                    },
+                  })
+                }
                 onOpenFloorPlans={() =>
                   router.push({
                     pathname: appRoutes.secondary.floorPlans,

@@ -48,6 +48,7 @@ export function FloorAssignedRoomsList({
   hasActiveFilters,
   isBusy,
   onClearFilters,
+  onManageBedspaces,
   onOpenActions,
   totalCount,
 }: {
@@ -55,6 +56,7 @@ export function FloorAssignedRoomsList({
   hasActiveFilters: boolean;
   isBusy: boolean;
   onClearFilters: () => void;
+  onManageBedspaces: (room: PropertyRoom) => void;
   onOpenActions: (roomId: string) => void;
   totalCount: number;
 }) {
@@ -78,7 +80,10 @@ export function FloorAssignedRoomsList({
           key={room.id}
           onAction={() => onOpenActions(room.id)}
         >
-          <FloorAssignedRoomCard room={room} />
+          <FloorAssignedRoomCard
+            onManageBedspaces={() => onManageBedspaces(room)}
+            room={room}
+          />
         </SwipeActionCard>
       ))}
     </View>

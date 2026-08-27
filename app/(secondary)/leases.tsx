@@ -14,6 +14,7 @@ import { BaseField } from "../../components/ui/fields/BaseField";
 import { ChoiceField } from "../../components/ui/fields/ChoiceField";
 import { DateTimePickerModal } from "../../components/ui/fields/DateTimePickerModal";
 import { PickerField } from "../../components/ui/fields/PickerField";
+import { DropdownField } from "../../components/ui/fields/DropdownField";
 import { FormSection } from "../../components/ui/forms/FormSection";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
@@ -61,6 +62,9 @@ export default function LeasesScreen() {
   const {
     activeLeaseCount,
     activeLeasePercentage,
+    bedspaceOptions,
+    bedspaces,
+    bedspacesQuery,
     changeEditMode,
     closeAmendmentDatePicker,
     closeForm,
@@ -88,6 +92,8 @@ export default function LeasesScreen() {
     openStartDatePicker,
     properties,
     propertyOptions,
+    roomOptions,
+    roomsQuery,
     refresh,
     saveMutation,
     searchQuery,
@@ -95,6 +101,9 @@ export default function LeasesScreen() {
     setDeleteTarget,
     setSearchQuery,
     setSelectedTenant,
+    selectBedspace,
+    selectProperty,
+    selectRoom,
     submit,
     updateForm,
   } = useLeaseManagement({
@@ -129,7 +138,7 @@ export default function LeasesScreen() {
         {/* --- TOP HEADER: Title & Primary Action --- */}
         <View className="px-1">
           <ModuleHeader
-            action={<AddButton onPress={openCreateForm} />}
+            action={<AddButton onPress={() => openCreateForm()} />}
             eyebrow="Contract Management"
             leading={
               <SecondaryBackButton
@@ -293,11 +302,53 @@ export default function LeasesScreen() {
           <ChoiceField
             emptyText="Create a property first before adding leases."
             label="Property"
-            onChange={(value) => updateForm("propertyId", value as string)}
+            onChange={(value) => selectProperty(value as string)}
             options={propertyOptions}
             value={form.propertyId}
             variant="filled"
           />
+          <DropdownField
+            disabled={!form.propertyId || roomsQuery.isLoading}
+            label="Room"
+            onSelect={selectRoom}
+            options={roomOptions}
+            placeholder={roomsQuery.isLoading ? "Loading rooms" : "Select room"}
+            subtitle="Choose a room before assigning an individual bedspace."
+            value={form.roomId}
+            variant="filled"
+          />
+          {form.roomId ? (
+            bedspacesQuery.isLoading ? (
+              <View className="rounded-2xl border border-primary/20 bg-primary/10 p-4">
+                <Text className="font-ralewayBold text-sm text-textPrimary">
+                  Loading rental inventory
+                </Text>
+                <Text className="mt-1 text-xs leading-5 text-description">
+                  Checking whole-room and individual bedspace availability.
+                </Text>
+              </View>
+            ) : bedspaceOptions.length ? (
+              <DropdownField
+                label="Rental scope"
+                onSelect={selectBedspace}
+                options={bedspaceOptions}
+                placeholder="Whole room or bedspace"
+                subtitle="Whole-room leases block all bedspaces for overlapping dates."
+                value={form.bedspaceId}
+                variant="filled"
+              />
+            ) : (
+              <View className="rounded-2xl border border-warning/25 bg-warningSurface p-4">
+                <Text className="font-ralewayBold text-sm text-warning">
+                  No leaseable inventory
+                </Text>
+                <Text className="mt-1 text-xs leading-5 text-warning">
+                  This room contains maintenance inventory. Update its bedspaces
+                  before creating a whole-room lease.
+                </Text>
+              </View>
+            )
+          ) : null}
           <ChoiceField
             emptyText="Create a tenant first before adding leases."
             label="Tenant"
@@ -380,13 +431,25 @@ export default function LeasesScreen() {
               editingLease && form.editMode === "typo" ? "opacity-60" : ""
             }
           />
-          <BaseField
-            label="Room Number"
-            onChangeText={(value) => updateForm("roomNumber", value)}
-            placeholder="Optional"
-            value={form.roomNumber}
-            variant="filled"
-          />
+          {!form.roomId ? (
+            <BaseField
+              label="Room label"
+              onChangeText={(value) => updateForm("roomNumber", value)}
+              placeholder="Optional legacy room reference"
+              value={form.roomNumber}
+              variant="filled"
+            />
+          ) : form.bedspaceId ? (
+            <View className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3.5">
+              <Text className="font-ralewayBold text-xs uppercase tracking-wider text-secondary">
+                Assigned bedspace
+              </Text>
+              <Text className="mt-1 font-ralewaySemiBold text-sm text-textPrimary">
+                {bedspaces.find((item) => item.id === form.bedspaceId)
+                  ?.bedspaceNumber ?? "Loading assignment"}
+              </Text>
+            </View>
+          ) : null}
           <ChoiceField
             label="Status"
             onChange={(value) => updateForm("status", value as string)}

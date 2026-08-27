@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 import type { PropertyRoom, PropertyRoomStatus } from "../../types";
 import { getRoomStatusLabel } from "../../utils/floorplans/floorPlanPresentation";
@@ -25,7 +25,13 @@ const STATUS_STYLES: Record<
   },
 };
 
-export function FloorAssignedRoomCard({ room }: { room: PropertyRoom }) {
+export function FloorAssignedRoomCard({
+  onManageBedspaces,
+  room,
+}: {
+  onManageBedspaces: () => void;
+  room: PropertyRoom;
+}) {
   const statusStyle = STATUS_STYLES[room.status];
 
   return (
@@ -58,6 +64,37 @@ export function FloorAssignedRoomCard({ room }: { room: PropertyRoom }) {
           </Text>
         </View>
       </View>
+
+      <TouchableOpacity
+        accessibilityLabel={`Manage bedspaces for room ${room.roomNumber}`}
+        accessibilityRole="button"
+        activeOpacity={0.8}
+        className="mt-3 flex-row items-center gap-3 rounded-xl bg-primary/10 px-3 py-3"
+        onPress={onManageBedspaces}
+      >
+        <MaterialCommunityIcons
+          name="bed-single-outline"
+          color="#8A77F4"
+          size={18}
+        />
+        <View className="min-w-0 flex-1">
+          <Text className="font-ralewayBold text-xs text-secondary">
+            {room.bedspaceCount > 0
+              ? `Manage ${room.bedspaceCount} ${room.bedspaceCount === 1 ? "bedspace" : "bedspaces"}`
+              : "Set up bedspaces"}
+          </Text>
+          <Text className="mt-0.5 text-[11px] text-description">
+            {room.bedspaceCount > 0
+              ? `${room.vacantBedspaceCount} vacant · ${room.occupiedBedspaceCount} occupied`
+              : "No bedspaces configured for this room"}
+          </Text>
+        </View>
+        <MaterialCommunityIcons
+          name="chevron-right"
+          color="#8A77F4"
+          size={19}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
