@@ -192,10 +192,9 @@ function BottomSheet({
     >
       <SafeAreaView
         accessibilityViewIsModal
-        className="rounded-t-[30px] bg-white px-5 pb-4 pt-3"
+        className="rounded-t-[30px] bg-white px-5 pb-4"
         edges={["bottom"]}
       >
-        <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
         <View className="mb-5 flex-row items-start justify-between gap-3">
           <View className="min-w-0 flex-1">
             <Text

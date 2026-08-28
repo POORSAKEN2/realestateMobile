@@ -367,6 +367,7 @@ export function TenantsScreen({
       </AddEditModal>
 
       <TenantDetailsModal
+        leases={selectedTenantLeases}
         linkedLeaseCount={
           selectedTenant ? selectedTenantLeases.length : undefined
         }

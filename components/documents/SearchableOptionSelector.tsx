@@ -24,7 +24,7 @@ export function SelectionField({
         accessibilityLabel={`${label}, ${value}`}
         accessibilityRole="button"
         activeOpacity={0.8}
-        className="min-h-14 flex-row items-center rounded-2xl border border-primary/20 bg-primary/10 px-4"
+        className="min-h-14 flex-row items-center rounded-2xl border border-textPrimary/10 bg-surface px-4"
         onPress={onPress}
       >
         <Text
@@ -35,7 +35,7 @@ export function SelectionField({
         </Text>
         <MaterialCommunityIcons
           name="chevron-right"
-          color="#8A77F4"
+          color="#6F6D6D"
           size={21}
         />
       </TouchableOpacity>
@@ -95,7 +95,7 @@ export function SearchableOptionSelector({
           onChangeText={onChangeQuery}
           placeholder="Search"
           value={query}
-          wrapperClassName="h-14 rounded-[22px]"
+          wrapperClassName="h-14 rounded-[22px] border-textPrimary/10 bg-surface"
         />
       </View>
       <ScrollView
@@ -143,7 +143,7 @@ function OptionRow({
       className={`min-h-14 flex-row items-center rounded-2xl border px-4 ${
         isSelected
           ? "border-primary bg-primary/10"
-          : "border-primary/20 bg-white"
+          : "border-textPrimary/10 bg-white"
       }`}
       onPress={onPress}
     >

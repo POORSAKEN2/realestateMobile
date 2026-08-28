@@ -296,7 +296,7 @@ export function MoreBottomSheet({ visible, onClose }: MoreBottomSheetProps) {
             transform: [{ translateY }],
           }}
         >
-          <View className="mb-[18px] h-[5px] w-11 self-center rounded-full bg-description/20" />
+          <View className="mb-[18px] h-1 w-10 self-center rounded-full bg-description/25" />
 
           <View className="mb-[18px] flex-row items-center justify-between">
             <View>

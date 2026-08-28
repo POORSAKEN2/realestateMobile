@@ -26,7 +26,7 @@ export interface DocumentRepository {
     payload: CreateDocumentPayload,
     accessToken?: string,
   ): Promise<PropertyDocument>;
-  list(accessToken?: string): Promise<PropertyDocument[]>;
+  list(accessToken?: string, signal?: AbortSignal): Promise<PropertyDocument[]>;
   listClients(accessToken?: string): Promise<Lessee[]>;
   remove(id: string, accessToken?: string): Promise<void>;
   update(
@@ -38,7 +38,7 @@ export interface DocumentRepository {
 
 export const apiDocumentRepository: DocumentRepository = {
   create: uploadDocument,
-  list: fetchDocuments,
+  list: (accessToken, signal) => fetchDocuments(accessToken, undefined, signal),
   listClients: fetchClients,
   remove: deleteDocument,
   update: updateDocument,

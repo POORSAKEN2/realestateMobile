@@ -103,10 +103,6 @@ export function DocumentFilterSheet({
         accessibilityViewIsModal
         className="max-h-[90%] min-h-[520px] rounded-t-[30px] bg-white"
       >
-        <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
-        </View>
-
         {selectorMode ? (
           <SearchableOptionSelector
             backAccessibilityLabel="Back to filters"

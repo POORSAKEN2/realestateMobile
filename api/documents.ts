@@ -12,6 +12,10 @@ import type {
   DocumentUpload,
   PropertyDocument,
 } from "../types";
+import {
+  buildDocumentQuery,
+  type DocumentQueryParams,
+} from "../utils/documents/documentQuery";
 
 function formatDate(value?: string | null) {
   if (!value) return "";
@@ -98,14 +102,16 @@ function normalizeDocument(document: Record<string, any>): PropertyDocument {
 
 export async function fetchDocuments(
   accessToken?: string,
-  params?: { propertyId?: string },
+  params?: DocumentQueryParams,
+  signal?: AbortSignal,
 ) {
-  const query = params?.propertyId
-    ? `?property_id=${encodeURIComponent(params.propertyId)}`
-    : "";
+  const query = buildDocumentQuery(params);
   const response = await apiClient.get<
     ApiEnvelope<Record<string, any>[]> | Record<string, any>[]
-  >(`/documents${query}`, { headers: authHeaders(accessToken) });
+  >(`/documents${query}`, {
+    headers: authHeaders(accessToken),
+    signal,
+  });
   return unwrapCollection(response).map(normalizeDocument);
 }
 

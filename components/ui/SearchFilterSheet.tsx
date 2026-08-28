@@ -33,10 +33,6 @@ export function SearchFilterSheet({
         className="max-h-[90%] rounded-t-[30px] bg-white"
         edges={footer ? [] : ["bottom"]}
       >
-        <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
-        </View>
-
         <View className="flex-row items-center justify-between border-b border-primary/20 px-5 pb-4">
           <View className="min-w-0 flex-1 pr-4">
             <Text className="font-ralewayExtraBold text-xl text-textPrimary">

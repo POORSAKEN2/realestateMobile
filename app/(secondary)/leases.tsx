@@ -481,6 +481,11 @@ export default function LeasesScreen() {
       </AddEditModal>
 
       <TenantDetailsModal
+        leases={
+          selectedTenant
+            ? leases.filter((lease) => lease.lesseeId === selectedTenant.id)
+            : []
+        }
         onClose={() => setSelectedTenant(null)}
         tenant={selectedTenant}
       />

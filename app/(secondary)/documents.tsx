@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -43,6 +44,7 @@ import {
 } from "../../utils/documents/documentPresentation";
 
 export default function DocumentsScreen() {
+  const params = useLocalSearchParams<{ action?: string; tenantId?: string }>();
   const {
     deleteDocument,
     documents,
@@ -77,6 +79,20 @@ export default function DocumentsScreen() {
   const [formErrors, setFormErrors] = useState<DocumentFormErrors>({});
   const [formError, setFormError] = useState("");
   const feedbackSnackbar = useSnackbar({ autoHideDuration: 3000 });
+
+  useEffect(() => {
+    if (!params.tenantId) return;
+
+    setFilters((current) => ({ ...current, lesseeId: params.tenantId ?? "" }));
+    if (params.action === "add") {
+      setEditingDocument(null);
+      setSelectedFile(null);
+      setForm({ ...EMPTY_DOCUMENT_FORM, lesseeId: params.tenantId });
+      setFormErrors({});
+      setFormError("");
+      setIsFormVisible(true);
+    }
+  }, [params.action, params.tenantId]);
 
   const propertyLookup = useMemo(
     () => buildDocumentLookup(properties),
