@@ -23,6 +23,30 @@ export type Lease = {
   bedspace?: Bedspace;
 };
 
+export type PaymentStatus = "Paid" | "Pending" | "Overdue" | string;
+
+export type LeasePayment = {
+  id: string;
+  leaseId: string;
+  type: string;
+  amount: number;
+  dueDate: string;
+  paidDate?: string | null;
+  status: PaymentStatus;
+  paymentMethod?: string | null;
+  referenceNo?: string | null;
+};
+
+export type LeaseLedger = {
+  totalDue: number;
+  totalPaid: number;
+  totalOutstanding: number;
+  totalOverdue: number;
+  payments: LeasePayment[];
+};
+
+export type TenantFinancialLedger = LeaseLedger;
+
 export type PropertyDocument = {
   id: string;
   name: string;

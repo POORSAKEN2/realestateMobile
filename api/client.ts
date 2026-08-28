@@ -75,6 +75,7 @@ async function request<T>(
       method: options.method,
       data: options.body,
       headers,
+      signal: options.signal ?? undefined,
     });
 
     return response.data as T;

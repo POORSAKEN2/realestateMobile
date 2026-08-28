@@ -113,7 +113,7 @@ export function DropdownField<T extends string>({
         visible={isOpen}
       >
         <SafeAreaView
-          className="w-full overflow-hidden rounded-t-[28px] bg-whitePrimary px-5 pt-5"
+          className="w-full overflow-hidden rounded-t-[28px] bg-whitePrimary px-5"
           edges={["bottom", "left", "right"]}
           style={{ height: sheetHeight }}
         >

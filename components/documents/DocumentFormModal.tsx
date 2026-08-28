@@ -117,10 +117,6 @@ export function DocumentFormModal({
         accessibilityViewIsModal
         className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-surface"
       >
-        <View className="pt-3">
-          <View className="mb-3 h-1 w-10 self-center rounded-full bg-primary/30" />
-        </View>
-
         {selectorMode ? (
           <SearchableOptionSelector
             backAccessibilityLabel="Back to document form"
@@ -215,8 +211,8 @@ export function DocumentFormModal({
                   <FieldLabel label="Name" required />
                   <TextInput
                     accessibilityLabel="Document name, required"
-                    className={`min-h-14 rounded-2xl border bg-primary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
-                      errors.name ? "border-danger" : "border-primary/20"
+                    className={`min-h-14 rounded-2xl border bg-surface px-4 py-3 font-ralewayMedium text-base text-textPrimary ${
+                      errors.name ? "border-danger" : "border-textPrimary/10"
                     }`}
                     onChangeText={(name) => onChangeForm({ ...form, name })}
                     placeholder="Document name"
@@ -247,13 +243,13 @@ export function DocumentFormModal({
                           className={`min-h-11 justify-center rounded-2xl border px-4 ${
                             isSelected
                               ? "border-primary bg-primary"
-                              : "border-primary/20 bg-primary/10"
+                              : "border-textPrimary/10 bg-surface"
                           }`}
                           onPress={() => onChangeForm({ ...form, category })}
                         >
                           <Text
                             className={`font-ralewayBold text-xs ${
-                              isSelected ? "text-white" : "text-textPrimary"
+                              isSelected ? "text-white" : "text-description"
                             }`}
                           >
                             {category}
@@ -280,7 +276,7 @@ export function DocumentFormModal({
                     <FieldLabel label="Version note" />
                     <TextInput
                       accessibilityLabel="Version note"
-                      className="min-h-24 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 font-ralewayMedium text-base text-textPrimary"
+                      className="min-h-24 rounded-2xl border border-textPrimary/10 bg-surface px-4 py-3 font-ralewayMedium text-base text-textPrimary"
                       multiline
                       onChangeText={(revisionComment) =>
                         onChangeForm({ ...form, revisionComment })

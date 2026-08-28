@@ -1,4 +1,10 @@
-export { createLease, deleteLease, fetchLeases, updateLease } from "./leases";
+export {
+  createLease,
+  deleteLease,
+  fetchLeaseLedger,
+  fetchLeases,
+  updateLease,
+} from "./leases";
 export {
   createClient,
   deleteClient,

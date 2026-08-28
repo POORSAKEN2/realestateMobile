@@ -51,10 +51,14 @@ export type {
   DocumentUpdatePayload,
   DocumentUpload,
   Lease,
+  LeaseLedger,
+  LeasePayment,
   LeasePayload,
   Lessee,
   LesseePayload,
+  PaymentStatus,
   PropertyDocument,
+  TenantFinancialLedger,
 } from "./domain/propertyDetails";
 export type {
   TransientBooking,

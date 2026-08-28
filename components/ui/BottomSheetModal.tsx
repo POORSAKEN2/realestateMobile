@@ -165,6 +165,7 @@ export function BottomSheetModal({
 
     animation.start(({ finished }) => {
       if (finished && !visible) {
+        renderedChildren.current = null;
         setIsMounted(false);
         if (host || Platform.OS !== "ios") {
           requestAnimationFrame(() => onDismissRef.current?.());
@@ -200,7 +201,7 @@ export function BottomSheetModal({
 
       <Animated.View
         accessibilityViewIsModal
-        className="overflow-hidden rounded-t-[30px] bg-white"
+        className="overflow-hidden rounded-t-[30px] bg-white pt-5"
         pointerEvents={visible ? "auto" : "none"}
         style={{
           marginBottom:

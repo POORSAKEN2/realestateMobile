@@ -1,7 +1,8 @@
 import { apiClient, authHeaders, unwrapCollection, unwrapData } from "./client";
 import { normalizeClient } from "./clients";
 import { normalizeBedspace } from "./bedspaces";
-import type { ApiEnvelope, Lease, LeasePayload } from "../types";
+import type { ApiEnvelope, Lease, LeaseLedger, LeasePayload } from "../types";
+import { normalizeLeaseLedger } from "../utils/tenants/tenantDetails";
 
 function normalizeLease(lease: Record<string, any>): Lease {
   return {
@@ -37,6 +38,20 @@ export async function fetchLeases(accessToken?: string) {
     ApiEnvelope<Record<string, any>[]> | Record<string, any>[]
   >("/leases", { headers: authHeaders(accessToken) });
   return unwrapCollection(response).map(normalizeLease);
+}
+
+export async function fetchLeaseLedger(
+  leaseId: string,
+  accessToken?: string,
+  signal?: AbortSignal,
+): Promise<LeaseLedger> {
+  const response = await apiClient.get<
+    ApiEnvelope<Record<string, any>> | Record<string, any>
+  >(`/leases/${leaseId}/ledger`, {
+    headers: authHeaders(accessToken),
+    signal,
+  });
+  return normalizeLeaseLedger(unwrapData(response));
 }
 
 function toApiPayload(
