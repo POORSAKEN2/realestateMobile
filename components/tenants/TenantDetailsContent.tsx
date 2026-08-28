@@ -12,10 +12,12 @@ import type {
   Lessee,
   PropertyDocument,
   TenantFinancialLedger,
+  TenantNote,
 } from "../../types";
 import { formatCurrency } from "../../utils/formatters";
 import { TenantDocumentsSection } from "./TenantDocumentsSection";
 import { TenantFinancialLedgerSection } from "./TenantFinancialLedgerSection";
+import { TenantNotesSection } from "./TenantNotesSection";
 
 export type TenantDetailsContentProps = {
   documents: PropertyDocument[];
@@ -27,12 +29,21 @@ export type TenantDetailsContentProps = {
   linkedLeaseCount?: number;
   monthlyRent?: number;
   onAddDocument: () => void;
+  onAddNote: () => void;
   onClose: () => void;
+  onDeleteNote: (note: TenantNote) => void;
+  onEditNote: (note: TenantNote) => void;
+  onLoadMoreNotes: () => void;
   onOpenDocument: (document: PropertyDocument) => void;
   onSelectDocument: () => void;
   onViewAllDocuments: () => void;
   propertyNames: string[];
   tenant: Lessee;
+  tenantNotes: TenantNote[];
+  tenantNotesError: unknown;
+  tenantNotesHasNextPage: boolean;
+  tenantNotesIsFetchingNextPage: boolean;
+  tenantNotesIsLoading: boolean;
 };
 
 export function TenantDetailsContent({
@@ -45,12 +56,21 @@ export function TenantDetailsContent({
   linkedLeaseCount,
   monthlyRent,
   onAddDocument,
+  onAddNote,
   onClose,
+  onDeleteNote,
+  onEditNote,
+  onLoadMoreNotes,
   onOpenDocument,
   onSelectDocument,
   onViewAllDocuments,
   propertyNames,
   tenant,
+  tenantNotes,
+  tenantNotesError,
+  tenantNotesHasNextPage,
+  tenantNotesIsFetchingNextPage,
+  tenantNotesIsLoading,
 }: TenantDetailsContentProps) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -142,6 +162,18 @@ export function TenantDetailsContent({
             onOpen={onOpenDocument}
             onSelect={onSelectDocument}
             onViewAll={onViewAllDocuments}
+          />
+
+          <TenantNotesSection
+            error={tenantNotesError}
+            hasNextPage={tenantNotesHasNextPage}
+            isFetchingNextPage={tenantNotesIsFetchingNextPage}
+            isLoading={tenantNotesIsLoading}
+            notes={tenantNotes}
+            onAdd={onAddNote}
+            onDelete={onDeleteNote}
+            onEdit={onEditNote}
+            onLoadMore={onLoadMoreNotes}
           />
         </View>
       </ScrollView>
