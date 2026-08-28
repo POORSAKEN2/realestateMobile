@@ -60,6 +60,16 @@ export type {
   PropertyDocument,
   TenantFinancialLedger,
 } from "./domain/propertyDetails";
+export {
+  TENANT_NOTE_CATEGORIES,
+  type CreateTenantNotePayload,
+  type TenantNote,
+  type TenantNoteCategory,
+  type TenantNoteDraft,
+  type TenantNoteListParams,
+  type TenantNotePage,
+  type UpdateTenantNotePayload,
+} from "./domain/tenantNotes";
 export type {
   TransientBooking,
   TransientBookingPayload,

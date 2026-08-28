@@ -57,3 +57,14 @@ test("Select opens the document selector and close returns to details", () => {
     "details",
   );
 });
+
+test("Add note opens the editor and close returns to details", () => {
+  const editorView = tenantDetailsViewReducer("details", {
+    type: "open-note-editor",
+  });
+  assert.equal(editorView, "note-editor");
+  assert.equal(
+    tenantDetailsViewReducer(editorView, { type: "show-details" }),
+    "details",
+  );
+});
