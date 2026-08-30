@@ -11,7 +11,7 @@ import type { Lessee, Property } from "../../types";
 export type LeaseFilters = {
   lesseeId: string;
   propertyId: string;
-  status: "ALL" | "Active" | "Expired" | "Terminated";
+  status: "ALL" | "Draft" | "Active" | "Expiring" | "Expired" | "Terminated" | "Renewed";
 };
 
 export const EMPTY_LEASE_FILTERS: LeaseFilters = {
@@ -22,9 +22,12 @@ export const EMPTY_LEASE_FILTERS: LeaseFilters = {
 
 const statusOptions = [
   { label: "All statuses", value: "ALL" },
+  { label: "Draft", value: "Draft" },
   { label: "Active", value: "Active" },
+  { label: "Expiring", value: "Expiring" },
   { label: "Expired", value: "Expired" },
   { label: "Terminated", value: "Terminated" },
+  { label: "Renewed", value: "Renewed" },
 ] as const;
 
 export function LeaseFilterSheet({

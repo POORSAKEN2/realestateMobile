@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { Link, Stack } from "expo-router";
+import { Link, Stack, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -153,7 +153,7 @@ export default function LoginScreen() {
                     accessibilityRole="button"
                     hitSlop={10}
                     onPress={() => {
-                      // Navigate to your forgot-password screen.
+                      router.push("/(auth)/forgot-password");
                     }}
                   >
                     <Text className="font-ralewaySemiBold text-sm text-accent">

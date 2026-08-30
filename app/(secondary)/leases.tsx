@@ -38,7 +38,11 @@ import {
 import { formatCurrency } from "../../utils/formatters";
 import { useLeaseManagement } from "../../hooks/leases/useLeaseManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { renewLease } from "../../api/leases";
+import { LeaseRenewalModal } from "../../components/leases/LeaseRenewalModal";
+import { useQueryClient } from "@tanstack/react-query";
 import { colors } from "../../constants/colors";
+import type { Lease } from "../../types";
 
 type Option = {
   label: string;
@@ -123,6 +127,29 @@ export default function LeasesScreen() {
       ),
     [filteredLeases, filters],
   );
+  const queryClient = useQueryClient();
+  const [renewingLease, setRenewingLease] = useState<Lease | null>(null);
+  const [isRenewing, setIsRenewing] = useState(false);
+
+  async function handleRenewSubmit(
+    leaseId: string,
+    payload: {
+      end_date?: string;
+      term_length_months?: number;
+      monthly_rent?: number;
+    },
+  ) {
+    setIsRenewing(true);
+    try {
+      await renewLease(leaseId, payload);
+      await queryClient.invalidateQueries({ queryKey: ["leases"] });
+      setRenewingLease(null);
+      leaseSnackbar.show("Lease renewed successfully.");
+    } finally {
+      setIsRenewing(false);
+    }
+  }
+
   const activeFilterCount = [
     filters.status !== "ALL",
     filters.propertyId !== "ALL",
@@ -227,6 +254,7 @@ export default function LeasesScreen() {
                     onDelete={() => setDeleteTarget(lease)}
                     onEdit={() => openEditForm(lease)}
                     onOpenTenant={() => lessee && setSelectedTenant(lessee)}
+                    onRenew={() => setRenewingLease(lease)}
                     property={property}
                   />
                 );
@@ -479,6 +507,14 @@ export default function LeasesScreen() {
           />
         ) : null}
       </AddEditModal>
+
+      <LeaseRenewalModal
+        isPending={isRenewing}
+        isVisible={Boolean(renewingLease)}
+        lease={renewingLease}
+        onClose={() => setRenewingLease(null)}
+        onSubmit={handleRenewSubmit}
+      />
 
       <TenantDetailsModal
         leases={

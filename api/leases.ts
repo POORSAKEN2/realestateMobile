@@ -108,3 +108,18 @@ export async function deleteLease(id: string, accessToken?: string) {
     headers: authHeaders(accessToken),
   });
 }
+
+export async function renewLease(
+  id: string,
+  payload: { end_date?: string; term_length_months?: number; monthly_rent?: number },
+  accessToken?: string,
+) {
+  const response = await apiClient.post<
+    ApiEnvelope<Record<string, any>> | Record<string, any>
+  >(`/leases/${id}/renew`, payload, {
+    headers: authHeaders(accessToken),
+  });
+
+  return normalizeLease(unwrapData(response));
+}
+

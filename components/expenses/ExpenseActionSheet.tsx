@@ -5,11 +5,17 @@ export function ExpenseActionSheet({
   expense,
   onClose,
   onEdit,
+  onApprove,
+  onReject,
 }: {
   expense: Expense | null;
   onClose: () => void;
   onEdit: (expense: Expense) => void;
+  onApprove?: (expense: Expense) => void;
+  onReject?: (expense: Expense) => void;
 }) {
+  const isPendingApproval = !expense?.approval_status || expense.approval_status === "Pending";
+
   const actions: ActionSheetItem[] = expense
     ? [
         {
@@ -18,6 +24,26 @@ export function ExpenseActionSheet({
           label: "Edit expense",
           onPress: () => onEdit(expense),
         },
+        ...(isPendingApproval && onApprove
+          ? [
+              {
+                description: "Authorize and approve this operating expense.",
+                icon: "check-circle-outline" as const,
+                label: "Approve expense",
+                onPress: () => onApprove(expense),
+              },
+            ]
+          : []),
+        ...(isPendingApproval && onReject
+          ? [
+              {
+                description: "Decline and reject this expense item.",
+                icon: "close-circle-outline" as const,
+                label: "Reject expense",
+                onPress: () => onReject(expense),
+              },
+            ]
+          : []),
       ]
     : [];
 

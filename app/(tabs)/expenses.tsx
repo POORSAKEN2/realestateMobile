@@ -25,6 +25,7 @@ import {
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useExpenseForm } from "../../hooks/expenses/useExpenseForm";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { approveExpense, rejectExpense } from "../../api/expenses";
 import type { Expense } from "../../types/domain/expenses";
 
 function ExpenseLoadingState() {
@@ -217,6 +218,26 @@ export default function ExpensesScreen() {
         expense={actionExpense}
         onClose={() => setActionExpense(null)}
         onEdit={openEditForm}
+        onApprove={async (expense) => {
+          setActionExpense(null);
+          try {
+            await approveExpense(expense.id);
+            await refetch();
+            expenseSnackbar.show("Expense approved successfully.");
+          } catch (err) {
+            expenseSnackbar.show(err instanceof Error ? err.message : "Failed to approve expense.");
+          }
+        }}
+        onReject={async (expense) => {
+          setActionExpense(null);
+          try {
+            await rejectExpense(expense.id, "Rejected by property manager");
+            await refetch();
+            expenseSnackbar.show("Expense rejected.");
+          } catch (err) {
+            expenseSnackbar.show(err instanceof Error ? err.message : "Failed to reject expense.");
+          }
+        }}
       />
 
       <ExpenseFormModal

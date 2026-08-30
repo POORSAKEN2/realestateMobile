@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { Alert, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import Svg, {
   Circle,
   Defs,
@@ -21,6 +21,7 @@ import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
 import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
 import { colors } from "../../constants/colors";
+import { shareFinancialSummaryCsv } from "../../api/reports";
 
 type MetricCard = {
   label: string;
@@ -521,6 +522,60 @@ export default function AnalyticsScreen() {
 
             <PerformanceChart history={history} />
             <DistributionChart slices={distributionSlices} />
+
+            {/* Financial Summary Export */}
+            <View className="mt-4 rounded-3xl border border-primary/20 bg-white p-5 shadow-sm shadow-primary/5">
+              <View className="flex-row items-center justify-between">
+                <View>
+                  <Text className="font-ralewayBold text-base text-textPrimary">
+                    Financial Summary Report
+                  </Text>
+                  <Text className="mt-0.5 text-xs text-description">
+                    Export verified revenue, operating costs, and NOI
+                  </Text>
+                </View>
+                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                  <Feather name="file-text" size={18} color={colors.primary} />
+                </View>
+              </View>
+
+              <View className="mt-4 flex-row gap-2.5">
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  className="flex-1 h-12 flex-row items-center justify-center rounded-2xl bg-primary"
+                  onPress={async () => {
+                    try {
+                      await shareFinancialSummaryCsv();
+                    } catch (err) {
+                      Alert.alert(
+                        "Export Failed",
+                        err instanceof Error ? err.message : "Could not export report.",
+                      );
+                    }
+                  }}
+                >
+                  <Feather name="download" size={16} color="#FFFFFF" />
+                  <Text className="ml-2 font-ralewayBold text-xs text-white">
+                    Export CSV
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  className="h-12 px-4 flex-row items-center justify-center rounded-2xl border border-primary/20 bg-primary/5"
+                  onPress={() => {
+                    Alert.alert(
+                      "PDF Export Notice",
+                      "PDF report generator is being provisioned. Please use the server-reconciled CSV format.",
+                    );
+                  }}
+                >
+                  <Text className="font-ralewayBold text-xs text-primary">
+                    PDF Notice
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </>
         )}
       </ScrollView>

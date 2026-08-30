@@ -33,6 +33,10 @@ export type Property = {
   id: string;
   title: string;
   location: string;
+  street?: string;
+  city?: string;
+  postal_code?: string;
+  postalCode?: string;
   country?: string;
   status:
     | "UNDER_CONSTRUCTION"
@@ -63,6 +67,12 @@ export type Property = {
   totalUnits?: number;
   floorplans?: FloorPlan[];
   spatialCapabilities?: PropertySpatialCapabilities;
+  is_public_listed?: boolean;
+  isPublicListed?: boolean;
+  listing_headline?: string;
+  listing_description?: string;
+  listing_monthly_rent?: number;
+  listing_available_from?: string;
 };
 
 export type PropertyImageUpload = {
@@ -76,6 +86,9 @@ export type PropertyImageUpload = {
 export type CreatePropertyPayload = {
   title: string;
   location: string;
+  street?: string;
+  city?: string;
+  postal_code?: string;
   country: string;
   status: Property["status"];
   classification: PropertyClassification;
@@ -90,6 +103,11 @@ export type CreatePropertyPayload = {
   is_transient_bookable?: boolean;
   description?: string;
   area?: string;
+  is_public_listed?: boolean;
+  listing_headline?: string;
+  listing_description?: string;
+  listing_monthly_rent?: number;
+  listing_available_from?: string;
   image?: PropertyImageUpload;
   images?: PropertyImageUpload[];
 };

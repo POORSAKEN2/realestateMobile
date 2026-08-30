@@ -64,7 +64,7 @@ export function formatTenantDetailDate(value: string) {
   });
 }
 
-export function getPaymentStatusStyle(status: PaymentStatus) {
+export function getPaymentStatusStyle(status: string | PaymentStatus) {
   switch (status) {
     case "Paid":
       return { backgroundColor: "#D8F3EA", color: "#157457" };

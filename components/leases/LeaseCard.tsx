@@ -12,6 +12,7 @@ export function LeaseCard({
   onEdit,
   onDelete,
   onOpenTenant,
+  onRenew,
 }: {
   lease: Lease;
   property?: Property;
@@ -19,8 +20,10 @@ export function LeaseCard({
   onEdit: () => void;
   onDelete: () => void;
   onOpenTenant: () => void;
+  onRenew?: () => void;
 }) {
   const isActive = lease.status === "Active";
+  const isExpiring = lease.status === "Expiring";
   const isExpired = lease.status === "Expired";
 
   return (
@@ -47,18 +50,22 @@ export function LeaseCard({
                 className={`shrink-0 rounded-md px-2 py-0.5 ${
                   isActive
                     ? "bg-accent"
-                    : isExpired
-                      ? "bg-dangerSurface"
-                      : "bg-primary/10"
+                    : isExpiring
+                      ? "bg-warningSurface"
+                      : isExpired
+                        ? "bg-dangerSurface"
+                        : "bg-primary/10"
                 }`}
               >
                 <Text
                   className={`font-ralewayExtraBold text-[10px] uppercase tracking-wider ${
                     isActive
                       ? "text-textPrimary"
-                      : isExpired
-                        ? "text-danger"
-                        : "text-description"
+                      : isExpiring
+                        ? "text-warning"
+                        : isExpired
+                          ? "text-danger"
+                          : "text-description"
                   }`}
                 >
                   {lease.status}
@@ -88,8 +95,21 @@ export function LeaseCard({
             </View>
           </View>
 
-          {/* Quick Actions (Top Right to match Tenant Card) */}
+          {/* Quick Actions (Top Right) */}
           <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-primary/20 bg-primary/10 p-1">
+            {onRenew && (isActive || isExpiring || isExpired) ? (
+              <TouchableOpacity
+                accessibilityLabel="Renew lease"
+                activeOpacity={0.7}
+                onPress={(event) => {
+                  event.stopPropagation();
+                  onRenew();
+                }}
+                className="rounded-full p-1.5 hover:bg-primary/20"
+              >
+                <Ionicons name="refresh-circle" size={18} color={colors.primary} />
+              </TouchableOpacity>
+            ) : null}
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={(event) => {

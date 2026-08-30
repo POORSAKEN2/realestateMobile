@@ -48,9 +48,9 @@ const menuSections: MenuSection[] = [
     title: "Operations",
     items: [
       {
-        label: "Inquiries",
+        label: "Inquiries & Leads",
         supportingText: "Review listing leads and engagement",
-        badge: "Planned",
+        href: appRoutes.secondary.inquiries,
         icon: { family: "Ionicons", name: "chatbubbles-outline" },
       },
       {
@@ -100,6 +100,7 @@ const menuSections: MenuSection[] = [
       {
         label: "AI Assistant",
         supportingText: "Ask questions and create reports",
+        badge: "Planned",
         icon: { family: "MaterialCommunityIcons", name: "robot-outline" },
       },
     ],
@@ -116,7 +117,7 @@ const menuSections: MenuSection[] = [
       {
         label: "Plan & Billing",
         supportingText: "View subscription and property limits",
-        badge: "Owner",
+        href: appRoutes.secondary.billing,
         icon: { family: "Ionicons", name: "card-outline" },
       },
       {
@@ -126,9 +127,9 @@ const menuSections: MenuSection[] = [
         icon: { family: "Ionicons", name: "notifications-outline" },
       },
       {
-        label: "Support",
-        supportingText: "Get product and account help",
-        badge: "Planned",
+        label: "Support Center",
+        supportingText: "Get product help & FAQs",
+        href: appRoutes.secondary.support,
         icon: { family: "Ionicons", name: "help-buoy-outline" },
       },
       {

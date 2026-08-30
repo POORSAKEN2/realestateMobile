@@ -10,12 +10,16 @@ export type {
   RequestOptions,
 } from "./api/common";
 export type {
+  AccountDeletionRequestPayload,
   AuthContextValue,
   AuthResponse,
   AuthSession,
   AuthUser,
+  ChangePasswordPayload,
+  ForgotPasswordPayload,
   RegisterFormData,
   RegistrationDraft,
+  ResetPasswordPayload,
 } from "./auth";
 export type { PortfolioSnapshot, PortfolioStats } from "./domain/analytics";
 export type {
@@ -56,10 +60,16 @@ export type {
   LeasePayload,
   Lessee,
   LesseePayload,
-  PaymentStatus,
   PropertyDocument,
   TenantFinancialLedger,
 } from "./domain/propertyDetails";
+export type {
+  LeaseLedgerData,
+  Payment,
+  PaymentStatus,
+  PaymentType,
+  RecordPaymentPayload,
+} from "./domain/payments";
 export {
   TENANT_NOTE_CATEGORIES,
   type CreateTenantNotePayload,
@@ -84,6 +94,27 @@ export type {
   PushTokenPlatform,
   RegisterPushTokenPayload,
 } from "./domain/notifications";
+export type {
+  BillingEntitlement,
+  CheckoutSessionPayload,
+  CheckoutSessionResponse,
+  PlanTier,
+  SubscriptionTierKey,
+} from "./domain/billing";
+export type {
+  ListingLead,
+  ListingLeadStatus,
+  ListingLeadType,
+  UpdateLeadStatusPayload,
+} from "./domain/leads";
+export type {
+  CreateSupportTicketPayload,
+  FAQItem,
+  SupportTicket,
+  TicketPriority,
+  TicketStatus,
+} from "./domain/support";
+export type { GlobalSearchResults } from "./domain/search";
 export type {
   EditableProfileField,
   ProfileCompletion,
