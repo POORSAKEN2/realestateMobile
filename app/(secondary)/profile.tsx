@@ -1,14 +1,8 @@
 import { router } from "expo-router";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, View } from "react-native";
 
 import { ProfileAccountActions } from "../../components/profile/ProfileAccountActions";
 import { ProfileDetailsForm } from "../../components/profile/ProfileDetailsForm";
-import { ProfileHeader } from "../../components/profile/ProfileHeader";
 import { ProfileSaveButton } from "../../components/profile/ProfileSaveButton";
 import { ProfileSummaryCard } from "../../components/profile/ProfileSummaryCard";
 import { Screen } from "../../components/ui/Screen";
@@ -16,6 +10,8 @@ import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProfileController } from "../../hooks/profile/useProfileController";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { appRoutes } from "../../constants/navigation";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 
 type ProfileScreenProps = {
   navigationLevel?: "primary" | "secondary";
@@ -88,17 +84,23 @@ export function ProfileScreen({
   }
 
   return (
-    <Screen bottomInset={isPrimary ? "tab-bar" : "none"} className="bg-surface">
+    <Screen bottomInset={isPrimary ? "none" : "tab-bar"} className="bg-surface">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        <ScrollView
-          className="-mx-6 flex-1"
-          contentContainerClassName="px-6 pb-32"
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ModuleHeader
+          eyebrow="Profile"
+          title="Account Details"
+          leading={
+            <SecondaryBackButton
+              accessibilityLabel="Back from analytics"
+              variant="secondary"
+            />
+          }
+        />
+
+        <View className="-mx-6 flex-1 px-6 pb-32">
           <ProfileSummaryCard
             completion={profile.completion}
             email={profile.email}
@@ -124,7 +126,7 @@ export function ProfileScreen({
             }
             onSignOut={handleSignOut}
           />
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
 
       <ScreenSnackbar

@@ -78,6 +78,12 @@ export const dashboardNavigationSections = [
         icon: { family: "Ionicons", name: "analytics-outline" },
       },
       {
+        label: "Mapped Properties",
+        supportingText: "View mapped properties and portfolio locations",
+        href: appRoutes.secondary.map,
+        icon: { family: "Ionicons", name: "map-outline" },
+      },
+      {
         label: "Public Listing",
         supportingText: "Manage published properties and units",
         badge: "Planned",
