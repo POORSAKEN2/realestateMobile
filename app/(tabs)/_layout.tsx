@@ -1,8 +1,62 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import Svg, { Path } from "react-native-svg";
 
 import { colors } from "../../constants/colors";
-import { Platform } from "react-native";
+import { Platform, StyleSheet, useWindowDimensions, View } from "react-native";
+
+const TAB_BAR_HEIGHT = Platform.OS === "ios" ? 96 : 80;
+
+function CurvedTabBarBackground() {
+  const { width } = useWindowDimensions();
+  const center = width / 2;
+  const notchHalfWidth = 56;
+  const notchDepth = 42;
+  const notchStart = center - notchHalfWidth;
+  const notchEnd = center + notchHalfWidth;
+  const leftCurveControl = center - 44;
+  const rightCurveControl = center + 44;
+  const backgroundPath = [
+    `M 0 0`,
+    `H ${notchStart}`,
+    `C ${leftCurveControl} 0, ${leftCurveControl} ${notchDepth}, ${center} ${notchDepth}`,
+    `C ${rightCurveControl} ${notchDepth}, ${rightCurveControl} 0, ${notchEnd} 0`,
+    `H ${width}`,
+    `V ${TAB_BAR_HEIGHT}`,
+    `H 0`,
+    "Z",
+  ].join(" ");
+
+  const notchFillPath = [
+    `M ${notchStart} 0`,
+    `C ${leftCurveControl} 0, ${leftCurveControl} ${notchDepth}, ${center} ${notchDepth}`,
+    `C ${rightCurveControl} ${notchDepth}, ${rightCurveControl} 0, ${notchEnd} 0`,
+    "Z",
+  ].join(" ");
+
+  return (
+    <Svg height={TAB_BAR_HEIGHT} width={width} style={StyleSheet.absoluteFill}>
+      <Path d={backgroundPath} fill={colors.whitePrimary} />
+      <Path d={notchFillPath} fill={colors.surface} />
+    </Svg>
+  );
+}
+
+function AddTabBarButton() {
+  return (
+    <View
+      accessibilityLabel="Add, unavailable"
+      accessibilityRole="button"
+      accessibilityState={{ disabled: true }}
+      className="flex-1 items-center"
+      pointerEvents="none"
+    >
+      <View className="-mt-10 h-16 w-16 items-center justify-center rounded-full bg-primary">
+        <Ionicons name="add" color={colors.whitePrimary} size={36} />
+      </View>
+    </View>
+  );
+}
 
 export default function TabsLayout() {
   return (
@@ -21,18 +75,15 @@ export default function TabsLayout() {
           paddingVertical: 6,
         },
         tabBarStyle: {
-          backgroundColor: colors.whitePrimary,
-          borderTopColor: "#BEE3DB",
-          borderTopWidth: 1,
-          height: Platform.OS === "ios" ? 96 : 80,
-          paddingBottom: 8,
-          paddingTop: 6,
-          shadowColor: "#1E1F45",
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.08,
-          shadowRadius: 24,
-          elevation: 12,
+          backgroundColor: "transparent",
+          borderTopColor: "transparent",
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowColor: "transparent",
+          shadowOpacity: 0,
+          shadowRadius: 0,
         },
+        tabBarBackground: () => <CurvedTabBarBackground />,
       }}
     >
       <Tabs.Screen
@@ -48,7 +99,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-      <Tabs.Screen name="index" options={{ href: null, title: "Home" }} />
       <Tabs.Screen
         name="properties"
         options={{
@@ -60,6 +110,13 @@ export default function TabsLayout() {
               size={size}
             />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Add",
+          tabBarButton: () => <AddTabBarButton />,
         }}
       />
       <Tabs.Screen

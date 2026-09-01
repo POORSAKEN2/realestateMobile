@@ -43,23 +43,13 @@ function NavigationButton({
       accessibilityRole="button"
       accessibilityState={{ disabled: !isAvailable }}
       activeOpacity={0.78}
-      className={`w-full items-center ${isAvailable ? "" : "opacity-65"}`}
+      className={`w-full items-center ${isAvailable ? "" : "opacity-50"}`}
       disabled={!isAvailable}
       onPress={href ? () => onNavigate(href) : undefined}
     >
-      {item.badge ? (
-        <View className="h-5 w-full items-center justify-center rounded-lg bg-accent px-1">
-          <Text
-            className="font-ralewayExtraBold text-[8px] uppercase tracking-wide text-textPrimary"
-            numberOfLines={1}
-          >
-            {item.badge}
-          </Text>
-        </View>
-      ) : (
-        <View className="h-5 w-full" />
-      )}
-      <View className="mt-1 h-16 w-16 items-center justify-center rounded-[22px] border border-primary/30 bg-white ">
+      <View
+        className={`${item.badge ? "mt-1" : ""} h-16 w-16 items-center justify-center rounded-[22px] border border-primary/30 bg-white`}
+      >
         <NavigationIcon icon={item.icon} />
       </View>
 
@@ -69,6 +59,17 @@ function NavigationButton({
       >
         {item.label}
       </Text>
+
+      {item.badge ? (
+        <View className="h-5 w-full items-center justify-center rounded-lg bg-accent px-1">
+          <Text
+            className="font-ralewayExtraBold text-[8px] uppercase tracking-wide text-textPrimary"
+            numberOfLines={1}
+          >
+            {item.badge}
+          </Text>
+        </View>
+      ) : null}
     </TouchableOpacity>
   );
 }

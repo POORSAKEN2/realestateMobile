@@ -186,133 +186,16 @@ export default function DashboardScreen() {
   }
 
   return (
-    <Screen bottomInset="tab-bar" className="flex-1 bg-surface">
-      <ImageBackground
-        source={require("../../assets/images/dashboard.webp")}
-        resizeMode="cover"
-        className="-mx-6 -mt-6 overflow-hidden px-6 pt-6"
-        style={{
-          height: heroHeight,
-          width: "auto",
-        }}
-      >
-        <View className="absolute inset-0 bg-textPrimary/60" />
-
-        <View className="flex-row items-center justify-between pt-4">
-          {/* Profile */}
-          <View className="min-w-0 flex-1 flex-row items-center gap-3 pr-3">
-            <View className="h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/50 bg-white/30">
-              {profileImageUri ? (
-                <Image
-                  source={{ uri: profileImageUri }}
-                  className="h-full w-full"
-                  resizeMode="cover"
-                />
-              ) : (
-                <Text className="font-ralewayBold text-base text-white">
-                  {getInitials(displayName, displayEmail)}
-                </Text>
-              )}
-            </View>
-
-            <View className="min-w-0 flex-1">
-              <Text
-                className="font-ralewayBold text-base text-white"
-                numberOfLines={1}
-              >
-                {capitalizeWords(displayName)}
-              </Text>
-
-              <Text className="text-sm text-white/80" numberOfLines={1}>
-                {userSubtitle}
-              </Text>
-
-              {/* {displayEmail && (
-                <Text className="text-xs text-white/70" numberOfLines={1}>
-                  {displayEmail}
-                </Text>
-              )} */}
-            </View>
-          </View>
-
-          <View className="flex-row items-center gap-2">
-            {/* Global Search */}
-            <TouchableOpacity
-              activeOpacity={0.82}
-              accessibilityRole="button"
-              accessibilityLabel="Open global search"
-              hitSlop={10}
-              className="h-[45px] w-[45px] items-center justify-center rounded-full border border-white/45 bg-white/10"
-              onPress={() => setIsSearchModalOpen(true)}
-              style={{
-                shadowColor: "rgba(30,31,69,0.45)",
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.24,
-                shadowRadius: 16,
-                elevation: 7,
-              }}
-            >
-              <Feather name="search" size={20} color="#ffffff" />
-            </TouchableOpacity>
-
-            {/* Notification */}
-            <TouchableOpacity
-              activeOpacity={0.82}
-              accessibilityRole="button"
-              accessibilityLabel="Open notifications"
-              hitSlop={10}
-              className="relative overflow-hidden rounded-full border border-white/45 bg-white/10"
-              onPress={() => openModuleRoute(appRoutes.secondary.notifications)}
-              style={{
-                width: 45,
-                height: 45,
-                shadowColor: "rgba(30,31,69,0.45)",
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.24,
-                shadowRadius: 16,
-                elevation: 7,
-              }}
-            >
-              {Platform.OS === "ios" ? (
-                <GlassView
-                  glassEffectStyle="regular"
-                  tintColor="rgba(255,255,255,0.35)"
-                  isInteractive
-                  style={notificationGlassStyle}
-                >
-                  {iosNotificationGlassContent}
-                </GlassView>
-              ) : (
-                <BlurView
-                  intensity={410}
-                  tint="light"
-                  style={notificationGlassStyle}
-                >
-                  {androidNotificationGlassContent}
-                </BlurView>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ImageBackground>
-      <View className="z-10 -mt-32">
-        <PropertyPortfolioSummary
-          averageRoi={averageRoi}
-          portfolioValue={portfolioValue}
-          propertyCount={properties.length}
-          revenueGeneratingCount={revenueGeneratingCount}
-          state={
-            isLoadingProperties
-              ? "loading"
-              : isPropertiesError
-                ? "error"
-                : "ready"
-          }
-        />
-      </View>
+    <Screen
+      bottomInset="tab-bar"
+      className="flex-1 bg-surface"
+      horizontalInset="none"
+      topInset="safe-area"
+    >
       <FlatList
         automaticallyAdjustContentInsets={false}
         automaticallyAdjustsScrollIndicatorInsets={false}
+        className="-mx-6 -mt-6"
         contentInsetAdjustmentBehavior="never"
         data={isLoadingProperties ? [] : visibleAssets}
         keyExtractor={(property) => property.id}
@@ -320,36 +203,155 @@ export default function DashboardScreen() {
         contentContainerStyle={{ paddingBottom: 140 }}
         ListHeaderComponent={
           <>
-            <DashboardNavigationSections
-              sections={dashboardNavigationSections}
-              onNavigate={openModuleRoute}
-            />
+            <ImageBackground
+              source={require("../../assets/images/dashboard.webp")}
+              resizeMode="cover"
+              className="overflow-hidden px-6 pt-6"
+              style={{ height: heroHeight }}
+            >
+              <View className="absolute inset-0 bg-textPrimary/60" />
 
-            <View className="mb-4 mt-6">
-              <Text className="font-ralewayBold">Portfolio Assets</Text>
+              <View className="flex-row items-center justify-between pt-4">
+                <View className="min-w-0 flex-1 flex-row items-center gap-3 pr-3">
+                  <View className="h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-white/50 bg-white/30">
+                    {profileImageUri ? (
+                      <Image
+                        source={{ uri: profileImageUri }}
+                        className="h-full w-full"
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <Text className="font-ralewayBold text-base text-white">
+                        {getInitials(displayName, displayEmail)}
+                      </Text>
+                    )}
+                  </View>
 
-              <View className="mt-3 flex-row items-center gap-3">
-                <SearchToolbar
-                  accessibilityLabel="Search portfolio assets"
-                  activeFilterCount={activeAssetFilterCount}
-                  className="flex-1"
-                  clearAccessibilityLabel="Clear portfolio asset search"
-                  filterAccessibilityLabel="Open portfolio asset filters"
-                  onChangeText={setAssetSearchQuery}
-                  onFilterPress={() => setShowAssetFilters(true)}
-                  placeholder="Location or asset"
-                  value={assetSearchQuery}
-                />
+                  <View className="min-w-0 flex-1">
+                    <Text
+                      className="font-ralewayBold text-base text-white"
+                      numberOfLines={1}
+                    >
+                      {capitalizeWords(displayName)}
+                    </Text>
 
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  accessibilityLabel="Open property map"
-                  accessibilityRole="button"
-                  className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
-                  onPress={() => openModuleRoute(appRoutes.secondary.map)}
-                >
-                  <Feather name="map" color={colors.whitePrimary} size={18} />
-                </TouchableOpacity>
+                    <Text className="text-sm text-white/80" numberOfLines={1}>
+                      {userSubtitle}
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="flex-row items-center gap-2">
+                  <TouchableOpacity
+                    activeOpacity={0.82}
+                    accessibilityRole="button"
+                    accessibilityLabel="Open global search"
+                    hitSlop={10}
+                    className="h-[45px] w-[45px] items-center justify-center rounded-full border border-white/45 bg-white/10"
+                    onPress={() => setIsSearchModalOpen(true)}
+                    style={{
+                      shadowColor: "rgba(30,31,69,0.45)",
+                      shadowOffset: { width: 0, height: 10 },
+                      shadowOpacity: 0.24,
+                      shadowRadius: 16,
+                      elevation: 7,
+                    }}
+                  >
+                    <Feather name="search" size={20} color="#ffffff" />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    activeOpacity={0.82}
+                    accessibilityRole="button"
+                    accessibilityLabel="Open notifications"
+                    hitSlop={10}
+                    className="relative overflow-hidden rounded-full border border-white/45 bg-white/10"
+                    onPress={() =>
+                      openModuleRoute(appRoutes.secondary.notifications)
+                    }
+                    style={{
+                      width: 45,
+                      height: 45,
+                      shadowColor: "rgba(30,31,69,0.45)",
+                      shadowOffset: { width: 0, height: 10 },
+                      shadowOpacity: 0.24,
+                      shadowRadius: 16,
+                      elevation: 7,
+                    }}
+                  >
+                    {Platform.OS === "ios" ? (
+                      <GlassView
+                        glassEffectStyle="regular"
+                        tintColor="rgba(255,255,255,0.35)"
+                        isInteractive
+                        style={notificationGlassStyle}
+                      >
+                        {iosNotificationGlassContent}
+                      </GlassView>
+                    ) : (
+                      <BlurView
+                        intensity={410}
+                        tint="light"
+                        style={notificationGlassStyle}
+                      >
+                        {androidNotificationGlassContent}
+                      </BlurView>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </ImageBackground>
+
+            <View className="z-10 -mt-32 px-6">
+              <PropertyPortfolioSummary
+                averageRoi={averageRoi}
+                portfolioValue={portfolioValue}
+                propertyCount={properties.length}
+                revenueGeneratingCount={revenueGeneratingCount}
+                state={
+                  isLoadingProperties
+                    ? "loading"
+                    : isPropertiesError
+                      ? "error"
+                      : "ready"
+                }
+              />
+            </View>
+
+            <View className="px-6">
+              <DashboardNavigationSections
+                sections={dashboardNavigationSections}
+                onNavigate={openModuleRoute}
+              />
+
+              <View className="mb-4 mt-6">
+                <Text className="font-ralewayBold text-xl">
+                  Portfolio Assets
+                </Text>
+
+                <View className="mt-3 flex-row items-center gap-3">
+                  <SearchToolbar
+                    accessibilityLabel="Search portfolio assets"
+                    activeFilterCount={activeAssetFilterCount}
+                    className="flex-1"
+                    clearAccessibilityLabel="Clear portfolio asset search"
+                    filterAccessibilityLabel="Open portfolio asset filters"
+                    onChangeText={setAssetSearchQuery}
+                    onFilterPress={() => setShowAssetFilters(true)}
+                    placeholder="Location or asset"
+                    value={assetSearchQuery}
+                  />
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    accessibilityLabel="Open property map"
+                    accessibilityRole="button"
+                    className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
+                    onPress={() => openModuleRoute(appRoutes.secondary.map)}
+                  >
+                    <Feather name="map" color={colors.whitePrimary} size={18} />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </>
@@ -357,21 +359,25 @@ export default function DashboardScreen() {
         ItemSeparatorComponent={() => <View className="h-3" />}
         ListEmptyComponent={
           isLoadingProperties ? (
-            <SkeletonGroup
-              accessibilityLabel="Loading portfolio assets"
-              className="gap-3"
-            >
-              <SkeletonList
-                count={2}
-                renderItem={() => <SkeletonListCard className="min-h-24" />}
-              />
-            </SkeletonGroup>
+            <View className="px-6">
+              <SkeletonGroup
+                accessibilityLabel="Loading portfolio assets"
+                className="gap-3"
+              >
+                <SkeletonList
+                  count={2}
+                  renderItem={() => <SkeletonListCard className="min-h-24" />}
+                />
+              </SkeletonGroup>
+            </View>
           ) : (
-            <View className="items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-primary/10 px-4 py-6">
-              <Feather name="search" size={22} color={colors.primary} />
-              <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
-                No assets found
-              </Text>
+            <View className="px-6">
+              <View className="items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-primary/10 px-4 py-6">
+                <Feather name="search" size={22} color={colors.primary} />
+                <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
+                  No assets found
+                </Text>
+              </View>
             </View>
           )
         }
@@ -384,11 +390,13 @@ export default function DashboardScreen() {
           />
         }
         renderItem={({ item: property }) => (
-          <PortfolioAssetCard
-            property={property}
-            onOpen={setSelectedProperty}
-            onOpenImages={setImageGalleryProperty}
-          />
+          <View className="px-6">
+            <PortfolioAssetCard
+              property={property}
+              onOpen={setSelectedProperty}
+              onOpenImages={setImageGalleryProperty}
+            />
+          </View>
         )}
       />
 

@@ -69,19 +69,19 @@ export const dashboardNavigationSections = [
     ],
   },
   {
-    title: "Portfolio",
+    title: "Portfolio Intelligence",
     items: [
-      {
-        label: "Public Listing",
-        supportingText: "Manage published properties and units",
-        badge: "Planned",
-        icon: { family: "Ionicons", name: "globe-outline" },
-      },
       {
         label: "Analytics & Reports",
         supportingText: "View performance and portfolio insights",
         href: appRoutes.secondary.analytics,
         icon: { family: "Ionicons", name: "analytics-outline" },
+      },
+      {
+        label: "Public Listing",
+        supportingText: "Manage published properties and units",
+        badge: "Planned",
+        icon: { family: "Ionicons", name: "globe-outline" },
       },
       {
         label: "AI Assistant",
@@ -92,7 +92,7 @@ export const dashboardNavigationSections = [
     ],
   },
   {
-    title: "Account",
+    title: "Account & Organization",
     items: [
       {
         label: "Team & Access",
