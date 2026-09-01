@@ -59,8 +59,7 @@ function NavigationButton({
       ) : (
         <View className="h-5 w-full" />
       )}
-
-      <View className="mt-1 h-16 w-16 items-center justify-center rounded-[22px] border border-primary/10 bg-white shadow-sm">
+      <View className="mt-1 h-16 w-16 items-center justify-center rounded-[22px] border border-primary/30 bg-white ">
         <NavigationIcon icon={item.icon} />
       </View>
 
@@ -82,7 +81,7 @@ export function DashboardNavigationSections({
     <View className="mt-6 gap-6">
       {sections.map((section) => (
         <View key={section.title}>
-          <Text className="mb-3 font-ralewayBold">{section.title}</Text>
+          <Text className="mb-3 font-ralewayBold text-xl">{section.title}</Text>
           <View className="-mx-1.5 flex-row flex-wrap">
             {section.items.map((item) => (
               <View key={item.label} className="w-1/4 px-1.5 pb-4">
