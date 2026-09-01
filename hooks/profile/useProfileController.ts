@@ -91,7 +91,6 @@ export function useProfileController(
         {
           name: form.fullName.trim(),
           company: form.companyName.trim(),
-          role: form.jobTitle.trim(),
           phone: form.phoneNumber.trim(),
           profileImage: selectedImage,
         },

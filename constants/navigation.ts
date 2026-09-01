@@ -19,6 +19,7 @@ export const appRoutes = {
     documents: "/(secondary)/documents" as Href,
     profile: "/(secondary)/profile" as Href,
     settings: "/(secondary)/settings" as Href,
+    staffManagement: "/(secondary)/staff-management" as Href,
     map: "/(secondary)/mapCanvas" as Href,
     notifications: "/(secondary)/notificationScreen" as Href,
     floorPlans: "/(secondary)/floorplans" as Href,
@@ -49,6 +50,7 @@ const moduleRoutes: Record<string, Href> = {
   properties: appRoutes.primary.properties,
   rent: appRoutes.secondary.rent,
   settings: appRoutes.secondary.settings,
+  "staff-management": appRoutes.secondary.staffManagement,
   support: appRoutes.secondary.support,
   tenants: appRoutes.primary.tenants,
 };

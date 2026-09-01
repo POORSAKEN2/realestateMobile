@@ -56,7 +56,6 @@ export async function updateUserProfile(
   formData.append("_method", "PUT");
   formData.append("name", payload.name);
   formData.append("company", payload.company);
-  formData.append("role", payload.role);
   formData.append("phone", payload.phone);
 
   if (payload.profileImage) {
@@ -113,4 +112,3 @@ export async function exportUserData(accessToken?: string) {
 
   return unwrapData(response);
 }
-
