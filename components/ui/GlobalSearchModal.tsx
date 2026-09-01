@@ -1,5 +1,5 @@
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import type { Href } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,6 +16,7 @@ import { searchGlobal } from "../../api/search";
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 import type { GlobalSearchResults } from "../../types/domain/search";
+import { openModuleRoute } from "../../utils/navigation/moduleNavigation";
 
 type GlobalSearchModalProps = {
   isVisible: boolean;
@@ -58,10 +59,10 @@ export function GlobalSearchModal({ isVisible, onClose }: GlobalSearchModalProps
     return () => clearTimeout(timeoutId);
   }, [query]);
 
-  function navigateTo(route: any) {
+  function navigateTo(route: Href) {
     onClose();
     setTimeout(() => {
-      router.push(route as any);
+      openModuleRoute(route);
     }, 180);
   }
 

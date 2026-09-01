@@ -3,10 +3,11 @@ import { Text, View } from "react-native";
 
 type ModuleHeaderProps = {
   action?: ReactNode;
-  eyebrow: string;
+  eyebrow?: string;
   leading?: ReactNode;
   supportingText?: string;
   title: string;
+  centerTitle?: boolean;
 };
 
 export function ModuleHeader({
@@ -15,24 +16,31 @@ export function ModuleHeader({
   leading,
   supportingText,
   title,
+  centerTitle,
 }: ModuleHeaderProps) {
   return (
     <View className="flex-row items-center gap-3">
       {leading}
 
       <View className="min-w-0 flex-1">
-        <Text className="text-[11px] font-ralewayExtraBold uppercase tracking-[2px] text-description">
-          {eyebrow}
-        </Text>
+        {eyebrow ? (
+          <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-[2px] text-description">
+            {eyebrow}
+          </Text>
+        ) : null}
+
         <Text
           accessibilityRole="header"
-          className="font-ralewayExtraBold text-[30px] leading-9 tracking-tight text-textPrimary"
+          className={
+            `font-ralewayExtraBold text-[30px] leading-9 tracking-tight text-textPrimary` +
+            (centerTitle ? " text-center" : "")
+          }
           numberOfLines={1}
         >
           {title}
         </Text>
         {supportingText ? (
-          <Text className="mt-0.5 text-sm font-ralewayMedium text-description">
+          <Text className="mt-0.5 font-ralewayMedium text-sm text-description">
             {supportingText}
           </Text>
         ) : null}

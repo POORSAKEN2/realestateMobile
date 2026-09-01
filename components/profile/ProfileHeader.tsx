@@ -2,21 +2,22 @@ import { BackButton } from "../ui/buttons/BackButton";
 import { ModuleHeader } from "../ui/ModuleHeader";
 
 type ProfileHeaderProps = {
-  onBack: () => void;
+  onBack?: () => void;
 };
 
 export function ProfileHeader({ onBack }: ProfileHeaderProps) {
   return (
     <ModuleHeader
-      eyebrow="Account"
+      centerTitle
       leading={
-        <BackButton
-          accessibilityLabel="Back from profile"
-          onPress={onBack}
-          variant="secondary"
-        />
+        onBack ? (
+          <BackButton
+            accessibilityLabel="Back from profile"
+            onPress={onBack}
+            variant="secondary"
+          />
+        ) : undefined
       }
-      supportingText="Keep your account details current"
       title="Your Profile"
     />
   );

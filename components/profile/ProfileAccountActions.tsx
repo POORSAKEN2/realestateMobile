@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
 type ProfileAccountActionsProps = {
-  onOpenSecurity: () => void;
+  onOpenAdditionalSettings: () => void;
   onSignOut: () => void;
 };
 
 export function ProfileAccountActions({
-  onOpenSecurity,
+  onOpenAdditionalSettings,
   onSignOut,
 }: ProfileAccountActionsProps) {
   return (
@@ -16,16 +16,17 @@ export function ProfileAccountActions({
         Account
       </Text>
       <TouchableOpacity
+        accessibilityLabel="Open additional settings"
         accessibilityRole="button"
         activeOpacity={0.7}
-        onPress={onOpenSecurity}
+        onPress={onOpenAdditionalSettings}
         className="mt-3 min-h-14 flex-row items-center rounded-2xl border border-primary/20 bg-white px-4"
       >
         <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
           <Ionicons name="shield-checkmark-outline" color="#8A77F4" size={19} />
         </View>
         <Text className="ml-3 flex-1 font-ralewaySemiBold text-sm text-textPrimary">
-          Password and security
+          Additional settings
         </Text>
         <Ionicons name="chevron-forward" color="#8A77F4" size={20} />
       </TouchableOpacity>

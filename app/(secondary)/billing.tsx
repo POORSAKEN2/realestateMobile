@@ -18,7 +18,12 @@ import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 
 export default function BillingScreen() {
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const { data: entitlement, isLoading, isRefetching, refetch } = useBillingEntitlement();
+  const {
+    data: entitlement,
+    isLoading,
+    isRefetching,
+    refetch,
+  } = useBillingEntitlement();
 
   const propertyCount = entitlement?.property_count ?? 0;
   const propertyLimit = entitlement?.property_limit;
@@ -39,10 +44,9 @@ export default function BillingScreen() {
             />
           }
           title="Plan & Billing"
+          supportingText="Review your subscription tier, property limits, and entitlement quota."
         />
-        <Text className="mt-2 text-base leading-6 text-description">
-          Review your subscription tier, property limits, and entitlement quota.
-        </Text>
+        <Text className="mt-2 text-base leading-6 text-description"></Text>
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
@@ -50,7 +54,7 @@ export default function BillingScreen() {
           </View>
         ) : (
           <ScrollView
-            className="-mx-6 flex-1 mt-6"
+            className="-mx-6 mt-6 flex-1"
             contentContainerClassName="px-6 pb-12 gap-5"
             refreshControl={
               <RefreshControl
@@ -97,7 +101,10 @@ export default function BillingScreen() {
                     Property Limit Quota
                   </Text>
                   <Text className="font-ralewayBold text-sm text-textPrimary">
-                    {propertyCount} {isUnlimited ? "Properties (Unlimited)" : `/ ${propertyLimit} Properties`}
+                    {propertyCount}{" "}
+                    {isUnlimited
+                      ? "Properties (Unlimited)"
+                      : `/ ${propertyLimit} Properties`}
                   </Text>
                 </View>
 
@@ -114,7 +121,8 @@ export default function BillingScreen() {
 
                 {!isUnlimited && propertyCount >= (propertyLimit || 0) ? (
                   <Text className="mt-2 font-ralewayMedium text-xs text-danger">
-                    You have reached your plan's property limit. Upgrade to add more properties.
+                    You have reached your plan's property limit. Upgrade to add
+                    more properties.
                   </Text>
                 ) : null}
               </View>
@@ -126,11 +134,28 @@ export default function BillingScreen() {
                 Available Subscription Tiers
               </Text>
 
-              {(entitlement?.tiers || [
-                { key: "free", label: "Free Tier", property_limit: 2, price_php: 0 },
-                { key: "tier_1", label: "Tier 1", property_limit: 5, price_php: 299.99 },
-                { key: "all_in", label: "All-In", property_limit: null, price_php: 1499.99 },
-              ]).map((tier) => {
+              {(
+                entitlement?.tiers || [
+                  {
+                    key: "free",
+                    label: "Free Tier",
+                    property_limit: 2,
+                    price_php: 0,
+                  },
+                  {
+                    key: "tier_1",
+                    label: "Tier 1",
+                    property_limit: 5,
+                    price_php: 299.99,
+                  },
+                  {
+                    key: "all_in",
+                    label: "All-In",
+                    property_limit: null,
+                    price_php: 1499.99,
+                  },
+                ]
+              ).map((tier) => {
                 const isCurrent = entitlement?.tier === tier.key;
 
                 return (
@@ -176,7 +201,9 @@ export default function BillingScreen() {
                   Organization-Wide Entitlements
                 </Text>
                 <Text className="mt-1 font-ralewayMedium text-xs leading-4 text-description">
-                  Subscription plans are tied to your organization tenant account, automatically granting quota to all linked property managers.
+                  Subscription plans are tied to your organization tenant
+                  account, automatically granting quota to all linked property
+                  managers.
                 </Text>
               </View>
             </View>

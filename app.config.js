@@ -1,6 +1,3 @@
-const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, ".env") });
-
 module.exports = ({ config }) => {
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
@@ -19,13 +16,6 @@ module.exports = ({ config }) => {
             },
           }
         : {}),
-    },
-    ios: {
-      ...config.ios,
-      config: {
-        ...config.ios?.config,
-        usesAppleMaps: true,
-      },
     },
     plugins: [
       ...(config.plugins ?? []),

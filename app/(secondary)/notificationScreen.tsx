@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -28,6 +27,7 @@ import { colors } from "../../constants/colors";
 import { resolveModuleRoute } from "../../constants/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import type { AppNotification } from "../../types";
+import { openModuleRoute } from "../../utils/navigation/moduleNavigation";
 
 const severityStyles = {
   SUCCESS: {
@@ -229,7 +229,7 @@ export default function NotificationScreen() {
     const targetRoute = resolveModuleRoute(notification.actionUrl);
 
     if (targetRoute) {
-      router.push(targetRoute);
+      openModuleRoute(targetRoute);
     }
   }
 

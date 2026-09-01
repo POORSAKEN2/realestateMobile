@@ -1,6 +1,5 @@
 import Constants from "expo-constants";
 import * as Device from "expo-device";
-import { router } from "expo-router";
 import { Platform } from "react-native";
 
 import type {
@@ -10,6 +9,7 @@ import type {
   RegisterPushTokenPayload,
 } from "../types";
 import { resolveModuleRoute } from "../constants/navigation";
+import { openModuleRoute } from "../utils/navigation/moduleNavigation";
 
 type NotificationsModule = typeof import("expo-notifications");
 
@@ -96,7 +96,7 @@ export function openNotificationTarget(data?: PushNotificationData) {
 
   if (!targetRoute) return;
 
-  router.push(targetRoute);
+  openModuleRoute(targetRoute);
 }
 
 export async function getRegisterPushTokenPayload(): Promise<RegisterPushTokenPayload | null> {
