@@ -218,6 +218,18 @@ export function normalizeProperty(property: Record<string, any>): Property {
         : property?.total_units !== undefined && property?.total_units !== null
           ? Number(property.total_units)
           : undefined,
+    street: property?.street ?? undefined,
+    city: property?.city ?? undefined,
+    postal_code: property?.postal_code ?? property?.postalCode ?? undefined,
+    postalCode: property?.postal_code ?? property?.postalCode ?? undefined,
+    is_public_listed: normalizeBoolean(property?.is_public_listed ?? property?.isPublicListed ?? false),
+    isPublicListed: normalizeBoolean(property?.is_public_listed ?? property?.isPublicListed ?? false),
+    listing_headline: property?.listing_headline ?? undefined,
+    listing_description: property?.listing_description ?? undefined,
+    listing_monthly_rent: property?.listing_monthly_rent !== undefined && property?.listing_monthly_rent !== null
+      ? Number(property.listing_monthly_rent)
+      : undefined,
+    listing_available_from: property?.listing_available_from ?? undefined,
     floorplans: Array.isArray(property?.floorplans)
       ? property.floorplans.map((floorPlan: Record<string, any>) =>
           normalizeFloorPlan(floorPlan),

@@ -56,3 +56,26 @@ export type RegistrationDraft = {
   lastName: string;
   company: string;
 };
+
+export type ForgotPasswordPayload = {
+  email: string;
+};
+
+export type ResetPasswordPayload = {
+  email: string;
+  otp_code: string;
+  password: string;
+  password_confirmation: string;
+};
+
+export type ChangePasswordPayload = {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+};
+
+export type AccountDeletionRequestPayload = {
+  reason?: string;
+  confirmation: boolean;
+};
+

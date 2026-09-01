@@ -279,6 +279,34 @@ export function PropertyDetailsModal({
                 rooms={rooms}
               />
 
+              {property.is_public_listed || property.isPublicListed ? (
+                <View className="mt-4 rounded-2xl border border-success/30 bg-success/10 p-4">
+                  <View className="flex-row items-center justify-between">
+                    <View className="flex-row items-center gap-2">
+                      <Feather name="globe" size={16} color="#027A48" />
+                      <Text className="font-ralewayBold text-xs text-success">
+                        Published on Terrane Marketplace
+                      </Text>
+                    </View>
+                    <View className="rounded-full bg-success px-2 py-0.5">
+                      <Text className="font-ralewayBold text-[9px] uppercase text-white">
+                        Public
+                      </Text>
+                    </View>
+                  </View>
+                  {property.listing_headline ? (
+                    <Text className="mt-2 font-ralewayBold text-xs text-textPrimary">
+                      "{property.listing_headline}"
+                    </Text>
+                  ) : null}
+                  {property.listing_monthly_rent ? (
+                    <Text className="mt-1 font-ralewayMedium text-xs text-description">
+                      Monthly Rent: ₱{property.listing_monthly_rent.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                    </Text>
+                  ) : null}
+                </View>
+              ) : null}
+
               <DetailsSection title="Current Tenants">
                 {isLoading ? (
                   <View className="rounded-2xl border border-primary/20 bg-white p-3">

@@ -2,8 +2,8 @@ import { Feather } from "@expo/vector-icons";
 import { Image, Text, View } from "react-native";
 
 import { onboardingScreens } from "../../constants/onboarding";
-import { Screen } from "../ui/Screen";
-import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
+import { OnboardingControls } from "./OnboardingControls";
+import { OnboardingPageLayout } from "./OnboardingPageLayout";
 import analytics from "../../assets/images/analytics.png";
 const analyticsCardShadow = {
   elevation: 10,
@@ -17,10 +17,23 @@ export function OnboardingFour() {
   const item = onboardingScreens[3];
 
   return (
-    <Screen className="bg-whitePrimary">
-      <View className="flex-1 justify-between">
-        <OnboardingProgress activeIndex={3} />
+    <OnboardingPageLayout
+      activeIndex={3}
+      copy={
+        <View className="mb-5">
+          <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-textPrimary">
+            {item.title}
+          </Text>
 
+          <Text className="text-base leading-7 text-textPrimary">
+            {item.description}
+          </Text>
+        </View>
+      }
+      footer={
+        <OnboardingControls activeIndex={3} nextHref="/(onboarding)/screen-5" />
+      }
+      visual={
         <View className="w-full flex-1 items-center justify-center">
           <View
             className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary p-6"
@@ -73,25 +86,7 @@ export function OnboardingFour() {
             </View>
           </View>
         </View>
-
-        <View className="gap-8">
-          <View className=" mb-5">
-            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-textPrimary">
-              {item.title}
-            </Text>
-
-            <Text className="text-base leading-7 text-textPrimary">
-              {item.description}
-            </Text>
-          </View>
-
-          <OnboardingControls
-            activeIndex={3}
-            dotClassName="bg-warning"
-            nextHref="/(onboarding)/screen-5"
-          />
-        </View>
-      </View>
-    </Screen>
+      }
+    />
   );
 }

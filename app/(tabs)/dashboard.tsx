@@ -26,6 +26,7 @@ import PropertyImageGallery from "../../components/properties/PropertyImageGalle
 import { PortfolioAssetFilterSheet } from "../../components/properties/PortfolioAssetFilterSheet";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import { PropertyPortfolioSummary } from "../../components/properties/PropertyPortfolioSummary";
+import { GlobalSearchModal } from "../../components/ui/GlobalSearchModal";
 import {
   SkeletonGroup,
   SkeletonList,
@@ -80,6 +81,7 @@ export default function DashboardScreen() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
   );
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const { useList } = useProperties(accessToken);
   const {
     data: properties = [],
@@ -232,43 +234,64 @@ export default function DashboardScreen() {
             </View>
           </View>
 
-          {/* Notification */}
-          <TouchableOpacity
-            activeOpacity={0.82}
-            accessibilityRole="button"
-            accessibilityLabel="Open notifications"
-            hitSlop={10}
-            className="relative overflow-hidden rounded-full border border-white/45 bg-white/10"
-            onPress={() => router.push(appRoutes.secondary.notifications)}
-            style={{
-              width: 45,
-              height: 45,
-              shadowColor: "rgba(30,31,69,0.45)",
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.24,
-              shadowRadius: 16,
-              elevation: 7,
-            }}
-          >
-            {Platform.OS === "ios" ? (
-              <GlassView
-                glassEffectStyle="regular"
-                tintColor="rgba(255,255,255,0.35)"
-                isInteractive
-                style={notificationGlassStyle}
-              >
-                {iosNotificationGlassContent}
-              </GlassView>
-            ) : (
-              <BlurView
-                intensity={410}
-                tint="light"
-                style={notificationGlassStyle}
-              >
-                {androidNotificationGlassContent}
-              </BlurView>
-            )}
-          </TouchableOpacity>
+          <View className="flex-row items-center gap-2">
+            {/* Global Search */}
+            <TouchableOpacity
+              activeOpacity={0.82}
+              accessibilityRole="button"
+              accessibilityLabel="Open global search"
+              hitSlop={10}
+              className="h-[45px] w-[45px] items-center justify-center rounded-full border border-white/45 bg-white/10"
+              onPress={() => setIsSearchModalOpen(true)}
+              style={{
+                shadowColor: "rgba(30,31,69,0.45)",
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.24,
+                shadowRadius: 16,
+                elevation: 7,
+              }}
+            >
+              <Feather name="search" size={20} color="#ffffff" />
+            </TouchableOpacity>
+
+            {/* Notification */}
+            <TouchableOpacity
+              activeOpacity={0.82}
+              accessibilityRole="button"
+              accessibilityLabel="Open notifications"
+              hitSlop={10}
+              className="relative overflow-hidden rounded-full border border-white/45 bg-white/10"
+              onPress={() => router.push(appRoutes.secondary.notifications)}
+              style={{
+                width: 45,
+                height: 45,
+                shadowColor: "rgba(30,31,69,0.45)",
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.24,
+                shadowRadius: 16,
+                elevation: 7,
+              }}
+            >
+              {Platform.OS === "ios" ? (
+                <GlassView
+                  glassEffectStyle="regular"
+                  tintColor="rgba(255,255,255,0.35)"
+                  isInteractive
+                  style={notificationGlassStyle}
+                >
+                  {iosNotificationGlassContent}
+                </GlassView>
+              ) : (
+                <BlurView
+                  intensity={410}
+                  tint="light"
+                  style={notificationGlassStyle}
+                >
+                  {androidNotificationGlassContent}
+                </BlurView>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </ImageBackground>
       <View className="z-10 -mt-32">
@@ -444,6 +467,10 @@ export default function DashboardScreen() {
         accessToken={accessToken}
         onClose={() => setSelectedProperty(null)}
         property={selectedProperty}
+      />
+      <GlobalSearchModal
+        isVisible={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
       />
       {imageGalleryProperty ? (
         <PropertyImageGallery

@@ -1,4 +1,7 @@
 import type { Bedspace } from "./bedspaces";
+import type { Property } from "./properties";
+
+export type { Property } from "./properties";
 
 export type Lessee = {
   id: string;
@@ -21,6 +24,7 @@ export type Lease = {
   status: "Active" | "Expired" | "Terminated" | string;
   lessee?: Lessee;
   bedspace?: Bedspace;
+  property?: Property;
 };
 
 export type PaymentStatus = "Paid" | "Pending" | "Overdue" | string;

@@ -78,3 +78,39 @@ export async function updateUserProfile(
 
   return normalizeUser(unwrapData<AuthUser>(response));
 }
+
+export async function changePassword(
+  payload: { current_password: string; password: string; password_confirmation: string },
+  accessToken?: string,
+) {
+  const response = await apiClient.post<{ success?: boolean; message?: string }>(
+    "/user/change-password",
+    payload,
+    { headers: authHeaders(accessToken) },
+  );
+
+  return response;
+}
+
+export async function requestAccountDeletion(
+  payload: { reason?: string; confirmation: boolean },
+  accessToken?: string,
+) {
+  const response = await apiClient.post<{ success?: boolean; message?: string }>(
+    "/account/deletion-request",
+    payload,
+    { headers: authHeaders(accessToken) },
+  );
+
+  return response;
+}
+
+export async function exportUserData(accessToken?: string) {
+  const response = await apiClient.get<Record<string, unknown>>(
+    "/account/data-export",
+    { headers: authHeaders(accessToken) },
+  );
+
+  return unwrapData(response);
+}
+
