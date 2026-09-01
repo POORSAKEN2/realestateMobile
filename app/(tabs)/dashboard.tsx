@@ -19,7 +19,6 @@ import Feather from "@expo/vector-icons/Feather";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useAuth } from "../../hooks/useAuth";
 import type { Property } from "../../types";
-import { router } from "expo-router";
 import { appRoutes } from "../../constants/navigation";
 import { colors } from "../../constants/colors";
 import PropertyImageGallery from "../../components/properties/PropertyImageGallery";
@@ -27,6 +26,10 @@ import { PortfolioAssetFilterSheet } from "../../components/properties/Portfolio
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import { PropertyPortfolioSummary } from "../../components/properties/PropertyPortfolioSummary";
 import { GlobalSearchModal } from "../../components/ui/GlobalSearchModal";
+import { DashboardNavigationSections } from "../../components/dashboard/DashboardNavigationSections";
+import { PortfolioAssetCard } from "../../components/dashboard/PortfolioAssetCard";
+import { dashboardNavigationSections } from "../../constants/dashboardNavigation";
+import { openModuleRoute } from "../../utils/navigation/moduleNavigation";
 import {
   SkeletonGroup,
   SkeletonList,
@@ -35,8 +38,6 @@ import {
 import {
   capitalizeWords,
   filterAndSortProperties,
-  formatPesoValue,
-  formatPropertyStatus,
   formatRole,
   getInitials,
   getPropertyImages,
@@ -195,7 +196,7 @@ export default function DashboardScreen() {
           width: "auto",
         }}
       >
-        <View className="absolute inset-0 bg-textPrimary/25" />
+        <View className="absolute inset-0 bg-textPrimary/60" />
 
         <View className="flex-row items-center justify-between pt-4">
           {/* Profile */}
@@ -261,7 +262,7 @@ export default function DashboardScreen() {
               accessibilityLabel="Open notifications"
               hitSlop={10}
               className="relative overflow-hidden rounded-full border border-white/45 bg-white/10"
-              onPress={() => router.push(appRoutes.secondary.notifications)}
+              onPress={() => openModuleRoute(appRoutes.secondary.notifications)}
               style={{
                 width: 45,
                 height: 45,
@@ -309,144 +310,87 @@ export default function DashboardScreen() {
           }
         />
       </View>
-
-      <View className="mb-4 mt-5">
-        <Text className="font-ralewayBold">Portfolio Assets</Text>
-
-        <View className="mt-3 flex-row items-center gap-3">
-          <SearchToolbar
-            accessibilityLabel="Search portfolio assets"
-            activeFilterCount={activeAssetFilterCount}
-            className="flex-1"
-            clearAccessibilityLabel="Clear portfolio asset search"
-            filterAccessibilityLabel="Open portfolio asset filters"
-            onChangeText={setAssetSearchQuery}
-            onFilterPress={() => setShowAssetFilters(true)}
-            placeholder="Location or asset"
-            value={assetSearchQuery}
-          />
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            accessibilityLabel="Open property map"
-            accessibilityRole="button"
-            className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
-            onPress={() => router.navigate(appRoutes.secondary.map)}
-          >
-            <Feather name="map" color={colors.whitePrimary} size={18} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View className="mt-4 flex-1">
-        {isLoadingProperties ? (
-          <SkeletonGroup
-            accessibilityLabel="Loading portfolio assets"
-            className="gap-3"
-          >
-            <SkeletonList
-              count={2}
-              renderItem={() => <SkeletonListCard className="min-h-24" />}
+      <FlatList
+        automaticallyAdjustContentInsets={false}
+        automaticallyAdjustsScrollIndicatorInsets={false}
+        contentInsetAdjustmentBehavior="never"
+        data={isLoadingProperties ? [] : visibleAssets}
+        keyExtractor={(property) => property.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 140 }}
+        ListHeaderComponent={
+          <>
+            <DashboardNavigationSections
+              sections={dashboardNavigationSections}
+              onNavigate={openModuleRoute}
             />
-          </SkeletonGroup>
-        ) : (
-          <FlatList
-            data={visibleAssets}
-            keyExtractor={(property) => property.id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 140 }}
-            ItemSeparatorComponent={() => <View className="h-3" />}
-            ListEmptyComponent={
-              <View className="items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-primary/10 px-4 py-6">
-                <Feather name="search" size={22} color={colors.primary} />
-                <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
-                  No assets found
-                </Text>
-              </View>
-            }
-            refreshControl={
-              <RefreshControl
-                colors={[colors.primary]}
-                onRefresh={refreshDashboard}
-                refreshing={isRefreshing}
-                tintColor={colors.primary}
-              />
-            }
-            renderItem={({ item: property }) => (
-              <TouchableOpacity
-                activeOpacity={0.82}
-                accessibilityRole="button"
-                accessibilityLabel={`View ${property.title}`}
-                onPress={() => setSelectedProperty(property)}
-                className="flex-row gap-3 rounded-2xl border border-textPrimary/10 bg-white p-2.5"
-              >
+
+            <View className="mb-4 mt-6">
+              <Text className="font-ralewayBold">Portfolio Assets</Text>
+
+              <View className="mt-3 flex-row items-center gap-3">
+                <SearchToolbar
+                  accessibilityLabel="Search portfolio assets"
+                  activeFilterCount={activeAssetFilterCount}
+                  className="flex-1"
+                  clearAccessibilityLabel="Clear portfolio asset search"
+                  filterAccessibilityLabel="Open portfolio asset filters"
+                  onChangeText={setAssetSearchQuery}
+                  onFilterPress={() => setShowAssetFilters(true)}
+                  placeholder="Location or asset"
+                  value={assetSearchQuery}
+                />
+
                 <TouchableOpacity
-                  activeOpacity={0.86}
+                  activeOpacity={0.8}
+                  accessibilityLabel="Open property map"
                   accessibilityRole="button"
-                  accessibilityLabel={`View images for ${property.title}`}
-                  className="relative h-20 w-20 overflow-hidden rounded-xl bg-primary/10"
-                  onPress={(event) => {
-                    event.stopPropagation();
-                    setImageGalleryProperty(property);
-                  }}
+                  className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
+                  onPress={() => openModuleRoute(appRoutes.secondary.map)}
                 >
-                  <Image
-                    source={{ uri: getPropertyImages(property)[0] }}
-                    className="h-full w-full"
-                    resizeMode="cover"
-                  />
-                  {getPropertyImages(property).length > 1 ? (
-                    <View className="absolute bottom-1.5 right-1.5 rounded-full bg-blackPrimary/55 px-1.5 py-0.5">
-                      <Text className="font-ralewayBold text-[9px] text-white">
-                        {getPropertyImages(property).length}
-                      </Text>
-                    </View>
-                  ) : null}
+                  <Feather name="map" color={colors.whitePrimary} size={18} />
                 </TouchableOpacity>
-
-                <View className="min-w-0 flex-1 justify-between py-0.5">
-                  <View>
-                    <View className="flex-row items-start justify-between gap-2">
-                      <Text
-                        className="min-w-0 flex-1 font-ralewayBold text-sm text-textPrimary"
-                        numberOfLines={1}
-                      >
-                        {property.title}
-                      </Text>
-                      <Text className="rounded-full bg-accent px-2 py-0.5 font-ralewayBold text-[9px] uppercase text-textPrimary">
-                        {property.roi}% ROI
-                      </Text>
-                    </View>
-
-                    <View className="mt-1 flex-row items-center gap-1">
-                      <Feather
-                        name="map-pin"
-                        size={11}
-                        color={colors.description}
-                      />
-                      <Text
-                        className="min-w-0 flex-1 text-[11px] text-description"
-                        numberOfLines={1}
-                      >
-                        {property.location}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View className="flex-row items-center justify-between">
-                    <Text className="font-ralewaySemiBold text-[11px] text-description">
-                      {formatPropertyStatus(property.status)}
-                    </Text>
-                    <Text className="font-ralewayBold text-xs text-textPrimary">
-                      {formatPesoValue(property.value)}
-                    </Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            )}
+              </View>
+            </View>
+          </>
+        }
+        ItemSeparatorComponent={() => <View className="h-3" />}
+        ListEmptyComponent={
+          isLoadingProperties ? (
+            <SkeletonGroup
+              accessibilityLabel="Loading portfolio assets"
+              className="gap-3"
+            >
+              <SkeletonList
+                count={2}
+                renderItem={() => <SkeletonListCard className="min-h-24" />}
+              />
+            </SkeletonGroup>
+          ) : (
+            <View className="items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-primary/10 px-4 py-6">
+              <Feather name="search" size={22} color={colors.primary} />
+              <Text className="mt-2 font-ralewaySemiBold text-xs text-description">
+                No assets found
+              </Text>
+            </View>
+          )
+        }
+        refreshControl={
+          <RefreshControl
+            colors={[colors.primary]}
+            onRefresh={refreshDashboard}
+            refreshing={isRefreshing}
+            tintColor={colors.primary}
+          />
+        }
+        renderItem={({ item: property }) => (
+          <PortfolioAssetCard
+            property={property}
+            onOpen={setSelectedProperty}
+            onOpenImages={setImageGalleryProperty}
           />
         )}
-      </View>
+      />
 
       <PortfolioAssetFilterSheet
         filters={{

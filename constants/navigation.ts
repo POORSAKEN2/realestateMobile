@@ -9,6 +9,7 @@ export const appRoutes = {
     properties: "/(tabs)/properties" as Href,
     expenses: "/(tabs)/expenses" as Href,
     tenants: "/(tabs)/tenants" as Href,
+    profile: "/(tabs)/profile" as Href,
   },
   secondary: {
     analytics: "/(secondary)/analytics" as Href,
@@ -25,6 +26,7 @@ export const appRoutes = {
     assignedRooms: "/(secondary)/assigned-rooms" as Href,
     billing: "/(secondary)/billing" as Href,
     inquiries: "/(secondary)/inquiries" as Href,
+    rent: "/(secondary)/rent" as Href,
     support: "/(secondary)/support" as Href,
   },
 };
@@ -43,8 +45,9 @@ const moduleRoutes: Record<string, Href> = {
   leases: appRoutes.secondary.leases,
   mapCanvas: appRoutes.secondary.map,
   notificationScreen: appRoutes.secondary.notifications,
-  profile: appRoutes.secondary.profile,
+  profile: appRoutes.primary.profile,
   properties: appRoutes.primary.properties,
+  rent: appRoutes.secondary.rent,
   settings: appRoutes.secondary.settings,
   support: appRoutes.secondary.support,
   tenants: appRoutes.primary.tenants,

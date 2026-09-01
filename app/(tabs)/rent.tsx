@@ -13,6 +13,7 @@ import {
 import { LeaseLedgerModal } from "../../components/payments/LeaseLedgerModal";
 import { PaymentCard } from "../../components/payments/PaymentCard";
 import { RecordPaymentModal } from "../../components/payments/RecordPaymentModal";
+import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
@@ -27,7 +28,13 @@ const STATUS_FILTERS: Array<{ label: string; value: PaymentStatus | "ALL" }> = [
   { label: "Paid", value: "Paid" },
 ];
 
-export default function RentScreen() {
+type RentScreenProps = {
+  navigationLevel?: "primary" | "secondary";
+};
+
+export function RentScreen({
+  navigationLevel = "primary",
+}: RentScreenProps) {
   const [statusFilter, setStatusFilter] = useState<PaymentStatus | "ALL">("ALL");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPaymentForRecord, setSelectedPaymentForRecord] = useState<Payment | null>(null);
@@ -110,7 +117,10 @@ export default function RentScreen() {
   }
 
   return (
-    <Screen bottomInset="tab-bar" className="bg-surface">
+    <Screen
+      bottomInset={navigationLevel === "secondary" ? "safe-area" : "tab-bar"}
+      className="bg-surface"
+    >
       <ModuleHeader
         action={
           <TouchableOpacity
@@ -127,6 +137,14 @@ export default function RentScreen() {
           </TouchableOpacity>
         }
         eyebrow="Financial Operations"
+        leading={
+          navigationLevel === "secondary" ? (
+            <SecondaryBackButton
+              accessibilityLabel="Back from rent collection"
+              variant="secondary"
+            />
+          ) : undefined
+        }
         title="Rent Collection"
       />
 
@@ -284,3 +302,5 @@ export default function RentScreen() {
     </Screen>
   );
 }
+
+export default RentScreen;

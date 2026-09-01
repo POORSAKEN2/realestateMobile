@@ -17,9 +17,16 @@ import { useProfileController } from "../../hooks/profile/useProfileController";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { appRoutes } from "../../constants/navigation";
 
-export default function ProfileScreen() {
+type ProfileScreenProps = {
+  navigationLevel?: "primary" | "secondary";
+};
+
+export function ProfileScreen({
+  navigationLevel = "secondary",
+}: ProfileScreenProps) {
   const profile = useProfileController();
   const profileSnackbar = useSnackbar();
+  const isPrimary = navigationLevel === "primary";
 
   function handleBack() {
     if (router.canGoBack()) {
@@ -81,12 +88,12 @@ export default function ProfileScreen() {
   }
 
   return (
-    <Screen className="bg-surface">
+    <Screen bottomInset={isPrimary ? "tab-bar" : "none"} className="bg-surface">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        <ProfileHeader onBack={handleBack} />
+        <ProfileHeader onBack={isPrimary ? undefined : handleBack} />
 
         <ScrollView
           className="-mx-6 flex-1"
@@ -114,7 +121,9 @@ export default function ProfileScreen() {
             onPress={handleSave}
           />
           <ProfileAccountActions
-            onOpenSecurity={() => router.push(appRoutes.secondary.settings)}
+            onOpenAdditionalSettings={() =>
+              router.push(appRoutes.secondary.settings)
+            }
             onSignOut={handleSignOut}
           />
         </ScrollView>
@@ -128,3 +137,5 @@ export default function ProfileScreen() {
     </Screen>
   );
 }
+
+export default ProfileScreen;
