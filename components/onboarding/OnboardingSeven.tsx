@@ -4,17 +4,33 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 import { colors } from "../../constants/colors";
 import { onboardingScreens } from "../../constants/onboarding";
-import { Screen } from "../ui/Screen";
-import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
+import { OnboardingControls } from "./OnboardingControls";
+import { OnboardingPageLayout } from "./OnboardingPageLayout";
 
 export function OnboardingSeven() {
   const item = onboardingScreens[6];
 
   return (
-    <Screen className="bg-whitePrimary">
-      <View className="flex-1 justify-between">
-        <OnboardingProgress activeIndex={6} />
+    <OnboardingPageLayout
+      activeIndex={6}
+      copy={
+        <View className="mb-5">
+          <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-textPrimary">
+            {item.title}
+          </Text>
 
+          <Text className="text-base text-textPrimary">{item.description}</Text>
+        </View>
+      }
+      footer={
+        <OnboardingControls
+          activeIndex={6}
+          buttonTitle="Get Started"
+          fullWidthButton
+          showSkip={false}
+        />
+      }
+      visual={
         <View className="flex-1 justify-center">
           <View className="items-center">
             <View className="my-5 h-80 w-80  justify-between overflow-hidden rounded-[32px] border border-whitePrimary bg-whitePrimary/90 p-5 shadow-2xl">
@@ -68,29 +84,7 @@ export function OnboardingSeven() {
             </View>
           </View>
         </View>
-
-        <View className="gap-8">
-          <View className=" mb-5">
-            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-textPrimary">
-              {item.title}
-            </Text>
-
-            <Text className="text-base text-textPrimary">
-              {item.description}
-            </Text>
-          </View>
-
-          <View className="w-full">
-            <OnboardingControls
-              activeIndex={6}
-              buttonTitle="Get Started"
-              dotClassName="bg-info"
-              fullWidthButton
-              showSkip={false}
-            />
-          </View>
-        </View>
-      </View>
-    </Screen>
+      }
+    />
   );
 }

@@ -1,40 +1,16 @@
 import type { Href } from "expo-router";
 import { router } from "expo-router";
+import { useEffect, useRef } from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { onboardingScreens } from "../../constants/onboarding";
 import { useAuth } from "../../hooks/useAuth";
-
-type OnboardingProgressProps = {
-  activeIndex: number;
-};
-
-export function OnboardingProgress({ activeIndex }: OnboardingProgressProps) {
-  const totalScreens = onboardingScreens.length;
-  const currentStep = activeIndex + 1;
-  const progress = (currentStep / totalScreens) * 100;
-
-  return (
-    <View className="w-full">
-      <View className="flex-row items-center gap-3">
-        <View className="h-2 flex-1 overflow-hidden rounded-full bg-accent/40">
-          <View
-            className="h-full rounded-full bg-primary"
-            style={{
-              width: `${progress}%` as `${number}%`,
-            }}
-          />
-        </View>
-      </View>
-    </View>
-  );
-}
+import { useOnboardingTransition } from "./OnboardingTransition";
 
 type OnboardingControlsProps = {
   activeIndex: number;
   nextHref?: Href;
   buttonTitle?: string;
-  dotClassName?: string;
   fullWidthButton?: boolean;
   showSkip?: boolean;
 };
@@ -43,21 +19,50 @@ export function OnboardingControls({
   activeIndex,
   nextHref,
   buttonTitle,
-  dotClassName = "bg-success",
   fullWidthButton = false,
   showSkip = true,
 }: OnboardingControlsProps) {
   const { completeOnboarding } = useAuth();
+  const runAfterExit = useOnboardingTransition();
   const isLast = activeIndex === onboardingScreens.length - 1;
+  const transitionLock = useRef(false);
+  const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (transitionTimer.current) {
+        clearTimeout(transitionTimer.current);
+      }
+    },
+    [],
+  );
+
+  function beginTransition(action: () => void) {
+    if (transitionLock.current) {
+      return;
+    }
+
+    transitionLock.current = true;
+    action();
+    transitionTimer.current = setTimeout(() => {
+      transitionLock.current = false;
+    }, 500);
+  }
 
   function finishOnboarding() {
-    completeOnboarding();
-    router.replace("/(auth)/login");
+    beginTransition(() => {
+      runAfterExit(() => {
+        completeOnboarding();
+        router.replace("/(auth)/login");
+      });
+    });
   }
 
   function handleNext() {
     if (nextHref) {
-      router.push(nextHref);
+      beginTransition(() => {
+        runAfterExit(() => router.replace(nextHref));
+      });
       return;
     }
 
@@ -72,6 +77,7 @@ export function OnboardingControls({
             accessibilityRole="button"
             className=" h-12 min-w-28 items-center justify-center rounded-full border border-accent px-6"
             onPress={finishOnboarding}
+            style={({ pressed }) => ({ opacity: pressed ? 0.65 : 1 })}
           >
             <Text className="font-ralewaySemiBold text-font14 text-textPrimary">
               Skip
@@ -87,6 +93,10 @@ export function OnboardingControls({
             fullWidthButton ? "w-full" : "min-w-32"
           }`}
           onPress={handleNext}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.82 : 1,
+            transform: [{ scale: pressed ? 0.98 : 1 }],
+          })}
         >
           <Text className="font-ralewaySemiBold text-font14 text-white">
             {buttonTitle ?? (isLast ? "Get started" : "Next")}

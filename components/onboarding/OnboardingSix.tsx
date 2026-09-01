@@ -2,18 +2,29 @@ import { Feather } from "@expo/vector-icons";
 import { Image, Text, View } from "react-native";
 
 import { onboardingScreens } from "../../constants/onboarding";
-import { Screen } from "../ui/Screen";
-import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
+import { OnboardingControls } from "./OnboardingControls";
+import { OnboardingPageLayout } from "./OnboardingPageLayout";
 import philippinesMap from "../../assets/images/philippines-map.png";
 
 export function OnboardingSix() {
   const item = onboardingScreens[5];
 
   return (
-    <Screen className="bg-whitePrimary">
-      <View className="flex-1 justify-between">
-        <OnboardingProgress activeIndex={5} />
+    <OnboardingPageLayout
+      activeIndex={5}
+      copy={
+        <View className="mb-5">
+          <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-textPrimary">
+            {item.title}
+          </Text>
 
+          <Text className="text-base text-textPrimary">{item.description}</Text>
+        </View>
+      }
+      footer={
+        <OnboardingControls activeIndex={5} nextHref="/(onboarding)/screen-7" />
+      }
+      visual={
         <View className="w-full flex-1 items-center justify-center">
           <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary/95 shadow-2xl">
             <View className="absolute inset-0">
@@ -76,25 +87,7 @@ export function OnboardingSix() {
             </View>
           </View>
         </View>
-
-        <View className="gap-8">
-          <View className=" mb-5">
-            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight  text-textPrimary">
-              {item.title}
-            </Text>
-
-            <Text className="text-base text-textPrimary">
-              {item.description}
-            </Text>
-          </View>
-
-          <OnboardingControls
-            activeIndex={5}
-            dotClassName="bg-accent"
-            nextHref="/(onboarding)/screen-7"
-          />
-        </View>
-      </View>
-    </Screen>
+      }
+    />
   );
 }

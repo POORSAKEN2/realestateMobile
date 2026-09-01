@@ -2,8 +2,8 @@ import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
 import { onboardingScreens } from "../../constants/onboarding";
-import { Screen } from "../ui/Screen";
-import { OnboardingControls, OnboardingProgress } from "./OnboardingControls";
+import { OnboardingControls } from "./OnboardingControls";
+import { OnboardingPageLayout } from "./OnboardingPageLayout";
 
 const folderRows = [
   {
@@ -33,10 +33,23 @@ export function OnboardingFive() {
   const item = onboardingScreens[4];
 
   return (
-    <Screen className="bg-whitePrimary">
-      <View className="flex-1 justify-between">
-        <OnboardingProgress activeIndex={4} />
+    <OnboardingPageLayout
+      activeIndex={4}
+      copy={
+        <View className="mb-5">
+          <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight text-blackPrimary">
+            {item.title}
+          </Text>
 
+          <Text className="text-base leading-7 text-textPrimary">
+            {item.description}
+          </Text>
+        </View>
+      }
+      footer={
+        <OnboardingControls activeIndex={4} nextHref="/(onboarding)/screen-6" />
+      }
+      visual={
         <View className="w-full flex-1 items-center justify-center">
           <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary/95 p-5 shadow-2xl">
             <View className="absolute inset-0">
@@ -105,40 +118,7 @@ export function OnboardingFive() {
             </View>
           </View>
         </View>
-
-        {/* <View className="items-center">
-          <Text className="mt-3 text-center text-4xl font-ralewayExtraBold leading-tight text-white">
-            {item.title}
-          </Text>
-          <Text className="mt-4 text-center text-base leading-7 text-description/60">
-            {item.description}
-          </Text>
-        </View>
-
-        <OnboardingControls
-          activeIndex={4}
-          dotClassName="bg-primary/50"
-          nextHref="/(onboarding)/screen-6"
-        /> */}
-
-        <View className="gap-8">
-          <View className=" mb-5">
-            <Text className="my-5 font-ralewayExtraBold text-4xl leading-tight text-blackPrimary">
-              {item.title}
-            </Text>
-
-            <Text className="text-base leading-7 text-textPrimary">
-              {item.description}
-            </Text>
-          </View>
-
-          <OnboardingControls
-            activeIndex={4}
-            dotClassName="bg-primary/50"
-            nextHref="/(onboarding)/screen-6"
-          />
-        </View>
-      </View>
-    </Screen>
+      }
+    />
   );
 }
