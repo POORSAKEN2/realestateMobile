@@ -1,5 +1,11 @@
 import { router } from "expo-router";
-import { Alert, KeyboardAvoidingView, Platform, View } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  View,
+} from "react-native";
 
 import { ProfileAccountActions } from "../../components/profile/ProfileAccountActions";
 import { ProfileDetailsForm } from "../../components/profile/ProfileDetailsForm";
@@ -100,7 +106,12 @@ export function ProfileScreen({
           }
         />
 
-        <View className="-mx-6 flex-1 px-6 pb-32">
+        <ScrollView
+          className="-mx-6 flex-1"
+          contentContainerClassName="px-6 pb-32"
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           <ProfileSummaryCard
             completion={profile.completion}
             email={profile.email}
@@ -126,7 +137,7 @@ export function ProfileScreen({
             }
             onSignOut={handleSignOut}
           />
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
 
       <ScreenSnackbar

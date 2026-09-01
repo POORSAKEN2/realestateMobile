@@ -100,11 +100,7 @@ export function ProfileMenuScreen() {
 
   return (
     <Screen bottomInset="none" className="bg-surface">
-      <ScrollView
-        className="-mx-6 flex-1"
-        contentContainerClassName="px-6"
-        showsVerticalScrollIndicator={false}
-      >
+      <View className="flex-1">
         <ProfileIdentityCard
           imageUri={imageUri}
           name={name}
@@ -114,7 +110,7 @@ export function ProfileMenuScreen() {
 
         <ProfileMenuSection items={accountItems} title="Account" />
         <ProfileMenuSection items={supportItems} title="Support" />
-      </ScrollView>
+      </View>
     </Screen>
   );
 }
