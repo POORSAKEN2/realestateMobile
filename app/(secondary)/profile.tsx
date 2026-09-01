@@ -93,8 +93,6 @@ export function ProfileScreen({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        <ProfileHeader onBack={isPrimary ? undefined : handleBack} />
-
         <ScrollView
           className="-mx-6 flex-1"
           contentContainerClassName="px-6 pb-32"
