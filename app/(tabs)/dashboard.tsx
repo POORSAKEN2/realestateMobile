@@ -1,13 +1,8 @@
-import {
-  FlatList,
-  Text,
-  View,
-  TouchableOpacity,
-  RefreshControl,
-} from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import { useMemo, useState } from "react";
 import { Screen } from "../../components/ui/Screen";
 import { SearchToolbar } from "../../components/ui/SearchToolbar";
+import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import Feather from "@expo/vector-icons/Feather";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useAuth } from "../../hooks/useAuth";
@@ -85,7 +80,6 @@ function AdminDashboardScreen() {
     isLoading: isLoadingProperties,
     refetch: refetchProperties,
   } = useList();
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const portfolioValue = useMemo(
     () => properties.reduce((sum, property) => sum + property.value, 0),
     [properties],
@@ -122,15 +116,6 @@ function AdminDashboardScreen() {
       properties,
     ],
   );
-  async function refreshDashboard() {
-    setIsRefreshing(true);
-    try {
-      await refetchProperties();
-    } finally {
-      setIsRefreshing(false);
-    }
-  }
-
   return (
     <Screen
       bottomInset="tab-bar"
@@ -138,43 +123,46 @@ function AdminDashboardScreen() {
       horizontalInset="none"
       topInset="safe-area"
     >
-      <DashboardHero
-        email={displayEmail}
-        name={displayName}
-        onNotificationsPress={() =>
-          openModuleRoute(appRoutes.secondary.notifications)
-        }
-        onSearchPress={() => setIsSearchModalOpen(true)}
-        profileImageUri={profileImageUri}
-        subtitle={userSubtitle}
-      />
-
-      <View className="z-10 -mt-32">
-        <PropertyPortfolioSummary
-          averageRoi={averageRoi}
-          portfolioValue={portfolioValue}
-          propertyCount={properties.length}
-          revenueGeneratingCount={revenueGeneratingCount}
-          state={
-            isLoadingProperties
-              ? "loading"
-              : isPropertiesError
-                ? "error"
-                : "ready"
-          }
-        />
-      </View>
-      <FlatList
+      <PullToRefreshFlatList
         automaticallyAdjustContentInsets={false}
         automaticallyAdjustsScrollIndicatorInsets={false}
-        className="-mx-6"
+        style={{ marginHorizontal: -24, marginTop: -24 }}
         contentInsetAdjustmentBehavior="never"
         data={isLoadingProperties ? [] : visibleAssets}
         keyExtractor={(property) => property.id}
+        onRefresh={refetchProperties}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 140 }}
+        contentContainerStyle={{ paddingBottom: 24 }}
         ListHeaderComponent={
           <>
+            <View className="px-6 pt-6">
+              <DashboardHero
+                email={displayEmail}
+                name={displayName}
+                onNotificationsPress={() =>
+                  openModuleRoute(appRoutes.secondary.notifications)
+                }
+                onSearchPress={() => setIsSearchModalOpen(true)}
+                profileImageUri={profileImageUri}
+                subtitle={userSubtitle}
+              />
+
+              <View className="z-10 -mt-32">
+                <PropertyPortfolioSummary
+                  averageRoi={averageRoi}
+                  portfolioValue={portfolioValue}
+                  propertyCount={properties.length}
+                  revenueGeneratingCount={revenueGeneratingCount}
+                  state={
+                    isLoadingProperties
+                      ? "loading"
+                      : isPropertiesError
+                        ? "error"
+                        : "ready"
+                  }
+                />
+              </View>
+            </View>
             <View className="px-6">
               <DashboardNavigationSections
                 sections={dashboardNavigationSections}
@@ -237,14 +225,6 @@ function AdminDashboardScreen() {
               </View>
             </View>
           )
-        }
-        refreshControl={
-          <RefreshControl
-            colors={[colors.primary]}
-            onRefresh={refreshDashboard}
-            refreshing={isRefreshing}
-            tintColor={colors.primary}
-          />
         }
         renderItem={({ item: property }) => (
           <View className="px-6">

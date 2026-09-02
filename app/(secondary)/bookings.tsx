@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { View } from "react-native";
 
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { fetchTransientBookings } from "../../api/bookings";
 import {
   BookingCalendar,
@@ -41,7 +42,6 @@ export default function BookingsScreen() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("Booked");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<BookingViewMode>("month");
 
   const { useList } = useProperties();
@@ -161,12 +161,7 @@ export default function BookingsScreen() {
   ].filter(Boolean).length;
 
   async function refreshBookings() {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([refetchProperties(), refetchBookings()]);
-    } finally {
-      setIsRefreshing(false);
-    }
+    await Promise.all([refetchProperties(), refetchBookings()]);
   }
 
   return (
@@ -196,15 +191,8 @@ export default function BookingsScreen() {
           />
         </View>
 
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              colors={["#8A77F4"]}
-              onRefresh={refreshBookings}
-              refreshing={isRefreshing}
-              tintColor="#8A77F4"
-            />
-          }
+        <PullToRefreshScrollView
+          onRefresh={refreshBookings}
           showsVerticalScrollIndicator={false}
         >
           <View className="gap-4 pb-8">
@@ -272,7 +260,7 @@ export default function BookingsScreen() {
               />
             )}
           </View>
-        </ScrollView>
+        </PullToRefreshScrollView>
       </View>
 
       <BookingFilterSheet

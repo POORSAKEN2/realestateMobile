@@ -90,7 +90,7 @@ export function ProfileScreen({
   }
 
   return (
-    <Screen bottomInset={isPrimary ? "none" : "tab-bar"} className="bg-surface">
+    <Screen bottomInset={isPrimary ? "tab-bar" : "safe-area"} className="bg-surface">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -108,7 +108,7 @@ export function ProfileScreen({
 
         <ScrollView
           className="-mx-6 flex-1"
-          contentContainerClassName="px-6 pb-32"
+          contentContainerClassName="px-6 pb-8"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >

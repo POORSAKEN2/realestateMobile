@@ -1,7 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
+import { PullToRefreshScrollView } from "../ui/PullToRefreshScrollView";
 import { FloorAreaCard } from "./FloorAreaCard";
 import { FloorPlanCanvas } from "./FloorPlanCanvas";
 import { FloorPlanTabs } from "./FloorPlanTabs";
@@ -31,7 +32,6 @@ export function FloorAreaWorkspace({
   onSaveShape,
   onSelectFloor,
   onToggleAreaVisibility,
-  refreshing,
   roomGuidance,
   rooms,
   showRoomActions,
@@ -46,12 +46,11 @@ export function FloorAreaWorkspace({
   onDeleteArea: (area: FloorArea) => void;
   onDrawArea: (areaId: string, mode: FloorPlanDrawingMode) => void;
   onManageRooms: (area: FloorArea) => void;
-  onRefresh: () => void;
+  onRefresh: () => Promise<unknown>;
   onRenameArea: (area: FloorArea) => void;
   onSaveShape: (points: FloorPlanPoint[]) => void;
   onSelectFloor: (id: string) => void;
   onToggleAreaVisibility: (areaId: string) => void;
-  refreshing: boolean;
   roomGuidance?: string;
   rooms: PropertyRoom[];
   showRoomActions: boolean;
@@ -132,7 +131,7 @@ export function FloorAreaWorkspace({
         onSelectFloor={onSelectFloor}
       />
 
-      <ScrollView
+      <PullToRefreshScrollView
         className="-mx-6 mt-4 flex-1"
         contentContainerStyle={{
           gap: 16,
@@ -140,14 +139,7 @@ export function FloorAreaWorkspace({
           paddingHorizontal: 24,
         }}
         ref={contentScrollRef}
-        refreshControl={
-          <RefreshControl
-            colors={["#8A77F4"]}
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-            tintColor="#8A77F4"
-          />
-        }
+        onRefresh={onRefresh}
         showsVerticalScrollIndicator={false}
       >
         <FloorPlanCanvas
@@ -239,7 +231,7 @@ export function FloorAreaWorkspace({
             </Text>
           </View>
         )}
-      </ScrollView>
+      </PullToRefreshScrollView>
     </>
   );
 }

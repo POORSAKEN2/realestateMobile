@@ -1,12 +1,8 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 
+import { PullToRefreshScrollView } from "../ui/PullToRefreshScrollView";
 import { FloorPlanActionsCard } from "./FloorPlanActionsCard";
 import { FloorPlanPreview } from "./FloorPlanPreview";
 import { FloorPlanTabs } from "./FloorPlanTabs";
@@ -22,7 +18,6 @@ export function FloorPlanWorkspace({
   onRefresh,
   onRenameFloor,
   onSelectFloor,
-  refreshing,
   rooms,
 }: {
   activeFloor: FloorPlan;
@@ -31,10 +26,10 @@ export function FloorPlanWorkspace({
   onDeleteFloor: (floor: FloorPlan) => void;
   onManageAreas: (floor: FloorPlan) => void;
   onPickImage: () => void;
-  onRefresh: () => void;
+  onRefresh: () => Promise<unknown>;
   onRenameFloor: (floor: FloorPlan) => void;
   onSelectFloor: (id: string) => void;
-  refreshing: boolean;
+
   rooms: PropertyRoom[];
 }) {
   const [showAreaShapes, setShowAreaShapes] = useState(false);
@@ -53,21 +48,14 @@ export function FloorPlanWorkspace({
         onSelectFloor={onSelectFloor}
       />
 
-      <ScrollView
+      <PullToRefreshScrollView
         className="-mx-6 mt-4 flex-1"
         contentContainerStyle={{
           gap: 16,
           paddingBottom: 80,
           paddingHorizontal: 24,
         }}
-        refreshControl={
-          <RefreshControl
-            colors={["#8A77F4"]}
-            onRefresh={onRefresh}
-            refreshing={refreshing}
-            tintColor="#8A77F4"
-          />
-        }
+        onRefresh={onRefresh}
         showsVerticalScrollIndicator={false}
       >
         <FloorPlanPreview
@@ -109,7 +97,7 @@ export function FloorPlanWorkspace({
             size={19}
           />
         </TouchableOpacity>
-      </ScrollView>
+      </PullToRefreshScrollView>
     </>
   );
 }

@@ -84,7 +84,7 @@ export function DashboardHero({
             <Feather name="search" color={colors.primary} size={20} />
           </TouchableOpacity>
 
-          {/* <TouchableOpacity
+          <TouchableOpacity
             accessibilityLabel="Open notifications"
             accessibilityRole="button"
             activeOpacity={0.82}
@@ -98,7 +98,7 @@ export function DashboardHero({
               size={21}
             />
             <View className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full border border-white bg-danger" />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>

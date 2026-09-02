@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { managerDashboardNavigationSections } from "../../constants/dashboardNavigation";
 import { appRoutes } from "../../constants/navigation";
@@ -10,6 +10,7 @@ import { formatRole, isAuthUser } from "../../utils/dashboard/dashboardHelpers";
 import { openModuleRoute } from "../../utils/navigation/moduleNavigation";
 import { GlobalSearchModal } from "../ui/GlobalSearchModal";
 import { Screen } from "../ui/Screen";
+import { PullToRefreshFlatList } from "../ui/PullToRefreshFlatList";
 import { DashboardHero } from "./DashboardHero";
 import { DashboardNavigationSections } from "./DashboardNavigationSections";
 import { DashboardSummaryCard } from "./DashboardSummaryCard";
@@ -74,103 +75,102 @@ export function ManagerDashboardScreen() {
 
   return (
     <Screen bottomInset="tab-bar" className="bg-surface" horizontalInset="none">
-      <View className="flex-1">
-        <DashboardHero
-          email={displayEmail}
-          name={displayName}
-          onNotificationsPress={() =>
-            openModuleRoute(appRoutes.secondary.notifications)
-          }
-          onSearchPress={() => setIsSearchOpen(true)}
-          profileImageUri={profileImageUri}
-          subtitle={userSubtitle}
-        />
+      <PullToRefreshFlatList
+        automaticallyAdjustContentInsets={false}
+        automaticallyAdjustsScrollIndicatorInsets={false}
+        contentInsetAdjustmentBehavior="never"
+        contentContainerStyle={{ paddingBottom: 24 }}
+        data={[]}
+        onRefresh={propertiesQuery.refetch}
+        renderItem={null}
+        showsVerticalScrollIndicator={false}
+        style={{ marginHorizontal: -24, marginTop: -24 }}
+        ListHeaderComponent={
+          <View className="px-6 pt-6">
+            <DashboardHero
+              email={displayEmail}
+              name={displayName}
+              onNotificationsPress={() =>
+                openModuleRoute(appRoutes.secondary.notifications)
+              }
+              onSearchPress={() => setIsSearchOpen(true)}
+              profileImageUri={profileImageUri}
+              subtitle={userSubtitle}
+            />
 
-        <View className="z-10 -mt-32">
-          <DashboardSummaryCard
-            badge="Manager overview"
-            icon="office-building-outline"
-            // label="Portfolio properties"
-            metrics={[
-              {
-                icon: "office-building-outline",
-                label: "Revenue generating",
-                tone: "success",
-                value: propertiesQuery.isError
-                  ? "—"
-                  : String(portfolioMetrics.revenueGenerating),
-              },
-              {
-                icon: "hammer-wrench",
-                label: "Under construction",
-                tone: "warning",
-                value: propertiesQuery.isError
-                  ? "—"
-                  : String(portfolioMetrics.inProgress),
-              },
-            ]}
-            state={
-              propertiesQuery.isLoading
-                ? "loading"
-                : propertiesQuery.isError
-                  ? "error"
-                  : "ready"
-            }
-            subtitle={
-              propertiesQuery.isError
-                ? "Portfolio unavailable"
-                : properties.length === 1
-                  ? "Property assigned"
-                  : "Properties assigned"
-            }
-            value={
-              propertiesQuery.isError
-                ? "Unavailable"
-                : String(properties.length)
-            }
-            variant="manager"
-          />
-        </View>
+            <View className="z-10 -mt-32">
+              <DashboardSummaryCard
+                badge="Manager overview"
+                icon="office-building-outline"
+                // label="Portfolio properties"
+                metrics={[
+                  {
+                    icon: "office-building-outline",
+                    label: "Revenue generating",
+                    tone: "success",
+                    value: propertiesQuery.isError
+                      ? "—"
+                      : String(portfolioMetrics.revenueGenerating),
+                  },
+                  {
+                    icon: "hammer-wrench",
+                    label: "Under construction",
+                    tone: "warning",
+                    value: propertiesQuery.isError
+                      ? "—"
+                      : String(portfolioMetrics.inProgress),
+                  },
+                ]}
+                state={
+                  propertiesQuery.isLoading
+                    ? "loading"
+                    : propertiesQuery.isError
+                      ? "error"
+                      : "ready"
+                }
+                subtitle={
+                  propertiesQuery.isError
+                    ? "Portfolio unavailable"
+                    : properties.length === 1
+                      ? "Property assigned"
+                      : "Properties assigned"
+                }
+                value={
+                  propertiesQuery.isError
+                    ? "Unavailable"
+                    : String(properties.length)
+                }
+                variant="manager"
+              />
+            </View>
 
-        <ScrollView
-          className="-mx-6 flex-1"
-          contentContainerClassName="px-6 pb-36"
-          refreshControl={
-            <RefreshControl
-              colors={["#8A77F4"]}
-              onRefresh={() => void propertiesQuery.refetch()}
-              refreshing={propertiesQuery.isFetching}
-              tintColor="#8A77F4"
+            <DashboardNavigationSections
+              onNavigate={openModuleRoute}
+              sections={managerDashboardNavigationSections}
             />
-          }
-          showsVerticalScrollIndicator={false}
-        >
-          <DashboardNavigationSections
-            onNavigate={openModuleRoute}
-            sections={managerDashboardNavigationSections}
-          />
 
-          <View className="mt-2 rounded-[24px] border border-primary/15 bg-white px-4 py-2 shadow-sm shadow-primary/5">
-            <AccessItem
-              description="Create and update operational records permitted by the Manager role."
-              icon="create-outline"
-              title="Operational access"
-            />
-            <View className="h-px bg-primary/10" />
-            <AccessItem
-              description="Plan details remain visible, but only administrators can start checkout."
-              icon="card-outline"
-              title="Billing is view-only"
-            />
-            <View className="h-px bg-primary/10" />
-            <AccessItem
-              description="Expense approval and staff provisioning are hidden from this workspace."
-              icon="lock-closed-outline"
-              title="Admin controls protected"
-            />
+            <View className="mt-2 rounded-[24px] border border-primary/15 bg-white px-4 py-2 shadow-sm shadow-primary/5">
+              <AccessItem
+                description="Create and update operational records permitted by the Manager role."
+                icon="create-outline"
+                title="Operational access"
+              />
+              <View className="h-px bg-primary/10" />
+              <AccessItem
+                description="Plan details remain visible, but only administrators can start checkout."
+                icon="card-outline"
+                title="Billing is view-only"
+              />
+              <View className="h-px bg-primary/10" />
+              <AccessItem
+                description="Expense approval and staff provisioning are hidden from this workspace."
+                icon="lock-closed-outline"
+                title="Admin controls protected"
+              />
+            </View>
           </View>
-        </ScrollView>
-      </View>
+        }
+      />
 
       <GlobalSearchModal
         isVisible={isSearchOpen}

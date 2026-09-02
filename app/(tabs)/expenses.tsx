@@ -1,4 +1,4 @@
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useMemo, useState } from "react";
 
 import {
@@ -11,6 +11,7 @@ import {
   ExpenseTransactionList,
   type ExpenseFilters,
 } from "../../components/expenses";
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { Screen } from "../../components/ui/Screen";
 import {
   formatSearchResultLabel,
@@ -94,7 +95,6 @@ export default function ExpensesScreen() {
     isDatePickerVisible,
     isFormVisible,
     isLoading,
-    isRefreshing,
     isSaving,
     openEditForm,
     openForm,
@@ -156,17 +156,10 @@ export default function ExpensesScreen() {
       <View className="flex-1">
         <ExpenseHeader onAddExpense={openForm} />
 
-        <ScrollView
+        <PullToRefreshScrollView
           className="mt-5"
-          contentContainerStyle={{ paddingBottom: 116 }}
-          refreshControl={
-            <RefreshControl
-              colors={["#8A77F4"]}
-              onRefresh={refetch}
-              refreshing={isRefreshing}
-              tintColor="#8A77F4"
-            />
-          }
+          contentContainerStyle={{ paddingBottom: 24 }}
+          onRefresh={refetch}
           showsVerticalScrollIndicator={false}
         >
           {isLoading ? (
@@ -206,7 +199,7 @@ export default function ExpensesScreen() {
               />
             </>
           )}
-        </ScrollView>
+        </PullToRefreshScrollView>
       </View>
 
       <ExpenseFilterSheet

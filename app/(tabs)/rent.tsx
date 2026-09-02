@@ -2,14 +2,13 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  FlatList,
-  RefreshControl,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
+import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { LeaseLedgerModal } from "../../components/payments/LeaseLedgerModal";
 import { PaymentCard } from "../../components/payments/PaymentCard";
 import { RecordPaymentModal } from "../../components/payments/RecordPaymentModal";
@@ -43,7 +42,7 @@ export function RentScreen({
   const [ledgerLeaseTitle, setLedgerLeaseTitle] = useState<string | undefined>(undefined);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
 
-  const { data: payments = [], isLoading, isRefetching, refetch } = usePayments();
+  const { data: payments = [], isLoading, refetch } = usePayments();
   const recordPaymentMutation = useRecordPayment();
 
   // Filter and search payments
@@ -230,19 +229,13 @@ export function RentScreen({
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : (
-          <FlatList
+          <PullToRefreshFlatList
             className="flex-1 -mx-1 px-1"
-            contentContainerClassName="pb-16 pt-2"
+            contentContainerClassName="pt-2"
+            contentContainerStyle={{ paddingBottom: 24 }}
             data={filteredPayments}
             keyExtractor={(item) => item.id}
-            refreshControl={
-              <RefreshControl
-                colors={[colors.primary]}
-                refreshing={isRefetching}
-                tintColor={colors.primary}
-                onRefresh={refetch}
-              />
-            }
+            onRefresh={refetch}
             renderItem={({ item }) => (
               <PaymentCard
                 payment={item}

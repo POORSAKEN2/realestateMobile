@@ -1,14 +1,8 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { UpgradePlanModal } from "../../components/billing/UpgradePlanModal";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
@@ -22,12 +16,7 @@ export default function BillingScreen() {
   const { session } = useAuth();
   const canStartCheckout = hasAppPermission(session?.user, "billing.checkout");
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const {
-    data: entitlement,
-    isLoading,
-    isRefetching,
-    refetch,
-  } = useBillingEntitlement();
+  const { data: entitlement, isLoading, refetch } = useBillingEntitlement();
 
   const propertyCount = entitlement?.property_count ?? 0;
   const propertyLimit = entitlement?.property_limit;
@@ -55,17 +44,10 @@ export default function BillingScreen() {
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : (
-          <ScrollView
+          <PullToRefreshScrollView
             className="-mx-6 mt-6 flex-1"
             contentContainerClassName="px-6 pb-12 gap-5"
-            refreshControl={
-              <RefreshControl
-                colors={[colors.primary]}
-                refreshing={isRefetching}
-                tintColor={colors.primary}
-                onRefresh={refetch}
-              />
-            }
+            onRefresh={refetch}
             showsVerticalScrollIndicator={false}
           >
             <View className="gap-12">
@@ -226,7 +208,7 @@ export default function BillingScreen() {
                 </Text>
               </View>
             </View>
-          </ScrollView>
+          </PullToRefreshScrollView>
         )}
       </View>
 

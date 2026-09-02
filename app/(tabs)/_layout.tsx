@@ -12,14 +12,15 @@ import Svg, { Path } from "react-native-svg";
 
 import BrandLogomarkWhite from "../../assets/branding/svg/brand-logomark-white.svg";
 import { colors } from "../../constants/colors";
+import { tabBarLayout } from "../../constants/tabBar";
 
-const ADD_BUTTON_SIZE = 64;
+const ADD_BUTTON_SIZE = tabBarLayout.addButtonSize;
 const ADD_BUTTON_GAP = 24;
 const NOTCH_DEPTH = ADD_BUTTON_SIZE / 2 + ADD_BUTTON_GAP;
 const NOTCH_HALF_WIDTH = 64;
 const NOTCH_OUTER_CONTROL = 28;
 const NOTCH_INNER_CONTROL = 56;
-const TAB_BAR_CONTENT_HEIGHT = 64;
+const TAB_BAR_CONTENT_HEIGHT = tabBarLayout.contentHeight;
 const TAB_BAR_TOP = NOTCH_DEPTH;
 const PRIMARY_TABS = [
   { label: "Home", name: "dashboard" },
@@ -62,12 +63,12 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
         accessibilityLabel="Add, unavailable"
         accessibilityRole="button"
         accessibilityState={{ disabled: true }}
-        className="absolute mt-4 items-center justify-center rounded-full bg-primary shadow-lg shadow-slate-300"
+        className="absolute items-center justify-center rounded-full bg-primary shadow-lg shadow-slate-300"
         pointerEvents="none"
         style={{
           height: ADD_BUTTON_SIZE,
           left: center - ADD_BUTTON_SIZE / 2,
-          top: TAB_BAR_TOP - ADD_BUTTON_SIZE / 2,
+          top: TAB_BAR_TOP - ADD_BUTTON_SIZE / 2 + tabBarLayout.addButtonOffset,
           width: ADD_BUTTON_SIZE,
           zIndex: 0,
         }}

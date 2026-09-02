@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { Screen, type ScreenBottomInset } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { ModuleEmptyState } from "../../components/ui/ModuleState";
@@ -31,7 +32,6 @@ import {
 import { formatCurrency } from "../../utils/formatters";
 import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
-import { colors } from "../../constants/colors";
 
 type TenantsScreenProps = {
   bottomInset?: ScreenBottomInset;
@@ -136,7 +136,6 @@ export function TenantsScreen({
     getTenantLeases,
     isFormOpen,
     isLoading,
-    isRefreshing,
     leases,
     linkedTenantCount,
     linkedTenantPercentage,
@@ -209,19 +208,12 @@ export function TenantsScreen({
         />
       </View>
 
-      <ScrollView
+      <PullToRefreshScrollView
         className="flex-1"
         contentContainerStyle={{
-          paddingBottom: bottomInset === "tab-bar" ? 116 : 32,
+          paddingBottom: 32,
         }}
-        refreshControl={
-          <RefreshControl
-            colors={[colors.primary]}
-            onRefresh={refresh}
-            refreshing={isRefreshing}
-            tintColor={colors.primary}
-          />
-        }
+        onRefresh={refresh}
         showsVerticalScrollIndicator={false}
       >
         {isLoading ? (
@@ -309,7 +301,7 @@ export function TenantsScreen({
             </View>
           </View>
         )}
-      </ScrollView>
+      </PullToRefreshScrollView>
 
       <TenantFilterSheet
         filters={filters}

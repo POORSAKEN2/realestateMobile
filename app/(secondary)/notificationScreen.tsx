@@ -1,20 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 import {
   fetchNotifications,
   markAllNotificationsRead,
   markNotificationRead,
 } from "../../api/notifications";
+import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { Screen } from "../../components/ui/Screen";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
@@ -185,7 +179,6 @@ export default function NotificationScreen() {
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
   const queryKey = ["notifications", accessToken];
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const notificationsQuery = useQuery({
     queryKey,
@@ -237,12 +230,7 @@ export default function NotificationScreen() {
     notificationsQuery.isLoading && notifications.length === 0;
 
   async function refreshNotifications() {
-    setIsRefreshing(true);
-    try {
-      await notificationsQuery.refetch();
-    } finally {
-      setIsRefreshing(false);
-    }
+    await notificationsQuery.refetch();
   }
 
   return (
@@ -312,7 +300,7 @@ export default function NotificationScreen() {
           />
         </SkeletonGroup>
       ) : (
-        <FlatList
+        <PullToRefreshFlatList
           data={notifications}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{
@@ -322,13 +310,7 @@ export default function NotificationScreen() {
           ListEmptyComponent={
             <EmptyState onRefresh={() => void refreshNotifications()} />
           }
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              tintColor={colors.primary}
-              onRefresh={refreshNotifications}
-            />
-          }
+          onRefresh={refreshNotifications}
           renderItem={({ item }) => (
             <NotificationRow
               notification={item}
