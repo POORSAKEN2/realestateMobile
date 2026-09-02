@@ -61,11 +61,10 @@ function ManagerMetric({
 
   return (
     <View
-      className={`h-full min-w-0 flex-1 rounded-2xl border p-1.5 ${tone.container}`}
+      className={`h-full min-w-0 flex-1 rounded-2xl border p-3 ${tone.container}`}
     >
-      <View className="flex-row items-center justify-between gap-1.5">
+      <View className="flex-row items-center justify-between ">
         <View className="min-w-0 flex-1 flex-row items-center gap-1.5">
-          <View className={`h-1.5 w-1.5 rounded-full ${tone.dot}`} />
           <Text
             adjustsFontSizeToFit
             className={`min-w-0 flex-1 font-ralewayExtraBold text-[8px] uppercase tracking-wide ${tone.label}`}
@@ -108,10 +107,10 @@ export function ManagerDashboardSummaryCard({
 }: RoleDashboardSummaryCardProps) {
   return (
     <View
-      className="overflow-hidden rounded-[28px] border border-primary/15 bg-white"
-      style={[managerShadow, { aspectRatio: 1.9 }]}
+      className="flex aspect-video overflow-hidden rounded-2xl border border-primary/15 bg-white p-2"
+      style={[managerShadow]}
     >
-      <View className="px-4 py-2" style={{ height: "64%" }}>
+      <View className="p-4" style={{ height: "55%" }}>
         <View className="flex-row items-center justify-between gap-4">
           <View className="rounded-full border border-primary/10 bg-primary/10 px-2.5 py-1">
             <Text className="font-ralewayExtraBold text-[9px] uppercase tracking-wider text-primary">
@@ -127,10 +126,13 @@ export function ManagerDashboardSummaryCard({
           </View>
         </View>
 
-        <View className="flex-1 justify-end">
-          <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wide text-description">
-            {label}
-          </Text>
+        <View className="flex-1 justify-evenly">
+          {label ? (
+            <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wide text-description">
+              {label}
+            </Text>
+          ) : null}
+
           {isLoading ? (
             <SkeletonBlock className="mt-1 h-7 w-1/3 rounded-xl bg-primary/10" />
           ) : (
@@ -145,12 +147,9 @@ export function ManagerDashboardSummaryCard({
           ) : null}
         </View>
       </View>
-
-      <View
-        className="border-t border-primary/10 px-3 py-2"
-        style={{ height: "36%" }}
-      >
-        <View className="h-full flex-row gap-2.5">
+      <View className="flex items-center gap-4 px-4">
+        <View className="w-full border-t border-primary/50" />
+        <View className="flex-row justify-center gap-4">
           {metrics.map((metric) => (
             <ManagerMetric
               isLoading={isLoading}

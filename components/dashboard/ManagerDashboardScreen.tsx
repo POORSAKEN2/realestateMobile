@@ -90,7 +90,7 @@ export function ManagerDashboardScreen() {
           <DashboardSummaryCard
             badge="Manager overview"
             icon="office-building-outline"
-            label="Portfolio properties"
+            // label="Portfolio properties"
             metrics={[
               {
                 icon: "office-building-outline",

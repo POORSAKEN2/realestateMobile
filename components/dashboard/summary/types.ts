@@ -12,7 +12,7 @@ export type DashboardSummaryMetric = {
 export type DashboardSummaryCardProps = {
   badge: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  label: string;
+  label?: string;
   metrics: DashboardSummaryMetric[];
   state?: "error" | "loading" | "ready";
   subtitle?: string;

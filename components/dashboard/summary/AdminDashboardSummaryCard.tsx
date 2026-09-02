@@ -63,7 +63,7 @@ export function AdminDashboardSummaryCard({
 }: RoleDashboardSummaryCardProps) {
   return (
     <View
-      className="overflow-hidden rounded-[28px] border border-primary/25 bg-secondary p-5"
+      className="overflow-hidden rounded-2xl border border-primary/25 bg-secondary p-5"
       style={adminShadow}
     >
       <View className="absolute -right-10 -top-14 h-36 w-36 rounded-full bg-primary/55" />
