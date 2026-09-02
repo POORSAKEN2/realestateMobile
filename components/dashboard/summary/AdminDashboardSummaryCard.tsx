@@ -24,31 +24,45 @@ function AdminMetric({
   metric: DashboardSummaryMetric;
 }) {
   return (
-    <View className="min-w-0 flex-1 rounded-2xl border border-white/15 bg-white/10 p-3">
-      <View className="h-7 w-7 items-center justify-center rounded-xl bg-white/10">
+    <View
+      className="min-w-0 flex-1 justify-center overflow-hidden rounded-2xl border border-white/15 bg-white/10 p-1.5"
+      style={{ aspectRatio: 16 / 9 }}
+    >
+      <View
+        accessibilityElementsHidden
+        className="absolute -bottom-2 -right-2"
+        importantForAccessibility="no-hide-descendants"
+        pointerEvents="none"
+        style={{ opacity: 0.14 }}
+      >
         <MaterialCommunityIcons
+          accessible={false}
           name={metric.icon}
           color={colors.whitePrimary}
-          size={15}
+          size={56}
         />
       </View>
-      <Text
-        className="mt-2 font-ralewayBold text-[9px] uppercase tracking-wide text-accent/80"
-        numberOfLines={2}
-      >
-        {metric.label}
-      </Text>
-      {isLoading ? (
-        <SkeletonBlock className="mt-1.5 h-4 w-2/3 bg-accent/20" />
-      ) : (
+      <View className="z-10 min-w-0">
         <Text
           adjustsFontSizeToFit
-          className="mt-1 font-ralewayExtraBold text-base text-white"
-          numberOfLines={1}
+          className="font-ralewayBold text-[9px] uppercase leading-[10px] text-accent"
+          minimumFontScale={0.75}
+          numberOfLines={2}
         >
-          {metric.value}
+          {metric.label}
         </Text>
-      )}
+        {isLoading ? (
+          <SkeletonBlock className="mt-0.5 h-4 w-2/3 bg-accent/20" />
+        ) : (
+          <Text
+            adjustsFontSizeToFit
+            className="mt-0.5 font-ralewayExtraBold text-base leading-[18px] text-white"
+            numberOfLines={1}
+          >
+            {metric.value}
+          </Text>
+        )}
+      </View>
     </View>
   );
 }
@@ -63,26 +77,26 @@ export function AdminDashboardSummaryCard({
 }: RoleDashboardSummaryCardProps) {
   return (
     <View
-      className="overflow-hidden rounded-2xl border border-primary/25 bg-secondary p-5"
+      className="overflow-hidden rounded-2xl border border-primary/25 bg-secondary px-4 py-6"
       style={adminShadow}
     >
       <View className="absolute -right-10 -top-14 h-36 w-36 rounded-full bg-primary/55" />
       <View className="absolute -bottom-14 -left-10 h-28 w-28 rounded-full bg-accent/10" />
 
       <View className="flex-row items-center justify-between gap-4">
+        {/* <View className="h-10 w-10 items-center justify-center rounded-2xl border border-accent/30 bg-white/10">
+          <MaterialCommunityIcons name={icon} color={colors.accent} size={21} />
+        </View> */}
+        <Text className="font-ralewayBold text-[10px] uppercase tracking-wider text-accent/80">
+          {label}
+        </Text>
         <View className="rounded-full bg-textPrimary/20 px-3 py-1.5">
           <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-white">
             {badge}
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl border border-accent/30 bg-white/10">
-          <MaterialCommunityIcons name={icon} color={colors.accent} size={21} />
-        </View>
       </View>
 
-      <Text className="mt-4 font-ralewayBold text-[10px] uppercase tracking-wider text-accent/80">
-        {label}
-      </Text>
       {isLoading ? (
         <SkeletonBlock className="mt-2 h-9 w-4/5 rounded-xl bg-accent/20" />
       ) : (
@@ -95,7 +109,7 @@ export function AdminDashboardSummaryCard({
         </Text>
       )}
 
-      <View className="mt-4 flex-row gap-2">
+      <View className="mt-4 flex-row gap-3">
         {metrics.map((metric) => (
           <AdminMetric
             isLoading={isLoading}
