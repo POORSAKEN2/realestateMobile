@@ -88,17 +88,22 @@ export function ManagerDashboardScreen() {
 
         <View className="z-10 -mt-32">
           <DashboardSummaryCard
+            badge="Manager overview"
             icon="office-building-outline"
             label="Portfolio properties"
             metrics={[
               {
+                icon: "office-building-outline",
                 label: "Revenue generating",
+                tone: "success",
                 value: propertiesQuery.isError
                   ? "—"
                   : String(portfolioMetrics.revenueGenerating),
               },
               {
+                icon: "hammer-wrench",
                 label: "Under construction",
+                tone: "warning",
                 value: propertiesQuery.isError
                   ? "—"
                   : String(portfolioMetrics.inProgress),
@@ -111,11 +116,19 @@ export function ManagerDashboardScreen() {
                   ? "error"
                   : "ready"
             }
+            subtitle={
+              propertiesQuery.isError
+                ? "Portfolio unavailable"
+                : properties.length === 1
+                  ? "Property assigned"
+                  : "Properties assigned"
+            }
             value={
               propertiesQuery.isError
                 ? "Unavailable"
                 : String(properties.length)
             }
+            variant="manager"
           />
         </View>
 

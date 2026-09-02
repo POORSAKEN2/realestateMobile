@@ -24,18 +24,22 @@ export function PropertyPortfolioSummary({
 
   return (
     <DashboardSummaryCard
+      badge="Admin overview"
       icon="chart-box-outline"
       label="Total portfolio value"
       metrics={[
         {
+          icon: "office-building-outline",
           label: "Properties",
           value: isReady ? String(propertyCount) : "—",
         },
         {
+          icon: "chart-line-variant",
           label: "Average ROI",
           value: isReady ? `${averageRoi.toFixed(1)}%` : "—",
         },
         {
+          icon: "chart-donut",
           label: "Generating",
           value: isReady
             ? `${revenueGeneratingCount} of ${propertyCount}`
@@ -44,6 +48,7 @@ export function PropertyPortfolioSummary({
       ]}
       state={state}
       value={portfolioValueLabel}
+      variant="admin"
     />
   );
 }
