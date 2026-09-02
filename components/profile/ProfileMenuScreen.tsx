@@ -58,6 +58,13 @@ export function ProfileMenuScreen() {
 
     items.push(
       {
+        accessibilityHint: "Opens notifications and reminders",
+        icon: "notifications-outline",
+        label: "Notifications",
+        onPress: () => router.push(appRoutes.secondary.notifications),
+        supportingText: "Review alerts and rent reminders",
+      },
+      {
         accessibilityHint: "Opens subscription and billing information",
         badge: canManageBilling ? undefined : "View only",
         icon: "card-outline",
@@ -66,13 +73,6 @@ export function ProfileMenuScreen() {
         supportingText: canManageBilling
           ? "View subscription and property limits"
           : "View plan details; changes require an administrator",
-      },
-      {
-        accessibilityHint: "Opens notifications and reminders",
-        icon: "notifications-outline",
-        label: "Notifications",
-        onPress: () => router.push(appRoutes.secondary.notifications),
-        supportingText: "Review alerts and rent reminders",
       },
     );
 
