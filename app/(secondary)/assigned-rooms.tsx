@@ -132,7 +132,7 @@ export default function AssignedRoomsScreen() {
               </Text>
             </View>
           }
-          eyebrow={`${floorName} · ${areaLabel}`}
+          eyebrow="Portfolio Intelligence"
           leading={
             <BackButton
               accessibilityLabel="Back to floor plans"

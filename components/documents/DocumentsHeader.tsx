@@ -29,7 +29,7 @@ export function DocumentsHeader({
           </Text>
         </TouchableOpacity>
       }
-      eyebrow="Portfolio Library"
+      eyebrow="Operations"
       leading={
         <SecondaryBackButton
           accessibilityLabel="Back from documents"

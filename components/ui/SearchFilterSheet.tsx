@@ -1,12 +1,12 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { BottomSheetModal } from "./BottomSheetModal";
 import { FormActionRow } from "./forms/FormActionRow";
 import { RadioOptionList, type RadioOption } from "./groups/RadioOptionList";
 import { ModalActionFooter } from "./ModalActionFooter";
+import { ModalHeader } from "./ModalHeader";
 
 export function SearchFilterSheet({
   children,
@@ -33,23 +33,12 @@ export function SearchFilterSheet({
         className="max-h-[90%] rounded-t-[30px] bg-white"
         edges={footer ? [] : ["bottom"]}
       >
-        <View className="flex-row items-center justify-between border-b border-primary/20 px-5 pb-4">
-          <View className="min-w-0 flex-1 pr-4">
-            <Text className="font-ralewayExtraBold text-xl text-textPrimary">
-              {title}
-            </Text>
-            <Text className="mt-1 text-sm text-description">{description}</Text>
-          </View>
-          <TouchableOpacity
-            accessibilityLabel={`Close ${title.toLowerCase()}`}
-            accessibilityRole="button"
-            activeOpacity={0.8}
-            className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
-            onPress={onClose}
-          >
-            <MaterialCommunityIcons name="close" color="#8A77F4" size={21} />
-          </TouchableOpacity>
-        </View>
+        <ModalHeader
+          closeAccessibilityLabel={`Close ${title.toLowerCase()}`}
+          onClose={onClose}
+          subtitle={description}
+          title={title}
+        />
 
         <ScrollView
           contentContainerClassName="gap-5 px-5 pb-5 pt-5"

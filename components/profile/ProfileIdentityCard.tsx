@@ -23,9 +23,11 @@ export function ProfileIdentityCard({
       accessibilityLabel={`${name}, ${roleLabel}`}
       accessibilityRole="button"
       activeOpacity={0.78}
-      className="mt-7 min-h-28 flex-row items-center rounded-[26px] border border-primary/20 bg-white px-5 py-5 shadow-sm shadow-primary/10"
+      className="relative mt-6 min-h-28 flex-row items-center overflow-hidden rounded-[28px] border border-primary/20 bg-primary/10 px-5 py-5 shadow-sm shadow-primary/10"
       onPress={onPress}
     >
+      <View className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-accent/40" />
+      <View className="absolute -bottom-12 right-12 h-24 w-24 rounded-full bg-primary/10" />
       <ProfileAvatar imageUri={imageUri} name={name} size="large" tone="mint" />
       <View className="ml-4 min-w-0 flex-1">
         <Text
@@ -34,11 +36,18 @@ export function ProfileIdentityCard({
         >
           {name}
         </Text>
-        <Text className="mt-1 text-base text-description" numberOfLines={1}>
-          {roleLabel}
-        </Text>
+        <View className="mt-2 self-start rounded-full bg-accent px-3 py-1.5">
+          <Text
+            className="font-ralewayExtraBold text-xs text-success"
+            numberOfLines={1}
+          >
+            {roleLabel}
+          </Text>
+        </View>
       </View>
-      <Ionicons name="chevron-forward" color={colors.description} size={24} />
+      <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white">
+        <Ionicons name="chevron-forward" color={colors.primary} size={21} />
+      </View>
     </TouchableOpacity>
   );
 }

@@ -166,7 +166,7 @@ export default function LeasesScreen() {
         <View className="px-1">
           <ModuleHeader
             action={<AddButton onPress={() => openCreateForm()} />}
-            eyebrow="Contract Management"
+            eyebrow="Operations"
             leading={
               <SecondaryBackButton
                 accessibilityLabel="Back from leases"

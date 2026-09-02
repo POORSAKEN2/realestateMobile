@@ -96,7 +96,7 @@ export function ProfileScreen({
         className="flex-1"
       >
         <ModuleHeader
-          eyebrow="Profile"
+          eyebrow="Account"
           title="Account Details"
           leading={
             <SecondaryBackButton

@@ -168,7 +168,7 @@ export default function BedspacesScreen() {
               title="Add"
             />
           }
-          eyebrow="Room Inventory"
+          eyebrow="Portfolio Intelligence"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from bedspaces"

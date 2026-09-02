@@ -196,7 +196,7 @@ export function TenantsScreen({
       <View className="px-1">
         <ModuleHeader
           action={<AddButton onPress={openCreateForm} />}
-          eyebrow="CRM Dashboard"
+          eyebrow="Operations"
           leading={
             showBackButton ? (
               <SecondaryBackButton

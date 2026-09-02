@@ -6,6 +6,7 @@ import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 import { useAuth } from "../../hooks/useAuth";
+import { canManageStaff } from "../../utils/auth/staffAccess";
 import {
   formatRole,
   getProfileImageUri,
@@ -33,36 +34,41 @@ export function ProfileMenuScreen() {
   const name = user?.name?.trim() || "Your profile";
   const imageUri = getProfileImageUri(user);
   const roleLabel = getRoleLabel(user?.role);
+  const showTeamAccess = canManageStaff(user);
 
-  const accountItems = useMemo<ProfileMenuItem[]>(
-    () => [
+  const accountOrganizationItems = useMemo<ProfileMenuItem[]>(() => {
+    const items: ProfileMenuItem[] = [];
+
+    if (showTeamAccess) {
+      items.push({
+        accessibilityHint: "Opens team and property access management",
+        badge: "Owner",
+        icon: "people-circle-outline",
+        label: "Team & Access",
+        onPress: () => router.push(appRoutes.secondary.staffManagement),
+        supportingText: "Manage managers and property access",
+      });
+    }
+
+    items.push(
       {
-        accessibilityHint: "Opens personal and professional details",
-        icon: "person-outline",
-        label: "Account details",
-        onPress: () => router.push(appRoutes.secondary.profile),
+        accessibilityHint: "Opens subscription and billing information",
+        icon: "card-outline",
+        label: "Plan & Billing",
+        onPress: () => router.push(appRoutes.secondary.billing),
+        supportingText: "View subscription and property limits",
       },
       {
-        accessibilityHint: "Opens password and security settings",
-        icon: "lock-closed-outline",
-        label: "Security",
-        onPress: () => router.push(appRoutes.secondary.settings),
-      },
-      {
-        accessibilityHint: "Opens notifications",
+        accessibilityHint: "Opens notifications and reminders",
         icon: "notifications-outline",
         label: "Notifications",
         onPress: () => router.push(appRoutes.secondary.notifications),
+        supportingText: "Review alerts and rent reminders",
       },
-      {
-        accessibilityHint: "Opens additional account settings",
-        icon: "settings-outline",
-        label: "Additional settings",
-        onPress: () => router.push(appRoutes.secondary.settings),
-      },
-    ],
-    [],
-  );
+    );
+
+    return items;
+  }, [showTeamAccess]);
   const supportItems = useMemo<ProfileMenuItem[]>(
     () => [
       {
@@ -70,6 +76,7 @@ export function ProfileMenuScreen() {
         icon: "help-circle-outline",
         label: "Help center",
         onPress: () => router.push(appRoutes.secondary.support),
+        supportingText: "Browse FAQs or contact support",
         trailingIcon: "open-outline",
       },
     ],
@@ -100,7 +107,14 @@ export function ProfileMenuScreen() {
 
   return (
     <Screen bottomInset="none" className="bg-surface">
-      <View className="flex-1">
+      <View className="-mx-6 flex-1 px-6 pb-36">
+        <ModuleHeader
+          action={<ProfileAvatar imageUri={imageUri} name={name} />}
+          eyebrow="Account"
+          supportingText="Manage your profile, security, and support."
+          title="Profile"
+        />
+
         <ProfileIdentityCard
           imageUri={imageUri}
           name={name}
@@ -108,7 +122,10 @@ export function ProfileMenuScreen() {
           roleLabel={roleLabel}
         />
 
-        <ProfileMenuSection items={accountItems} title="Account" />
+        <ProfileMenuSection
+          items={accountOrganizationItems}
+          title="Account & Organization"
+        />
         <ProfileMenuSection items={supportItems} title="Support" />
       </View>
     </Screen>

@@ -13,6 +13,7 @@ import { colors } from "../../constants/colors";
 import { getStandardModalSheetHeight } from "../../constants/modal";
 import { BottomSheetModal } from "./BottomSheetModal";
 import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "./ModalActionFooter";
+import { ModalHeader } from "./ModalHeader";
 
 export type ActionSheetItem = {
   description?: string;
@@ -68,40 +69,24 @@ export function ActionSheet({
     >
       <SafeAreaView
         accessibilityViewIsModal
-        className="overflow-hidden rounded-t-[28px] bg-white px-5"
+        className="overflow-hidden rounded-t-[28px] bg-white"
         edges={["bottom"]}
         style={{ maxHeight: maxSheetHeight }}
       >
-        <View className="mb-4 flex-row items-start gap-3">
-          <View className="min-w-0 flex-1">
-            <Text
-              accessibilityRole="header"
-              className="font-ralewayBold text-xl text-textPrimary"
-            >
-              {title}
-            </Text>
-            {subtitle ? (
-              <Text className="mt-1 text-sm leading-5 text-description">
-                {subtitle}
-              </Text>
-            ) : null}
-          </View>
-          <TouchableOpacity
-            accessibilityLabel={`Close ${title}`}
-            accessibilityRole="button"
-            activeOpacity={0.8}
-            className="h-11 w-11 items-center justify-center rounded-full bg-surface"
-            onPress={onClose}
-          >
-            <MaterialCommunityIcons name="close" color="#1E1F45" size={20} />
-          </TouchableOpacity>
-        </View>
+        <ModalHeader
+          closeAccessibilityLabel={`Close ${title}`}
+          onClose={onClose}
+          subtitle={subtitle}
+          title={title}
+        />
 
         <ScrollView
           bounces={false}
           contentContainerStyle={{
             gap: 8,
             paddingBottom: MODAL_ACTION_FOOTER_CONTENT_HEIGHT,
+            paddingHorizontal: 20,
+            paddingTop: 16,
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}

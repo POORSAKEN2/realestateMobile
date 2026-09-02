@@ -8,6 +8,8 @@ export type ProfileMenuItem = {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   onPress: () => void;
+  supportingText?: string;
+  badge?: string;
   trailingIcon?: keyof typeof Ionicons.glyphMap;
 };
 
@@ -29,21 +31,23 @@ function ProfileMenuRow({
       accessibilityLabel={item.label}
       accessibilityRole="button"
       activeOpacity={0.72}
-      className={`min-h-[72px] flex-row items-center px-5 ${
+      className={`min-h-20 flex-row items-center px-5 py-3.5 ${
         isLast ? "" : "border-b border-primary/10"
       }`}
       onPress={item.onPress}
     >
-      <View className="h-10 w-10 items-center justify-center">
-        <Ionicons name={item.icon} color={colors.text} size={25} />
+      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+        <Ionicons name={item.icon} color={colors.primary} size={22} />
       </View>
-      <Text className="ml-3 flex-1 font-ralewayBold text-base text-textPrimary">
-        {item.label}
-      </Text>
+      <View className="ml-3 min-w-0 flex-1">
+        <Text className="font-ralewayMedium text-[15px] text-textPrimary">
+          {item.label}
+        </Text>
+      </View>
       <Ionicons
         name={item.trailingIcon ?? "chevron-forward"}
-        color={colors.description}
-        size={22}
+        color={colors.primary}
+        size={20}
       />
     </TouchableOpacity>
   );
@@ -51,11 +55,11 @@ function ProfileMenuRow({
 
 export function ProfileMenuSection({ items, title }: ProfileMenuSectionProps) {
   return (
-    <View className="mt-8">
-      <Text className="mb-3 font-ralewayExtraBold text-xs uppercase tracking-[1.5px] text-primary">
+    <View className="mt-7">
+      <Text className="mb-3 font-ralewayBold text-lg text-textPrimary">
         {title}
       </Text>
-      <View className="overflow-hidden rounded-[24px] border border-primary/20 bg-white shadow-sm shadow-primary/10">
+      <View className="overflow-hidden rounded-[28px] border border-primary/20 bg-white shadow-sm shadow-primary/10">
         {items.map((item, index) => (
           <ProfileMenuRow
             isLast={index === items.length - 1}

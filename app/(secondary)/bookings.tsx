@@ -185,7 +185,7 @@ export default function BookingsScreen() {
                 }
               />
             }
-            eyebrow="Short Stay"
+            eyebrow="Operations"
             leading={
               <SecondaryBackButton
                 accessibilityLabel="Back from bookings"

@@ -70,7 +70,7 @@ export default function SupportScreen() {
               </Text>
             </TouchableOpacity>
           }
-          eyebrow="Help & Assistance"
+          eyebrow="Account"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from support"

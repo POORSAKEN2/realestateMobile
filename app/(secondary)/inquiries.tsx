@@ -76,7 +76,7 @@ export default function InquiriesScreen() {
     <Screen className="bg-surface">
       <View className="flex-1">
         <ModuleHeader
-          eyebrow="Marketplace"
+          eyebrow="Operations"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from inquiries"

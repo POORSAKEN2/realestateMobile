@@ -136,7 +136,7 @@ export function RentScreen({
             </Text>
           </TouchableOpacity>
         }
-        eyebrow="Financial Operations"
+        eyebrow="Operations"
         leading={
           navigationLevel === "secondary" ? (
             <SecondaryBackButton

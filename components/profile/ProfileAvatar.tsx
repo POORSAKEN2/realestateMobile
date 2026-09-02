@@ -21,7 +21,7 @@ export function ProfileAvatar({
 
   return (
     <View
-      className={`${sizeClassName} ${toneClassName} items-center justify-center overflow-hidden rounded-full`}
+      className={`${sizeClassName} ${toneClassName} items-center justify-center overflow-hidden rounded-full border border-primary/20`}
     >
       {imageUri ? (
         <Image

@@ -36,7 +36,7 @@ export default function BillingScreen() {
     <Screen className="bg-surface">
       <View className="flex-1">
         <ModuleHeader
-          eyebrow="Organization"
+          eyebrow="Account"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from billing"
@@ -44,9 +44,7 @@ export default function BillingScreen() {
             />
           }
           title="Plan & Billing"
-          supportingText="Review your subscription tier, property limits, and entitlement quota."
         />
-        <Text className="mt-2 text-base leading-6 text-description"></Text>
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
@@ -66,131 +64,133 @@ export default function BillingScreen() {
             }
             showsVerticalScrollIndicator={false}
           >
-            {/* Active Plan Card */}
-            <View className="rounded-[28px] border border-primary/20 bg-primary/10 p-5 shadow-sm shadow-primary/5">
-              <View className="flex-row items-center justify-between">
-                <View className="flex-row items-center gap-2.5">
-                  <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary">
-                    <Ionicons name="sparkles" size={20} color="#FFFFFF" />
-                  </View>
-                  <View>
-                    <Text className="font-ralewayExtraBold text-lg text-textPrimary">
-                      {entitlement?.tier_label || "Free Tier"}
-                    </Text>
-                    <Text className="font-ralewayBold text-xs text-primary">
-                      Active Plan
-                    </Text>
-                  </View>
-                </View>
-
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  className="rounded-2xl bg-primary px-4 py-2.5"
-                  onPress={() => setIsUpgradeModalOpen(true)}
-                >
-                  <Text className="font-ralewayBold text-xs text-white">
-                    Upgrade
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Property Quota Progress */}
-              <View className="mt-6 border-t border-primary/15 pt-4">
+            <View className="gap-12">
+              {/* Active Plan Card */}
+              <View className="mt-3 rounded-[28px] border border-primary/20 bg-primary/10 p-5 shadow-sm shadow-primary/5">
                 <View className="flex-row items-center justify-between">
-                  <Text className="font-ralewayBold text-xs uppercase tracking-wider text-description">
-                    Property Limit Quota
-                  </Text>
-                  <Text className="font-ralewayBold text-sm text-textPrimary">
-                    {propertyCount}{" "}
-                    {isUnlimited
-                      ? "Properties (Unlimited)"
-                      : `/ ${propertyLimit} Properties`}
-                  </Text>
-                </View>
-
-                {!isUnlimited ? (
-                  <View className="mt-2 h-3 w-full overflow-hidden rounded-full bg-primary/20">
-                    <View
-                      className={`h-full rounded-full ${
-                        usagePercentage >= 100 ? "bg-danger" : "bg-primary"
-                      }`}
-                      style={{ width: `${usagePercentage}%` }}
-                    />
-                  </View>
-                ) : null}
-
-                {!isUnlimited && propertyCount >= (propertyLimit || 0) ? (
-                  <Text className="mt-2 font-ralewayMedium text-xs text-danger">
-                    You have reached your plan's property limit. Upgrade to add
-                    more properties.
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-
-            {/* Plan Catalog Grid */}
-            <View className="gap-3">
-              <Text className="font-ralewayBold text-base text-textPrimary">
-                Available Subscription Tiers
-              </Text>
-
-              {(
-                entitlement?.tiers || [
-                  {
-                    key: "free",
-                    label: "Free Tier",
-                    property_limit: 2,
-                    price_php: 0,
-                  },
-                  {
-                    key: "tier_1",
-                    label: "Tier 1",
-                    property_limit: 5,
-                    price_php: 299.99,
-                  },
-                  {
-                    key: "all_in",
-                    label: "All-In",
-                    property_limit: null,
-                    price_php: 1499.99,
-                  },
-                ]
-              ).map((tier) => {
-                const isCurrent = entitlement?.tier === tier.key;
-
-                return (
-                  <View
-                    key={tier.key}
-                    className="rounded-2xl border border-primary/15 bg-white p-4 shadow-sm shadow-primary/5"
-                  >
-                    <View className="flex-row items-center justify-between">
-                      <View>
-                        <Text className="font-ralewayBold text-base text-textPrimary">
-                          {tier.label}
-                        </Text>
-                        <Text className="mt-0.5 text-xs text-description">
-                          {tier.property_limit === null
-                            ? "Unlimited properties"
-                            : `Up to ${tier.property_limit} properties`}
-                        </Text>
-                      </View>
-
-                      <View className="items-end">
-                        <Text className="font-ralewayExtraBold text-base text-primary">
-                          {tier.price_php === 0
-                            ? "Free"
-                            : `₱${tier.price_php.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`}
-                        </Text>
-                        {isCurrent ? (
-                          <Text className="font-ralewayBold text-[10px] uppercase text-success">
-                            Current Tier
-                          </Text>
-                        ) : null}
-                      </View>
+                  <View className="flex-row items-center gap-2.5">
+                    <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary">
+                      <Ionicons name="sparkles" size={20} color="#FFFFFF" />
+                    </View>
+                    <View>
+                      <Text className="font-ralewayExtraBold text-lg text-textPrimary">
+                        {entitlement?.tier_label || "Free Tier"}
+                      </Text>
+                      <Text className="font-ralewayBold text-xs text-primary">
+                        Active Plan
+                      </Text>
                     </View>
                   </View>
-                );
-              })}
+
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    className="rounded-2xl bg-primary px-4 py-2.5"
+                    onPress={() => setIsUpgradeModalOpen(true)}
+                  >
+                    <Text className="font-ralewayBold text-xs text-white">
+                      Upgrade
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Property Quota Progress */}
+                <View className="mt-6 border-t border-primary/15 pt-4">
+                  <View className="flex-row items-center justify-between">
+                    <Text className="font-ralewayBold text-xs uppercase tracking-wider text-description">
+                      Property Limit Quota
+                    </Text>
+                    <Text className="font-ralewayBold text-sm text-textPrimary">
+                      {propertyCount}{" "}
+                      {isUnlimited
+                        ? "Properties (Unlimited)"
+                        : `/ ${propertyLimit} Properties`}
+                    </Text>
+                  </View>
+
+                  {!isUnlimited ? (
+                    <View className="mt-2 h-3 w-full overflow-hidden rounded-full bg-primary/20">
+                      <View
+                        className={`h-full rounded-full ${
+                          usagePercentage >= 100 ? "bg-danger" : "bg-primary"
+                        }`}
+                        style={{ width: `${usagePercentage}%` }}
+                      />
+                    </View>
+                  ) : null}
+
+                  {!isUnlimited && propertyCount >= (propertyLimit || 0) ? (
+                    <Text className="mt-2 font-ralewayMedium text-xs text-danger">
+                      You have reached your plan's property limit. Upgrade to
+                      add more properties.
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+
+              {/* Plan Catalog Grid */}
+              <View className="gap-3">
+                <Text className="font-ralewayBold text-base text-textPrimary">
+                  Available Subscription Tiers
+                </Text>
+
+                {(
+                  entitlement?.tiers || [
+                    {
+                      key: "free",
+                      label: "Free Tier",
+                      property_limit: 2,
+                      price_php: 0,
+                    },
+                    {
+                      key: "tier_1",
+                      label: "Tier 1",
+                      property_limit: 5,
+                      price_php: 299.99,
+                    },
+                    {
+                      key: "all_in",
+                      label: "All-In",
+                      property_limit: null,
+                      price_php: 1499.99,
+                    },
+                  ]
+                ).map((tier) => {
+                  const isCurrent = entitlement?.tier === tier.key;
+
+                  return (
+                    <View
+                      key={tier.key}
+                      className="rounded-2xl border border-primary/15 bg-white p-4 shadow-sm shadow-primary/5"
+                    >
+                      <View className="flex-row items-center justify-between">
+                        <View>
+                          <Text className="font-ralewayBold text-base text-textPrimary">
+                            {tier.label}
+                          </Text>
+                          <Text className="mt-0.5 text-xs text-description">
+                            {tier.property_limit === null
+                              ? "Unlimited properties"
+                              : `Up to ${tier.property_limit} properties`}
+                          </Text>
+                        </View>
+
+                        <View className="items-end">
+                          <Text className="font-ralewayExtraBold text-base text-primary">
+                            {tier.price_php === 0
+                              ? "Free"
+                              : `₱${tier.price_php.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`}
+                          </Text>
+                          {isCurrent ? (
+                            <Text className="font-ralewayBold text-[10px] uppercase text-success">
+                              Current Tier
+                            </Text>
+                          ) : null}
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
             </View>
 
             {/* Billing Engine Notice */}

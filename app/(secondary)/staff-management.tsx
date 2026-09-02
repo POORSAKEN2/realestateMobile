@@ -32,15 +32,14 @@ export default function StaffManagementScreen() {
     <Screen className="bg-surface">
       <View className="flex-1">
         <ModuleHeader
-          eyebrow="Owner tools"
+          eyebrow="Account"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from staff management"
               variant="secondary"
             />
           }
-          supportingText="Manage up to two property managers."
-          title="Staff management"
+          title="Team & Access"
         />
 
         {!hasStaffAccess ? (

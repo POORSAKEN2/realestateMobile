@@ -137,7 +137,7 @@ export default function PropertiesScreen() {
         <View className="px-1 pb-5">
           <ModuleHeader
             action={<AddButton title="Add" onPress={openForm} />}
-            eyebrow="Asset Management"
+            eyebrow="Portfolio Intelligence"
             title="Properties"
           />
         </View>

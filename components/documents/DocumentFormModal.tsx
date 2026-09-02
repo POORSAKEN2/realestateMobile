@@ -1,4 +1,3 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import {
   ScrollView,
@@ -27,6 +26,7 @@ import {
 import { FormSection } from "../ui/forms/FormSection";
 import { FormActionRow } from "../ui/forms/FormActionRow";
 import { ModalActionFooter } from "../ui/ModalActionFooter";
+import { ModalHeader } from "../ui/ModalHeader";
 import { DocumentFileField } from "./DocumentFileField";
 
 type SelectorMode = "property" | "tenant" | null;
@@ -143,34 +143,16 @@ export function DocumentFormModal({
           />
         ) : (
           <>
-            <View className="flex-row items-center justify-between bg-white px-6 pb-5 pt-2">
-              <View className="min-w-0 flex-1 pr-3">
-                <Text
-                  accessibilityRole="header"
-                  className="font-ralewayBold text-[28px] leading-9 tracking-tight text-textPrimary"
-                >
-                  {editingDocument ? "Edit document" : "Upload document"}
-                </Text>
-                <Text className="mt-2 font-ralewayMedium text-sm leading-5 text-description">
-                  {editingDocument
-                    ? "Update its details or choose a replacement file."
-                    : "Organize a file by category, property, and tenant."}
-                </Text>
-              </View>
-              <TouchableOpacity
-                accessibilityLabel="Close document form"
-                accessibilityRole="button"
-                activeOpacity={0.75}
-                className="h-11 w-11 items-center justify-center rounded-full bg-transparent"
-                onPress={onClose}
-              >
-                <MaterialCommunityIcons
-                  name="close"
-                  color="#8A77F4"
-                  size={21}
-                />
-              </TouchableOpacity>
-            </View>
+            <ModalHeader
+              closeAccessibilityLabel="Close document form"
+              onClose={onClose}
+              subtitle={
+                editingDocument
+                  ? "Update its details or choose a replacement file."
+                  : "Organize a file by category, property, and tenant."
+              }
+              title={editingDocument ? "Edit document" : "Upload document"}
+            />
 
             <ScrollView
               contentContainerClassName="gap-4 p-5"

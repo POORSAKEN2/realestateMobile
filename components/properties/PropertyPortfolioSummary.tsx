@@ -69,7 +69,7 @@ export function PropertyPortfolioSummary({
       style={portfolioSummaryShadow}
     >
       <View className="overflow-hidden rounded-3xl bg-secondary p-5">
-        <View className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-primary/25" />
+        <View className="absolute -right-10 -top-12 h-36 w-36 rounded-full bg-primary/60" />
         <View className="absolute -bottom-12 -left-8 h-28 w-28 rounded-full bg-accent/10" />
 
         <View className="flex-row items-start justify-between gap-4">
@@ -98,7 +98,7 @@ export function PropertyPortfolioSummary({
           </View>
         </View>
 
-        <View className="mt-5 flex-row gap-4 border-t border-accent/15 pt-4">
+        <View className="mt-5 flex-row gap-4 border-t border-accent/50 pt-4">
           <SummaryMetric
             isLoading={isLoading}
             label="Properties"

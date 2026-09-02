@@ -273,7 +273,7 @@ export default function NotificationScreen() {
               )}
             </TouchableOpacity>
           }
-          eyebrow="Activity Center"
+          eyebrow="Account"
           leading={
             <SecondaryBackButton accessibilityLabel="Back from notifications" />
           }
