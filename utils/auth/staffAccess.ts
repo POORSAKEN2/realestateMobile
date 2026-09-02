@@ -1,15 +1,7 @@
-const STAFF_MANAGEMENT_ROLES = new Set(["ADMIN", "OWNER"]);
+import { getAppRole, hasAppPermission } from "./accessPolicy";
 
-export function getSessionRole(user: unknown) {
-  if (!user || typeof user !== "object" || !("role" in user)) {
-    return undefined;
-  }
-
-  const role = (user as { role?: unknown }).role;
-  return typeof role === "string" ? role.toUpperCase() : undefined;
-}
+export const getSessionRole = getAppRole;
 
 export function canManageStaff(user: unknown) {
-  const role = getSessionRole(user);
-  return role ? STAFF_MANAGEMENT_ROLES.has(role) : false;
+  return hasAppPermission(user, "staff.manage");
 }

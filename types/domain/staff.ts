@@ -1,16 +1,13 @@
-export type StaffManagerStatus = "active" | "pending";
-
 export type StaffManager = {
   id: string;
   name: string;
   email: string;
-  status: StaffManagerStatus;
+  role: "MANAGER";
   createdAt?: string;
 };
 
-export type StaffOverview = {
-  managers: StaffManager[];
-  managerCount: number;
-  managerLimit: number;
-  canInvite: boolean;
+export type CreateStaffManagerPayload = {
+  name: string;
+  email: string;
+  password: string;
 };

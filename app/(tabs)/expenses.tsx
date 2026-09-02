@@ -24,9 +24,11 @@ import {
 } from "../../components/ui/Skeleton";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useExpenseForm } from "../../hooks/expenses/useExpenseForm";
+import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { approveExpense, rejectExpense } from "../../api/expenses";
 import type { Expense } from "../../types/domain/expenses";
+import { hasAppPermission } from "../../utils/auth/accessPolicy";
 
 function ExpenseLoadingState() {
   return (
@@ -72,6 +74,11 @@ function ExpenseLoadingState() {
 }
 
 export default function ExpensesScreen() {
+  const { session } = useAuth();
+  const canApproveExpenses = hasAppPermission(
+    session?.user,
+    "expenses.approve",
+  );
   const expenseSnackbar = useSnackbar();
   const [actionExpense, setActionExpense] = useState<Expense | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -218,26 +225,42 @@ export default function ExpensesScreen() {
         expense={actionExpense}
         onClose={() => setActionExpense(null)}
         onEdit={openEditForm}
-        onApprove={async (expense) => {
-          setActionExpense(null);
-          try {
-            await approveExpense(expense.id);
-            await refetch();
-            expenseSnackbar.show("Expense approved successfully.");
-          } catch (err) {
-            expenseSnackbar.show(err instanceof Error ? err.message : "Failed to approve expense.");
-          }
-        }}
-        onReject={async (expense) => {
-          setActionExpense(null);
-          try {
-            await rejectExpense(expense.id, "Rejected by property manager");
-            await refetch();
-            expenseSnackbar.show("Expense rejected.");
-          } catch (err) {
-            expenseSnackbar.show(err instanceof Error ? err.message : "Failed to reject expense.");
-          }
-        }}
+        onApprove={
+          canApproveExpenses
+            ? async (expense) => {
+                setActionExpense(null);
+                try {
+                  await approveExpense(expense.id);
+                  await refetch();
+                  expenseSnackbar.show("Expense approved successfully.");
+                } catch (err) {
+                  expenseSnackbar.show(
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to approve expense.",
+                  );
+                }
+              }
+            : undefined
+        }
+        onReject={
+          canApproveExpenses
+            ? async (expense) => {
+                setActionExpense(null);
+                try {
+                  await rejectExpense(expense.id, "Rejected by administrator");
+                  await refetch();
+                  expenseSnackbar.show("Expense rejected.");
+                } catch (err) {
+                  expenseSnackbar.show(
+                    err instanceof Error
+                      ? err.message
+                      : "Failed to reject expense.",
+                  );
+                }
+              }
+            : undefined
+        }
       />
 
       <ExpenseFormModal

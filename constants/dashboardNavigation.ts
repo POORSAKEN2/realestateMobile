@@ -102,8 +102,9 @@ export const dashboardNavigationSections = [
     items: [
       {
         label: "Team & Access",
-        supportingText: "Manage managers and property access",
-        badge: "Owner",
+        supportingText: "Create property manager accounts",
+        href: appRoutes.secondary.staffManagement,
+        badge: "Admin",
         icon: { family: "Ionicons", name: "people-circle-outline" },
       },
       {
@@ -121,6 +122,106 @@ export const dashboardNavigationSections = [
       {
         label: "Support Center",
         supportingText: "Get product help & FAQs",
+        href: appRoutes.secondary.support,
+        icon: { family: "Ionicons", name: "help-buoy-outline" },
+      },
+    ],
+  },
+] as const satisfies readonly DashboardNavigationSection[];
+
+export const managerDashboardNavigationSections = [
+  {
+    title: "Daily Operations",
+    items: [
+      {
+        label: "Inquiries & Leads",
+        supportingText: "Review listing leads and engagement",
+        href: appRoutes.secondary.inquiries,
+        icon: { family: "Ionicons", name: "chatbubbles-outline" },
+      },
+      {
+        label: "Leases",
+        supportingText: "Manage agreements and lease terms",
+        href: appRoutes.secondary.leases,
+        icon: { family: "Ionicons", name: "document-text-outline" },
+      },
+      {
+        label: "Rent",
+        supportingText: "Track collections and payment records",
+        href: appRoutes.secondary.rent,
+        icon: { family: "MaterialCommunityIcons", name: "cash-multiple" },
+      },
+      {
+        label: "Expenses",
+        supportingText: "Record and review operating costs",
+        href: appRoutes.primary.expenses,
+        icon: { family: "Ionicons", name: "receipt-outline" },
+      },
+      {
+        label: "Documents",
+        supportingText: "Manage property and tenant files",
+        href: appRoutes.secondary.documents,
+        icon: {
+          family: "MaterialCommunityIcons",
+          name: "file-document-outline",
+        },
+      },
+      {
+        label: "Bookings",
+        supportingText: "Manage transient property stays",
+        href: appRoutes.secondary.bookings,
+        icon: { family: "Ionicons", name: "calendar-outline" },
+      },
+    ],
+  },
+  {
+    title: "Portfolio Workspace",
+    items: [
+      {
+        label: "Properties",
+        supportingText: "View and manage portfolio properties",
+        href: appRoutes.primary.properties,
+        icon: { family: "MaterialCommunityIcons", name: "office-building" },
+      },
+      {
+        label: "Tenants",
+        supportingText: "View tenant records and activity",
+        href: appRoutes.primary.tenants,
+        icon: { family: "Ionicons", name: "people-outline" },
+      },
+      {
+        label: "Mapped Properties",
+        supportingText: "Open portfolio locations on the map",
+        href: appRoutes.secondary.map,
+        icon: { family: "Ionicons", name: "map-outline" },
+      },
+      {
+        label: "Analytics",
+        supportingText: "Review portfolio performance",
+        href: appRoutes.secondary.analytics,
+        icon: { family: "Ionicons", name: "analytics-outline" },
+      },
+    ],
+  },
+  {
+    title: "Account",
+    items: [
+      {
+        label: "Plan Details",
+        supportingText: "View organization plan and limits",
+        href: appRoutes.secondary.billing,
+        badge: "View only",
+        icon: { family: "Ionicons", name: "card-outline" },
+      },
+      {
+        label: "Notifications",
+        supportingText: "Review alerts and reminders",
+        href: appRoutes.secondary.notifications,
+        icon: { family: "Ionicons", name: "notifications-outline" },
+      },
+      {
+        label: "Support Center",
+        supportingText: "Browse help or submit a ticket",
         href: appRoutes.secondary.support,
         icon: { family: "Ionicons", name: "help-buoy-outline" },
       },

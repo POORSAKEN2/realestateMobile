@@ -12,7 +12,7 @@ export function StaffManagementEntryCard({
 }: StaffManagementEntryCardProps) {
   return (
     <TouchableOpacity
-      accessibilityHint="Opens your property manager team"
+      accessibilityHint="Opens property manager account setup"
       accessibilityLabel="Staff management"
       accessibilityRole="button"
       activeOpacity={0.82}
@@ -27,7 +27,7 @@ export function StaffManagementEntryCard({
           Staff management
         </Text>
         <Text className="mt-1 text-sm leading-5 text-description">
-          Invite and manage property managers
+          Create property manager accounts
         </Text>
       </View>
       <Ionicons name="chevron-forward" color={colors.primary} size={21} />

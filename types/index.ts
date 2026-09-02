@@ -115,11 +115,7 @@ export type {
   TicketStatus,
 } from "./domain/support";
 export type { GlobalSearchResults } from "./domain/search";
-export type {
-  StaffManager,
-  StaffManagerStatus,
-  StaffOverview,
-} from "./domain/staff";
+export type { CreateStaffManagerPayload, StaffManager } from "./domain/staff";
 export type {
   EditableProfileField,
   ProfileCompletion,

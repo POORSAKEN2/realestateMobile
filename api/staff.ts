@@ -1,19 +1,16 @@
 import { apiClient, authHeaders, unwrapData } from "./client";
-import type { ApiEnvelope, StaffManager, StaffOverview } from "../types";
+import type {
+  ApiEnvelope,
+  CreateStaffManagerPayload,
+  StaffManager,
+} from "../types";
 
 type StaffManagerApi = {
   id?: string | number;
   name?: string;
   email?: string;
-  status?: string;
+  role?: string;
   created_at?: string;
-};
-
-type StaffOverviewApi = {
-  managers?: StaffManagerApi[];
-  manager_count?: number;
-  manager_limit?: number;
-  can_invite?: boolean;
 };
 
 function normalizeManager(manager: StaffManagerApi): StaffManager {
@@ -21,27 +18,27 @@ function normalizeManager(manager: StaffManagerApi): StaffManager {
     id: String(manager.id ?? ""),
     name: manager.name?.trim() || "Property manager",
     email: manager.email?.trim() || "No email available",
-    status: manager.status === "pending" ? "pending" : "active",
+    role: "MANAGER",
     createdAt: manager.created_at,
   };
 }
 
-export async function fetchStaffOverview(
+export async function createStaffManager(
+  payload: CreateStaffManagerPayload,
   accessToken?: string,
-): Promise<StaffOverview> {
-  const response = await apiClient.get<
-    ApiEnvelope<StaffOverviewApi> | StaffOverviewApi
-  >("/staff/managers", { headers: authHeaders(accessToken) });
-  const overview = unwrapData(response);
-  const managers = (overview.managers ?? []).map(normalizeManager);
+): Promise<StaffManager> {
+  const response = await apiClient.post<
+    ApiEnvelope<StaffManagerApi> | StaffManagerApi
+  >(
+    "/users",
+    {
+      name: payload.name.trim(),
+      email: payload.email.trim().toLowerCase(),
+      password: payload.password,
+      role: "MANAGER",
+    },
+    { headers: authHeaders(accessToken) },
+  );
 
-  return {
-    managers,
-    managerCount: overview.manager_count ?? managers.length,
-    managerLimit: overview.manager_limit ?? 2,
-    canInvite:
-      overview.can_invite ??
-      (overview.manager_count ?? managers.length) <
-        (overview.manager_limit ?? 2),
-  };
+  return normalizeManager(unwrapData(response));
 }

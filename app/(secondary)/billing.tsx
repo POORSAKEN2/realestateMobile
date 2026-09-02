@@ -15,8 +15,12 @@ import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
 import { colors } from "../../constants/colors";
 import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
+import { useAuth } from "../../hooks/useAuth";
+import { hasAppPermission } from "../../utils/auth/accessPolicy";
 
 export default function BillingScreen() {
+  const { session } = useAuth();
+  const canStartCheckout = hasAppPermission(session?.user, "billing.checkout");
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const {
     data: entitlement,
@@ -82,15 +86,30 @@ export default function BillingScreen() {
                     </View>
                   </View>
 
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className="rounded-2xl bg-primary px-4 py-2.5"
-                    onPress={() => setIsUpgradeModalOpen(true)}
-                  >
-                    <Text className="font-ralewayBold text-xs text-white">
-                      Upgrade
-                    </Text>
-                  </TouchableOpacity>
+                  {canStartCheckout ? (
+                    <TouchableOpacity
+                      accessibilityLabel="Upgrade organization plan"
+                      accessibilityRole="button"
+                      activeOpacity={0.8}
+                      className="rounded-2xl bg-primary px-4 py-2.5"
+                      onPress={() => setIsUpgradeModalOpen(true)}
+                    >
+                      <Text className="font-ralewayBold text-xs text-white">
+                        Upgrade
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <View className="flex-row items-center rounded-2xl bg-white/70 px-3 py-2.5">
+                      <Ionicons
+                        name="lock-closed-outline"
+                        color={colors.description}
+                        size={14}
+                      />
+                      <Text className="ml-1.5 font-ralewayBold text-[10px] uppercase text-description">
+                        Admin managed
+                      </Text>
+                    </View>
+                  )}
                 </View>
 
                 {/* Property Quota Progress */}
@@ -211,10 +230,12 @@ export default function BillingScreen() {
         )}
       </View>
 
-      <UpgradePlanModal
-        isVisible={isUpgradeModalOpen}
-        onClose={() => setIsUpgradeModalOpen(false)}
-      />
+      {canStartCheckout ? (
+        <UpgradePlanModal
+          isVisible={isUpgradeModalOpen}
+          onClose={() => setIsUpgradeModalOpen(false)}
+        />
+      ) : null}
     </Screen>
   );
 }

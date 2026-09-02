@@ -6,6 +6,7 @@ import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 import { useAuth } from "../../hooks/useAuth";
+import { hasAppPermission } from "../../utils/auth/accessPolicy";
 import { canManageStaff } from "../../utils/auth/staffAccess";
 import {
   formatRole,
@@ -21,7 +22,11 @@ import { ModuleHeader } from "../ui/ModuleHeader";
 function getRoleLabel(role?: string) {
   const normalizedRole = role?.toUpperCase();
 
-  if (normalizedRole === "ADMIN" || normalizedRole === "OWNER") {
+  if (normalizedRole === "ADMIN") {
+    return "Administrator";
+  }
+
+  if (normalizedRole === "OWNER") {
     return "Owner";
   }
 
@@ -35,28 +40,32 @@ export function ProfileMenuScreen() {
   const imageUri = getProfileImageUri(user);
   const roleLabel = getRoleLabel(user?.role);
   const showTeamAccess = canManageStaff(user);
+  const canManageBilling = hasAppPermission(user, "billing.checkout");
 
   const accountOrganizationItems = useMemo<ProfileMenuItem[]>(() => {
     const items: ProfileMenuItem[] = [];
 
     if (showTeamAccess) {
       items.push({
-        accessibilityHint: "Opens team and property access management",
-        badge: "Owner",
+        accessibilityHint: "Opens property manager account setup",
+        badge: "Admin",
         icon: "people-circle-outline",
         label: "Team & Access",
         onPress: () => router.push(appRoutes.secondary.staffManagement),
-        supportingText: "Manage managers and property access",
+        supportingText: "Create property manager accounts",
       });
     }
 
     items.push(
       {
         accessibilityHint: "Opens subscription and billing information",
+        badge: canManageBilling ? undefined : "View only",
         icon: "card-outline",
         label: "Plan & Billing",
         onPress: () => router.push(appRoutes.secondary.billing),
-        supportingText: "View subscription and property limits",
+        supportingText: canManageBilling
+          ? "View subscription and property limits"
+          : "View plan details; changes require an administrator",
       },
       {
         accessibilityHint: "Opens notifications and reminders",
@@ -68,7 +77,7 @@ export function ProfileMenuScreen() {
     );
 
     return items;
-  }, [showTeamAccess]);
+  }, [canManageBilling, showTeamAccess]);
   const supportItems = useMemo<ProfileMenuItem[]>(
     () => [
       {
