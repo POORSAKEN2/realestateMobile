@@ -58,10 +58,33 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
         width,
       }}
     >
+      <View
+        accessibilityLabel="Add, unavailable"
+        accessibilityRole="button"
+        accessibilityState={{ disabled: true }}
+        className="absolute mt-4 items-center justify-center rounded-full bg-primary shadow-lg shadow-slate-300"
+        pointerEvents="none"
+        style={{
+          height: ADD_BUTTON_SIZE,
+          left: center - ADD_BUTTON_SIZE / 2,
+          top: TAB_BAR_TOP - ADD_BUTTON_SIZE / 2,
+          width: ADD_BUTTON_SIZE,
+          zIndex: 0,
+        }}
+      >
+        <BrandLogomarkWhite width={40} height={40} />
+      </View>
+
       <Svg
         height={totalHeight}
         pointerEvents="none"
-        style={{ left: 0, overflow: "visible", position: "absolute", top: 0 }}
+        style={{
+          left: 0,
+          overflow: "visible",
+          position: "absolute",
+          top: 0,
+          zIndex: 1,
+        }}
         width={width}
       >
         <Path
@@ -82,6 +105,7 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
           position: "absolute",
           right: 0,
           top: TAB_BAR_TOP,
+          zIndex: 2,
         }}
       >
         {PRIMARY_TABS.map((tab) => {
@@ -136,22 +160,6 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
             </TouchableOpacity>
           );
         })}
-      </View>
-
-      <View
-        accessibilityLabel="Add, unavailable"
-        accessibilityRole="button"
-        accessibilityState={{ disabled: true }}
-        className="absolute mt-4 items-center justify-center rounded-full bg-primary shadow-lg"
-        pointerEvents="none"
-        style={{
-          height: ADD_BUTTON_SIZE,
-          left: center - ADD_BUTTON_SIZE / 2,
-          top: TAB_BAR_TOP - ADD_BUTTON_SIZE / 2,
-          width: ADD_BUTTON_SIZE,
-        }}
-      >
-        <BrandLogomarkWhite width={40} height={40} />
       </View>
     </View>
   );

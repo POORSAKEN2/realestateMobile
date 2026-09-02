@@ -77,14 +77,14 @@ export function DashboardHero({
             accessibilityLabel="Open global search"
             accessibilityRole="button"
             activeOpacity={0.82}
-            className="h-11 w-11 items-center justify-center rounded-2xl border border-white/60 bg-white/90 shadow-lg shadow-textPrimary/20"
+            className="h-11 w-11 items-center justify-center rounded-2xl border-white/60 bg-white/90 shadow-lg shadow-textPrimary/20"
             hitSlop={10}
             onPress={onSearchPress}
           >
             <Feather name="search" color={colors.primary} size={20} />
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             accessibilityLabel="Open notifications"
             accessibilityRole="button"
             activeOpacity={0.82}
@@ -98,7 +98,7 @@ export function DashboardHero({
               size={21}
             />
             <View className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full border border-white bg-danger" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </ImageBackground>
