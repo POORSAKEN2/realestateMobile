@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { View, Text } from "react-native";
 
 import { FloorPlanIconButton } from "./FloorPlanIconButton";
@@ -47,24 +48,24 @@ export function FloorPlanActionsCard({
           onPress={onToggleAreaShapes}
           selected={showAreaShapes}
         />
-        <FloorPlanIconButton
+        <PermissionGate permission="floorplans.update" propertyId={floor.propertyId}><FloorPlanIconButton
           icon="image-outline"
           label={
             floor.image ? "Change floor plan image" : "Upload floor plan image"
           }
           onPress={onPickImage}
-        />
-        <FloorPlanIconButton
+        /></PermissionGate>
+        <PermissionGate permission="floorplans.update" propertyId={floor.propertyId}><FloorPlanIconButton
           icon="pencil-outline"
           label="Rename floor"
           onPress={onRename}
-        />
-        <FloorPlanIconButton
+        /></PermissionGate>
+        <PermissionGate permission="floorplans.delete" propertyId={floor.propertyId}><FloorPlanIconButton
           danger
           icon="trash-can-outline"
           label="Delete floor"
           onPress={onDelete}
-        />
+        /></PermissionGate>
       </View>
     </View>
   );

@@ -74,7 +74,7 @@ export function ExpenseFormModal({
   onUpdateForm,
 }: ExpenseFormModalProps) {
   return (
-    <AddEditModal
+    <AddEditModal permission={editingExpense ? "expenses.update" : "expenses.create"} propertyId={form.propertyId || undefined}
       appearance="card"
       isVisible={isVisible}
       onClose={onClose}

@@ -1,13 +1,21 @@
+import type { AccessSnapshot } from "./access";
 export type AuthResponse = {
   data?: {
     access_token?: string;
     user?: unknown;
     onboarding?: unknown;
+    permissions?: string[];
+    assigned_property_ids?: Array<string | number>;
+    property_permissions?: Record<string, string[]>;
   };
   message?: string;
 };
 
 export type AuthUser = {
+  access?: AccessSnapshot;
+  property_permissions?: Record<string, string[]>;
+  permissions?: string[];
+  assigned_property_ids?: Array<string | number>;
   id?: string | number;
   name?: string;
   email?: string;
@@ -78,4 +86,3 @@ export type AccountDeletionRequestPayload = {
   reason?: string;
   confirmation: boolean;
 };
-

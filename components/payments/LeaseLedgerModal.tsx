@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -209,7 +210,7 @@ export function LeaseLedgerModal({
                       </View>
 
                       {!isPaid && onRecordPayment ? (
-                        <TouchableOpacity
+                        <PermissionGate permission="payments.create"><TouchableOpacity
                           activeOpacity={0.8}
                           className="mt-2 h-9 items-center justify-center rounded-xl bg-primary/10"
                           onPress={() => {
@@ -220,7 +221,7 @@ export function LeaseLedgerModal({
                           <Text className="font-ralewayBold text-xs text-primary">
                             Record Payment
                           </Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity></PermissionGate>
                       ) : null}
                     </View>
                   );

@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity } from "react-native";
 
@@ -16,7 +17,7 @@ export function DocumentsHeader({
   return (
     <ModuleHeader
       action={
-        <TouchableOpacity
+        <PermissionGate permission="documents.create"><TouchableOpacity
           accessibilityLabel="Upload document"
           accessibilityRole="button"
           activeOpacity={0.85}
@@ -27,7 +28,7 @@ export function DocumentsHeader({
           <Text className="font-ralewayExtraBold text-xs text-white">
             Upload
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity></PermissionGate>
       }
       eyebrow="Operations"
       leading={

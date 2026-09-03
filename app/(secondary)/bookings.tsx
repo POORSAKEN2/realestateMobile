@@ -1,3 +1,4 @@
+import { useAccess } from "../../hooks/auth/useAccess";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -34,6 +35,7 @@ import {
 } from "../../utils/bookings/bookingCalendar";
 
 export default function BookingsScreen() {
+  const { can } = useAccess();
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const params = useLocalSearchParams<{ propertyId?: string }>();
@@ -170,7 +172,7 @@ export default function BookingsScreen() {
         <View className="px-1">
           <ModuleHeader
             action={
-              <AddButton
+              <AddButton permission="bookings.create"
                 disabled={!selectedBuilding}
                 onPress={() =>
                   bookingForm.openCreate(
@@ -238,7 +240,7 @@ export default function BookingsScreen() {
                   <BookingDaySchedule
                     availability={calendar.selectedDayAvailability}
                     bookings={calendar.selectedDayBookings}
-                    canCreate={calendar.canCreateOnSelectedDay}
+                    canCreate={calendar.canCreateOnSelectedDay && can("bookings.create", selectedPropertyId)}
                     date={calendar.selectedDate}
                     onCreate={(date) =>
                       bookingForm.openCreate(selectedPropertyId, date)

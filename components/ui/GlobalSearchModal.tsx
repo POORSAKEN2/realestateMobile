@@ -18,23 +18,16 @@ import { appRoutes } from "../../constants/navigation";
 import type { GlobalSearchResults } from "../../types/domain/search";
 import { openModuleRoute } from "../../utils/navigation/moduleNavigation";
 
-type GlobalSearchModalProps = {
-  isVisible: boolean;
-  onClose: () => void;
-};
+type GlobalSearchModalProps = { onClose: () => void };
 
-export function GlobalSearchModal({ isVisible, onClose }: GlobalSearchModalProps) {
+/**
+ * Parents mount this only while open. Keeping a hidden native Modal mounted
+ * caused its reset effects to schedule nested state updates during startup.
+ */
+export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GlobalSearchResults | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if (!isVisible) {
-      setQuery("");
-      setResults(null);
-      return;
-    }
-  }, [isVisible]);
 
   useEffect(() => {
     const trimmed = query.trim();
@@ -79,7 +72,7 @@ export function GlobalSearchModal({ isVisible, onClose }: GlobalSearchModalProps
     <Modal
       animationType="fade"
       presentationStyle="pageSheet"
-      visible={isVisible}
+      visible
       onRequestClose={onClose}
     >
       <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>

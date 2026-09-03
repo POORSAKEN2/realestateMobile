@@ -1,3 +1,4 @@
+import { useAccess } from "../../hooks/auth/useAccess";
 import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
 import { View } from "react-native";
@@ -39,6 +40,7 @@ type PropertyListItem =
 
 export default function PropertiesScreen() {
   const { session } = useAuth();
+  const { can, access } = useAccess();
   const accessToken = session?.accessToken;
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,7 +50,7 @@ export default function PropertiesScreen() {
   );
 
   const { useList } = useProperties(accessToken);
-  const { data: properties = [], isError, isLoading, refetch } = useList();
+  const { data: properties = [], isError, isLoading, refetch, error } = useList();
   const propertySnackbar = useSnackbar();
   const propertyForm = usePropertyFormController(accessToken, {
     onSaved: (_property, operation) =>
@@ -131,7 +133,7 @@ export default function PropertiesScreen() {
       <View className="flex-1">
         <View className="px-1 pb-5">
           <ModuleHeader
-            action={<AddButton title="Add" onPress={openForm} />}
+            action={<AddButton permission="properties.create" title="Add" onPress={openForm} />}
             eyebrow="Portfolio Intelligence"
             title="Properties"
           />
@@ -178,7 +180,7 @@ export default function PropertiesScreen() {
               return (
                 <PropertyListMessage
                   actionLabel="Try again"
-                  description="Properties could not be loaded. Check your connection and retry."
+                  description={error?.message ?? "Properties could not be loaded. Check your connection and retry."}
                   icon="cloud-alert-outline"
                   onAction={refetch}
                   title="Unable to load properties"
@@ -192,11 +194,11 @@ export default function PropertiesScreen() {
 
               return (
                 <PropertyListMessage
-                  actionLabel={isFiltered ? "Clear filters" : "Add property"}
+                  actionLabel={isFiltered ? "Clear filters" : can("properties.create") ? "Add property" : undefined}
                   description={
                     isFiltered
                       ? "Change your search or reset filters to see more results."
-                      : "Add your first property to start tracking portfolio performance."
+                      : access.role === "MANAGER" ? "No assigned properties are available. Ask your account owner to review your access." : "Add your first property to start tracking portfolio performance."
                   }
                   icon={
                     isFiltered ? "home-search-outline" : "home-plus-outline"
@@ -207,7 +209,7 @@ export default function PropertiesScreen() {
                           setSearchQuery("");
                           setStatusFilter("ALL");
                         }
-                      : openForm
+                      : can("properties.create") ? openForm : undefined
                   }
                   title={
                     isFiltered ? "No matching properties" : "No properties yet"
@@ -263,7 +265,7 @@ export default function PropertiesScreen() {
         property={selectedProperty}
       />
 
-      <AddEditModal
+      <AddEditModal permission={editingProperty ? "properties.update" : "properties.create"} propertyId={editingProperty?.id}
         appearance="card"
         isVisible={isFormVisible}
         onClose={closeForm}

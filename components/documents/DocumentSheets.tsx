@@ -96,6 +96,8 @@ export function DocumentActionSheet({
           description: "Update details or replace the uploaded file.",
           icon: "file-edit-outline",
           label: "Edit or replace",
+          permission: "documents.update" as const,
+          propertyId: document.propertyId,
           onPress: () => onEdit(document),
         },
         {
@@ -103,6 +105,8 @@ export function DocumentActionSheet({
           destructive: true,
           icon: "trash-can-outline",
           label: "Delete document",
+          permission: "documents.delete" as const,
+          propertyId: document.propertyId,
           onPress: () => onDelete(document),
         },
       ]

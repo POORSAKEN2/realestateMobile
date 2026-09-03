@@ -1,3 +1,4 @@
+import { reportAccessDenied } from "../services/access/accessEvents";
 import type {
   ApiEnvelope,
   ApiErrorResponse,
@@ -8,7 +9,11 @@ import type {
 export { API_BASE_URL } from "./config";
 
 import { axiosInstance } from "./axios";
-import { getFirstValidationError } from "./response";
+import { toApiError, ApiError } from "./errors";
+import { getSessionAccess } from "../services/access/sessionAccess";
+import { assertRequestAccess, describeRequest, ResourceScopeIndex, scopeResponse } from "../services/access/requestPolicy";
+let scopeRevision = -1;
+let scopeIndex = new ResourceScopeIndex();
 
 export function authHeaders(accessToken?: string) {
   return {
@@ -61,10 +66,26 @@ async function request<T>(
     method: "GET",
   },
 ): Promise<T> {
+  const session = getSessionAccess();
+  if (session.revision !== scopeRevision) {
+    scopeIndex = new ResourceScopeIndex();
+    scopeRevision = session.revision;
+  }
+  const index = scopeIndex;
+  const accessRequest = describeRequest(path, options.method, options.body);
+  if (options.access) {
+    accessRequest.permission = options.access.permission;
+    accessRequest.propertyId = options.access.propertyId ?? accessRequest.propertyId;
+  }
+  assertRequestAccess(session.access, accessRequest, index);
   const url = path;
   const isFormData =
     typeof FormData !== "undefined" && options.body instanceof FormData;
   const headers = { ...options.headers } as Record<string, any>;
+  if (accessRequest.permission && session.token && headers.Authorization && headers.Authorization !== `Bearer ${session.token}`) {
+    throw new ApiError("Your account changed. Please try again.", 409, "ACCESS_CHANGED");
+  }
+  if (session.token && !headers.Authorization) headers.Authorization = `Bearer ${session.token}`;
   if (isFormData) {
     headers["Content-Type"] = undefined;
   }
@@ -78,17 +99,16 @@ async function request<T>(
       signal: options.signal ?? undefined,
     });
 
-    return response.data as T;
+    if (getSessionAccess().revision !== session.revision) {
+      throw new ApiError("Your account access changed. Please try again.", 409, "ACCESS_CHANGED");
+    }
+    return scopeResponse(response.data as T, session.access, accessRequest, index);
   } catch (error: any) {
     if (error.response) {
       const data = error.response.data as ApiErrorResponse;
-      const validationMessage = getFirstValidationError(data?.errors);
-
-      throw new Error(
-        data?.message ||
-          validationMessage ||
-          `API request failed with status ${error.response.status}`,
-      );
+      const failure = toApiError(error.response.status, data);
+      if (failure.status === 403 && getSessionAccess().revision === session.revision) reportAccessDenied(failure.message);
+      throw failure;
     }
     throw error;
   }

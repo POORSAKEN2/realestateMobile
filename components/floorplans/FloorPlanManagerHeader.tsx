@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -29,7 +30,7 @@ export function FloorPlanManagerHeader({
     <>
       <ModuleHeader
         action={
-          <TouchableOpacity
+          <PermissionGate permission="floorplans.create"><TouchableOpacity
             accessibilityLabel="Add floor"
             accessibilityRole="button"
             className={`h-11 flex-row items-center gap-1.5 rounded-2xl px-3.5 ${
@@ -50,7 +51,7 @@ export function FloorPlanManagerHeader({
             >
               Floor
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity></PermissionGate>
         }
         eyebrow="Portfolio Intelligence"
         leading={

@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
@@ -74,7 +75,7 @@ export function BookingFormModal({
   onUpdateForm,
 }: BookingFormModalProps) {
   return (
-    <AddEditModal
+    <AddEditModal permission={mode === "edit" ? "bookings.update" : "bookings.create"} propertyId={form.propertyId || undefined}
       appearance="card"
       formError={formError}
       isPending={isSaving}
@@ -249,7 +250,7 @@ export function BookingFormModal({
               The reservation will remain in your records as cancelled.
             </Text>
           </View>
-          <TouchableOpacity
+          <PermissionGate permission="bookings.update"><TouchableOpacity
             accessibilityRole="button"
             activeOpacity={0.85}
             className="h-12 items-center justify-center rounded-2xl border border-danger/20 bg-white"
@@ -263,7 +264,7 @@ export function BookingFormModal({
                 Cancel Booking
               </Text>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity></PermissionGate>
         </View>
       ) : null}
     </AddEditModal>

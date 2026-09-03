@@ -1,3 +1,4 @@
+import { toApiError } from "./errors";
 import type { ApiErrorResponse } from "../types";
 
 export function getFirstValidationError(errors?: Record<string, string[]>) {
@@ -22,7 +23,7 @@ export async function parseApiResponse<T>(
   if (!response.ok) {
     const validationMessage = getFirstValidationError(data?.errors);
 
-    throw new Error(data?.message || validationMessage || fallbackMessage);
+    throw toApiError(response.status, { ...data, message: data?.message || validationMessage || (response.status === 403 ? undefined : fallbackMessage) });
   }
 
   if (!isJson) {

@@ -1,140 +1,63 @@
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-
+import { useState } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
+import { StaffManagerCard } from "../../components/staff/StaffManagerCard";
+import { StaffActionButton } from "../../components/staff/StaffActionButton";
+import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
-import { ModuleEmptyState } from "../../components/ui/ModuleState";
 import { Screen } from "../../components/ui/Screen";
-import { colors } from "../../constants/colors";
+import { useStaffManagement } from "../../hooks/api/useStaffManagement";
+import { canAddManager, MAX_MANAGERS } from "../../services/staff/staffService";
 import { appRoutes } from "../../constants/navigation";
-import { useAuth } from "../../hooks/useAuth";
-import { canManageStaff } from "../../utils/auth/staffAccess";
-
-function ManagerRule({
-  description,
-  icon,
-  title,
-}: {
-  description: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-}) {
-  return (
-    <View className="flex-row items-start py-4">
-      <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-        <Ionicons name={icon} color={colors.primary} size={20} />
-      </View>
-      <View className="ml-3 flex-1">
-        <Text className="font-ralewayExtraBold text-sm text-textPrimary">
-          {title}
-        </Text>
-        <Text className="mt-1 text-sm leading-5 text-description">
-          {description}
-        </Text>
-      </View>
-    </View>
-  );
-}
+import type { StaffManager } from "../../types/domain/staff";
 
 export default function StaffManagementScreen() {
-  const { session } = useAuth();
-  const hasStaffAccess = canManageStaff(session?.user);
-
-  return (
-    <Screen className="bg-surface">
-      <ModuleHeader
-        eyebrow="Account"
-        leading={
-          <SecondaryBackButton
-            accessibilityLabel="Back from staff management"
-            variant="secondary"
-          />
-        }
-        title="Staff management"
-      />
-
-      {!hasStaffAccess ? (
-        <View className="mt-8">
-          <ModuleEmptyState
-            description="Only administrators can create property manager accounts."
-            icon="lock-closed-outline"
-            title="Administrator access required"
-          />
-        </View>
-      ) : (
-        <ScrollView
-          className="-mx-6 mt-7 flex-1"
-          contentContainerClassName="px-6 pb-8"
-          showsVerticalScrollIndicator={false}
-        >
-          <View className="rounded-[28px] border border-primary/15 bg-white p-5 shadow-sm shadow-primary/10">
-            <View className="h-14 w-14 items-center justify-center rounded-2xl bg-accent/60">
-              <Ionicons
-                name="people-outline"
-                color={colors.primary}
-                size={28}
-              />
-            </View>
-            <Text className="mt-5 font-ralewayExtraBold text-xl text-textPrimary">
-              Property manager accounts
-            </Text>
-            <Text className="mt-2 text-sm leading-6 text-description">
-              Create a manager with immediate account access. Your organization
-              can have up to two managers.
-            </Text>
-
-            <View className="mt-4 border-t border-primary/10">
-              <ManagerRule
-                description="The backend always creates staff with the Manager role."
-                icon="shield-checkmark-outline"
-                title="Fixed Manager role"
-              />
-              <View className="h-px bg-primary/10" />
-              <ManagerRule
-                description="Managers receive the operational permissions configured for your organization."
-                icon="key-outline"
-                title="Role-based access"
-              />
-              <View className="h-px bg-primary/10" />
-              <ManagerRule
-                description="The API rejects creation when two managers already exist."
-                icon="people-circle-outline"
-                title="Two-manager limit"
-              />
-            </View>
-          </View>
-
-          <TouchableOpacity
-            accessibilityLabel="Create Manager account"
-            accessibilityRole="button"
-            activeOpacity={0.82}
-            className="mt-5 min-h-14 flex-row items-center justify-center rounded-2xl bg-primary"
-            onPress={() => router.push(appRoutes.secondary.staffManagerForm)}
-          >
-            <Ionicons
-              name="person-add-outline"
-              color={colors.whitePrimary}
-              size={20}
-            />
-            <Text className="ml-2 font-ralewayExtraBold text-base text-white">
-              Create Manager
-            </Text>
-          </TouchableOpacity>
-
-          <View className="mt-4 flex-row rounded-2xl border border-warning/20 bg-warningSurface p-4">
-            <Ionicons
-              name="information-circle-outline"
-              color={colors.warning}
-              size={20}
-            />
-            <Text className="ml-3 flex-1 text-sm leading-6 text-description">
-              Manager listing, property assignment, and account disabling are
-              unavailable until the backend exposes those operations.
-            </Text>
-          </View>
-        </ScrollView>
-      )}
-    </Screen>
-  );
+  const staff = useStaffManagement();
+  const [confirmation, setConfirmation] = useState<{ manager: StaffManager; action: "remove" | "toggle" } | null>(null);
+  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  const busy = staff.remove.isPending || staff.setEnabled.isPending;
+  const rosterAvailable = Boolean(staff.gateway.list);
+  const limitReached = !canAddManager(staff.roster.data);
+  const enabling = confirmation?.action === "toggle" && confirmation.manager.status === "disabled";
+  const actionLabel = confirmation?.action === "remove" ? "Remove" : enabling ? "Enable" : "Disable";
+  async function confirm() {
+    if (!confirmation || busy) return;
+    setError(""); setNotice("");
+    try {
+      if (confirmation.action === "remove") await staff.remove.mutateAsync(confirmation.manager.id);
+      else await staff.setEnabled.mutateAsync({ id: confirmation.manager.id, enabled: enabling });
+      setNotice(confirmation.action === "remove" ? "Manager removed." : enabling ? "Manager enabled." : "Manager disabled.");
+      setConfirmation(null);
+    } catch (failure) { setError(failure instanceof Error ? failure.message : "Manager could not be updated."); setConfirmation(null); }
+  }
+  return <Screen className="bg-surface"><ModuleHeader title="Staff management" eyebrow="Account owner" leading={<SecondaryBackButton />} />
+    <ScrollView className="mt-6" contentContainerClassName="gap-4 pb-8">
+      <View className="gap-2 rounded-3xl bg-white p-5">
+        <Text className="font-ralewayExtraBold text-xl">Property managers</Text>
+        <Text className="text-description">{staff.roster.data ? `${staff.roster.data.total} of ${MAX_MANAGERS} manager accounts` : `Up to ${MAX_MANAGERS} manager accounts`}</Text>
+        <Text className="text-description">Invited and disabled accounts count toward the limit. Remove an account to free a place.</Text>
+      </View>
+      {(error || staff.roster.error) && <Text accessibilityRole="alert" className="rounded-2xl bg-dangerSurface p-4 text-danger">{error || staff.roster.error?.message}</Text>}
+      {notice ? <Text accessibilityRole="alert" className="rounded-2xl bg-successSurface p-4 text-description">{notice}</Text> : null}
+      {rosterAvailable ? <>
+        <StaffActionButton label="Refresh managers" pending={staff.roster.isFetching} onPress={() => void staff.roster.refetch()} />
+        {staff.roster.isPending ? <Text>Loading managers…</Text> : staff.roster.data?.managers.map((manager) =>
+          <StaffManagerCard key={manager.id} manager={manager} gateway={staff.gateway} busy={busy}
+            onEdit={() => router.push({ pathname: appRoutes.secondary.staffManagerForm, params: { managerId: manager.id } })}
+            onToggle={() => setConfirmation({ manager, action: "toggle" })} onRemove={() => setConfirmation({ manager, action: "remove" })} />)}
+        {staff.roster.data?.total === 0 && <Text className="text-description">No managers yet. Add someone to help manage your properties.</Text>}
+        {staff.roster.data && !staff.roster.data.complete && <Text className="text-description">Some managers are not included in this list. The account total still applies to the limit.</Text>}
+      </> : <Text className="rounded-2xl bg-warningSurface p-4 text-description">Your account supports manager creation. Viewing and changing existing managers is not available yet.</Text>}
+      {limitReached && <Text accessibilityRole="alert" className="text-description">Two-manager limit reached. Remove a manager before adding another.</Text>}
+      <StaffActionButton label={staff.gateway.creationMode === "invitation" ? "Invite manager" : "Create manager"}
+        disabled={limitReached || busy || rosterAvailable && (staff.roster.isPending || staff.roster.isError)}
+        onPress={() => router.push(appRoutes.secondary.staffManagerForm)} />
+    </ScrollView>
+    <ConfirmationModal visible={Boolean(confirmation)} title={`${actionLabel} manager?`} confirmLabel={actionLabel} isPending={busy}
+      description={confirmation?.action === "remove" ? `Remove ${confirmation.manager.name} from your staff? They will lose manager access.` : enabling
+        ? `Restore ${confirmation?.manager.name}'s manager access?` : `Disable ${confirmation?.manager.name}'s manager access? Their account will still count toward the two-manager limit.`}
+      onCancel={() => { if (!busy) setConfirmation(null); }} onConfirm={() => void confirm()} />
+  </Screen>;
 }

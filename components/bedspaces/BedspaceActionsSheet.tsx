@@ -26,6 +26,7 @@ export function BedspaceActionsSheet({
             disabled: isBusy,
             icon: "account-plus-outline",
             label: "Assign tenant and lease",
+          permission: "leases.create" as const,
             onPress: () => onAssignLease(bedspace),
           },
         ]
@@ -36,6 +37,7 @@ export function BedspaceActionsSheet({
               disabled: isBusy,
               icon: "file-document-outline",
               label: "View leases",
+          permission: "leases.viewAny" as const,
               onPress: () => onViewLease(bedspace),
             },
           ]
@@ -49,6 +51,7 @@ export function BedspaceActionsSheet({
           disabled: isBusy,
           icon: "pencil-outline",
           label: "Edit bedspace",
+          permission: "bedspaces.update" as const,
           onPress: () => onEdit(bedspace),
         },
         {
@@ -60,6 +63,7 @@ export function BedspaceActionsSheet({
           disabled: isBusy || bedspace.status === "Occupied",
           icon: "trash-can-outline",
           label: "Delete bedspace",
+          permission: "bedspaces.delete" as const,
           onPress: () => onDelete(bedspace),
         },
       ]

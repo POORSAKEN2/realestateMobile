@@ -10,7 +10,7 @@ export function ExpenseHeader({ onAddExpense }: ExpenseHeaderProps) {
   return (
     <ModuleHeader
       action={
-        <AddButton
+        <AddButton permission="expenses.create"
           onPress={onAddExpense}
           title="Record"
           className="min-h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary px-3.5"

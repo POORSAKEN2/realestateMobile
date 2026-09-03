@@ -65,7 +65,7 @@ export function useLogin() {
 
       signIn({
         accessToken: access_token,
-        user: user && typeof user === "object" ? normalizeUser(user) : user,
+        user: user && typeof user === "object" ? normalizeUser({ ...user, ...Object.fromEntries(Object.entries(result.data ?? {}).filter(([key]) => ["permissions", "assigned_property_ids", "property_permissions"].includes(key))) }) : user,
         onboarding,
       });
       router.replace("/(tabs)/dashboard");

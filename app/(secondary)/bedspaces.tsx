@@ -151,7 +151,7 @@ export default function BedspacesScreen() {
       <View className="flex-1 gap-5">
         <ModuleHeader
           action={
-            <AddButton
+            <AddButton permission="bedspaces.create"
               disabled={!selectedRoomId || isLoading || isError}
               onPress={management.openCreateForm}
               title="Add"
@@ -315,7 +315,7 @@ export default function BedspacesScreen() {
                   }
                 />
                 {!management.bedspaces.length ? (
-                  <AddButton
+                  <AddButton permission="bedspaces.create"
                     className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
                     onPress={management.openCreateForm}
                     title="Add first bedspace"

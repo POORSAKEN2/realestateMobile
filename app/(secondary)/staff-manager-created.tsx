@@ -12,9 +12,11 @@ function firstParam(value?: string | string[]) {
 
 export default function StaffManagerCreatedScreen() {
   const params = useLocalSearchParams<{
+    mode?: string | string[];
     managerEmail?: string | string[];
     managerName?: string | string[];
   }>();
+  const invited = firstParam(params.mode) === "invitation";
   const managerName = firstParam(params.managerName) ?? "Manager";
   const managerEmail = firstParam(params.managerEmail) ?? "";
 
@@ -26,11 +28,10 @@ export default function StaffManagerCreatedScreen() {
             <Ionicons name="checkmark" color={colors.success} size={48} />
           </View>
           <Text className="mt-7 text-center font-ralewayExtraBold text-[30px] text-textPrimary">
-            Manager created
+            {invited ? "Invitation sent" : "Manager created"}
           </Text>
           <Text className="mt-3 max-w-[320px] text-center text-base leading-6 text-description">
-            {managerName} can now sign in using the account credentials you
-            created.
+            {invited ? `${managerName} will receive an invitation to join your staff.` : `${managerName} can now sign in using the account credentials you created.`}
           </Text>
         </View>
 
@@ -77,8 +78,7 @@ export default function StaffManagerCreatedScreen() {
             size={20}
           />
           <Text className="ml-3 flex-1 text-sm leading-6 text-description">
-            Send the temporary password through a secure channel. It is not
-            included on this screen.
+            {invited ? "Access begins after the manager accepts the invitation." : "Send the temporary password through a secure channel. It is not included on this screen."}
           </Text>
         </View>
 

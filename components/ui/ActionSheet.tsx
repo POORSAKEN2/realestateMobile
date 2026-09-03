@@ -1,3 +1,5 @@
+import { useAccess } from "../../hooks/auth/useAccess";
+import type { AppPermission } from "../../types/auth/access";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef } from "react";
 import {
@@ -16,6 +18,8 @@ import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "./ModalActionFooter";
 import { ModalHeader } from "./ModalHeader";
 
 export type ActionSheetItem = {
+  permission?: AppPermission;
+  propertyId?: string;
   description?: string;
   destructive?: boolean;
   disabled?: boolean;
@@ -39,11 +43,14 @@ export function ActionSheet({
   title: string;
   visible: boolean;
 }) {
+  const { can } = useAccess();
+  const visibleActions = actions.filter((action) => !action.permission || can(action.permission, action.propertyId));
   const pendingAction = useRef<(() => void) | null>(null);
   const { height } = useWindowDimensions();
   const maxSheetHeight = getStandardModalSheetHeight(height);
 
   function handleAction(action: ActionSheetItem) {
+    if (action.disabled || action.permission && !can(action.permission, action.propertyId)) return;
     if (action.dismissOnPress === false) {
       action.onPress();
       return;
@@ -92,7 +99,7 @@ export function ActionSheet({
           showsVerticalScrollIndicator={false}
           style={{ flexGrow: 0, flexShrink: 1 }}
         >
-          {actions.map((action) => {
+          {visibleActions.map((action) => {
             const color = action.destructive ? "#B42318" : colors.primary;
 
             return (

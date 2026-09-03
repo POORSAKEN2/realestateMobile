@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -67,7 +68,7 @@ export function TenantCard({
 
           {/* Quick Actions (Moved to top right to declutter bottom) */}
           <View className="flex-row items-center gap-1 rounded-full border border-primary/20 bg-primary/10 p-1">
-            <TouchableOpacity
+            <PermissionGate permission="clients.update"><TouchableOpacity
               activeOpacity={0.7}
               onPress={(event) => {
                 event.stopPropagation();
@@ -76,8 +77,8 @@ export function TenantCard({
               className="rounded-full p-1.5 hover:bg-primary/10"
             >
               <Ionicons name="pencil" size={16} color={colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity></PermissionGate>
+            <PermissionGate permission="clients.delete"><TouchableOpacity
               activeOpacity={0.7}
               onPress={(event) => {
                 event.stopPropagation();
@@ -86,7 +87,7 @@ export function TenantCard({
               className="rounded-full p-1.5 hover:bg-dangerSurface"
             >
               <Ionicons name="trash" size={16} color="#B42318" />
-            </TouchableOpacity>
+            </TouchableOpacity></PermissionGate>
           </View>
         </View>
 

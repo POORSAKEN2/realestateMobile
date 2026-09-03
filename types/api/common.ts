@@ -1,3 +1,4 @@
+import type { AppPermission } from "../auth/access";
 export type ApiEnvelope<T> = {
   data?: T;
 };
@@ -17,4 +18,6 @@ export type ApiErrorResponse = {
 
 export type RequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
+  /** Semantic permission for operations using a shared backend endpoint. */
+  access?: { permission: AppPermission; propertyId?: string };
 };

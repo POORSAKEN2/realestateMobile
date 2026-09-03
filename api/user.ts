@@ -1,3 +1,4 @@
+import { normalizeAccess } from "../utils/auth/accessAdapter";
 import { API_BASE_URL, apiClient, authHeaders, unwrapData } from "./client";
 import type { ApiEnvelope, AuthUser, UpdateUserProfilePayload } from "../types";
 
@@ -39,6 +40,7 @@ export function normalizeUser(user: AuthUser): AuthUser {
 
   return {
     ...user,
+    ...(user.access || user.permissions !== undefined || user.assigned_property_ids !== undefined || user.property_permissions !== undefined ? { access: normalizeAccess(user) } : {}),
     job_title: user.job_title ?? user.jobTitle ?? user.role,
     jobTitle: user.jobTitle ?? user.job_title ?? user.role,
     profile_image_url: profileImageUrl || user.profile_image_url,
@@ -111,4 +113,9 @@ export async function exportUserData(accessToken?: string) {
   );
 
   return unwrapData(response);
+}
+
+export async function fetchCurrentUser(accessToken: string): Promise<AuthUser> {
+  const response = await apiClient.get<ApiEnvelope<AuthUser> | AuthUser>("/user", { headers: authHeaders(accessToken) });
+  return normalizeUser(unwrapData(response));
 }

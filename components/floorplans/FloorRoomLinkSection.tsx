@@ -55,7 +55,7 @@ export function FloorRoomLinkSection({
             variant="filled"
             wrapperClassName="min-w-0 flex-1"
           />
-          <AddButton
+          <AddButton permission="rooms.update"
             className="h-14 flex-row items-center justify-center gap-2 rounded-2xl bg-primary px-5"
             disabled={!selectedRoomId || isBusy}
             iconName="link-variant"

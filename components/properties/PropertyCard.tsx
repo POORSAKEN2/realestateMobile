@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
@@ -369,18 +370,18 @@ export function PropertyCard({
           </View>
 
           {onOpenBookings ? (
-            <PropertyAction
+            <PermissionGate permission="bookings.viewAny" propertyId={property.id}><PropertyAction
               icon="calendar-clock"
               label="Bookings"
               onPress={onOpenBookings}
-            />
+            /></PermissionGate>
           ) : null}
-          <PropertyAction
+          <PermissionGate permission="properties.update" propertyId={property.id}><PropertyAction
             icon="pencil-outline"
             label="Edit"
             onPress={onEdit}
             primary
-          />
+          /></PermissionGate>
         </View>
       </View>
     </TouchableOpacity>

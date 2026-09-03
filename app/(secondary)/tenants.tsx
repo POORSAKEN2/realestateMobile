@@ -194,7 +194,7 @@ export function TenantsScreen({
     <Screen bottomInset={bottomInset} className="bg-surface">
       <View className="px-1">
         <ModuleHeader
-          action={<AddButton onPress={openCreateForm} />}
+          action={<AddButton permission="clients.create" onPress={openCreateForm} />}
           eyebrow="Operations"
           leading={
             showBackButton ? (
@@ -314,7 +314,7 @@ export function TenantsScreen({
         visible={isFilterVisible}
       />
 
-      <AddEditModal
+      <AddEditModal permission={editingTenant ? "clients.update" : "clients.create"}
         appearance="card"
         isVisible={isFormOpen}
         onClose={closeForm}

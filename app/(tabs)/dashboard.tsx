@@ -257,10 +257,9 @@ function AdminDashboardScreen() {
         onClose={() => setSelectedProperty(null)}
         property={selectedProperty}
       />
-      <GlobalSearchModal
-        isVisible={isSearchModalOpen}
-        onClose={() => setIsSearchModalOpen(false)}
-      />
+      {isSearchModalOpen ? (
+        <GlobalSearchModal onClose={() => setIsSearchModalOpen(false)} />
+      ) : null}
       {imageGalleryProperty ? (
         <PropertyImageGallery
           images={getPropertyImages(imageGalleryProperty)}

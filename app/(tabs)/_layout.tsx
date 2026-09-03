@@ -1,3 +1,5 @@
+import { useAccess } from "../../hooks/auth/useAccess";
+import { ROUTE_PERMISSIONS } from "../../utils/auth/routeAccess";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
@@ -31,6 +33,7 @@ const PRIMARY_TABS = [
 ] as const;
 
 function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
+  const { can } = useAccess();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const barHeight = TAB_BAR_CONTENT_HEIGHT + insets.bottom;
@@ -110,6 +113,8 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
         }}
       >
         {PRIMARY_TABS.map((tab) => {
+          const permission = ROUTE_PERMISSIONS[tab.name];
+          if (permission && !can(permission)) return <View className="flex-1" key={tab.name} />;
           if (tab.name === "index") {
             return <View className="flex-1" key={tab.name} />;
           }

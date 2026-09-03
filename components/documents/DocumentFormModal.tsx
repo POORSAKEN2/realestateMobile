@@ -1,3 +1,4 @@
+import { useAccess } from "../../hooks/auth/useAccess";
 import { useEffect, useMemo, useState } from "react";
 import {
   ScrollView,
@@ -62,6 +63,7 @@ export function DocumentFormModal({
   selectedFile: DocumentUpload | null;
   visible: boolean;
 }) {
+  const { can } = useAccess();
   const [selectorMode, setSelectorMode] = useState<SelectorMode>(null);
   const [selectorQuery, setSelectorQuery] = useState("");
 
@@ -279,7 +281,7 @@ export function DocumentFormModal({
                 isPending={isSaving}
                 onCancel={onClose}
                 onSubmit={onSubmit}
-                submitDisabled={!canSubmit}
+                submitDisabled={!canSubmit || !can(editingDocument ? "documents.update" : "documents.create", form.propertyId || undefined)}
                 submitText={
                   editingDocument ? "Save changes" : "Upload document"
                 }

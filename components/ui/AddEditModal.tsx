@@ -1,3 +1,5 @@
+import { useAccess } from "../../hooks/auth/useAccess";
+import type { AppPermission } from "../../types/auth/access";
 import React, { useEffect, useRef } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -25,6 +27,8 @@ function AddEditModalHost({ children }: React.PropsWithChildren) {
 }
 
 interface AddEditModalProps {
+  permission?: AppPermission;
+  propertyId?: string;
   appearance?: "default" | "card";
   backAccessibilityLabel?: string;
   cancelText?: string;
@@ -46,6 +50,8 @@ interface AddEditModalProps {
 }
 
 export const AddEditModal: React.FC<AddEditModalProps> = ({
+  permission,
+  propertyId,
   appearance = "default",
   backAccessibilityLabel,
   cancelText = "Cancel",
@@ -65,6 +71,8 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
   children,
   footer,
 }) => {
+  const { can } = useAccess();
+  const canSubmit = !permission || can(permission, propertyId);
   const scrollRef = useRef<ScrollView | null>(null);
   const isCardAppearance = appearance === "card";
 
@@ -155,9 +163,9 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                   disabled={isPending}
                   isPending={isPending}
                   onCancel={onClose}
-                  onSubmit={onSubmit}
+                  onSubmit={() => { if (canSubmit) onSubmit(); }}
                   showCancelAction={showCancelAction}
-                  showSubmitAction={showSubmitAction}
+                  showSubmitAction={showSubmitAction && canSubmit}
                   submitText={submitText}
                 />
               )}

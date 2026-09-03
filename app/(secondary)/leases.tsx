@@ -164,7 +164,7 @@ export default function LeasesScreen() {
         {/* --- TOP HEADER: Title & Primary Action --- */}
         <View className="px-1">
           <ModuleHeader
-            action={<AddButton onPress={() => openCreateForm()} />}
+            action={<AddButton permission="leases.create" onPress={() => openCreateForm()} />}
             eyebrow="Operations"
             leading={
               <SecondaryBackButton
@@ -284,7 +284,7 @@ export default function LeasesScreen() {
         visible={isFilterVisible}
       />
 
-      <AddEditModal
+      <AddEditModal permission={editingLease ? "leases.update" : "leases.create"} propertyId={form.propertyId || undefined}
         appearance="card"
         isVisible={isFormOpen}
         onClose={closeForm}

@@ -1,3 +1,5 @@
+import { useAccess } from "../../../hooks/auth/useAccess";
+import type { AppPermission } from "../../../types/auth/access";
 import React from "react";
 import {
   TouchableOpacity,
@@ -9,6 +11,8 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 interface AddButtonProps {
+  permission?: AppPermission;
+  propertyId?: string;
   onPress: (event: GestureResponderEvent) => void;
   title?: string;
   iconName?: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -22,6 +26,8 @@ interface AddButtonProps {
 
 export default function AddButton({
   onPress,
+  permission,
+  propertyId,
   title = "New",
   iconName = "plus",
   iconSize = 20,
@@ -31,6 +37,8 @@ export default function AddButton({
   textClassName = "font-ralewayBold text-sm text-white",
   style,
 }: AddButtonProps) {
+  const { can } = useAccess();
+  if (permission && !can(permission, propertyId)) return null;
   const isButtonDisabled = disabled || loading;
 
   return (

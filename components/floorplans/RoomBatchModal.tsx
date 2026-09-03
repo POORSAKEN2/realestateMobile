@@ -45,7 +45,7 @@ export function RoomBatchModal(props: RoomBatchModalProps) {
             onDismiss={props.onSnackbarDismiss}
           />
 
-          <AddButton
+          <AddButton permission="rooms.create"
             className="h-14 flex-row items-center justify-center gap-2 rounded-2xl bg-primary px-5"
             disabled={props.isBusy}
             iconName="door-open"

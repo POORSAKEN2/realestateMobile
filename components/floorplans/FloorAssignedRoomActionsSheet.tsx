@@ -34,6 +34,7 @@ export function FloorAssignedRoomActionsSheet({
           icon:
             option.value === room.status ? "check-circle" : "circle-outline",
           label: option.label,
+          permission: "rooms.update",
           onPress: () => onStatusChange(room, option.value),
           selected: option.value === room.status,
         }))
@@ -43,6 +44,7 @@ export function FloorAssignedRoomActionsSheet({
             disabled: isBusy,
             icon: "bed-single-outline",
             label: "Manage bedspaces",
+            permission: "bedspaces.viewAny",
             onPress: () => onManageBedspaces(room),
           },
           {
@@ -51,6 +53,7 @@ export function FloorAssignedRoomActionsSheet({
             dismissOnPress: false,
             icon: "pencil-outline",
             label: "Edit status",
+            permission: "rooms.update",
             onPress: onShowStatus,
           },
           {
@@ -58,6 +61,7 @@ export function FloorAssignedRoomActionsSheet({
             disabled: isBusy,
             icon: "link-variant-off",
             label: "Unlink",
+            permission: "rooms.update",
             onPress: () => onUnlink(room),
           },
         ]

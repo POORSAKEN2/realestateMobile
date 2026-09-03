@@ -172,10 +172,9 @@ export function ManagerDashboardScreen() {
         }
       />
 
-      <GlobalSearchModal
-        isVisible={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-      />
+      {isSearchOpen ? (
+        <GlobalSearchModal onClose={() => setIsSearchOpen(false)} />
+      ) : null}
     </Screen>
   );
 }

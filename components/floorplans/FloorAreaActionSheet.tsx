@@ -23,12 +23,14 @@ export function FloorAreaActionSheet({
             description: "Draw a four-corner rectangular area.",
             icon: "vector-square",
             label: "Rectangle",
+          permission: "areas.update" as const,
             onPress: () => onDraw("rectangle"),
           },
           {
             description: "Trace a custom area with multiple corners.",
             icon: "vector-polygon",
             label: "Polygon",
+          permission: "areas.update" as const,
             onPress: () => onDraw("polygon"),
           },
         ]
@@ -36,12 +38,14 @@ export function FloorAreaActionSheet({
           {
             icon: "pencil-outline",
             label: "Rename area",
+          permission: "areas.update" as const,
             onPress: onRename,
           },
           {
             destructive: true,
             icon: "trash-can-outline",
             label: "Delete area",
+          permission: "areas.delete" as const,
             onPress: onDelete,
           },
         ];

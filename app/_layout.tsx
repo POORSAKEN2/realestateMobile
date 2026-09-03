@@ -1,3 +1,4 @@
+import { ApiError } from "../api/errors";
 import "react-native-gesture-handler";
 
 import {
@@ -54,7 +55,11 @@ export default function RootLayout() {
       new QueryClient({
         defaultOptions: {
           queries: {
-            retry: 1,
+            retry: (count, error) =>
+              !(
+                error instanceof ApiError &&
+                [401, 403, 409].includes(error.status)
+              ) && count < 1,
             staleTime: 1000 * 60,
           },
         },

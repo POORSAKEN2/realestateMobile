@@ -22,6 +22,8 @@ export function ExpenseActionSheet({
           description: "Update expense details, payment status, or notes.",
           icon: "pencil-outline",
           label: "Edit expense",
+          permission: "expenses.update" as const,
+          propertyId: expense.property_id,
           onPress: () => onEdit(expense),
         },
         ...(isPendingApproval && onApprove
@@ -30,6 +32,8 @@ export function ExpenseActionSheet({
                 description: "Authorize and approve this operating expense.",
                 icon: "check-circle-outline" as const,
                 label: "Approve expense",
+          permission: "expenses.approve" as const,
+          propertyId: expense.property_id,
                 onPress: () => onApprove(expense),
               },
             ]
@@ -40,6 +44,8 @@ export function ExpenseActionSheet({
                 description: "Decline and reject this expense item.",
                 icon: "close-circle-outline" as const,
                 label: "Reject expense",
+          permission: "expenses.approve" as const,
+          propertyId: expense.property_id,
                 onPress: () => onReject(expense),
               },
             ]

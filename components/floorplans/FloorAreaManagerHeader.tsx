@@ -18,7 +18,7 @@ export function FloorAreaManagerHeader({
   return (
     <ModuleHeader
       action={
-        <AddButton
+        <AddButton permission="areas.create"
           className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary px-3.5"
           disabled={!canAddArea}
           iconSize={17}

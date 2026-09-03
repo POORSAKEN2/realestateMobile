@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { Ionicons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
@@ -40,7 +41,7 @@ export function TenantNotesSection({
   return (
     <TenantSection icon="reader-outline" title="Internal logs & notes">
       <View className="mb-3 flex-row justify-end">
-        <TouchableOpacity
+        <PermissionGate permission="tenant-notes.create"><TouchableOpacity
           accessibilityLabel="Add internal note"
           accessibilityRole="button"
           activeOpacity={0.75}
@@ -51,7 +52,7 @@ export function TenantNotesSection({
           <Text className="font-ralewayBold text-xs text-secondary">
             Add note
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity></PermissionGate>
       </View>
 
       {isLoading ? (
@@ -147,16 +148,16 @@ function NoteRow({
           </Text>
         </View>
         <View className="flex-row gap-1">
-          <NoteAction
+          <PermissionGate permission="tenant-notes.update"><NoteAction
             accessibilityLabel="Edit internal note"
             icon="create-outline"
             onPress={onEdit}
-          />
-          <NoteAction
+          /></PermissionGate>
+          <PermissionGate permission="tenant-notes.delete"><NoteAction
             accessibilityLabel="Delete internal note"
             icon="trash-outline"
             onPress={onDelete}
-          />
+          /></PermissionGate>
         </View>
       </View>
     </View>
