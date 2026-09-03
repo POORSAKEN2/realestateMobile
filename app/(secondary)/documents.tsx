@@ -1,18 +1,12 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Linking,
-  RefreshControl,
-  Share,
-  View,
-} from "react-native";
+import { Alert, Linking, Share, View } from "react-native";
 
 import {
   DocumentActionSheet,
   DeleteDocumentSheet,
 } from "../../components/documents/DocumentSheets";
+import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { DocumentCard } from "../../components/documents/DocumentCard";
 import { DocumentModuleState } from "../../components/documents/DocumentModuleState";
 import { DocumentFilterSheet } from "../../components/documents/DocumentFilterSheet";
@@ -25,7 +19,6 @@ import { useDocumentLibrary } from "../../hooks/documents/useDocumentLibrary";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import type { DocumentUpload, PropertyDocument } from "../../types";
 import { chooseDocumentFile } from "../../utils/documents/documentFiles";
-import { colors } from "../../constants/colors";
 import {
   createDocumentFormValues,
   EMPTY_DOCUMENT_FORM,
@@ -51,7 +44,6 @@ export default function DocumentsScreen() {
     isDeleting,
     isError,
     isLoading,
-    isRefreshing,
     isSaving,
     lessees,
     properties,
@@ -221,7 +213,7 @@ export default function DocumentsScreen() {
         onUpload={openCreateForm}
       />
 
-      <FlatList
+      <PullToRefreshFlatList
         className="flex-1"
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 140 }}
         data={isLoading || isError ? [] : visibleDocuments}
@@ -247,14 +239,7 @@ export default function DocumentsScreen() {
             onUpload={openCreateForm}
           />
         }
-        refreshControl={
-          <RefreshControl
-            colors={[colors.primary]}
-            onRefresh={() => void refresh()}
-            refreshing={isRefreshing && !isLoading}
-            tintColor={colors.primary}
-          />
-        }
+        onRefresh={refresh}
         renderItem={({ item: document }) => (
           <DocumentCard
             document={document}

@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../constants/colors";
 import { useLeaseLedger } from "../../hooks/api/usePayments";
 import type { Payment } from "../../types";
+import { ModalHeader } from "../ui/ModalHeader";
 
 type LeaseLedgerModalProps = {
   isVisible: boolean;
@@ -39,24 +40,12 @@ export function LeaseLedgerModal({
       onRequestClose={onClose}
     >
       <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
-        {/* Header */}
-        <View className="flex-row items-center justify-between border-b border-primary/10 bg-white px-5 py-4">
-          <View className="flex-1 pr-3">
-            <Text className="font-ralewayBold text-xl text-textPrimary">
-              Financial Ledger
-            </Text>
-            <Text className="font-ralewayMedium text-xs text-description">
-              {leaseTitle || "Lease payment schedule and history"}
-            </Text>
-          </View>
-          <TouchableOpacity
-            accessibilityRole="button"
-            className="h-10 w-10 items-center justify-center rounded-full bg-surface"
-            onPress={onClose}
-          >
-            <Ionicons name="close" size={22} color={colors.text} />
-          </TouchableOpacity>
-        </View>
+        <ModalHeader
+          closeAccessibilityLabel="Close financial ledger"
+          onClose={onClose}
+          subtitle={leaseTitle || "Lease payment schedule and history"}
+          title="Financial Ledger"
+        />
 
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
@@ -64,7 +53,11 @@ export function LeaseLedgerModal({
           </View>
         ) : error ? (
           <View className="flex-1 items-center justify-center p-6">
-            <Ionicons name="alert-circle-outline" size={40} color={colors.danger} />
+            <Ionicons
+              name="alert-circle-outline"
+              size={40}
+              color={colors.danger}
+            />
             <Text className="mt-2 font-ralewayBold text-base text-textPrimary">
               Failed to load ledger
             </Text>
@@ -80,39 +73,52 @@ export function LeaseLedgerModal({
           >
             {/* KPI Summary Tiles */}
             <View className="flex-row flex-wrap gap-2.5">
-              <View className="flex-1 min-w-[45%] rounded-2xl border border-primary/15 bg-white p-3.5 shadow-sm shadow-primary/5">
+              <View className="min-w-[45%] flex-1 rounded-2xl border border-primary/15 bg-white p-3.5 shadow-sm shadow-primary/5">
                 <Text className="font-ralewaySemiBold text-[10px] uppercase tracking-wider text-description">
                   Total Due
                 </Text>
                 <Text className="mt-1 font-ralewayBold text-base text-textPrimary">
-                  ₱{Number(ledger?.total_due || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                  ₱
+                  {Number(ledger?.total_due || 0).toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                  })}
                 </Text>
               </View>
 
-              <View className="flex-1 min-w-[45%] rounded-2xl border border-success/20 bg-successSurface p-3.5 shadow-sm shadow-success/5">
+              <View className="min-w-[45%] flex-1 rounded-2xl border border-success/20 bg-successSurface p-3.5 shadow-sm shadow-success/5">
                 <Text className="font-ralewaySemiBold text-[10px] uppercase tracking-wider text-success">
                   Total Paid
                 </Text>
                 <Text className="mt-1 font-ralewayBold text-base text-success">
-                  ₱{Number(ledger?.total_paid || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                  ₱
+                  {Number(ledger?.total_paid || 0).toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                  })}
                 </Text>
               </View>
 
-              <View className="flex-1 min-w-[45%] rounded-2xl border border-warning/20 bg-warningSurface p-3.5 shadow-sm shadow-warning/5">
+              <View className="min-w-[45%] flex-1 rounded-2xl border border-warning/20 bg-warningSurface p-3.5 shadow-sm shadow-warning/5">
                 <Text className="font-ralewaySemiBold text-[10px] uppercase tracking-wider text-warning">
                   Outstanding
                 </Text>
                 <Text className="mt-1 font-ralewayBold text-base text-warning">
-                  ₱{Number(ledger?.total_outstanding || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                  ₱
+                  {Number(ledger?.total_outstanding || 0).toLocaleString(
+                    "en-PH",
+                    { minimumFractionDigits: 2 },
+                  )}
                 </Text>
               </View>
 
-              <View className="flex-1 min-w-[45%] rounded-2xl border border-danger/20 bg-dangerSurface p-3.5 shadow-sm shadow-danger/5">
+              <View className="min-w-[45%] flex-1 rounded-2xl border border-danger/20 bg-dangerSurface p-3.5 shadow-sm shadow-danger/5">
                 <Text className="font-ralewaySemiBold text-[10px] uppercase tracking-wider text-danger">
                   Overdue Arrears
                 </Text>
                 <Text className="mt-1 font-ralewayBold text-base text-danger">
-                  ₱{Number(ledger?.total_overdue || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                  ₱
+                  {Number(ledger?.total_overdue || 0).toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                  })}
                 </Text>
               </View>
             </View>
@@ -120,12 +126,17 @@ export function LeaseLedgerModal({
             {/* Payments List */}
             <View className="mt-2">
               <Text className="mb-3 font-ralewayBold text-base text-textPrimary">
-                Payment Schedule & Ledger Items ({ledger?.payments?.length || 0})
+                Payment Schedule & Ledger Items ({ledger?.payments?.length || 0}
+                )
               </Text>
 
-              {(!ledger?.payments || ledger.payments.length === 0) ? (
+              {!ledger?.payments || ledger.payments.length === 0 ? (
                 <View className="items-center justify-center rounded-2xl border border-dashed border-primary/20 bg-white p-6">
-                  <Feather name="calendar" size={28} color={colors.description} />
+                  <Feather
+                    name="calendar"
+                    size={28}
+                    color={colors.description}
+                  />
                   <Text className="mt-2 font-ralewayBold text-sm text-textPrimary">
                     No payment stubs generated yet
                   </Text>
@@ -143,13 +154,29 @@ export function LeaseLedgerModal({
                         <View className="flex-row items-center gap-2">
                           <View
                             className={`h-7 w-7 items-center justify-center rounded-lg ${
-                              isPaid ? "bg-success/15" : isOverdue ? "bg-danger/15" : "bg-warning/15"
+                              isPaid
+                                ? "bg-success/15"
+                                : isOverdue
+                                  ? "bg-danger/15"
+                                  : "bg-warning/15"
                             }`}
                           >
                             <Ionicons
-                              name={isPaid ? "checkmark" : isOverdue ? "alert" : "time-outline"}
+                              name={
+                                isPaid
+                                  ? "checkmark"
+                                  : isOverdue
+                                    ? "alert"
+                                    : "time-outline"
+                              }
                               size={14}
-                              color={isPaid ? colors.success : isOverdue ? colors.danger : colors.warning}
+                              color={
+                                isPaid
+                                  ? colors.success
+                                  : isOverdue
+                                    ? colors.danger
+                                    : colors.warning
+                              }
                             />
                           </View>
                           <Text className="font-ralewayBold text-sm text-textPrimary">
@@ -157,7 +184,10 @@ export function LeaseLedgerModal({
                           </Text>
                         </View>
                         <Text className="font-ralewayBold text-sm text-textPrimary">
-                          ₱{Number(p.amount || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                          ₱
+                          {Number(p.amount || 0).toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                          })}
                         </Text>
                       </View>
 
@@ -167,7 +197,11 @@ export function LeaseLedgerModal({
                         </Text>
                         <Text
                           className={`font-ralewayBold text-xs uppercase ${
-                            isPaid ? "text-success" : isOverdue ? "text-danger" : "text-warning"
+                            isPaid
+                              ? "text-success"
+                              : isOverdue
+                                ? "text-danger"
+                                : "text-warning"
                           }`}
                         >
                           {p.status}

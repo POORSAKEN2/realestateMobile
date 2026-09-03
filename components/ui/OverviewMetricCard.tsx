@@ -51,11 +51,11 @@ function SubMetric({
   return (
     <View
       className={`flex-1 rounded-2xl border border-textPrimary/10 bg-white shadow-sm shadow-textPrimary/10 ${
-        compact ? "min-h-0 p-3" : "min-h-24 p-4"
+        compact ? "min-h-0 px-3 py-2" : "min-h-24 p-4"
       }`}
     >
       <View
-        className={`flex-1 ${compact ? "justify-center" : "flex-row items-start gap-3"}`}
+        className={`flex-1 justify-center ${compact ? "" : "flex-row items-center gap-3"}`}
       >
         <View className={compact ? "flex-row items-center gap-2" : ""}>
           <MetricIcon compact={compact} icon={metric.icon} />
@@ -65,7 +65,9 @@ function SubMetric({
             </Text>
           ) : null}
         </View>
-        <View className={`min-w-0 flex-1 ${compact ? "mt-1" : "self-stretch"}`}>
+        <View
+          className={`min-w-0 ${compact ? "ml-10 mt-1" : "flex-1 justify-center"}`}
+        >
           {!compact ? (
             <Text className="font-ralewaySemiBold text-xs leading-4 text-description">
               {metric.label}
@@ -86,46 +88,48 @@ function SubMetric({
               {metric.value}
             </Text>
           )}
-          <View className={compact ? "min-h-5" : "min-h-10 justify-start"}>
-            {hasProgress ? (
-              isLoading ? (
-                <>
-                  <SkeletonBlock className="mt-1.5 h-1.5 w-full" />
-                  <SkeletonBlock className="h-2.5 w-8 self-end" />
-                </>
-              ) : (
-                <>
-                  <View
-                    className={`${compact ? "mt-1" : "mt-2"} h-1.5 w-full overflow-hidden rounded-full bg-primary/10`}
-                  >
+          {hasProgress || metric.detail ? (
+            <View className={hasProgress ? "" : "mt-0.5"}>
+              {hasProgress ? (
+                isLoading ? (
+                  <>
+                    <SkeletonBlock className="mt-1.5 h-1.5 w-full" />
+                    <SkeletonBlock className="h-2.5 w-8 self-end" />
+                  </>
+                ) : (
+                  <>
                     <View
-                      className="h-full rounded-full bg-primary"
-                      style={{ width: `${boundedProgress}%` }}
-                    />
-                  </View>
+                      className={`${compact ? "mt-1" : "mt-2"} h-1.5 w-full overflow-hidden rounded-full bg-primary/10`}
+                    >
+                      <View
+                        className="h-full rounded-full bg-primary"
+                        style={{ width: `${boundedProgress}%` }}
+                      />
+                    </View>
+                    <Text
+                      className={`text-right font-ralewayMedium text-description ${
+                        compact ? "text-[10px] leading-3" : "text-xs"
+                      }`}
+                    >
+                      {metric.detail ?? `${Math.round(boundedProgress)}%`}
+                    </Text>
+                  </>
+                )
+              ) : metric.detail ? (
+                isLoading ? (
+                  <SkeletonBlock className="h-3 w-1/2" />
+                ) : (
                   <Text
-                    className={`text-right font-ralewayMedium text-description ${
+                    className={`font-ralewayMedium text-description ${
                       compact ? "text-[10px] leading-3" : "text-xs"
                     }`}
                   >
-                    {metric.detail ?? `${Math.round(boundedProgress)}%`}
+                    {metric.detail}
                   </Text>
-                </>
-              )
-            ) : metric.detail ? (
-              isLoading ? (
-                <SkeletonBlock className="h-3 w-1/2" />
-              ) : (
-                <Text
-                  className={`font-ralewayMedium text-description ${
-                    compact ? "text-[10px] leading-3" : "text-xs"
-                  }`}
-                >
-                  {metric.detail}
-                </Text>
-              )
-            ) : null}
-          </View>
+                )
+              ) : null}
+            </View>
+          ) : null}
         </View>
       </View>
     </View>
@@ -151,7 +155,7 @@ function MainMetric({
     <View
       className={`overflow-hidden rounded-2xl border p-4 shadow-sm ${
         split
-          ? "min-h-[248px] flex-1 items-start justify-between border-primary/25 bg-secondary shadow-secondary/25"
+          ? "min-h-[216px] flex-1 items-start justify-between border-primary/25 bg-secondary shadow-secondary/25"
           : "min-h-32 flex-row items-center gap-4 border-textPrimary/10 bg-white shadow-textPrimary/10"
       }`}
     >

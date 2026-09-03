@@ -36,14 +36,6 @@ const PROFILE_FIELDS: ProfileFieldDefinition[] = [
     maxLength: 100,
   },
   {
-    field: "jobTitle",
-    icon: "briefcase-outline",
-    label: "Job title",
-    placeholder: "e.g. Property Manager",
-    autoCapitalize: "words",
-    maxLength: 80,
-  },
-  {
     field: "phoneNumber",
     icon: "call-outline",
     label: "Phone number",

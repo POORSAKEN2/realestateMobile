@@ -10,15 +10,17 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Path } from "react-native-svg";
 
+import BrandLogomarkWhite from "../../assets/branding/svg/brand-logomark-white.svg";
 import { colors } from "../../constants/colors";
+import { tabBarLayout } from "../../constants/tabBar";
 
-const ADD_BUTTON_SIZE = 60;
-const ADD_BUTTON_GAP = 12;
+const ADD_BUTTON_SIZE = tabBarLayout.addButtonSize;
+const ADD_BUTTON_GAP = 24;
 const NOTCH_DEPTH = ADD_BUTTON_SIZE / 2 + ADD_BUTTON_GAP;
-const NOTCH_HALF_WIDTH = 76;
-const NOTCH_OUTER_CONTROL = 40;
-const NOTCH_INNER_CONTROL = 48;
-const TAB_BAR_CONTENT_HEIGHT = 64;
+const NOTCH_HALF_WIDTH = 64;
+const NOTCH_OUTER_CONTROL = 28;
+const NOTCH_INNER_CONTROL = 56;
+const TAB_BAR_CONTENT_HEIGHT = tabBarLayout.contentHeight;
 const TAB_BAR_TOP = NOTCH_DEPTH;
 const PRIMARY_TABS = [
   { label: "Home", name: "dashboard" },
@@ -57,10 +59,33 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
         width,
       }}
     >
+      <View
+        accessibilityLabel="Add, unavailable"
+        accessibilityRole="button"
+        accessibilityState={{ disabled: true }}
+        className="absolute items-center justify-center rounded-full bg-primary shadow-lg shadow-slate-300"
+        pointerEvents="none"
+        style={{
+          height: ADD_BUTTON_SIZE,
+          left: center - ADD_BUTTON_SIZE / 2,
+          top: TAB_BAR_TOP - ADD_BUTTON_SIZE / 2 + tabBarLayout.addButtonOffset,
+          width: ADD_BUTTON_SIZE,
+          zIndex: 0,
+        }}
+      >
+        <BrandLogomarkWhite width={40} height={40} />
+      </View>
+
       <Svg
         height={totalHeight}
         pointerEvents="none"
-        style={{ left: 0, overflow: "visible", position: "absolute", top: 0 }}
+        style={{
+          left: 0,
+          overflow: "visible",
+          position: "absolute",
+          top: 0,
+          zIndex: 1,
+        }}
         width={width}
       >
         <Path
@@ -81,6 +106,7 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
           position: "absolute",
           right: 0,
           top: TAB_BAR_TOP,
+          zIndex: 2,
         }}
       >
         {PRIMARY_TABS.map((tab) => {
@@ -135,22 +161,6 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
             </TouchableOpacity>
           );
         })}
-      </View>
-
-      <View
-        accessibilityLabel="Add, unavailable"
-        accessibilityRole="button"
-        accessibilityState={{ disabled: true }}
-        className="absolute items-center justify-center rounded-full bg-primary"
-        pointerEvents="none"
-        style={{
-          height: ADD_BUTTON_SIZE,
-          left: center - ADD_BUTTON_SIZE / 2,
-          top: TAB_BAR_TOP - ADD_BUTTON_SIZE / 2,
-          width: ADD_BUTTON_SIZE,
-        }}
-      >
-        <Ionicons name="add" color={colors.whitePrimary} size={36} />
       </View>
     </View>
   );

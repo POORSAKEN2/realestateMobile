@@ -20,7 +20,7 @@ export type SnackbarProps = {
 export type ScreenSnackbarPlacement = "above-navigation" | "screen-bottom";
 
 const SCREEN_PLACEMENT_CLASSES: Record<ScreenSnackbarPlacement, string> = {
-  "above-navigation": "bottom-28",
+  "above-navigation": "bottom-40",
   "screen-bottom": "bottom-6",
 };
 

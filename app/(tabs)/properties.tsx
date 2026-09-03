@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import { useMemo, useRef, useState } from "react";
-import { FlatList, RefreshControl, View } from "react-native";
+import { View } from "react-native";
 
+import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { PropertyCard } from "../../components/properties/PropertyCard";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
@@ -45,7 +46,6 @@ export default function PropertiesScreen() {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
   );
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { useList } = useProperties(accessToken);
   const { data: properties = [], isError, isLoading, refetch } = useList();
@@ -123,12 +123,7 @@ export default function PropertiesScreen() {
   );
 
   async function refreshProperties() {
-    setIsRefreshing(true);
-    try {
-      await refetch();
-    } finally {
-      setIsRefreshing(false);
-    }
+    await refetch();
   }
 
   return (
@@ -137,7 +132,7 @@ export default function PropertiesScreen() {
         <View className="px-1 pb-5">
           <ModuleHeader
             action={<AddButton title="Add" onPress={openForm} />}
-            eyebrow="Asset Management"
+            eyebrow="Portfolio Intelligence"
             title="Properties"
           />
         </View>
@@ -162,7 +157,7 @@ export default function PropertiesScreen() {
           />
         </View>
 
-        <FlatList
+        <PullToRefreshFlatList
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
           data={propertyListItems}
           ItemSeparatorComponent={() => <View className="h-4" />}
@@ -257,14 +252,7 @@ export default function PropertiesScreen() {
               />
             );
           }}
-          refreshControl={
-            <RefreshControl
-              colors={["#8A77F4"]}
-              onRefresh={refreshProperties}
-              refreshing={isRefreshing}
-              tintColor="#8A77F4"
-            />
-          }
+          onRefresh={refreshProperties}
           showsVerticalScrollIndicator={false}
         />
       </View>

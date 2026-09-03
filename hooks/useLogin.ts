@@ -68,7 +68,6 @@ export function useLogin() {
         user: user && typeof user === "object" ? normalizeUser(user) : user,
         onboarding,
       });
-      Alert.alert("Signed in", "Signed in successfully.");
       router.replace("/(tabs)/dashboard");
     } catch (err) {
       const message = getErrorMessage(err);

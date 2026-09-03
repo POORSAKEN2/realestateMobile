@@ -17,7 +17,7 @@ export function ExpenseHeader({ onAddExpense }: ExpenseHeaderProps) {
           textClassName="font-ralewayBold text-xs text-white"
         />
       }
-      eyebrow="Portfolio Operations"
+      eyebrow="Operations"
       leading={
         <SecondaryBackButton
           accessibilityLabel="Back from expenses"

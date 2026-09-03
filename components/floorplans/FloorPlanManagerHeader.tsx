@@ -52,7 +52,7 @@ export function FloorPlanManagerHeader({
             </Text>
           </TouchableOpacity>
         }
-        eyebrow="Property Layout"
+        eyebrow="Portfolio Intelligence"
         leading={
           <BackButton
             accessibilityLabel="Back to properties"

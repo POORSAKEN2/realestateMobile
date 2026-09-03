@@ -1,5 +1,4 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
 import { View } from "react-native";
 
 import { FloorAreaManagerHeader } from "../../components/floorplans/FloorAreaManagerHeader";
@@ -65,7 +64,6 @@ export default function FloorAreasScreen() {
     propertyId,
     roomCapability: basePolicy.rooms,
   });
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const floorPlanSnackbar = useFloorPlanSnackbar({
     clearNotice: controller.actions.clearNotice,
     isImageUploading: controller.pending.imageUpload,
@@ -100,16 +98,11 @@ export default function FloorAreasScreen() {
     controller.queries.rooms.isError;
 
   async function refreshFloorAreas() {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([
-        propertyQuery.refetch(),
-        controller.queries.floorPlans.refetch(),
-        controller.queries.rooms.refetch(),
-      ]);
-    } finally {
-      setIsRefreshing(false);
-    }
+    await Promise.all([
+      propertyQuery.refetch(),
+      controller.queries.floorPlans.refetch(),
+      controller.queries.rooms.refetch(),
+    ]);
   }
 
   return (
@@ -149,7 +142,6 @@ export default function FloorAreasScreen() {
             onSaveShape={actions.saveShape}
             onSelectFloor={actions.selectFloor}
             onToggleAreaVisibility={controller.visibility.toggle}
-            refreshing={isRefreshing}
             roomGuidance={getRoomManagementGuidance(policy)}
             rooms={controller.rooms}
             showRoomActions={policy.showRoomActions}

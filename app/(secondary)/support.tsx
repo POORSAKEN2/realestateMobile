@@ -2,16 +2,14 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  FlatList,
   Linking,
-  RefreshControl,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
+import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { FaqAccordion } from "../../components/support/FaqAccordion";
 import { SupportTicketModal } from "../../components/support/SupportTicketModal";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
@@ -70,7 +68,7 @@ export default function SupportScreen() {
               </Text>
             </TouchableOpacity>
           }
-          eyebrow="Help & Assistance"
+          eyebrow="Account"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from support"
@@ -144,19 +142,12 @@ export default function SupportScreen() {
                 <ActivityIndicator size="large" color={colors.primary} />
               </View>
             ) : (
-              <FlatList
+              <PullToRefreshFlatList
                 className="flex-1 -mx-1 px-1"
                 contentContainerClassName="pb-12 pt-1"
                 data={filteredFaqs}
                 keyExtractor={(item) => String(item.id)}
-                refreshControl={
-                  <RefreshControl
-                    colors={[colors.primary]}
-                    refreshing={false}
-                    tintColor={colors.primary}
-                    onRefresh={refetchFaqs}
-                  />
-                }
+                onRefresh={refetchFaqs}
                 renderItem={({ item }) => <FaqAccordion faq={item} />}
                 ListEmptyComponent={
                   <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-white p-8 mt-4">
@@ -180,19 +171,12 @@ export default function SupportScreen() {
                 <ActivityIndicator size="large" color={colors.primary} />
               </View>
             ) : (
-              <FlatList
+              <PullToRefreshFlatList
                 className="flex-1 -mx-1 px-1"
                 contentContainerClassName="pb-12 pt-1"
                 data={tickets}
                 keyExtractor={(item) => String(item.id)}
-                refreshControl={
-                  <RefreshControl
-                    colors={[colors.primary]}
-                    refreshing={false}
-                    tintColor={colors.primary}
-                    onRefresh={refetchTickets}
-                  />
-                }
+                onRefresh={refetchTickets}
                 renderItem={({ item }) => {
                   const isResolved = item.status === "Resolved" || item.status === "Closed";
                   return (

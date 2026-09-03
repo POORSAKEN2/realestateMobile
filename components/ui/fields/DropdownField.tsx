@@ -12,6 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { getStandardModalSheetHeight } from "../../../constants/modal";
 import { BottomSheetModal } from "../BottomSheetModal";
 import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "../ModalActionFooter";
+import { ModalHeader } from "../ModalHeader";
 
 const DROPDOWN_OPTION_GAP = 8;
 
@@ -113,34 +114,16 @@ export function DropdownField<T extends string>({
         visible={isOpen}
       >
         <SafeAreaView
-          className="w-full overflow-hidden rounded-t-[28px] bg-whitePrimary px-5"
+          className="w-full overflow-hidden rounded-t-[28px] bg-whitePrimary"
           edges={["bottom", "left", "right"]}
           style={{ height: sheetHeight }}
         >
-          <View className="mb-4 flex-row items-start justify-between gap-3">
-            <View className="min-w-0 flex-1">
-              <Text className="font-ralewayExtraBold text-lg text-textPrimary">
-                Select {label}
-              </Text>
-              {subtitle ? (
-                <Text
-                  className="mt-1 font-ralewayBold text-xs text-description"
-                  numberOfLines={2}
-                >
-                  {subtitle}
-                </Text>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              accessibilityLabel={`Close ${label} options`}
-              accessibilityRole="button"
-              activeOpacity={0.85}
-              className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
-              onPress={() => setIsOpen(false)}
-            >
-              <MaterialCommunityIcons name="close" color="#8A77F4" size={20} />
-            </TouchableOpacity>
-          </View>
+          <ModalHeader
+            closeAccessibilityLabel={`Close ${label} options`}
+            onClose={() => setIsOpen(false)}
+            subtitle={subtitle}
+            title={`Select ${label}`}
+          />
 
           <ScrollView
             bounces={false}
@@ -148,6 +131,8 @@ export function DropdownField<T extends string>({
             contentContainerStyle={{
               gap: DROPDOWN_OPTION_GAP,
               paddingBottom: MODAL_ACTION_FOOTER_CONTENT_HEIGHT,
+              paddingHorizontal: 20,
+              paddingTop: 16,
             }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}

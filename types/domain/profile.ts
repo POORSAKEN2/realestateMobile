@@ -8,7 +8,7 @@ export type ProfileForm = {
   imageUri: string;
 };
 
-export type EditableProfileField = Exclude<keyof ProfileForm, "imageUri">;
+export type EditableProfileField = "fullName" | "companyName" | "phoneNumber";
 
 export type ProfileImageUpload = {
   uri: string;
@@ -20,7 +20,6 @@ export type ProfileImageUpload = {
 export type UpdateUserProfilePayload = {
   name: string;
   company: string;
-  role: string;
   phone: string;
   profileImage?: ProfileImageUpload | null;
 };
