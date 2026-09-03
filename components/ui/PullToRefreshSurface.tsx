@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo, type ReactElement } from "react";
-import { StyleSheet, View, type ScrollViewProps } from "react-native";
+import { View, type ScrollViewProps } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   cancelAnimation,
@@ -27,7 +27,7 @@ const SCROLL_DEFAULTS = {
   bounces: false,
   overScrollMode: "never",
   scrollEventThrottle: 16,
-  style: { flex: 1, zIndex: 0 },
+  className: "z-0 flex-1",
 } as const;
 
 export type PullToRefreshProps = PullToRefreshOptions;
@@ -129,7 +129,7 @@ export function PullToRefreshSurface({
 
   return (
     <GestureDetector gesture={pullGesture}>
-      <View className={className} style={[styles.container, style]}>
+      <View className={`relative flex-1 ${className ?? ""}`} style={style}>
         <GestureDetector gesture={nativeGesture}>
           {children({
             ...SCROLL_DEFAULTS,
@@ -138,20 +138,24 @@ export function PullToRefreshSurface({
             onAccessibilityAction: handleAccessibilityAction,
           })}
         </GestureDetector>
-        <View pointerEvents="none" style={styles.overlay}>
+        <View
+          className="elevation-[100] absolute inset-0 z-[100] items-center overflow-hidden"
+          pointerEvents="none"
+        >
           <Animated.View
             accessible={refreshing}
             accessibilityElementsHidden={!refreshing}
             accessibilityLabel="Refreshing content"
             accessibilityRole="progressbar"
             accessibilityState={{ busy: refreshing }}
+            className="h-[48px] w-[48px] items-center justify-center rounded-full bg-whitePrimary"
             importantForAccessibility={
               refreshing ? "yes" : "no-hide-descendants"
             }
-            style={[styles.indicator, indicatorStyle]}
+            style={indicatorStyle}
           >
             <Animated.View style={iconStyle}>
-              <Ionicons name="refresh" color={colors.whitePrimary} size={28} />
+              <Ionicons name="refresh" color={colors.primary} size={28} />
             </Animated.View>
           </Animated.View>
         </View>
@@ -159,22 +163,3 @@ export function PullToRefreshSurface({
     </GestureDetector>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, position: "relative" },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    zIndex: 100,
-    elevation: 100,
-    overflow: "hidden",
-    alignItems: "center",
-  },
-  indicator: {
-    width: INDICATOR_SIZE,
-    height: INDICATOR_SIZE,
-    borderRadius: INDICATOR_SIZE / 2,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.text,
-  },
-});
