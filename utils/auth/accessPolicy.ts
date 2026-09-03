@@ -1,6 +1,24 @@
 export type AppRole = "ADMIN" | "MANAGER";
 
+// Dashboard entry permissions mirror the backend permission matrix.
+// Tenant records use clients.*; tenants.* manages organization accounts.
+const SHARED_MODULE_PERMISSIONS = [
+  "leads.viewAny",
+  "leases.viewAny",
+  "payments.viewAny",
+  "expenses.viewAny",
+  "documents.viewAny",
+  "bookings.viewAny",
+  "properties.viewAny",
+  "clients.viewAny",
+  "analytics.viewStats",
+  "billing.viewEntitlement",
+  "notifications.viewAny",
+  "support-tickets.viewAny",
+] as const;
+
 export type AppPermission =
+  | (typeof SHARED_MODULE_PERMISSIONS)[number]
   | "billing.checkout"
   | "dashboard.admin"
   | "dashboard.manager"
@@ -9,12 +27,13 @@ export type AppPermission =
 
 const ROLE_PERMISSIONS: Record<AppRole, ReadonlySet<AppPermission>> = {
   ADMIN: new Set([
+    ...SHARED_MODULE_PERMISSIONS,
     "billing.checkout",
     "dashboard.admin",
     "expenses.approve",
     "staff.manage",
   ]),
-  MANAGER: new Set(["dashboard.manager"]),
+  MANAGER: new Set([...SHARED_MODULE_PERMISSIONS, "dashboard.manager"]),
 };
 
 function readRole(user: unknown) {
