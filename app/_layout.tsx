@@ -23,6 +23,7 @@ import { AppleMapsTokenBootstrap } from "../components/maps/AppleMapsTokenBootst
 import { MapKitGeocodingProvider } from "../components/maps/MapKitGeocodingProvider";
 import { NotificationBootstrap } from "../components/notifications/NotificationBootstrap";
 import { EntitlementLimitPrompt } from "../components/billing/EntitlementLimitPrompt";
+import { AccessDeniedPrompt } from "../components/auth/AccessDeniedPrompt";
 import { AuthProvider } from "../context/AuthContext";
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
 
@@ -97,6 +98,7 @@ export default function RootLayout() {
                 />
               </Stack>
               <EntitlementLimitPrompt />
+              <AccessDeniedPrompt />
             </DefaultLocationProvider>
           </MapKitGeocodingProvider>
         </AuthProvider>

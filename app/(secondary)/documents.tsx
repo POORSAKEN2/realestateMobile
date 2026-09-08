@@ -49,6 +49,7 @@ export default function DocumentsScreen() {
     properties,
     refresh,
     saveDocument,
+    storageRemainingLabel,
   } = useDocumentLibrary();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -313,6 +314,7 @@ export default function DocumentsScreen() {
         onSubmit={() => void submitForm()}
         properties={properties}
         selectedFile={selectedFile}
+        storageRemainingLabel={storageRemainingLabel}
         visible={isFormVisible}
       />
       <ScreenSnackbar

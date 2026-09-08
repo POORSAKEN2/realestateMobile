@@ -19,6 +19,7 @@ export interface SupportTicket {
   status: TicketStatus | string;
   priority: TicketPriority | string;
   category?: string;
+  support_level?: "community" | "priority" | "named_escalation" | string;
   created_at?: string;
   updated_at?: string;
 }

@@ -66,15 +66,21 @@ export default function PropertiesScreen() {
     formError,
     isFormVisible,
     isLoadingExistingDocuments,
+    isLoadingPropertyOwners,
     isSaving,
     openCreateForm: openForm,
     openEditForm,
     pickDocuments,
     pickImages: pickImage,
+    propertyOwnerChoices,
+    propertyOwnersError,
+    publishingBlocked,
+    publishingQuotaLabel,
     removeDocument,
     removeImage,
     selectedDocuments,
     selectedImages,
+    storageRemainingLabel,
     selectSuggestedLocation: selectLocation,
     submitForm: handleSubmit,
     updateClassification,
@@ -288,6 +294,11 @@ export default function PropertiesScreen() {
           onCoordinatesChange={updateCoordinates}
           onSelectSuggestedLocation={selectLocation}
           onUpdate={updateForm}
+          propertyOwnerChoices={propertyOwnerChoices}
+          propertyOwnersError={propertyOwnersError}
+          propertyOwnersLoading={isLoadingPropertyOwners}
+          publishingBlocked={publishingBlocked}
+          publishingQuotaLabel={publishingQuotaLabel}
           propertyTypeChoices={propertyTypeChoices}
         />
 
@@ -296,6 +307,7 @@ export default function PropertiesScreen() {
           maxImages={MAX_PROPERTY_IMAGES}
           onPick={pickImage}
           onRemove={removeImage}
+          storageHint={storageRemainingLabel}
         />
 
         <PropertyDocumentsField
@@ -305,6 +317,7 @@ export default function PropertiesScreen() {
           isLoadingExistingDocuments={isLoadingExistingDocuments}
           onPick={pickDocuments}
           onRemove={removeDocument}
+          storageHint={storageRemainingLabel}
         />
       </AddEditModal>
 

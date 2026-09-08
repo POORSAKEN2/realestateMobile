@@ -23,6 +23,8 @@ import {
   useSupportTickets,
 } from "../../hooks/api/useSupport";
 import type { CreateSupportTicketPayload } from "../../types/domain/support";
+import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
+import { supportLevelLabel } from "../../utils/billing/entitlementCapabilities";
 
 export default function SupportScreen() {
   const [activeTab, setActiveTab] = useState<"faqs" | "tickets">("faqs");
@@ -33,6 +35,9 @@ export default function SupportScreen() {
   const { data: faqs = [], isLoading: isFaqsLoading, refetch: refetchFaqs } = useFaqs();
   const { data: tickets = [], isLoading: isTicketsLoading, refetch: refetchTickets } = useSupportTickets();
   const createTicketMutation = useCreateSupportTicket();
+  const entitlementQuery = useBillingEntitlement();
+  const currentSupportLevel =
+    entitlementQuery.data?.limits?.support_level?.level;
 
   const filteredFaqs = useMemo(() => {
     if (!searchQuery.trim()) return faqs;
@@ -80,6 +85,20 @@ export default function SupportScreen() {
         <Text className="mt-2 text-base leading-6 text-description">
           Find instant answers to common questions or submit a ticket to our support team.
         </Text>
+
+        <View className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/10 p-4">
+          <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white">
+            <Feather name="headphones" size={18} color={colors.primary} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="font-ralewayBold text-sm text-textPrimary">
+              {supportLevelLabel(currentSupportLevel)}
+            </Text>
+            <Text className="mt-1 text-xs leading-4 text-description">
+              New tickets use the support level active when submitted.
+            </Text>
+          </View>
+        </View>
 
         {/* Tab Switcher */}
         <View className="mt-4 flex-row rounded-2xl bg-primary/10 p-1">
@@ -205,6 +224,11 @@ export default function SupportScreen() {
                       {item.created_at ? (
                         <Text className="mt-2 font-ralewayMedium text-[10px] text-description/70">
                           Submitted {item.created_at.slice(0, 10)}
+                        </Text>
+                      ) : null}
+                      {item.support_level ? (
+                        <Text className="mt-2 font-ralewayBold text-[10px] uppercase text-primary">
+                          {supportLevelLabel(item.support_level)}
                         </Text>
                       ) : null}
                     </View>

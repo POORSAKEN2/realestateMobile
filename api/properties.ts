@@ -143,8 +143,16 @@ export function normalizeProperty(property: Record<string, any>): Property {
     media?.original_url ??
     media?.url ??
     media?.preview_url;
-  const image =
-    getImageUrl(rawImage) || normalizedImages[0] || DEFAULT_PROPERTY_IMAGE;
+  const actualImages = Array.from(
+    new Set(
+      [
+        getImageUrl(rawImage),
+        ...normalizedImages,
+        ...normalizedMediaImages,
+      ].filter(Boolean),
+    ),
+  );
+  const image = actualImages[0] || DEFAULT_PROPERTY_IMAGE;
   const lat =
     property?.lat ??
     property?.latitude ??
@@ -200,11 +208,7 @@ export function normalizeProperty(property: Record<string, any>): Property {
     lat: lat !== undefined && lat !== null ? Number(lat) : undefined,
     lng: lng !== undefined && lng !== null ? Number(lng) : undefined,
     image,
-    images: Array.from(
-      new Set(
-        [image, ...normalizedImages, ...normalizedMediaImages].filter(Boolean),
-      ),
-    ),
+    images: actualImages,
     parentId: property?.parentId ?? property?.parent_id,
     isTransientBookable: normalizeBoolean(
       property?.isTransientBookable ??
@@ -222,14 +226,21 @@ export function normalizeProperty(property: Record<string, any>): Property {
     city: property?.city ?? undefined,
     postal_code: property?.postal_code ?? property?.postalCode ?? undefined,
     postalCode: property?.postal_code ?? property?.postalCode ?? undefined,
-    is_public_listed: normalizeBoolean(property?.is_public_listed ?? property?.isPublicListed ?? false),
-    isPublicListed: normalizeBoolean(property?.is_public_listed ?? property?.isPublicListed ?? false),
-    listing_headline: property?.listing_headline ?? undefined,
-    listing_description: property?.listing_description ?? undefined,
-    listing_monthly_rent: property?.listing_monthly_rent !== undefined && property?.listing_monthly_rent !== null
-      ? Number(property.listing_monthly_rent)
-      : undefined,
-    listing_available_from: property?.listing_available_from ?? undefined,
+    isPublished: normalizeBoolean(
+      property?.isPublished ??
+        property?.is_published ??
+        property?.isPublicListed ??
+        property?.is_public_listed ??
+        false,
+    ),
+    listingMode: property?.listingMode ?? property?.listing_mode ?? undefined,
+    listingType: property?.listingType ?? property?.listing_type ?? undefined,
+    sqm:
+      property?.sqm !== undefined && property?.sqm !== null
+        ? Number(property.sqm)
+        : undefined,
+    ownerId: property?.ownerId ?? property?.owner_id ?? undefined,
+    description: property?.description ?? undefined,
     floorplans: Array.isArray(property?.floorplans)
       ? property.floorplans.map((floorPlan: Record<string, any>) =>
           normalizeFloorPlan(floorPlan),

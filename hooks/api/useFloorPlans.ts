@@ -14,6 +14,7 @@ import {
   updatePropertyRoom,
   uploadFloorPlanImage,
 } from "../../api/floorplans";
+import { BILLING_ENTITLEMENT_QUERY_KEY } from "./useBillingEntitlement";
 
 export const floorPlanKeys = {
   property: (propertyId: string) => ["floorplans", propertyId] as const,
@@ -62,6 +63,7 @@ export function usePropertyRoomsQuery(
 
 export function useFloorCommands(propertyId: string, accessToken?: string) {
   const invalidate = useFloorPlanInvalidation(propertyId);
+  const queryClient = useQueryClient();
 
   return {
     create: useMutation({
@@ -77,7 +79,11 @@ export function useFloorCommands(propertyId: string, accessToken?: string) {
     remove: useMutation({
       mutationFn: (id: string) => deleteFloorPlan(id, accessToken),
       onSuccess: async () => {
-        await Promise.all([invalidate.floorPlans(), invalidate.rooms()]);
+        await Promise.all([
+          invalidate.floorPlans(),
+          invalidate.rooms(),
+          queryClient.invalidateQueries({ queryKey: BILLING_ENTITLEMENT_QUERY_KEY }),
+        ]);
       },
     }),
     uploadImage: useMutation({
@@ -88,7 +94,11 @@ export function useFloorCommands(propertyId: string, accessToken?: string) {
         floorPlanId: string;
         image: Parameters<typeof uploadFloorPlanImage>[1];
       }) => uploadFloorPlanImage(floorPlanId, image, accessToken),
-      onSuccess: invalidate.floorPlans,
+      onSuccess: () =>
+        Promise.all([
+          invalidate.floorPlans(),
+          queryClient.invalidateQueries({ queryKey: BILLING_ENTITLEMENT_QUERY_KEY }),
+        ]),
     }),
   };
 }

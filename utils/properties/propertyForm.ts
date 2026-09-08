@@ -8,6 +8,8 @@ import {
   type Property,
   type PropertyClassification,
   type PropertyDocument,
+  type PropertyListingMode,
+  type PropertyListingType,
   type PropertyType,
 } from "../../types";
 
@@ -30,6 +32,11 @@ export type FormState = {
   area: string;
   description: string;
   isTransientBookable: boolean;
+  isPublished: boolean;
+  listingMode: PropertyListingMode;
+  listingType: PropertyListingType | "";
+  ownerId: string;
+  sqm: string;
 };
 
 export type Choice<T extends string> = { label: string; value: T };
@@ -57,6 +64,19 @@ export const propertyClassificationChoices: Choice<PropertyClassification>[] =
     label: classification,
     value: classification as PropertyClassification,
   }));
+
+export const propertyListingModeChoices: Choice<PropertyListingMode>[] = [
+  { label: "For rent", value: "rent" },
+  { label: "For sale", value: "sale" },
+  { label: "Short stay", value: "stay" },
+];
+
+export const propertyListingTypeChoices: Choice<PropertyListingType>[] = [
+  { label: "Condominium", value: "Condominium" },
+  { label: "House", value: "House" },
+  { label: "Office", value: "Office" },
+  { label: "Land", value: "Land" },
+];
 
 export function getPropertyTypeChoices(
   classification: PropertyClassification,
@@ -143,6 +163,11 @@ export const emptyForm: FormState = {
   area: "",
   description: "",
   isTransientBookable: false,
+  isPublished: false,
+  listingMode: "rent",
+  listingType: "",
+  ownerId: "",
+  sqm: "",
 };
 
 export function formatStatus(status: string) {
@@ -229,8 +254,18 @@ export function toFormState(property: Property): FormState {
         ? String(property.lng)
         : "",
     area: property.area ?? "",
-    description: "",
+    description: property.description ?? "",
     isTransientBookable: Boolean(property.isTransientBookable),
+    isPublished: Boolean(
+      property.isPublished ?? property.isPublicListed ?? property.is_public_listed,
+    ),
+    listingMode: property.listingMode ?? "rent",
+    listingType: property.listingType ?? "",
+    ownerId: property.ownerId ?? "",
+    sqm:
+      property.sqm !== undefined && property.sqm !== null
+        ? String(property.sqm)
+        : "",
   };
 }
 export function toSelectedImage(

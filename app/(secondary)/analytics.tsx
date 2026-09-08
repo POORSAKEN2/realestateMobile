@@ -14,6 +14,7 @@ import Svg, {
 import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { useProperties } from "../../hooks/api/useProperties";
 import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
+import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
@@ -23,6 +24,10 @@ import type { PortfolioSnapshot, Property } from "../../types";
 import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
 import { colors } from "../../constants/colors";
 import { shareFinancialSummaryCsv } from "../../api/reports";
+import {
+  hasAnalyticsDepth,
+  retentionDescription,
+} from "../../utils/billing/entitlementCapabilities";
 
 type MetricCard = {
   label: string;
@@ -384,20 +389,30 @@ function AnalyticsLoadingState() {
 export default function AnalyticsScreen() {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
+  const entitlementQuery = useBillingEntitlement();
+  const canViewHistory = hasAnalyticsDepth(
+    entitlementQuery.data,
+    "historical",
+  );
+  const retentionDays = entitlementQuery.data?.limits?.retention_days?.days;
   const {
     stats,
     history,
     isLoading: isLoadingAnalytics,
     isLoadingStats,
     refetch: refetchAnalytics,
-  } = usePortfolioAnalytics(accessToken);
+  } = usePortfolioAnalytics(accessToken, {
+    historyEnabled: canViewHistory,
+    retentionDays,
+  });
   const { useList } = useProperties();
   const {
     data: properties = [],
     isLoading: isLoadingProperties,
     refetch: refetchProperties,
   } = useList();
-  const isInitialLoading = isLoadingAnalytics || isLoadingProperties;
+  const isInitialLoading =
+    isLoadingAnalytics || isLoadingProperties || entitlementQuery.isLoading;
 
   const metricCards = useMemo<MetricCard[]>(
     () => [
@@ -451,7 +466,11 @@ export default function AnalyticsScreen() {
   }, [properties]);
 
   async function refreshAnalytics() {
-    await Promise.all([refetchAnalytics(), refetchProperties()]);
+    await Promise.all([
+      refetchAnalytics(),
+      refetchProperties(),
+      entitlementQuery.refetch(),
+    ]);
   }
 
   return (
@@ -508,7 +527,30 @@ export default function AnalyticsScreen() {
               ))}
             </View>
 
-            <PerformanceChart history={history} />
+            {canViewHistory ? (
+              <>
+                <PerformanceChart history={history} />
+                <Text className="mt-2 px-2 text-xs text-description">
+                  {retentionDescription(entitlementQuery.data)}. Chart shows latest six snapshots.
+                </Text>
+              </>
+            ) : (
+              <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+                <View className="flex-row items-center gap-3">
+                  <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                    <Feather name="lock" size={18} color={colors.primary} />
+                  </View>
+                  <View className="min-w-0 flex-1">
+                    <Text className="font-ralewayBold text-base text-textPrimary">
+                      Historical analytics
+                    </Text>
+                    <Text className="mt-1 text-xs leading-5 text-description">
+                      Current-period metrics remain available. Upgrade to Tier 1 for portfolio history.
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            )}
             <DistributionChart slices={distributionSlices} />
 
             {/* Financial Summary Export */}

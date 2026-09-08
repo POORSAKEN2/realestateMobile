@@ -6,6 +6,8 @@ import {
   cleanDecimal,
   cleanInteger,
   propertyClassificationChoices,
+  propertyListingModeChoices,
+  propertyListingTypeChoices,
   propertyStatusChoices,
   requiresBedroomAndBathroomCounts,
   seaCountryChoices,
@@ -29,6 +31,11 @@ export function PropertyCoreFields({
   onCoordinatesChange,
   onSelectSuggestedLocation,
   onUpdate,
+  propertyOwnerChoices,
+  propertyOwnersError,
+  propertyOwnersLoading,
+  publishingBlocked,
+  publishingQuotaLabel,
   propertyTypeChoices,
 }: {
   form: FormState;
@@ -37,6 +44,11 @@ export function PropertyCoreFields({
   onCoordinatesChange: (coordinates: { lat: string; lng: string }) => void;
   onSelectSuggestedLocation: (location: string) => void;
   onUpdate: UpdateForm;
+  propertyOwnerChoices: Choice<string>[];
+  propertyOwnersError?: string;
+  propertyOwnersLoading: boolean;
+  publishingBlocked: boolean;
+  publishingQuotaLabel?: string;
   propertyTypeChoices: Choice<PropertyType>[];
 }) {
   const filteredLocationSuggestions = locationSuggestions;
@@ -288,6 +300,98 @@ export function PropertyCoreFields({
             />
           </View>
         </View>
+      </PropertyFormSection>
+
+      <PropertyFormSection
+        description="Publish eligible properties to the Terrane marketplace. Listing limits follow your plan."
+        icon="storefront-outline"
+        title="Marketplace listing"
+        variant="card"
+      >
+        <View className={`rounded-2xl border border-primary/20 bg-primary/5 p-4 ${publishingBlocked ? "opacity-60" : ""}`}>
+          <View className="flex-row items-center justify-between gap-4">
+            <View className="min-w-0 flex-1 flex-row items-center gap-3">
+              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                <MaterialCommunityIcons
+                  name="earth"
+                  color="#8A77F4"
+                  size={21}
+                />
+              </View>
+              <View className="min-w-0 flex-1">
+                <Text className="font-ralewayExtraBold text-sm text-textPrimary">
+                  Publish property
+                </Text>
+                <Text className="mt-1 text-xs leading-4 text-description">
+                  Requires a verified owner, listing mode, map pin, photo, and price.
+                </Text>
+                {publishingQuotaLabel ? (
+                  <Text className="mt-1 font-ralewaySemiBold text-[11px] text-primary">
+                    {publishingQuotaLabel}
+                  </Text>
+                ) : null}
+              </View>
+            </View>
+            <Switch
+              accessibilityLabel="Publish property"
+              disabled={publishingBlocked}
+              onValueChange={(value) => updateForm("isPublished", value)}
+              thumbColor="#FFFFFF"
+              trackColor={{ false: "#6F6D6D", true: "#8A77F4" }}
+              value={form.isPublished}
+            />
+          </View>
+        </View>
+
+        {publishingBlocked ? (
+          <Text className="text-xs leading-4 text-warning">
+            Published-listing limit reached. Unpublish another property or upgrade your plan.
+          </Text>
+        ) : null}
+
+        {form.isPublished ? (
+          <>
+            <DropdownField
+              disabled={propertyOwnersLoading || propertyOwnerChoices.length === 0}
+              label="Verified property owner"
+              options={propertyOwnerChoices}
+              onSelect={(value) => updateForm("ownerId", value)}
+              placeholder={propertyOwnersLoading ? "Loading owners..." : "Select owner"}
+              value={form.ownerId}
+              required
+              variant="filled"
+            />
+            {!propertyOwnersLoading && propertyOwnerChoices.length === 0 ? (
+              <Text className="text-xs leading-4 text-warning">
+                {propertyOwnersError ?? "No verified property owner is available. Verify an owner before publishing."}
+              </Text>
+            ) : null}
+            <DropdownField
+              label="Listing mode"
+              options={propertyListingModeChoices}
+              onSelect={(value) => updateForm("listingMode", value)}
+              value={form.listingMode}
+              required
+              variant="filled"
+            />
+            <DropdownField
+              label="Listing type"
+              options={propertyListingTypeChoices}
+              onSelect={(value) => updateForm("listingType", value)}
+              placeholder="Optional"
+              value={form.listingType}
+              variant="filled"
+            />
+            <BaseField
+              keyboardType="number-pad"
+              label="Listing floor area (sqm)"
+              onChangeText={(value) => updateForm("sqm", cleanInteger(value))}
+              placeholder="Optional"
+              value={form.sqm}
+              variant="filled"
+            />
+          </>
+        ) : null}
       </PropertyFormSection>
     </>
   );

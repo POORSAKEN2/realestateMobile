@@ -46,6 +46,7 @@ export function DocumentFormModal({
   onSubmit,
   properties,
   selectedFile,
+  storageRemainingLabel,
   visible,
 }: {
   editingDocument: PropertyDocument | null;
@@ -61,6 +62,7 @@ export function DocumentFormModal({
   onSubmit: () => void;
   properties: Property[];
   selectedFile: DocumentUpload | null;
+  storageRemainingLabel?: string;
   visible: boolean;
 }) {
   const { can } = useAccess();
@@ -184,6 +186,11 @@ export function DocumentFormModal({
                   onPick={onPickFile}
                   selectedFile={selectedFile}
                 />
+                {storageRemainingLabel ? (
+                  <Text className="text-xs text-description">
+                    {storageRemainingLabel}
+                  </Text>
+                ) : null}
               </FormSection>
 
               <FormSection

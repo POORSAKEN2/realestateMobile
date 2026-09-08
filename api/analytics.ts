@@ -11,10 +11,14 @@ export async function fetchPortfolioStats(accessToken?: string) {
   return unwrapData<PortfolioStats>(response);
 }
 
-export async function fetchPortfolioHistory(accessToken?: string) {
+export async function fetchPortfolioHistory(
+  accessToken?: string,
+  days?: number | null,
+) {
+  const query = typeof days === "number" ? `?days=${encodeURIComponent(days)}` : "";
   const response = await apiClient.get<
     ApiEnvelope<PortfolioSnapshot[]> | PortfolioSnapshot[]
-  >("/analytics/history", { headers: authHeaders(accessToken) });
+  >(`/analytics/history${query}`, { headers: authHeaders(accessToken) });
 
   return unwrapData<PortfolioSnapshot[]>(response);
 }

@@ -282,7 +282,7 @@ export function PropertyDetailsModal({
                 rooms={rooms}
               />
 
-              {property.is_public_listed || property.isPublicListed ? (
+              {property.isPublished ? (
                 <View className="mt-4 rounded-2xl border border-success/30 bg-success/10 p-4">
                   <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-2">
@@ -297,14 +297,19 @@ export function PropertyDetailsModal({
                       </Text>
                     </View>
                   </View>
-                  {property.listing_headline ? (
+                  {property.listingMode ? (
                     <Text className="mt-2 font-ralewayBold text-xs text-textPrimary">
-                      "{property.listing_headline}"
+                      {property.listingMode === "sale"
+                        ? "For sale"
+                        : property.listingMode === "stay"
+                          ? "Available for short stays"
+                          : "For rent"}
+                      {property.listingType ? ` | ${property.listingType}` : ""}
                     </Text>
                   ) : null}
-                  {property.listing_monthly_rent ? (
+                  {property.value > 0 ? (
                     <Text className="mt-1 font-ralewayMedium text-xs text-description">
-                      Monthly Rent: ₱{property.listing_monthly_rent.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                      Listed value: ₱{property.value.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
                     </Text>
                   ) : null}
                 </View>

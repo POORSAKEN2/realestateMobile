@@ -19,6 +19,8 @@ import {
 } from "../../utils/floorplans/floorPlanValidation";
 import { useFloorPlanVisibility } from "./useFloorPlanVisibility";
 import { useRoomBatchController } from "./useRoomBatchController";
+import { useBillingEntitlement } from "../api/useBillingEntitlement";
+import { storageUploadError } from "../../utils/billing/entitlementCapabilities";
 
 export type NamedFloorPlanForm = {
   id?: string;
@@ -50,6 +52,7 @@ export function useFloorPlanManagerController({
   roomCapability?: SpatialCapabilityLevel;
 }) {
   const queries = useFloorPlanQueries(propertyId, accessToken);
+  const entitlementQuery = useBillingEntitlement();
   const floorCommands = useFloorCommands(propertyId, accessToken);
   const areaCommands = useFloorAreaCommands(propertyId, accessToken);
   const floorPlans = queries.floorPlans.data ?? [];
@@ -224,6 +227,14 @@ export function useFloorPlanManagerController({
         return;
       }
       if (selection.status !== "selected") return;
+
+      const quotaError = storageUploadError(entitlementQuery.data, [
+        selection.image,
+      ]);
+      if (quotaError) {
+        dependencies.feedback.showError("Storage limit reached", quotaError);
+        return;
+      }
 
       await floorCommands.uploadImage.mutateAsync({
         floorPlanId: activeFloor.id,

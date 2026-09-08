@@ -4,11 +4,20 @@ import { useProperties } from "../api/useProperties";
 import { clientKeys } from "../api/useClients";
 import { useAuth } from "../useAuth";
 import {
+  BILLING_ENTITLEMENT_QUERY_KEY,
+  useBillingEntitlement,
+} from "../api/useBillingEntitlement";
+import {
   apiDocumentRepository,
   type DocumentRepository,
 } from "../../services/documentRepository";
 import type { DocumentUpload, PropertyDocument } from "../../types";
 import type { DocumentFormValues } from "../../utils/documents/documentForm";
+import {
+  formatBytes,
+  remainingStorageBytes,
+  storageUploadError,
+} from "../../utils/billing/entitlementCapabilities";
 
 type SaveDocumentInput = {
   editingDocument: PropertyDocument | null;
@@ -22,6 +31,7 @@ export function useDocumentLibrary(
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
+  const entitlementQuery = useBillingEntitlement();
   const { useList } = useProperties();
   const propertiesQuery = useList();
   const documentsQuery = useQuery({
@@ -43,6 +53,10 @@ export function useDocumentLibrary(
     }: SaveDocumentInput) => {
       if (!accessToken)
         throw new Error("Please log in before saving documents.");
+      const quotaError = !editingDocument && file
+        ? storageUploadError(entitlementQuery.data, [file])
+        : null;
+      if (quotaError) throw new Error(quotaError);
 
       const name = values.name.trim();
       if (editingDocument) {
@@ -72,13 +86,21 @@ export function useDocumentLibrary(
         accessToken,
       );
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["documents"] }),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["documents"] }),
+        queryClient.invalidateQueries({ queryKey: BILLING_ENTITLEMENT_QUERY_KEY }),
+      ]),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (documentId: string) =>
       repository.remove(documentId, accessToken),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["documents"] }),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["documents"] }),
+        queryClient.invalidateQueries({ queryKey: BILLING_ENTITLEMENT_QUERY_KEY }),
+      ]),
   });
 
   const isLoading =
@@ -106,5 +128,9 @@ export function useDocumentLibrary(
     properties: propertiesQuery.data ?? [],
     refresh,
     saveDocument: saveMutation.mutateAsync,
+    storageRemainingLabel: (() => {
+      const remaining = remainingStorageBytes(entitlementQuery.data);
+      return remaining === null ? undefined : `${formatBytes(remaining)} plan storage remaining`;
+    })(),
   };
 }

@@ -10,6 +10,8 @@ import {
   uploadPropertyDocuments,
 } from "../../api/propertyDetails";
 import { propertyFetchers } from "../api/useProperties";
+import { useBillingEntitlement } from "../api/useBillingEntitlement";
+import { usePropertyOwners } from "../api/usePropertyOwners";
 import { usePropertyAttachments } from "./usePropertyAttachments";
 import type { Property, PropertyClassification } from "../../types";
 import {
@@ -24,6 +26,11 @@ import {
   buildPropertyPayload,
   type PropertyFormPayload,
 } from "../../utils/properties/propertyPayload";
+import {
+  formatBytes,
+  remainingStorageBytes,
+  storageUploadError,
+} from "../../utils/billing/entitlementCapabilities";
 
 export type PropertySaveOperation = "created" | "updated";
 
@@ -45,6 +52,20 @@ export function usePropertyFormController(
   const createdProperty = useRef<Property | null>(null);
   const formSessionRef = useRef(0);
   const attachments = usePropertyAttachments(setFormError);
+  const entitlementQuery = useBillingEntitlement();
+  const propertyOwnersQuery = usePropertyOwners(
+    accessToken,
+    isFormVisible && form.isPublished,
+  );
+  const publishedListings = entitlementQuery.data?.limits?.published_listings;
+  const publishingBlocked = Boolean(
+    entitlementQuery.data?.gating_enabled !== false &&
+      publishedListings &&
+      !publishedListings.unlimited &&
+      publishedListings.limit !== null &&
+      publishedListings.used >= publishedListings.limit &&
+      !editingProperty?.isPublished,
+  );
   const {
     clearAttachments,
     pickDocuments,
@@ -209,7 +230,18 @@ export function usePropertyFormController(
       return;
     }
 
-    const result = buildPropertyPayload(form, selectedImages);
+    const quotaError = storageUploadError(entitlementQuery.data, [
+      ...selectedImages,
+      ...selectedDocuments,
+    ]);
+    if (quotaError) {
+      setFormError(quotaError);
+      return;
+    }
+
+    const result = buildPropertyPayload(form, selectedImages, {
+      hasExistingImages: Boolean(editingProperty?.images?.length),
+    });
     if (result.error) {
       setFormError(result.error);
       return;
@@ -230,10 +262,28 @@ export function usePropertyFormController(
     openEditForm,
     pickDocuments,
     pickImages,
+    propertyOwnerChoices: (propertyOwnersQuery.data ?? [])
+      .filter((owner) => owner.verificationStatus?.toLowerCase() === "verified")
+      .map((owner) => ({ label: owner.name, value: owner.id })),
+    propertyOwnersError: propertyOwnersQuery.isError
+      ? propertyOwnersQuery.error?.message ?? "Property owners could not be loaded."
+      : undefined,
+    isLoadingPropertyOwners: propertyOwnersQuery.isLoading,
+    publishingBlocked,
+    publishingQuotaLabel:
+      publishedListings?.limit === null || publishedListings?.unlimited
+        ? "Unlimited published listings"
+        : publishedListings
+          ? `${publishedListings.used} of ${publishedListings.limit} published listings used`
+          : undefined,
     removeDocument,
     removeImage,
     selectedDocuments,
     selectedImages,
+    storageRemainingLabel: (() => {
+      const remaining = remainingStorageBytes(entitlementQuery.data);
+      return remaining === null ? undefined : `${formatBytes(remaining)} plan storage remaining`;
+    })(),
     selectSuggestedLocation,
     submitForm,
     updateClassification,
