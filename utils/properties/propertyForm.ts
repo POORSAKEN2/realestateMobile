@@ -8,8 +8,11 @@ import {
   type Property,
   type PropertyClassification,
   type PropertyDocument,
+  type PropertyListingMode,
+  type PropertyListingType,
   type PropertyType,
 } from "../../types";
+import { getPropertyLifecycleLabel } from "./propertyLifecycle";
 
 export type StatusFilter = Property["status"] | "ALL";
 
@@ -30,6 +33,11 @@ export type FormState = {
   area: string;
   description: string;
   isTransientBookable: boolean;
+  isPublished: boolean;
+  listingMode: PropertyListingMode;
+  listingType: PropertyListingType | "";
+  ownerId: string;
+  sqm: string;
 };
 
 export type Choice<T extends string> = { label: string; value: T };
@@ -45,18 +53,34 @@ export type SelectedImage = {
 export type SelectedDocument = DocumentUpload;
 
 export const propertyStatusChoices: Choice<Property["status"]>[] = [
-  { label: "Idle", value: "IDLE" },
-  { label: "Under Construction", value: "UNDER_CONSTRUCTION" },
-  { label: "Pre Leased", value: "PRE_LEASED" },
-  { label: "Revenue Generating", value: "REVENUE_GENERATING" },
-  { label: "Personal Use", value: "PERSONAL_USE" },
-];
+  "IDLE",
+  "UNDER_CONSTRUCTION",
+  "PRE_LEASED",
+  "REVENUE_GENERATING",
+  "PERSONAL_USE",
+].map((value) => ({
+  label: getPropertyLifecycleLabel(value as Property["status"]),
+  value: value as Property["status"],
+}));
 
 export const propertyClassificationChoices: Choice<PropertyClassification>[] =
   Object.keys(PROPERTY_TAXONOMY).map((classification) => ({
     label: classification,
     value: classification as PropertyClassification,
   }));
+
+export const propertyListingModeChoices: Choice<PropertyListingMode>[] = [
+  { label: "For rent", value: "rent" },
+  { label: "For sale", value: "sale" },
+  { label: "Short stay", value: "stay" },
+];
+
+export const propertyListingTypeChoices: Choice<PropertyListingType>[] = [
+  { label: "Condominium", value: "Condominium" },
+  { label: "House", value: "House" },
+  { label: "Office", value: "Office" },
+  { label: "Land", value: "Land" },
+];
 
 export function getPropertyTypeChoices(
   classification: PropertyClassification,
@@ -143,9 +167,20 @@ export const emptyForm: FormState = {
   area: "",
   description: "",
   isTransientBookable: false,
+  isPublished: false,
+  listingMode: "rent",
+  listingType: "",
+  ownerId: "",
+  sqm: "",
 };
 
 export function formatStatus(status: string) {
+  if (
+    propertyStatusChoices.some((choice) => choice.value === status)
+  ) {
+    return getPropertyLifecycleLabel(status as Property["status"]);
+  }
+
   return status
     .toLowerCase()
     .split("_")
@@ -229,8 +264,18 @@ export function toFormState(property: Property): FormState {
         ? String(property.lng)
         : "",
     area: property.area ?? "",
-    description: "",
+    description: property.description ?? "",
     isTransientBookable: Boolean(property.isTransientBookable),
+    isPublished: Boolean(
+      property.isPublished ?? property.isPublicListed ?? property.is_public_listed,
+    ),
+    listingMode: property.listingMode ?? "rent",
+    listingType: property.listingType ?? "",
+    ownerId: property.ownerId ?? "",
+    sqm:
+      property.sqm !== undefined && property.sqm !== null
+        ? String(property.sqm)
+        : "",
   };
 }
 export function toSelectedImage(

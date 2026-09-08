@@ -16,6 +16,7 @@ import { appRoutes } from "../../constants/navigation";
 import { fetchDocuments, fetchLeases } from "../../api/propertyDetails";
 import { useFloorPlanQueries } from "../../hooks/api/useFloorPlans";
 import { useClients } from "../../hooks/api/useClients";
+import { usePropertyLifecycleController } from "../../hooks/properties/usePropertyLifecycleController";
 import type { Property } from "../../types";
 import {
   formatPesoValue,
@@ -26,24 +27,34 @@ import {
 import { getPropertyImages } from "../../utils/properties/propertyPresentation";
 import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
+import { ConfirmationModal } from "../ui/ConfirmationModal";
 import { SkeletonBlock } from "../ui/Skeleton";
 import { PropertyFloorSummary } from "./PropertyFloorSummary";
 import { PropertyManagerAssignments } from "./PropertyManagerAssignments";
+import { PropertyLifecyclePanel } from "./PropertyLifecyclePanel";
 import { useAccess } from "../../hooks/auth/useAccess";
+import { getPropertyLifecycleLabel } from "../../utils/properties/propertyLifecycle";
 
 export function PropertyDetailsModal({
   accessToken,
   onClose,
+  onPropertyUpdated,
   property,
 }: {
   accessToken?: string;
   onClose: () => void;
+  onPropertyUpdated?: (property: Property) => void;
   property: Property | null;
 }) {
   const { height, width } = Dimensions.get("window");
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { can } = useAccess();
+  const lifecycle = usePropertyLifecycleController({
+    accessToken,
+    onUpdated: onPropertyUpdated,
+    property,
+  });
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),
@@ -227,6 +238,20 @@ export function PropertyDetailsModal({
                 />
               </View>
 
+              <PropertyLifecyclePanel
+                allowedTransitions={lifecycle.allowedTransitions}
+                canUpdate={Boolean(
+                  property && can("properties.update", property.id),
+                )}
+                currentStatus={property.status}
+                error={lifecycle.error}
+                history={lifecycle.history}
+                historyError={lifecycle.historyError}
+                isHistoryLoading={lifecycle.isHistoryLoading}
+                isPending={lifecycle.isPending}
+                onRequestTransition={lifecycle.requestTransition}
+              />
+
               <TouchableOpacity
                 accessibilityLabel="Manage property bedspaces"
                 accessibilityRole="button"
@@ -282,7 +307,7 @@ export function PropertyDetailsModal({
                 rooms={rooms}
               />
 
-              {property.is_public_listed || property.isPublicListed ? (
+              {property.isPublished ? (
                 <View className="mt-4 rounded-2xl border border-success/30 bg-success/10 p-4">
                   <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-2">
@@ -297,14 +322,19 @@ export function PropertyDetailsModal({
                       </Text>
                     </View>
                   </View>
-                  {property.listing_headline ? (
+                  {property.listingMode ? (
                     <Text className="mt-2 font-ralewayBold text-xs text-textPrimary">
-                      "{property.listing_headline}"
+                      {property.listingMode === "sale"
+                        ? "For sale"
+                        : property.listingMode === "stay"
+                          ? "Available for short stays"
+                          : "For rent"}
+                      {property.listingType ? ` | ${property.listingType}` : ""}
                     </Text>
                   ) : null}
-                  {property.listing_monthly_rent ? (
+                  {property.value > 0 ? (
                     <Text className="mt-1 font-ralewayMedium text-xs text-description">
-                      Monthly Rent: ₱{property.listing_monthly_rent.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                      Listed value: ₱{property.value.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
                     </Text>
                   ) : null}
                 </View>
@@ -424,6 +454,19 @@ export function PropertyDetailsModal({
           </ScrollView>
         </View>
       ) : null}
+      <ConfirmationModal
+        confirmLabel="Change state"
+        description={
+          property && lifecycle.requestedStatus
+            ? `Move ${property.title} from ${getPropertyLifecycleLabel(property.status)} to ${getPropertyLifecycleLabel(lifecycle.requestedStatus)}?`
+            : "Confirm this lifecycle change."
+        }
+        isPending={lifecycle.isPending}
+        onCancel={lifecycle.cancelTransition}
+        onConfirm={() => void lifecycle.confirmTransition()}
+        title="Change lifecycle state"
+        visible={Boolean(property && lifecycle.requestedStatus)}
+      />
     </BottomSheetModal>
   );
 }

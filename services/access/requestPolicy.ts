@@ -104,6 +104,10 @@ export function scopeResponse<T>(payload: T, access: AccessSnapshot, request: Re
   // A successful create returns the new property before the refreshed session
   // includes its automatic creator assignment. Do not grant other IDs here.
   if (request.resource === "properties" && request.permission === "properties.create" && !request.id) return payload;
+  // Request access already validates a concrete assigned property. Nested
+  // payloads such as status-history contain child IDs, not property IDs.
+  if (request.resource === "properties" && request.id && request.propertyId === request.id &&
+    canAccessProperty(access, request.id) && (!request.permission || permits(access, request.permission, request.id))) return payload;
   const resource = request.resource;
   function allowed(row: unknown): boolean {
     if (!row || typeof row !== "object") return false;

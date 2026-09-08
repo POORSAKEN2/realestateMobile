@@ -39,7 +39,7 @@ const STATUS_TONES: Record<Property["status"], PropertyStatusTone> = {
 };
 
 export function getPropertyImages(property: Property): string[] {
-  const images = property.images?.length ? property.images : [property.image];
+  const images = property.images ?? [];
 
   return Array.from(new Set(images.filter(Boolean))).slice(
     0,

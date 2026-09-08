@@ -1,6 +1,7 @@
 import { Alert, Linking } from "react-native";
 
 import type { AuthUser, Property, PropertyDocument } from "../../types";
+import { getPropertyLifecycleLabel } from "../properties/propertyLifecycle";
 export { getPropertyImages } from "../properties/propertyPresentation";
 
 export type AssetSortBy = "value" | "roi" | "name";
@@ -41,6 +42,13 @@ export function formatPesoValue(value = 0) {
 }
 
 export function formatPropertyStatus(status: string) {
+  if (
+    status !== "ALL" &&
+    ASSET_STATUS_FILTERS.includes(status as AssetStatusFilter)
+  ) {
+    return getPropertyLifecycleLabel(status as Property["status"]);
+  }
+
   return status
     .toLowerCase()
     .split("_")

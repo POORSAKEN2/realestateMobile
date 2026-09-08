@@ -16,6 +16,7 @@ export function PropertyDocumentsField({
   isLoadingExistingDocuments,
   onPick,
   onRemove,
+  storageHint,
 }: {
   documents: SelectedDocument[];
   existingDocuments: PropertyDocument[];
@@ -23,6 +24,7 @@ export function PropertyDocumentsField({
   isLoadingExistingDocuments: boolean;
   onPick: () => void;
   onRemove: (index: number) => void;
+  storageHint?: string;
 }) {
   return (
     <View className="gap-4 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
@@ -42,6 +44,11 @@ export function PropertyDocumentsField({
             <Text className="mt-1 text-xs leading-4 text-description">
               PDF, DOC, DOCX, JPG, or PNG files.
             </Text>
+            {storageHint ? (
+              <Text className="mt-1 text-[11px] text-description">
+                {storageHint}
+              </Text>
+            ) : null}
           </View>
         </View>
         <TouchableOpacity

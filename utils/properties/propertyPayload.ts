@@ -16,6 +16,7 @@ export type PropertyPayloadResult =
 export function buildPropertyPayload(
   form: FormState,
   selectedImages: SelectedImage[],
+  options: { hasExistingImages?: boolean; includeStatus?: boolean } = {},
 ): PropertyPayloadResult {
   const title = form.title.trim();
   const location = form.location.trim();
@@ -27,6 +28,7 @@ export function buildPropertyPayload(
   const occupancy = parseNumber(form.occupancy);
   const bedrooms = parseInteger(form.bedrooms);
   const bathrooms = parseInteger(form.bathrooms);
+  const sqm = parseInteger(form.sqm);
   const needsRoomCounts = requiresBedroomAndBathroomCounts(
     form.classification,
     form.type,
@@ -59,12 +61,28 @@ export function buildPropertyPayload(
   if (needsRoomCounts && bathrooms === undefined) {
     return { error: "Bathrooms must be a non-negative whole number." };
   }
+  if (form.sqm.trim() && (sqm === undefined || sqm < 0)) {
+    return { error: "Listing floor area must be a non-negative whole number." };
+  }
+  if (form.isPublished) {
+    if (!form.ownerId) {
+      return { error: "Choose a verified property owner before publishing." };
+    }
+    if (!form.listingMode) {
+      return { error: "Choose a listing mode before publishing." };
+    }
+    if (!options.hasExistingImages && selectedImages.length === 0) {
+      return { error: "Add at least one property image before publishing." };
+    }
+    if (value <= 0) {
+      return { error: "Market value must be greater than 0 before publishing." };
+    }
+  }
 
   const payload: PropertyFormPayload = {
     title,
     location,
     country,
-    status: form.status,
     classification: form.classification,
     type: form.type,
     value,
@@ -72,7 +90,11 @@ export function buildPropertyPayload(
     lat,
     lng,
     is_transient_bookable: form.isTransientBookable,
+    is_published: form.isPublished,
+    listing_mode: form.listingMode,
   };
+
+  if (options.includeStatus !== false) payload.status = form.status;
 
   if (selectedImages.length > 0) payload.images = selectedImages;
 
@@ -81,6 +103,9 @@ export function buildPropertyPayload(
   if (occupancy !== undefined) payload.occupancy = occupancy;
   if (area) payload.area = area;
   if (description) payload.description = description;
+  if (form.ownerId) payload.owner_id = form.ownerId;
+  if (form.listingType) payload.listing_type = form.listingType;
+  if (sqm !== undefined) payload.sqm = sqm;
 
   if (needsRoomCounts) {
     payload.bedrooms = bedrooms;

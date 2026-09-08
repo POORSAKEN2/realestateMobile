@@ -1,4 +1,10 @@
-import { API_BASE_URL, apiClient, authHeaders, unwrapData } from "./client";
+import {
+  API_BASE_URL,
+  apiClient,
+  authHeaders,
+  unwrapCollection,
+  unwrapData,
+} from "./client";
 import { normalizeFloorPlan } from "./floorplans";
 import type {
   ApiEnvelope,
@@ -6,10 +12,13 @@ import type {
   PaginatedApiData,
   Property,
   PropertyImageUpload,
+  PropertyStatus,
+  PropertyStatusHistoryEntry,
   PropertySpatialCapabilities,
   SpatialCapabilityLevel,
   UpdatePropertyPayload,
 } from "../types";
+import { assertPropertyTransition } from "../utils/properties/propertyLifecycle";
 
 export type {
   CreatePropertyPayload,
@@ -51,7 +60,7 @@ function unwrapList(
   return [];
 }
 
-function normalizePropertyStatus(status: unknown): Property["status"] {
+function parsePropertyStatus(status: unknown): Property["status"] | null {
   const value = String(status ?? "").toUpperCase();
 
   if (
@@ -64,7 +73,51 @@ function normalizePropertyStatus(status: unknown): Property["status"] {
     return value;
   }
 
-  return "IDLE";
+  return null;
+}
+
+function normalizePropertyStatus(status: unknown): Property["status"] {
+  return parsePropertyStatus(status) ?? "IDLE";
+}
+
+function normalizePropertyStatusHistory(
+  value: unknown,
+): PropertyStatusHistoryEntry[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.flatMap((item, index) => {
+    if (!item || typeof item !== "object") return [];
+
+    const source = item as Record<string, any>;
+    const fromStatus = parsePropertyStatus(
+      source.fromStatus ?? source.from_status,
+    );
+    const toStatus = parsePropertyStatus(source.toStatus ?? source.to_status);
+    if (!fromStatus || !toStatus) return [];
+    const createdAt = String(
+      source.createdAt ?? source.created_at ?? new Date(0).toISOString(),
+    );
+
+    return [
+      {
+        id: String(
+          source.id ?? `${fromStatus}:${toStatus}:${createdAt}:${index}`,
+        ),
+        fromStatus,
+        toStatus,
+        reason:
+          typeof source.reason === "string" && source.reason.trim()
+            ? source.reason.trim()
+            : undefined,
+        actorName:
+          source.actorName ??
+          source.actor_name ??
+          source.actor?.name ??
+          undefined,
+        createdAt,
+      },
+    ];
+  });
 }
 
 function normalizeBoolean(value: unknown) {
@@ -143,8 +196,16 @@ export function normalizeProperty(property: Record<string, any>): Property {
     media?.original_url ??
     media?.url ??
     media?.preview_url;
-  const image =
-    getImageUrl(rawImage) || normalizedImages[0] || DEFAULT_PROPERTY_IMAGE;
+  const actualImages = Array.from(
+    new Set(
+      [
+        getImageUrl(rawImage),
+        ...normalizedImages,
+        ...normalizedMediaImages,
+      ].filter(Boolean),
+    ),
+  );
+  const image = actualImages[0] || DEFAULT_PROPERTY_IMAGE;
   const lat =
     property?.lat ??
     property?.latitude ??
@@ -166,6 +227,9 @@ export function normalizeProperty(property: Record<string, any>): Property {
     title: property?.title ?? property?.name ?? "Untitled Property",
     location: property?.location ?? property?.address ?? "Location unavailable",
     status: normalizePropertyStatus(property?.status),
+    statusHistory: normalizePropertyStatusHistory(
+      property?.statusHistory ?? property?.status_history,
+    ),
     value: Number(property?.value ?? 0),
     roi: Number(property?.roi ?? 0),
     occupancy:
@@ -200,11 +264,7 @@ export function normalizeProperty(property: Record<string, any>): Property {
     lat: lat !== undefined && lat !== null ? Number(lat) : undefined,
     lng: lng !== undefined && lng !== null ? Number(lng) : undefined,
     image,
-    images: Array.from(
-      new Set(
-        [image, ...normalizedImages, ...normalizedMediaImages].filter(Boolean),
-      ),
-    ),
+    images: actualImages,
     parentId: property?.parentId ?? property?.parent_id,
     isTransientBookable: normalizeBoolean(
       property?.isTransientBookable ??
@@ -222,14 +282,21 @@ export function normalizeProperty(property: Record<string, any>): Property {
     city: property?.city ?? undefined,
     postal_code: property?.postal_code ?? property?.postalCode ?? undefined,
     postalCode: property?.postal_code ?? property?.postalCode ?? undefined,
-    is_public_listed: normalizeBoolean(property?.is_public_listed ?? property?.isPublicListed ?? false),
-    isPublicListed: normalizeBoolean(property?.is_public_listed ?? property?.isPublicListed ?? false),
-    listing_headline: property?.listing_headline ?? undefined,
-    listing_description: property?.listing_description ?? undefined,
-    listing_monthly_rent: property?.listing_monthly_rent !== undefined && property?.listing_monthly_rent !== null
-      ? Number(property.listing_monthly_rent)
-      : undefined,
-    listing_available_from: property?.listing_available_from ?? undefined,
+    isPublished: normalizeBoolean(
+      property?.isPublished ??
+        property?.is_published ??
+        property?.isPublicListed ??
+        property?.is_public_listed ??
+        false,
+    ),
+    listingMode: property?.listingMode ?? property?.listing_mode ?? undefined,
+    listingType: property?.listingType ?? property?.listing_type ?? undefined,
+    sqm:
+      property?.sqm !== undefined && property?.sqm !== null
+        ? Number(property.sqm)
+        : undefined,
+    ownerId: property?.ownerId ?? property?.owner_id ?? undefined,
+    description: property?.description ?? undefined,
     floorplans: Array.isArray(property?.floorplans)
       ? property.floorplans.map((floorPlan: Record<string, any>) =>
           normalizeFloorPlan(floorPlan),
@@ -274,6 +341,60 @@ export async function syncPropertyManagers(id: string, managerIds: string[], acc
     { headers: authHeaders(accessToken), access: { permission: "staff.manage", propertyId: id } },
   );
   return normalizeProperty(unwrapData(response) as Property);
+}
+
+export async function fetchPropertyStatusHistory(
+  id: string,
+  accessToken?: string,
+) {
+  const response = await apiClient.get<
+    ApiEnvelope<PropertyStatusHistoryEntry[]> | PropertyStatusHistoryEntry[]
+  >(`/properties/${encodeURIComponent(id)}/status-history`, {
+    headers: authHeaders(accessToken),
+    access: { permission: "properties.view", propertyId: id },
+  });
+
+  return normalizePropertyStatusHistory(unwrapCollection(response));
+}
+
+export type PropertyLifecycleTransitionResult = {
+  property: Property;
+  historyEntry: PropertyStatusHistoryEntry;
+};
+
+export async function transitionPropertyLifecycle(
+  id: string,
+  fromStatus: PropertyStatus,
+  toStatus: PropertyStatus,
+  accessToken?: string,
+): Promise<PropertyLifecycleTransitionResult> {
+  assertPropertyTransition(fromStatus, toStatus);
+
+  const response = await apiClient.patch<ApiEnvelope<Property> | Property>(
+    `/properties/${encodeURIComponent(id)}`,
+    { status: toStatus },
+    {
+      headers: authHeaders(accessToken),
+      access: { permission: "properties.update", propertyId: id },
+    },
+  );
+  const property = normalizeProperty(unwrapData<Property>(response));
+  const serverEntry = property.statusHistory?.find(
+    (entry) =>
+      entry.fromStatus === fromStatus && entry.toStatus === property.status,
+  );
+
+  return {
+    property,
+    historyEntry:
+      serverEntry ??
+      {
+        id: `${id}:${fromStatus}:${property.status}:${Date.now()}`,
+        fromStatus,
+        toStatus: property.status,
+        createdAt: new Date().toISOString(),
+      },
+  };
 }
 
 export async function createProperty(
@@ -334,7 +455,7 @@ export async function updateProperty(
 }
 
 function toPropertyFormData(
-  payload: Omit<CreatePropertyPayload, "image" | "images">,
+  payload: Partial<Omit<CreatePropertyPayload, "image" | "images">>,
   images: NonNullable<CreatePropertyPayload["images"]>,
   method?: "PUT",
 ) {

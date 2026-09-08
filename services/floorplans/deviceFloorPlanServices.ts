@@ -82,6 +82,7 @@ export const deviceFloorPlanImagePicker: FloorPlanImagePicker = {
           (asset.uri.toLowerCase().endsWith(".png")
             ? "image/png"
             : "image/jpeg"),
+        size: asset.fileSize,
         file: asset.file,
       },
     };

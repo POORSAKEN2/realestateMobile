@@ -8,11 +8,13 @@ export function PropertyImagesField({
   maxImages,
   onPick,
   onRemove,
+  storageHint,
 }: {
   images: SelectedImage[];
   maxImages: number;
   onPick: () => void;
   onRemove: (index: number) => void;
+  storageHint?: string;
 }) {
   return (
     <View className="gap-4 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
@@ -32,6 +34,11 @@ export function PropertyImagesField({
             <Text className="mt-1 text-xs leading-4 text-description">
               JPG, PNG, or WEBP. Upload up to {maxImages}.
             </Text>
+            {storageHint ? (
+              <Text className="mt-1 text-[11px] text-description">
+                {storageHint}
+              </Text>
+            ) : null}
           </View>
         </View>
         <TouchableOpacity

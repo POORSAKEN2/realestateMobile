@@ -255,6 +255,7 @@ function AdminDashboardScreen() {
       <PropertyDetailsModal
         accessToken={accessToken}
         onClose={() => setSelectedProperty(null)}
+        onPropertyUpdated={setSelectedProperty}
         property={selectedProperty}
       />
       {isSearchModalOpen ? (

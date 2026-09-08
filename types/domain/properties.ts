@@ -29,6 +29,33 @@ export type PropertySpatialCapabilities = {
   rooms?: SpatialCapabilityLevel;
 };
 
+export type PropertyListingMode = "rent" | "sale" | "stay";
+export type PropertyListingType = "Condominium" | "House" | "Office" | "Land";
+
+export type PropertyStatus =
+  | "UNDER_CONSTRUCTION"
+  | "PRE_LEASED"
+  | "REVENUE_GENERATING"
+  | "PERSONAL_USE"
+  | "IDLE";
+
+export type PropertyStatusHistoryEntry = {
+  id: string;
+  fromStatus: PropertyStatus;
+  toStatus: PropertyStatus;
+  reason?: string;
+  actorName?: string;
+  createdAt: string;
+};
+
+export type PropertyOwner = {
+  id: string;
+  name: string;
+  contactEmail: string;
+  phone: string;
+  verificationStatus?: string;
+};
+
 export type Property = {
   id: string;
   managers?: Array<{ id: string; name: string; email: string }>;
@@ -39,12 +66,8 @@ export type Property = {
   postal_code?: string;
   postalCode?: string;
   country?: string;
-  status:
-    | "UNDER_CONSTRUCTION"
-    | "PRE_LEASED"
-    | "REVENUE_GENERATING"
-    | "PERSONAL_USE"
-    | "IDLE";
+  status: PropertyStatus;
+  statusHistory?: PropertyStatusHistoryEntry[];
   classification?: PropertyClassification;
   type?: PropertyType;
   value: number;
@@ -68,6 +91,13 @@ export type Property = {
   totalUnits?: number;
   floorplans?: FloorPlan[];
   spatialCapabilities?: PropertySpatialCapabilities;
+  isPublished?: boolean;
+  listingMode?: PropertyListingMode;
+  listingType?: PropertyListingType;
+  sqm?: number;
+  ownerId?: string;
+  description?: string;
+  // Legacy mobile aliases kept while persisted caches roll forward.
   is_public_listed?: boolean;
   isPublicListed?: boolean;
   listing_headline?: string;
@@ -104,19 +134,19 @@ export type CreatePropertyPayload = {
   is_transient_bookable?: boolean;
   description?: string;
   area?: string;
-  is_public_listed?: boolean;
-  listing_headline?: string;
-  listing_description?: string;
-  listing_monthly_rent?: number;
-  listing_available_from?: string;
+  is_published?: boolean;
+  listing_mode?: PropertyListingMode;
+  listing_type?: PropertyListingType;
+  sqm?: number;
+  owner_id?: string;
   image?: PropertyImageUpload;
   images?: PropertyImageUpload[];
 };
 
-export type UpdatePropertyPayload = Omit<
+export type UpdatePropertyPayload = Partial<Omit<
   CreatePropertyPayload,
   "image" | "images"
-> & {
+>> & {
   image?: PropertyImageUpload | string;
   images?: Array<PropertyImageUpload | string>;
   retained_images?: string[];
