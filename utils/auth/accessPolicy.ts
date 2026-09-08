@@ -8,7 +8,7 @@ export const OPERATIONAL_RESOURCES: readonly Resource[] = [
 ];
 const OWNER_ONLY = new Set<AppPermission>([
   "staff.manage", "dashboard.admin", "billing.checkout", "expenses.approve",
-  "payments.delete", "expenses.delete", "properties.create",
+  "payments.delete", "expenses.delete",
 ]);
 const SHARED = new Set<AppPermission>([
   "billing.viewEntitlement", "analytics.viewStats", "notifications.viewAny", "support-tickets.viewAny",

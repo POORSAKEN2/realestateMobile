@@ -1,4 +1,7 @@
 import * as Location from "expo-location";
+import { fetchCurrentUser } from "../../api/user";
+import { useAuth } from "../useAuth";
+import { getSessionAccess } from "../../services/access/sessionAccess";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
@@ -33,11 +36,13 @@ export function usePropertyFormController(
   } = {},
 ) {
   const queryClient = useQueryClient();
+  const { session, signIn } = useAuth();
   const [form, setForm] = useState<FormState>(emptyForm);
   const formRef = useRef(form);
   const [formError, setFormError] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+  const createdProperty = useRef<Property | null>(null);
   const formSessionRef = useRef(0);
   const attachments = usePropertyAttachments(setFormError);
   const {
@@ -66,12 +71,26 @@ export function usePropertyFormController(
 
   const saveMutation = useMutation({
     mutationFn: async (payload: PropertyFormPayload) => {
-      const property = editingProperty
+      async function refreshManagerAccess() {
+        if (getSessionAccess().access.role !== "MANAGER" || !accessToken) return;
+        const user = await fetchCurrentUser(accessToken);
+        if (getSessionAccess().token === accessToken) signIn({ ...session, user });
+      }
+      // If a follow-up upload or access refresh fails after creation, retry
+      // against the saved property rather than creating another quota entry.
+      if (createdProperty.current) await refreshManagerAccess();
+      const existing = editingProperty ?? createdProperty.current;
+      const property = existing
         ? await propertyFetchers.update(
-            { id: editingProperty.id, payload },
+            { id: existing.id, payload },
             accessToken,
           )
         : await propertyFetchers.create(payload as any, accessToken);
+
+      if (!editingProperty) {
+        createdProperty.current = property;
+        await refreshManagerAccess();
+      }
 
       if (selectedDocuments.length > 0) {
         await uploadPropertyDocuments(
@@ -94,6 +113,7 @@ export function usePropertyFormController(
           queryKey: ["transientBookablePropertyIds"],
         }),
         queryClient.invalidateQueries({ queryKey: ["analytics"] }),
+        queryClient.invalidateQueries({ queryKey: ["billingEntitlement"] }),
       ]);
       closeForm();
       onSaved?.(property, operation);
@@ -143,6 +163,7 @@ export function usePropertyFormController(
   }
 
   function resetFormState(nextForm: FormState, property: Property | null) {
+    createdProperty.current = null;
     formSessionRef.current += 1;
     formRef.current = nextForm;
     setForm(nextForm);

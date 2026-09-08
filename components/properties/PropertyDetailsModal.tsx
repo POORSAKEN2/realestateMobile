@@ -28,6 +28,8 @@ import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPo
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import { SkeletonBlock } from "../ui/Skeleton";
 import { PropertyFloorSummary } from "./PropertyFloorSummary";
+import { PropertyManagerAssignments } from "./PropertyManagerAssignments";
+import { useAccess } from "../../hooks/auth/useAccess";
 
 export function PropertyDetailsModal({
   accessToken,
@@ -41,6 +43,7 @@ export function PropertyDetailsModal({
   const { height, width } = Dimensions.get("window");
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { can } = useAccess();
   const { data: leases = [], isLoading: isLoadingLeases } = useQuery({
     queryKey: ["leases", accessToken],
     queryFn: () => fetchLeases(accessToken),
@@ -417,6 +420,7 @@ export function PropertyDetailsModal({
                 />
               </View>
             </View>
+            {can("staff.manage") && <PropertyManagerAssignments key={property.id} propertyId={property.id} />}
           </ScrollView>
         </View>
       ) : null}

@@ -17,6 +17,7 @@ import { BottomSheetHost } from "./BottomSheetModal";
 import { FormActionRow } from "./forms/FormActionRow";
 import { ModalActionFooter } from "./ModalActionFooter";
 import { ModalHeader } from "./ModalHeader";
+import { EntitlementLimitPrompt } from "../billing/EntitlementLimitPrompt";
 
 function AddEditModalHost({ children }: React.PropsWithChildren) {
   return (
@@ -95,6 +96,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
       visible={isVisible}
     >
       <AddEditModalHost>
+        <EntitlementLimitPrompt active={isVisible} priority={1} />
         {/* Explicit style layout string replaces 'modal-container' */}
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}

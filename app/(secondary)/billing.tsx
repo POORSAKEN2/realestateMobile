@@ -4,6 +4,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { UpgradePlanModal } from "../../components/billing/UpgradePlanModal";
+import { EntitlementSummary } from "../../components/billing/EntitlementSummary";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
@@ -16,7 +17,7 @@ export default function BillingScreen() {
   const { session } = useAuth();
   const canStartCheckout = hasAppPermission(session?.user, "billing.checkout");
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const { data: entitlement, isLoading, refetch } = useBillingEntitlement();
+  const { data: entitlement, isLoading, isError, refetch } = useBillingEntitlement();
 
   const propertyCount = entitlement?.property_count ?? 0;
   const propertyLimit = entitlement?.property_limit;
@@ -43,6 +44,10 @@ export default function BillingScreen() {
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
+        ) : isError || !entitlement ? (
+          <TouchableOpacity accessibilityRole="button" onPress={() => void refetch()} className="mt-6 p-5">
+            <Text className="text-danger">Plan information is unavailable. Tap to retry.</Text>
+          </TouchableOpacity>
         ) : (
           <PullToRefreshScrollView
             className="-mx-6 mt-6 flex-1"
@@ -63,7 +68,7 @@ export default function BillingScreen() {
                         {entitlement?.tier_label || "Free Tier"}
                       </Text>
                       <Text className="font-ralewayBold text-xs text-primary">
-                        Active Plan
+                        Current access
                       </Text>
                     </View>
                   </View>
@@ -77,7 +82,7 @@ export default function BillingScreen() {
                       onPress={() => setIsUpgradeModalOpen(true)}
                     >
                       <Text className="font-ralewayBold text-xs text-white">
-                        Upgrade
+                        Change plan
                       </Text>
                     </TouchableOpacity>
                   ) : (
@@ -128,6 +133,7 @@ export default function BillingScreen() {
                 </View>
               </View>
 
+              <EntitlementSummary entitlement={entitlement} />
               {/* Plan Catalog Grid */}
               <View className="gap-3">
                 <Text className="font-ralewayBold text-base text-textPrimary">
@@ -143,7 +149,7 @@ export default function BillingScreen() {
                       price_php: 0,
                     },
                     {
-                      key: "tier_1",
+                      key: "tier1",
                       label: "Tier 1",
                       property_limit: 5,
                       price_php: 299.99,

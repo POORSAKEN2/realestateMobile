@@ -268,6 +268,14 @@ export async function fetchProperty(id: string, accessToken?: string) {
   );
 }
 
+export async function syncPropertyManagers(id: string, managerIds: string[], accessToken?: string) {
+  const response = await apiClient.post<ApiEnvelope<Property>>(
+    `/properties/${encodeURIComponent(id)}/managers`, { manager_ids: managerIds },
+    { headers: authHeaders(accessToken), access: { permission: "staff.manage", propertyId: id } },
+  );
+  return normalizeProperty(unwrapData(response) as Property);
+}
+
 export async function createProperty(
   payload: CreatePropertyPayload,
   accessToken?: string,

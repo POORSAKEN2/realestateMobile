@@ -1,4 +1,10 @@
 import * as SecureStore from "expo-secure-store";
+import { useQueryClient } from "@tanstack/react-query";
+import { AppState } from "react-native";
+import { fetchCurrentUser } from "../api/user";
+import { ApiError } from "../api/errors";
+import { getSessionAccess } from "../services/access/sessionAccess";
+import { normalizeAccess } from "../utils/auth/accessAdapter";
 import {
   createContext,
   PropsWithChildren,
@@ -74,10 +80,50 @@ function removeSecureItem(key: string) {
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {
+  const queryClient = useQueryClient();
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [session, setSession] = useState<AuthSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const token = session?.accessToken;
+    if (!token) return;
+    let disposed = false;
+    let refreshing = false;
+    async function refresh() {
+      if (refreshing || !token) return;
+      refreshing = true;
+      const revision = getSessionAccess().revision;
+      try {
+        const user = await fetchCurrentUser(token);
+        if (disposed || getSessionAccess().revision !== revision) return;
+        const changed = JSON.stringify(normalizeAccess(user)) !== JSON.stringify(getSessionAccess().access);
+        if (changed) {
+          setSessionAccess(user, token);
+          queryClient.clear();
+        }
+        setSession(previous => {
+          if (previous?.accessToken !== token) return previous;
+          const next = { ...previous, user };
+          persistSecureItem(AUTH_STORAGE_KEY, JSON.stringify(next));
+          return next;
+        });
+      } catch (error) {
+        if (!disposed && getSessionAccess().revision === revision && error instanceof ApiError && [401, 403].includes(error.status)) {
+          setSessionAccess(null);
+          queryClient.clear();
+          setSession(null);
+          setIsAuthenticated(false);
+          removeSecureItem(AUTH_STORAGE_KEY);
+        }
+      } finally { refreshing = false; }
+    }
+    void refresh();
+    const subscription = AppState.addEventListener("change", state => { if (state === "active") void refresh(); });
+    const timer = setInterval(() => { if (AppState.currentState === "active") void refresh(); }, 60_000);
+    return () => { disposed = true; subscription.remove(); clearInterval(timer); };
+  }, [session?.accessToken, queryClient]);
 
   useEffect(() => {
     let isMounted = true;
@@ -123,7 +169,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       },
       signIn: (nextSession) => {
         const normalizedSession = nextSession ?? null;
-        setSessionAccess(normalizedSession?.user, normalizedSession?.accessToken);
+        const current = getSessionAccess();
+        if (current.token !== normalizedSession?.accessToken || JSON.stringify(current.access) !== JSON.stringify(normalizeAccess(normalizedSession?.user))) {
+          setSessionAccess(normalizedSession?.user, normalizedSession?.accessToken);
+          queryClient.clear();
+        }
         setSession(normalizedSession);
         setIsAuthenticated(Boolean(normalizedSession?.accessToken));
         if (normalizedSession?.accessToken) {
@@ -138,12 +188,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
       },
       signOut: () => {
         setSessionAccess(null);
+        queryClient.clear();
         setSession(null);
         setIsAuthenticated(false);
         removeSecureItem(AUTH_STORAGE_KEY);
       },
     }),
-    [hasCompletedOnboarding, isAuthenticated, isLoading, session],
+    [hasCompletedOnboarding, isAuthenticated, isLoading, session, queryClient],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

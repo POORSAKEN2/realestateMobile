@@ -9,7 +9,8 @@ import type {
 export { API_BASE_URL } from "./config";
 
 import { axiosInstance } from "./axios";
-import { toApiError, ApiError } from "./errors";
+import { toApiError, ApiError, entitlementLimitDetails } from "./errors";
+import { reportEntitlementLimit } from "../services/billing/entitlementEvents";
 import { getSessionAccess } from "../services/access/sessionAccess";
 import { assertRequestAccess, describeRequest, ResourceScopeIndex, scopeResponse } from "../services/access/requestPolicy";
 let scopeRevision = -1;
@@ -107,7 +108,10 @@ async function request<T>(
     if (error.response) {
       const data = error.response.data as ApiErrorResponse;
       const failure = toApiError(error.response.status, data);
-      if (failure.status === 403 && getSessionAccess().revision === session.revision) reportAccessDenied(failure.message);
+      if (failure.status === 403 && getSessionAccess().revision === session.revision) {
+        if (entitlementLimitDetails(failure)) reportEntitlementLimit(failure);
+        else reportAccessDenied(failure.message);
+      }
       throw failure;
     }
     throw error;

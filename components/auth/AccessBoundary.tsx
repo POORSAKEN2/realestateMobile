@@ -17,7 +17,7 @@ export function AccessBoundary({ children }: PropsWithChildren) {
   if (isLoading) return children;
   if (!isAuthenticated) return <Redirect href="/(auth)/login" />;
   const permission = ROUTE_PERMISSIONS[route];
-  const needsAssignments = access.role === "MANAGER" && (PROPERTY_ROUTES.has(route) || route === "dashboard");
+  const needsAssignments = access.role === "MANAGER" && PROPERTY_ROUTES.has(route) && route !== "properties";
   const denied = permission && !can(permission) || PROPERTY_ROUTES.has(route) && propertyId && !canAccessProperty(propertyId);
   const aggregateUnavailable = access.role === "MANAGER" && route === "analytics";
   if (!denied && !(needsAssignments && !hasAssignments) && !aggregateUnavailable) return children;

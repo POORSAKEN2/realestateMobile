@@ -44,6 +44,7 @@ export function describeRequest(path: string, method: string, body?: unknown): R
     if (resource === "expenses" && segments[2] === "approve") permission = "expenses.approve";
   }
   if (segments[0] === "users") permission = "staff.manage";
+  if (segments[0] === "properties" && segments[2] === "managers") permission = "staff.manage";
   if (segments[0] === "billing") permission = segments[1] === "checkout" ? "billing.checkout" : "billing.viewEntitlement";
   if (segments[0] === "analytics") permission = "analytics.viewStats";
   // These responses cannot be safely reduced to assigned properties on the device.
@@ -69,6 +70,10 @@ export function assertRequestAccess(access: AccessSnapshot, request: RequestAcce
   if (access.role !== "MANAGER") return;
   if (request.aggregate) denyAccess("This view is unavailable for property managers until account reporting supports assigned properties.");
   if (!request.resource) return;
+  // Creating the portfolio's first property needs no existing assignment.
+  // The backend checks the shared tenant quota and assigns its creator.
+  if (request.resource === "properties" && request.permission === "properties.create" && !request.id) return;
+  if (request.resource === "properties" && request.permission === "properties.viewAny" && request.collection) return;
   if (!access.propertyIds?.length) denyAccess("No properties are assigned to your account. Ask your account owner to review your access.");
   for (const reference of request.references) {
     const property = index.find(reference.resource, reference.id);
@@ -96,6 +101,9 @@ function propertyFor(row: Record<string, any>, resource: Resource, context: Requ
 /** Filter raw API envelopes before data enters React Query or screen state. Unknown scope stays hidden. */
 export function scopeResponse<T>(payload: T, access: AccessSnapshot, request: RequestAccess, index: ResourceScopeIndex): T {
   if (access.role !== "MANAGER" || !request.resource) return payload;
+  // A successful create returns the new property before the refreshed session
+  // includes its automatic creator assignment. Do not grant other IDs here.
+  if (request.resource === "properties" && request.permission === "properties.create" && !request.id) return payload;
   const resource = request.resource;
   function allowed(row: unknown): boolean {
     if (!row || typeof row !== "object") return false;

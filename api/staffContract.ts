@@ -12,6 +12,10 @@ export interface StaffApiContract {
 export const staffApiContract: StaffApiContract = {
   creationMode: "account",
   create: "/users",
-  supportsAssignments: false,
-  supportsPermissions: false,
+  list: "/users",
+  update: id => `/users/${id}`,
+  setEnabled: id => `/users/${id}`,
+  remove: id => `/users/${id}`,
+  supportsAssignments: true,
+  supportsPermissions: true,
 };

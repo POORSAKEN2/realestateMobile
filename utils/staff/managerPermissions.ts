@@ -6,7 +6,7 @@ export const MANAGER_PERMISSION_GROUPS: Array<{ label: string; options: Array<{ 
 ).map(([resource, label]) => ({ label, options: [
   { label: "View", grants: [`${resource}.viewAny`, `${resource}.view`] as AppPermission[] },
   ...(["create", "update", "delete"] as const).filter((action) =>
-    !(resource === "properties" && action === "create") && !(["payments", "expenses"].includes(resource) && action === "delete")
+    !(["payments", "expenses"].includes(resource) && action === "delete")
   ).map((action) => ({ label: action === "create" ? "Add" : action === "update" ? "Edit" : "Delete", grants: [`${resource}.${action}`] as AppPermission[] })),
 ] }));
 export const DEFAULT_MANAGER_PERMISSIONS = [

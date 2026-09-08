@@ -1,12 +1,12 @@
 import { toApiError } from "./errors";
 import type { ApiErrorResponse } from "../types";
 
-export function getFirstValidationError(errors?: Record<string, string[]>) {
+export function getFirstValidationError(errors?: Record<string, unknown>) {
   if (!errors) {
     return undefined;
   }
 
-  const [firstError] = Object.values(errors).flat();
+  const firstError = Object.values(errors).flat().find((value): value is string => typeof value === "string");
 
   return firstError;
 }

@@ -13,7 +13,9 @@ export type PaginatedApiData<T> = {
 
 export type ApiErrorResponse = {
   message?: string;
-  errors?: Record<string, string[]>;
+  code?: string;
+  error?: string;
+  errors?: Record<string, unknown>;
 };
 
 export type RequestOptions = Omit<RequestInit, "body"> & {

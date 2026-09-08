@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -18,11 +18,17 @@ import {
   useCreateBillingCheckout,
 } from "../../hooks/api/useBillingEntitlement";
 import type { PlanTier } from "../../types/domain/billing";
+import type { PlanChangePreview, SubscriptionTierKey } from "../../types/domain/billing";
+import { fetchPlanChangePreview } from "../../api/billing";
+import { useAccess } from "../../hooks/auth/useAccess";
+import { blockerMessage } from "../../utils/billing/entitlementPresentation";
 import { ModalHeader } from "../ui/ModalHeader";
 
 type UpgradePlanModalProps = {
   isVisible: boolean;
   onClose: () => void;
+  message?: string;
+  requiredTier?: string;
 };
 
 type PlanCardProps = {
@@ -30,13 +36,14 @@ type PlanCardProps = {
   isCurrent: boolean;
   isFeatured: boolean;
   isPending: boolean;
+  disabled: boolean;
   onUpgrade: () => void;
   tier: PlanTier;
 };
 
 const fallbackTiers: PlanTier[] = [
   { key: "free", label: "Free Tier", property_limit: 2, price_php: 0 },
-  { key: "tier_1", label: "Tier 1", property_limit: 5, price_php: 299.99 },
+  { key: "tier1", label: "Tier 1", property_limit: 5, price_php: 299.99 },
   { key: "all_in", label: "All-In", property_limit: null, price_php: 1499.99 },
 ];
 
@@ -79,6 +86,7 @@ function PlanCard({
   isCurrent,
   isFeatured,
   isPending,
+  disabled,
   onUpgrade,
   tier,
 }: PlanCardProps) {
@@ -137,21 +145,21 @@ function PlanCard({
 
       {canUpgrade ? (
         <TouchableOpacity
-          accessibilityLabel={`Upgrade to ${tier.label}`}
+          accessibilityLabel={`Choose ${tier.label}`}
           accessibilityRole="button"
-          accessibilityState={{ busy: isPending, disabled: isPending }}
+          accessibilityState={{ busy: isPending, disabled }}
           activeOpacity={0.8}
           className={`mt-5 min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary px-4 ${
             isPending ? "opacity-70" : ""
           }`}
-          disabled={isPending}
+          disabled={disabled}
           onPress={onUpgrade}
         >
           {isPending ? (
             <ActivityIndicator color={colors.whitePrimary} size="small" />
           ) : null}
           <Text className="font-ralewayExtraBold text-sm text-white">
-            {isPending ? "Opening checkout…" : `Upgrade to ${tier.label}`}
+            {isPending ? "Checking plan…" : `Choose ${tier.label}`}
           </Text>
         </TouchableOpacity>
       ) : null}
@@ -162,20 +170,44 @@ function PlanCard({
 export function UpgradePlanModal({
   isVisible,
   onClose,
+  message,
+  requiredTier,
 }: UpgradePlanModalProps) {
-  const { data: entitlement } = useBillingEntitlement();
+  const { data: entitlement, isFetching, isError, refetch } = useBillingEntitlement();
+  const { can } = useAccess();
   const checkoutMutation = useCreateBillingCheckout();
   const [pendingTierKey, setPendingTierKey] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ tier: SubscriptionTierKey; result: PlanChangePreview } | null>(null);
+  const busy = useRef(false);
+  useEffect(() => { if (!isVisible) setPreview(null); }, [isVisible]);
   const tiers = entitlement?.tiers?.length ? entitlement.tiers : fallbackTiers;
   const currentTierKey = entitlement?.tier ?? "free";
-  const currentTier = tiers.find((tier) => tier.key === currentTierKey);
-  const currentPrice = entitlement?.price_php ?? currentTier?.price_php ?? 0;
-
   async function handleUpgrade(tierKey: string) {
+    if (busy.current || !can("billing.checkout") || !entitlement || isFetching || isError) return;
+    if (!["free", "tier1", "all_in"].includes(tierKey)) return;
+    busy.current = true;
     setPendingTierKey(tierKey);
-
     try {
-      const response = await checkoutMutation.mutateAsync({ tier: tierKey });
+      const result = await fetchPlanChangePreview(tierKey as SubscriptionTierKey);
+      setPreview({ tier: tierKey as SubscriptionTierKey, result });
+    } catch (err) {
+      Alert.alert("Plan preview unavailable", err instanceof Error ? err.message : "Please try again.");
+    } finally {
+      busy.current = false;
+      setPendingTierKey(null);
+    }
+  }
+
+  async function continueCheckout() {
+    if (busy.current || !preview?.result.allowed || preview.tier === "free" || !can("billing.checkout")) return;
+    busy.current = true;
+    setPendingTierKey(preview.tier);
+    try {
+      // Recheck usage immediately before checkout; the server also enforces it.
+      const latest = await fetchPlanChangePreview(preview.tier);
+      setPreview({ ...preview, result: latest });
+      if (!latest.allowed) return;
+      const response = await checkoutMutation.mutateAsync({ tier: preview.tier });
       if (response.checkout_url) {
         await Linking.openURL(response.checkout_url);
         onClose();
@@ -193,6 +225,7 @@ export function UpgradePlanModal({
           : "Billing checkout is currently configured via web portal.",
       );
     } finally {
+      busy.current = false;
       setPendingTierKey(null);
     }
   }
@@ -200,16 +233,16 @@ export function UpgradePlanModal({
   return (
     <Modal
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={() => { if (!busy.current) onClose(); }}
       presentationStyle="pageSheet"
       visible={isVisible}
     >
       <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
         <ModalHeader
           closeAccessibilityLabel="Close upgrade subscription"
-          onClose={onClose}
+          onClose={() => { if (!busy.current) onClose(); }}
           subtitle="Choose the property capacity that fits your portfolio."
-          title="Upgrade Subscription"
+          title="Choose subscription"
         />
 
         <ScrollView
@@ -217,10 +250,24 @@ export function UpgradePlanModal({
           contentContainerClassName="gap-4 px-6 pb-10 pt-5"
           showsVerticalScrollIndicator={false}
         >
+          {message && <Text accessibilityRole="alert" className="rounded-2xl bg-warningSurface p-4 text-textPrimary">{message}</Text>}
+          {requiredTier && <Text className="text-description">Suggested plan: {tiers.find(tier => tier.key === requiredTier)?.label ?? requiredTier}</Text>}
+          {isFetching && <Text className="text-description">Refreshing available plans…</Text>}
+          {isError && <TouchableOpacity accessibilityRole="button" onPress={() => void refetch()}><Text className="text-danger">Plans could not be loaded. Tap to retry.</Text></TouchableOpacity>}
+          {!can("billing.checkout") && <Text className="text-description">Ask your account owner to change the organization plan.</Text>}
+          {preview && <View className="gap-3 rounded-2xl bg-white p-4">
+            <Text className="font-ralewayBold text-textPrimary">Plan change preview: {tiers.find(tier => tier.key === preview.tier)?.label ?? preview.tier}</Text>
+            {preview.result.blockers.map(blocker => <Text key={blocker.dimension} accessibilityRole="alert" className="text-danger">{blockerMessage(blocker)}</Text>)}
+            {preview.result.allowed && <Text className="text-description">Your current usage fits this plan.</Text>}
+            {preview.tier === "free" && preview.result.allowed && <Text className="text-description">Contact support to cancel renewal and return to Free at the end of your paid period.</Text>}
+            {preview.result.allowed && preview.tier !== "free" && can("billing.checkout") && <TouchableOpacity accessibilityRole="button" disabled={pendingTierKey !== null} onPress={() => void continueCheckout()} className="rounded-2xl bg-primary p-4">
+              <Text className="text-center text-white">{pendingTierKey ? "Opening checkout…" : "Continue to checkout"}</Text>
+            </TouchableOpacity>}
+          </View>}
           {tiers.map((tier) => {
             const isCurrent = currentTierKey === tier.key;
             const isFeatured = tier.key === "all_in";
-            const canUpgrade = !isCurrent && tier.price_php > currentPrice;
+            const canUpgrade = !isCurrent && can("billing.checkout") && ["free", "tier1", "all_in"].includes(tier.key);
 
             return (
               <PlanCard
@@ -228,6 +275,7 @@ export function UpgradePlanModal({
                 isCurrent={isCurrent}
                 isFeatured={isFeatured}
                 isPending={pendingTierKey === tier.key}
+                disabled={!entitlement || isFetching || isError || pendingTierKey !== null}
                 key={tier.key}
                 onUpgrade={() => handleUpgrade(tier.key)}
                 tier={tier}

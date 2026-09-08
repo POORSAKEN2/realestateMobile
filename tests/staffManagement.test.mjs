@@ -5,6 +5,7 @@ const { createStaffService, canAddManager } = load('../../services/staff/staffSe
 const { createHttpStaffGateway, normalizeStaffRoster } = load('../../services/staff/httpStaffGateway.ts');
 const { normalizeAccess } = load('../../utils/auth/accessAdapter.ts');
 const { staffApiContract } = load('../../api/staffContract.ts');
+const legacyContract = { creationMode: 'account', create: '/users', supportsAssignments: false, supportsPermissions: false };
 const owner = normalizeAccess({ role: 'ADMIN' });
 const manager = { id: 'm1', name: 'Manager', email: 'manager@example.test', role: 'MANAGER', status: 'active', propertyIds: [], permissions: null };
 const details = { name: 'Manager', email: 'manager@example.test', password: 'test-password' };
@@ -50,13 +51,13 @@ test('revoked owner permission during count refresh prevents creation', async ()
 });
 test('unconfigured lifecycle operations never call guessed endpoints', async () => {
   const calls = [];
-  const gateway = createHttpStaffGateway({ post: async (...args) => { calls.push(args); return manager; } }, staffApiContract);
+  const gateway = createHttpStaffGateway({ post: async (...args) => { calls.push(args); return manager; } }, legacyContract);
   assert.equal(gateway.list, undefined); assert.equal(gateway.update, undefined); assert.equal(gateway.remove, undefined);
   await assert.rejects(() => createStaffService(gateway, () => owner).remove('m1'), /not available/);
   assert.deepEqual(calls, []);
 });
 test('legacy creation sends only supported fields and fixes MANAGER role', async () => {
-  const calls = []; const gateway = createHttpStaffGateway({ post: async (...args) => { calls.push(args); return manager; } }, staffApiContract);
+  const calls = []; const gateway = createHttpStaffGateway({ post: async (...args) => { calls.push(args); return manager; } }, legacyContract);
   await gateway.create({ ...details, name: ' Manager ', email: ' MANAGER@example.test ', role: 'ADMIN', tenant_id: 'other', propertyIds: ['p1'], permissions: ['staff.manage'] });
   assert.deepEqual(calls[0][1], { name: 'Manager', email: 'manager@example.test', password: 'test-password', role: 'MANAGER' });
 });
@@ -72,4 +73,26 @@ test('partial and invalid rosters cannot disguise the manager limit', () => {
   assert.equal(normalizeStaffRoster({ data: { data: [manager], total: 2, last_page: 2 } }).complete, false);
   assert.throws(() => normalizeStaffRoster({ data: 'invalid' }));
   assert.throws(() => normalizeStaffRoster([{ ...manager, role: 'ADMIN' }]));
+});
+test('backend staff contract supports lifecycle, assignment and permission payloads', async () => {
+  const calls = [];
+  const response = { data: { ...manager, is_active: true, assigned_property_ids: ['p1'], permissions: ['properties.view'] } };
+  const transport = {
+    get: async path => { calls.push(['GET', path]); return { data: [response.data] }; },
+    post: async (path, payload) => { calls.push(['POST', path, payload]); return response; },
+    patch: async (path, payload) => { calls.push(['PATCH', path, payload]); return response; },
+    remove: async path => { calls.push(['DELETE', path]); },
+  };
+  const gateway = createHttpStaffGateway(transport, staffApiContract);
+  const roster = await gateway.list();
+  assert.equal(roster.complete, true);
+  assert.deepEqual(roster.managers[0].propertyIds, ['p1']);
+  await gateway.create({ ...details, propertyIds: ['p1'], permissions: ['properties.view'] });
+  await gateway.update('m1', { ...details, propertyIds: [], permissions: [] });
+  await gateway.setEnabled('m1', false);
+  await gateway.remove('m1');
+  assert.deepEqual(calls.map(call => call.slice(0, 2)), [['GET', '/users'], ['POST', '/users'], ['PATCH', '/users/m1'], ['PATCH', '/users/m1'], ['DELETE', '/users/m1']]);
+  assert.deepEqual(calls[1][2].assigned_property_ids, ['p1']);
+  assert.deepEqual(calls[2][2].permissions, []);
+  assert.deepEqual(calls[3][2], { is_active: false });
 });

@@ -87,6 +87,16 @@ test('scope changes and logout invalidate the session revision', () => {
   assert.equal(getSessionAccess().token, undefined);
   assert.equal(getSessionAccess().access.role, undefined);
 });
+test('manager may create a property before receiving assignments; owner staff controls stay closed', () => {
+  const unassigned = normalizeAccess({ role: 'MANAGER' });
+  assert.equal(permits(unassigned, 'properties.create'), true);
+  assert.doesNotThrow(() => assertRequestAccess(unassigned, describeRequest('/properties', 'POST'), new ResourceScopeIndex()));
+  assert.doesNotThrow(() => assertRequestAccess(unassigned, describeRequest('/properties', 'GET'), new ResourceScopeIndex()));
+  assert.throws(() => assertRequestAccess(manager, describeRequest('/properties/p1/managers', 'POST', { manager_ids: ['m1'] }), new ResourceScopeIndex()), ApiError);
+  assert.throws(() => assertRequestAccess(unassigned, describeRequest('/rooms', 'POST'), new ResourceScopeIndex()), ApiError);
+  assert.deepEqual(scopeResponse({ data: { id: 'new' } }, unassigned, describeRequest('/properties', 'POST'), new ResourceScopeIndex()), { data: { id: 'new' } });
+  assert.equal(canAccessProperty(unassigned, 'new'), false);
+});
 test('403 error retains status/code and actionable business messages', () => {
   assert.match(toApiError(403, { message: 'Unauthorized action.' }).message, /account owner/);
   const limit = toApiError(403, { message: 'Manager limit reached (maximum 2).', code: 'MANAGER_LIMIT_REACHED' });
