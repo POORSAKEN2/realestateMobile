@@ -48,6 +48,8 @@ export type {
   PropertyListingType,
   PropertyOwner,
   PropertySpatialCapabilities,
+  PropertyStatus,
+  PropertyStatusHistoryEntry,
   PropertyType,
   SpatialCapabilityLevel,
   UpdatePropertyPayload,

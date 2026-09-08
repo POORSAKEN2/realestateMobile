@@ -241,6 +241,7 @@ export function usePropertyFormController(
 
     const result = buildPropertyPayload(form, selectedImages, {
       hasExistingImages: Boolean(editingProperty?.images?.length),
+      includeStatus: !editingProperty,
     });
     if (result.error) {
       setFormError(result.error);

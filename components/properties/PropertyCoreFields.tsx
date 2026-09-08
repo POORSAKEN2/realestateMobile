@@ -37,6 +37,7 @@ export function PropertyCoreFields({
   publishingBlocked,
   publishingQuotaLabel,
   propertyTypeChoices,
+  statusEditable = true,
 }: {
   form: FormState;
   locationSuggestions: string[];
@@ -50,6 +51,7 @@ export function PropertyCoreFields({
   publishingBlocked: boolean;
   publishingQuotaLabel?: string;
   propertyTypeChoices: Choice<PropertyType>[];
+  statusEditable?: boolean;
 }) {
   const filteredLocationSuggestions = locationSuggestions;
   const selectLocation = onSelectSuggestedLocation;
@@ -72,7 +74,11 @@ export function PropertyCoreFields({
       </View>
 
       <PropertyFormSection
-        description="Name the property and choose its current portfolio status."
+        description={
+          statusEditable
+            ? "Name the property and choose its initial lifecycle state."
+            : "Update the property name. Lifecycle changes use the controlled transition workflow."
+        }
         icon="home-outline"
         title="Basics"
         variant="card"
@@ -86,15 +92,27 @@ export function PropertyCoreFields({
           required
           variant="filled"
         />
-        <DropdownField
-          label="Current status"
-          options={propertyStatusChoices}
-          onSelect={(value) => updateForm("status", value)}
-          placeholder="Select a status"
-          value={form.status}
-          required
-          variant="filled"
-        />
+        {statusEditable ? (
+          <DropdownField
+            label="Initial lifecycle state"
+            options={propertyStatusChoices}
+            onSelect={(value) => updateForm("status", value)}
+            placeholder="Select a state"
+            value={form.status}
+            required
+            variant="filled"
+          />
+        ) : (
+          <View className="rounded-2xl bg-primary/5 px-4 py-3.5">
+            <Text className="font-ralewayBold text-xs text-textPrimary">
+              Lifecycle state changes live in Property details.
+            </Text>
+            <Text className="mt-1 text-xs leading-5 text-description">
+              Close this form, open property details, then choose an allowed
+              next state.
+            </Text>
+          </View>
+        )}
       </PropertyFormSection>
 
       <PropertyFormSection

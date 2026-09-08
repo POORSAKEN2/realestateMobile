@@ -114,7 +114,7 @@ export function ManagerDashboardScreen() {
                   },
                   {
                     icon: "hammer-wrench",
-                    label: "Under construction",
+                    label: "Building",
                     tone: "warning",
                     value: propertiesQuery.isError
                       ? "—"

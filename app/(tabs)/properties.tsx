@@ -268,6 +268,7 @@ export default function PropertiesScreen() {
       <PropertyDetailsModal
         accessToken={accessToken}
         onClose={() => setSelectedProperty(null)}
+        onPropertyUpdated={setSelectedProperty}
         property={selectedProperty}
       />
 
@@ -300,6 +301,7 @@ export default function PropertiesScreen() {
           publishingBlocked={publishingBlocked}
           publishingQuotaLabel={publishingQuotaLabel}
           propertyTypeChoices={propertyTypeChoices}
+          statusEditable={!editingProperty}
         />
 
         <PropertyImagesField

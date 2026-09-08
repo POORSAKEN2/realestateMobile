@@ -7,12 +7,15 @@ import {
 import {
   createProperty,
   fetchProperty,
+  fetchPropertyStatusHistory,
   fetchProperties,
+  transitionPropertyLifecycle,
   updateProperty,
 } from "../../api/properties";
 import {
   CreatePropertyPayload,
   Property,
+  PropertyStatus,
   UpdatePropertyPayload,
 } from "../../types";
 import { usePaginatedQuery } from "./usePaginatedResource";
@@ -23,6 +26,8 @@ export const propertyKeys = {
   list: (filters?: any) => [...propertyKeys.lists(), filters] as const,
   details: () => [...propertyKeys.all, "detail"] as const,
   detail: (id: string) => [...propertyKeys.details(), id] as const,
+  lifecycleHistory: (id: string) =>
+    [...propertyKeys.detail(id), "status-history"] as const,
 };
 
 export const propertyFetchers = {
@@ -76,6 +81,13 @@ export function useProperties(accessToken?: string) {
         enabled: Boolean(id) && (options?.enabled ?? true),
       });
     },
+    useLifecycleHistory: (id: string, enabled = true) => {
+      return useQuery({
+        queryKey: propertyKeys.lifecycleHistory(id),
+        queryFn: () => fetchPropertyStatusHistory(id, accessToken),
+        enabled: Boolean(id) && enabled,
+      });
+    },
     useCreate: () => {
       return useMutation({
         mutationFn: (payload: CreatePropertyPayload) =>
@@ -93,6 +105,35 @@ export function useProperties(accessToken?: string) {
           queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
           queryClient.invalidateQueries({
             queryKey: propertyKeys.detail(variables.id),
+          });
+        },
+      });
+    },
+    useTransitionLifecycle: () => {
+      return useMutation({
+        mutationFn: ({
+          id,
+          fromStatus,
+          toStatus,
+        }: {
+          id: string;
+          fromStatus: PropertyStatus;
+          toStatus: PropertyStatus;
+        }) =>
+          transitionPropertyLifecycle(
+            id,
+            fromStatus,
+            toStatus,
+            accessToken,
+          ),
+        onSuccess: ({ property }) => {
+          queryClient.setQueryData(
+            propertyKeys.detail(property.id),
+            property,
+          );
+          queryClient.invalidateQueries({ queryKey: propertyKeys.lists() });
+          queryClient.invalidateQueries({
+            queryKey: propertyKeys.lifecycleHistory(property.id),
           });
         },
       });

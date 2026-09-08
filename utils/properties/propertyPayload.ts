@@ -16,7 +16,7 @@ export type PropertyPayloadResult =
 export function buildPropertyPayload(
   form: FormState,
   selectedImages: SelectedImage[],
-  options: { hasExistingImages?: boolean } = {},
+  options: { hasExistingImages?: boolean; includeStatus?: boolean } = {},
 ): PropertyPayloadResult {
   const title = form.title.trim();
   const location = form.location.trim();
@@ -83,7 +83,6 @@ export function buildPropertyPayload(
     title,
     location,
     country,
-    status: form.status,
     classification: form.classification,
     type: form.type,
     value,
@@ -94,6 +93,8 @@ export function buildPropertyPayload(
     is_published: form.isPublished,
     listing_mode: form.listingMode,
   };
+
+  if (options.includeStatus !== false) payload.status = form.status;
 
   if (selectedImages.length > 0) payload.images = selectedImages;
 

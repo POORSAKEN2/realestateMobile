@@ -32,6 +32,22 @@ export type PropertySpatialCapabilities = {
 export type PropertyListingMode = "rent" | "sale" | "stay";
 export type PropertyListingType = "Condominium" | "House" | "Office" | "Land";
 
+export type PropertyStatus =
+  | "UNDER_CONSTRUCTION"
+  | "PRE_LEASED"
+  | "REVENUE_GENERATING"
+  | "PERSONAL_USE"
+  | "IDLE";
+
+export type PropertyStatusHistoryEntry = {
+  id: string;
+  fromStatus: PropertyStatus;
+  toStatus: PropertyStatus;
+  reason?: string;
+  actorName?: string;
+  createdAt: string;
+};
+
 export type PropertyOwner = {
   id: string;
   name: string;
@@ -50,12 +66,8 @@ export type Property = {
   postal_code?: string;
   postalCode?: string;
   country?: string;
-  status:
-    | "UNDER_CONSTRUCTION"
-    | "PRE_LEASED"
-    | "REVENUE_GENERATING"
-    | "PERSONAL_USE"
-    | "IDLE";
+  status: PropertyStatus;
+  statusHistory?: PropertyStatusHistoryEntry[];
   classification?: PropertyClassification;
   type?: PropertyType;
   value: number;
@@ -131,10 +143,10 @@ export type CreatePropertyPayload = {
   images?: PropertyImageUpload[];
 };
 
-export type UpdatePropertyPayload = Omit<
+export type UpdatePropertyPayload = Partial<Omit<
   CreatePropertyPayload,
   "image" | "images"
-> & {
+>> & {
   image?: PropertyImageUpload | string;
   images?: Array<PropertyImageUpload | string>;
   retained_images?: string[];

@@ -74,6 +74,13 @@ test('nested room inventory inherits a verified property and records bedspace sc
   assert.equal(index.find('bedspaces', 'b1'), 'p1');
   assert.doesNotThrow(() => assertRequestAccess(manager, describeRequest('/bedspaces/b1', 'PATCH'), index));
 });
+test('assigned property subresources keep child rows after target access is verified', () => {
+  const index = new ResourceScopeIndex();
+  const request = describeRequest('/properties/p1/status-history', 'GET');
+  const response = { data: [{ id: 'history-1', fromStatus: 'IDLE', toStatus: 'UNDER_CONSTRUCTION' }] };
+  assert.doesNotThrow(() => assertRequestAccess(manager, request, index));
+  assert.deepEqual(scopeResponse(response, manager, request, index), response);
+});
 test('aggregate endpoints stay closed to managers until scoped reporting exists', () => {
   for (const path of ['/analytics/stats', '/search?q=home', '/reports/export', '/account/data-export']) {
     assert.throws(() => assertRequestAccess(manager, describeRequest(path, 'GET'), new ResourceScopeIndex()), ApiError);

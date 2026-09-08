@@ -40,7 +40,7 @@ export function PropertyPortfolioSummary({
         },
         {
           icon: "chart-donut",
-          label: "Generating",
+          label: "Revenue generating",
           value: isReady
             ? `${revenueGeneratingCount} of ${propertyCount}`
             : "—",

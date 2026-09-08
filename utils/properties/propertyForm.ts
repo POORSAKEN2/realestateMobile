@@ -12,6 +12,7 @@ import {
   type PropertyListingType,
   type PropertyType,
 } from "../../types";
+import { getPropertyLifecycleLabel } from "./propertyLifecycle";
 
 export type StatusFilter = Property["status"] | "ALL";
 
@@ -52,12 +53,15 @@ export type SelectedImage = {
 export type SelectedDocument = DocumentUpload;
 
 export const propertyStatusChoices: Choice<Property["status"]>[] = [
-  { label: "Idle", value: "IDLE" },
-  { label: "Under Construction", value: "UNDER_CONSTRUCTION" },
-  { label: "Pre Leased", value: "PRE_LEASED" },
-  { label: "Revenue Generating", value: "REVENUE_GENERATING" },
-  { label: "Personal Use", value: "PERSONAL_USE" },
-];
+  "IDLE",
+  "UNDER_CONSTRUCTION",
+  "PRE_LEASED",
+  "REVENUE_GENERATING",
+  "PERSONAL_USE",
+].map((value) => ({
+  label: getPropertyLifecycleLabel(value as Property["status"]),
+  value: value as Property["status"],
+}));
 
 export const propertyClassificationChoices: Choice<PropertyClassification>[] =
   Object.keys(PROPERTY_TAXONOMY).map((classification) => ({
@@ -171,6 +175,12 @@ export const emptyForm: FormState = {
 };
 
 export function formatStatus(status: string) {
+  if (
+    propertyStatusChoices.some((choice) => choice.value === status)
+  ) {
+    return getPropertyLifecycleLabel(status as Property["status"]);
+  }
+
   return status
     .toLowerCase()
     .split("_")
