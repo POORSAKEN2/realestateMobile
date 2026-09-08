@@ -37,7 +37,6 @@ export function useTenantManagement({
   const [selectedTenant, setSelectedTenant] = useState<Lessee | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Lessee | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const tenantsQuery = useClients(accessToken);
   const tenants = tenantsQuery.data ?? [];
@@ -149,16 +148,11 @@ export function useTenantManagement({
   }
 
   async function refresh() {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([
-        tenantsQuery.refetch(),
-        leasesQuery.refetch(),
-        propertiesQuery.refetch(),
-      ]);
-    } finally {
-      setIsRefreshing(false);
-    }
+    await Promise.all([
+      tenantsQuery.refetch(),
+      leasesQuery.refetch(),
+      propertiesQuery.refetch(),
+    ]);
   }
 
   const linkedTenantCount = tenants.filter((tenant) =>
@@ -180,7 +174,6 @@ export function useTenantManagement({
       tenantsQuery.isLoading ||
       leasesQuery.isLoading ||
       propertiesQuery.isLoading,
-    isRefreshing,
     leases,
     linkedTenantCount,
     linkedTenantPercentage:

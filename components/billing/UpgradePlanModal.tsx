@@ -1,6 +1,7 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { Feather } from "@expo/vector-icons";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Linking,
   Modal,
@@ -12,20 +13,201 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "../../constants/colors";
-import { useBillingEntitlement, useCreateBillingCheckout } from "../../hooks/api/useBillingEntitlement";
+import {
+  useBillingEntitlement,
+  useCreateBillingCheckout,
+} from "../../hooks/api/useBillingEntitlement";
+import type { PlanTier } from "../../types/domain/billing";
+import type { PlanChangePreview, SubscriptionTierKey } from "../../types/domain/billing";
+import { fetchPlanChangePreview } from "../../api/billing";
+import { useAccess } from "../../hooks/auth/useAccess";
+import { blockerMessage } from "../../utils/billing/entitlementPresentation";
+import { ModalHeader } from "../ui/ModalHeader";
 
 type UpgradePlanModalProps = {
   isVisible: boolean;
   onClose: () => void;
+  message?: string;
+  requiredTier?: string;
 };
 
-export function UpgradePlanModal({ isVisible, onClose }: UpgradePlanModalProps) {
-  const { data: entitlement } = useBillingEntitlement();
-  const checkoutMutation = useCreateBillingCheckout();
+type PlanCardProps = {
+  canUpgrade: boolean;
+  isCurrent: boolean;
+  isFeatured: boolean;
+  isPending: boolean;
+  disabled: boolean;
+  onUpgrade: () => void;
+  tier: PlanTier;
+};
 
+const fallbackTiers: PlanTier[] = [
+  { key: "free", label: "Free Tier", property_limit: 2, price_php: 0 },
+  { key: "tier1", label: "Tier 1", property_limit: 5, price_php: 299.99 },
+  { key: "all_in", label: "All-In", property_limit: null, price_php: 1499.99 },
+];
+
+function PlanBadge({
+  isCurrent,
+  isFeatured,
+}: {
+  isCurrent: boolean;
+  isFeatured: boolean;
+}) {
+  if (!isCurrent && !isFeatured) return null;
+
+  return (
+    <View className="rounded-full bg-accent px-3 py-1.5">
+      <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wide text-success">
+        {isCurrent ? "Current plan" : "Best value"}
+      </Text>
+    </View>
+  );
+}
+
+function PlanFeature({ children }: { children: string }) {
+  return (
+    <View className="flex-row items-start gap-2.5">
+      <Feather
+        name="check-circle"
+        color={colors.primary}
+        size={17}
+        style={{ marginTop: 1 }}
+      />
+      <Text className="min-w-0 flex-1 font-ralewayMedium text-xs leading-5 text-textPrimary">
+        {children}
+      </Text>
+    </View>
+  );
+}
+
+function PlanCard({
+  canUpgrade,
+  isCurrent,
+  isFeatured,
+  isPending,
+  disabled,
+  onUpgrade,
+  tier,
+}: PlanCardProps) {
+  return (
+    <View
+      className={`relative overflow-hidden rounded-[28px] border p-5 shadow-sm shadow-primary/5 ${
+        isCurrent
+          ? "border-primary/25 bg-primary/10"
+          : isFeatured
+            ? "border-primary/25 bg-primary/5"
+            : "border-primary/15 bg-white"
+      }`}
+    >
+      {isFeatured ? (
+        <View className="absolute -right-10 -top-12 h-28 w-28 rounded-full bg-accent/30" />
+      ) : null}
+
+      <View className="flex-row items-start justify-between gap-3">
+        <View className="min-w-0 flex-1">
+          <Text
+            className="font-ralewayExtraBold text-lg text-textPrimary"
+            numberOfLines={1}
+          >
+            {tier.label}
+          </Text>
+          <View className="mt-1.5 flex-row items-baseline gap-1">
+            <Text className="font-ralewayExtraBold text-2xl text-primary">
+              {tier.price_php === 0
+                ? "Free"
+                : `₱${tier.price_php.toLocaleString("en-PH", {
+                    minimumFractionDigits: 2,
+                  })}`}
+            </Text>
+            {tier.price_php > 0 ? (
+              <Text className="font-ralewayMedium text-xs text-description">
+                / month
+              </Text>
+            ) : null}
+          </View>
+        </View>
+
+        <PlanBadge isCurrent={isCurrent} isFeatured={isFeatured} />
+      </View>
+
+      <View className="mt-4 gap-2.5 border-t border-primary/10 pt-4">
+        <PlanFeature>
+          {tier.property_limit === null
+            ? "Unlimited managed properties"
+            : `Up to ${tier.property_limit} properties`}
+        </PlanFeature>
+        <PlanFeature>Floor plans and bedspace management</PlanFeature>
+        <PlanFeature>
+          Rent tracking, financial ledger, and analytics
+        </PlanFeature>
+      </View>
+
+      {canUpgrade ? (
+        <TouchableOpacity
+          accessibilityLabel={`Choose ${tier.label}`}
+          accessibilityRole="button"
+          accessibilityState={{ busy: isPending, disabled }}
+          activeOpacity={0.8}
+          className={`mt-5 min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary px-4 ${
+            isPending ? "opacity-70" : ""
+          }`}
+          disabled={disabled}
+          onPress={onUpgrade}
+        >
+          {isPending ? (
+            <ActivityIndicator color={colors.whitePrimary} size="small" />
+          ) : null}
+          <Text className="font-ralewayExtraBold text-sm text-white">
+            {isPending ? "Checking plan…" : `Choose ${tier.label}`}
+          </Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  );
+}
+
+export function UpgradePlanModal({
+  isVisible,
+  onClose,
+  message,
+  requiredTier,
+}: UpgradePlanModalProps) {
+  const { data: entitlement, isFetching, isError, refetch } = useBillingEntitlement();
+  const { can } = useAccess();
+  const checkoutMutation = useCreateBillingCheckout();
+  const [pendingTierKey, setPendingTierKey] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ tier: SubscriptionTierKey; result: PlanChangePreview } | null>(null);
+  const busy = useRef(false);
+  useEffect(() => { if (!isVisible) setPreview(null); }, [isVisible]);
+  const tiers = entitlement?.tiers?.length ? entitlement.tiers : fallbackTiers;
+  const currentTierKey = entitlement?.tier ?? "free";
   async function handleUpgrade(tierKey: string) {
+    if (busy.current || !can("billing.checkout") || !entitlement || isFetching || isError) return;
+    if (!["free", "tier1", "all_in"].includes(tierKey)) return;
+    busy.current = true;
+    setPendingTierKey(tierKey);
     try {
-      const response = await checkoutMutation.mutateAsync({ tier: tierKey });
+      const result = await fetchPlanChangePreview(tierKey as SubscriptionTierKey);
+      setPreview({ tier: tierKey as SubscriptionTierKey, result });
+    } catch (err) {
+      Alert.alert("Plan preview unavailable", err instanceof Error ? err.message : "Please try again.");
+    } finally {
+      busy.current = false;
+      setPendingTierKey(null);
+    }
+  }
+
+  async function continueCheckout() {
+    if (busy.current || !preview?.result.allowed || preview.tier === "free" || !can("billing.checkout")) return;
+    busy.current = true;
+    setPendingTierKey(preview.tier);
+    try {
+      // Recheck usage immediately before checkout; the server also enforces it.
+      const latest = await fetchPlanChangePreview(preview.tier);
+      setPreview({ ...preview, result: latest });
+      if (!latest.allowed) return;
+      const response = await checkoutMutation.mutateAsync({ tier: preview.tier });
       if (response.checkout_url) {
         await Linking.openURL(response.checkout_url);
         onClose();
@@ -42,133 +224,62 @@ export function UpgradePlanModal({ isVisible, onClose }: UpgradePlanModalProps) 
           ? err.message
           : "Billing checkout is currently configured via web portal.",
       );
+    } finally {
+      busy.current = false;
+      setPendingTierKey(null);
     }
   }
-
-  const tiers = entitlement?.tiers || [
-    { key: "free", label: "Free Tier", property_limit: 2, price_php: 0 },
-    { key: "tier_1", label: "Tier 1", property_limit: 5, price_php: 299.99 },
-    { key: "all_in", label: "All-In", property_limit: null, price_php: 1499.99 },
-  ];
 
   return (
     <Modal
       animationType="slide"
+      onRequestClose={() => { if (!busy.current) onClose(); }}
       presentationStyle="pageSheet"
       visible={isVisible}
-      onRequestClose={onClose}
     >
       <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
-        {/* Header */}
-        <View className="flex-row items-center justify-between border-b border-primary/10 bg-white px-5 py-4">
-          <View className="flex-1">
-            <Text className="font-ralewayBold text-xl text-textPrimary">
-              Upgrade Subscription
-            </Text>
-            <Text className="font-ralewayMedium text-xs text-description">
-              Unlock higher property limits & portfolio features
-            </Text>
-          </View>
-          <TouchableOpacity
-            accessibilityRole="button"
-            className="h-10 w-10 items-center justify-center rounded-full bg-surface"
-            onPress={onClose}
-          >
-            <Ionicons name="close" size={22} color={colors.text} />
-          </TouchableOpacity>
-        </View>
+        <ModalHeader
+          closeAccessibilityLabel="Close upgrade subscription"
+          onClose={() => { if (!busy.current) onClose(); }}
+          subtitle="Choose the property capacity that fits your portfolio."
+          title="Choose subscription"
+        />
 
         <ScrollView
-          className="flex-1 px-5 pt-4"
-          contentContainerClassName="pb-10 gap-4"
+          className="flex-1"
+          contentContainerClassName="gap-4 px-6 pb-10 pt-5"
           showsVerticalScrollIndicator={false}
         >
+          {message && <Text accessibilityRole="alert" className="rounded-2xl bg-warningSurface p-4 text-textPrimary">{message}</Text>}
+          {requiredTier && <Text className="text-description">Suggested plan: {tiers.find(tier => tier.key === requiredTier)?.label ?? requiredTier}</Text>}
+          {isFetching && <Text className="text-description">Refreshing available plans…</Text>}
+          {isError && <TouchableOpacity accessibilityRole="button" onPress={() => void refetch()}><Text className="text-danger">Plans could not be loaded. Tap to retry.</Text></TouchableOpacity>}
+          {!can("billing.checkout") && <Text className="text-description">Ask your account owner to change the organization plan.</Text>}
+          {preview && <View className="gap-3 rounded-2xl bg-white p-4">
+            <Text className="font-ralewayBold text-textPrimary">Plan change preview: {tiers.find(tier => tier.key === preview.tier)?.label ?? preview.tier}</Text>
+            {preview.result.blockers.map(blocker => <Text key={blocker.dimension} accessibilityRole="alert" className="text-danger">{blockerMessage(blocker)}</Text>)}
+            {preview.result.allowed && <Text className="text-description">Your current usage fits this plan.</Text>}
+            {preview.tier === "free" && preview.result.allowed && <Text className="text-description">Contact support to cancel renewal and return to Free at the end of your paid period.</Text>}
+            {preview.result.allowed && preview.tier !== "free" && can("billing.checkout") && <TouchableOpacity accessibilityRole="button" disabled={pendingTierKey !== null} onPress={() => void continueCheckout()} className="rounded-2xl bg-primary p-4">
+              <Text className="text-center text-white">{pendingTierKey ? "Opening checkout…" : "Continue to checkout"}</Text>
+            </TouchableOpacity>}
+          </View>}
           {tiers.map((tier) => {
-            const isCurrent = entitlement?.tier === tier.key;
-            const isAllIn = tier.key === "all_in";
+            const isCurrent = currentTierKey === tier.key;
+            const isFeatured = tier.key === "all_in";
+            const canUpgrade = !isCurrent && can("billing.checkout") && ["free", "tier1", "all_in"].includes(tier.key);
 
             return (
-              <View
+              <PlanCard
+                canUpgrade={canUpgrade}
+                isCurrent={isCurrent}
+                isFeatured={isFeatured}
+                isPending={pendingTierKey === tier.key}
+                disabled={!entitlement || isFetching || isError || pendingTierKey !== null}
                 key={tier.key}
-                className={`rounded-3xl border p-5 shadow-sm ${
-                  isAllIn
-                    ? "border-primary bg-primary/5"
-                    : isCurrent
-                      ? "border-accent bg-accent/10"
-                      : "border-primary/15 bg-white"
-                }`}
-              >
-                <View className="flex-row items-start justify-between">
-                  <View>
-                    <Text className="font-ralewayExtraBold text-lg text-textPrimary">
-                      {tier.label}
-                    </Text>
-                    <Text className="mt-1 font-ralewayBold text-2xl text-primary">
-                      {tier.price_php === 0
-                        ? "Free"
-                        : `₱${tier.price_php.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`}
-                      {tier.price_php > 0 ? (
-                        <Text className="font-ralewayMedium text-xs text-description">
-                          {" "}
-                          / month
-                        </Text>
-                      ) : null}
-                    </Text>
-                  </View>
-
-                  {isCurrent ? (
-                    <View className="rounded-full bg-primary px-3 py-1">
-                      <Text className="font-ralewayBold text-[10px] uppercase text-white">
-                        Active Plan
-                      </Text>
-                    </View>
-                  ) : isAllIn ? (
-                    <View className="rounded-full bg-accent px-3 py-1">
-                      <Text className="font-ralewayBold text-[10px] uppercase text-textPrimary">
-                        Best Value
-                      </Text>
-                    </View>
-                  ) : null}
-                </View>
-
-                {/* Features */}
-                <View className="my-4 border-t border-primary/10 pt-3 gap-2">
-                  <View className="flex-row items-center gap-2">
-                    <Feather name="check-circle" size={15} color={colors.primary} />
-                    <Text className="font-ralewayMedium text-xs text-textPrimary">
-                      {tier.property_limit === null
-                        ? "Unlimited managed properties"
-                        : `Up to ${tier.property_limit} properties`}
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center gap-2">
-                    <Feather name="check-circle" size={15} color={colors.primary} />
-                    <Text className="font-ralewayMedium text-xs text-textPrimary">
-                      Full Floor Plan Canvas & Bedspace management
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center gap-2">
-                    <Feather name="check-circle" size={15} color={colors.primary} />
-                    <Text className="font-ralewayMedium text-xs text-textPrimary">
-                      Financial ledger, rent tracking & analytics
-                    </Text>
-                  </View>
-                </View>
-
-                {/* CTA */}
-                {!isCurrent && tier.key !== "free" ? (
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    className="h-12 items-center justify-center rounded-2xl bg-primary"
-                    disabled={checkoutMutation.isPending}
-                    onPress={() => handleUpgrade(tier.key)}
-                  >
-                    <Text className="font-ralewayExtraBold text-sm text-white">
-                      Upgrade to {tier.label}
-                    </Text>
-                  </TouchableOpacity>
-                ) : null}
-              </View>
+                onUpgrade={() => handleUpgrade(tier.key)}
+                tier={tier}
+              />
             );
           })}
         </ScrollView>

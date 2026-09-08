@@ -1,3 +1,5 @@
+import { useAccess } from "../../hooks/auth/useAccess";
+import type { AppPermission } from "../../types/auth/access";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef } from "react";
 import {
@@ -13,8 +15,11 @@ import { colors } from "../../constants/colors";
 import { getStandardModalSheetHeight } from "../../constants/modal";
 import { BottomSheetModal } from "./BottomSheetModal";
 import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "./ModalActionFooter";
+import { ModalHeader } from "./ModalHeader";
 
 export type ActionSheetItem = {
+  permission?: AppPermission;
+  propertyId?: string;
   description?: string;
   destructive?: boolean;
   disabled?: boolean;
@@ -38,11 +43,14 @@ export function ActionSheet({
   title: string;
   visible: boolean;
 }) {
+  const { can } = useAccess();
+  const visibleActions = actions.filter((action) => !action.permission || can(action.permission, action.propertyId));
   const pendingAction = useRef<(() => void) | null>(null);
   const { height } = useWindowDimensions();
   const maxSheetHeight = getStandardModalSheetHeight(height);
 
   function handleAction(action: ActionSheetItem) {
+    if (action.disabled || action.permission && !can(action.permission, action.propertyId)) return;
     if (action.dismissOnPress === false) {
       action.onPress();
       return;
@@ -68,46 +76,30 @@ export function ActionSheet({
     >
       <SafeAreaView
         accessibilityViewIsModal
-        className="overflow-hidden rounded-t-[28px] bg-white px-5"
+        className="overflow-hidden rounded-t-[28px] bg-white"
         edges={["bottom"]}
         style={{ maxHeight: maxSheetHeight }}
       >
-        <View className="mb-4 flex-row items-start gap-3">
-          <View className="min-w-0 flex-1">
-            <Text
-              accessibilityRole="header"
-              className="font-ralewayBold text-xl text-textPrimary"
-            >
-              {title}
-            </Text>
-            {subtitle ? (
-              <Text className="mt-1 text-sm leading-5 text-description">
-                {subtitle}
-              </Text>
-            ) : null}
-          </View>
-          <TouchableOpacity
-            accessibilityLabel={`Close ${title}`}
-            accessibilityRole="button"
-            activeOpacity={0.8}
-            className="h-11 w-11 items-center justify-center rounded-full bg-surface"
-            onPress={onClose}
-          >
-            <MaterialCommunityIcons name="close" color="#1E1F45" size={20} />
-          </TouchableOpacity>
-        </View>
+        <ModalHeader
+          closeAccessibilityLabel={`Close ${title}`}
+          onClose={onClose}
+          subtitle={subtitle}
+          title={title}
+        />
 
         <ScrollView
           bounces={false}
           contentContainerStyle={{
             gap: 8,
             paddingBottom: MODAL_ACTION_FOOTER_CONTENT_HEIGHT,
+            paddingHorizontal: 20,
+            paddingTop: 16,
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           style={{ flexGrow: 0, flexShrink: 1 }}
         >
-          {actions.map((action) => {
+          {visibleActions.map((action) => {
             const color = action.destructive ? "#B42318" : colors.primary;
 
             return (

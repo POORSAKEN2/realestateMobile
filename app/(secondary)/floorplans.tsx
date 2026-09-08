@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { View } from "react-native";
 
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { FloorPlanManagerHeader } from "../../components/floorplans/FloorPlanManagerHeader";
 import { FloorNameModal } from "../../components/floorplans/FloorPlanManagerModals";
 import {
@@ -66,7 +66,6 @@ export default function FloorPlansScreen() {
     propertyId,
     roomCapability: basePolicy.rooms,
   });
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const floorPlanSnackbar = useFloorPlanSnackbar({
     clearNotice: controller.actions.clearNotice,
     isImageUploading: controller.pending.imageUpload,
@@ -100,16 +99,11 @@ export default function FloorPlansScreen() {
     controller.queries.rooms.isError;
 
   async function refreshFloorPlans() {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([
-        propertyQuery.refetch(),
-        controller.queries.floorPlans.refetch(),
-        controller.queries.rooms.refetch(),
-      ]);
-    } finally {
-      setIsRefreshing(false);
-    }
+    await Promise.all([
+      propertyQuery.refetch(),
+      controller.queries.floorPlans.refetch(),
+      controller.queries.rooms.refetch(),
+    ]);
   }
 
   return (
@@ -132,24 +126,17 @@ export default function FloorPlansScreen() {
         ) : isError ? (
           <FloorPlanErrorState onRetry={() => void refreshFloorPlans()} />
         ) : !controller.activeFloor ? (
-          <ScrollView
+          <PullToRefreshScrollView
             className="-mx-6 flex-1"
             contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24 }}
-            refreshControl={
-              <RefreshControl
-                colors={["#8A77F4"]}
-                onRefresh={refreshFloorPlans}
-                refreshing={isRefreshing}
-                tintColor="#8A77F4"
-              />
-            }
+            onRefresh={refreshFloorPlans}
           >
             <EmptyFloorPlanState
               canCreate={policy.canCreateFloorPlans}
               mode={policy.mode}
               onCreate={actions.openFloorCreate}
             />
-          </ScrollView>
+          </PullToRefreshScrollView>
         ) : (
           <FloorPlanWorkspace
             activeFloor={controller.activeFloor}
@@ -173,7 +160,6 @@ export default function FloorPlansScreen() {
             onRefresh={refreshFloorPlans}
             onSelectFloor={actions.selectFloor}
             rooms={controller.rooms}
-            refreshing={isRefreshing}
           />
         )}
       </View>

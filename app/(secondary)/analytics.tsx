@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useMemo, useState } from "react";
-import { Alert, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useMemo } from "react";
+import { Alert, Text, TouchableOpacity, View } from "react-native";
 import Svg, {
   Circle,
   Defs,
@@ -11,6 +11,7 @@ import Svg, {
   Stop,
 } from "react-native-svg";
 
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { useProperties } from "../../hooks/api/useProperties";
 import { usePortfolioAnalytics } from "../../hooks/api/usePortfolioAnalytics";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
@@ -396,7 +397,6 @@ export default function AnalyticsScreen() {
     isLoading: isLoadingProperties,
     refetch: refetchProperties,
   } = useList();
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const isInitialLoading = isLoadingAnalytics || isLoadingProperties;
 
   const metricCards = useMemo<MetricCard[]>(
@@ -451,12 +451,7 @@ export default function AnalyticsScreen() {
   }, [properties]);
 
   async function refreshAnalytics() {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([refetchAnalytics(), refetchProperties()]);
-    } finally {
-      setIsRefreshing(false);
-    }
+    await Promise.all([refetchAnalytics(), refetchProperties()]);
   }
 
   return (
@@ -477,18 +472,11 @@ export default function AnalyticsScreen() {
         title="Analytics"
       />
 
-      <ScrollView
+      <PullToRefreshScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 32 }}
-        refreshControl={
-          <RefreshControl
-            colors={[colors.primary]}
-            onRefresh={refreshAnalytics}
-            refreshing={isRefreshing}
-            tintColor={colors.primary}
-          />
-        }
+        onRefresh={refreshAnalytics}
       >
         {isInitialLoading ? (
           <AnalyticsLoadingState />
@@ -578,7 +566,7 @@ export default function AnalyticsScreen() {
             </View>
           </>
         )}
-      </ScrollView>
+      </PullToRefreshScrollView>
     </Screen>
   );
 }

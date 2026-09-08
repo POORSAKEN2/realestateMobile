@@ -31,6 +31,7 @@ export type PropertySpatialCapabilities = {
 
 export type Property = {
   id: string;
+  managers?: Array<{ id: string; name: string; email: string }>;
   title: string;
   location: string;
   street?: string;

@@ -1,14 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { BedspaceActionsSheet } from "../../components/bedspaces/BedspaceActionsSheet";
 import { BedspaceCard } from "../../components/bedspaces/BedspaceCard";
 import { BedspaceFormFields } from "../../components/bedspaces/BedspaceFormFields";
@@ -60,7 +55,6 @@ export default function BedspacesScreen() {
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId);
   const [actionTarget, setActionTarget] = useState<Bedspace | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const selectedRoom = rooms.find((room) => room.id === selectedRoomId);
   const management = useBedspaceManagement({
     accessToken,
@@ -108,12 +102,7 @@ export default function BedspacesScreen() {
   }, [rooms, selectedRoomId]);
 
   async function refresh() {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([roomsQuery.refetch(), management.query.refetch()]);
-    } finally {
-      setIsRefreshing(false);
-    }
+    await Promise.all([roomsQuery.refetch(), management.query.refetch()]);
   }
 
   function openLeaseAssignment(bedspace: Bedspace) {
@@ -162,13 +151,13 @@ export default function BedspacesScreen() {
       <View className="flex-1 gap-5">
         <ModuleHeader
           action={
-            <AddButton
+            <AddButton permission="bedspaces.create"
               disabled={!selectedRoomId || isLoading || isError}
               onPress={management.openCreateForm}
               title="Add"
             />
           }
-          eyebrow="Room Inventory"
+          eyebrow="Portfolio Intelligence"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from bedspaces"
@@ -282,20 +271,13 @@ export default function BedspacesScreen() {
             </TouchableOpacity>
           </View>
         ) : (
-          <ScrollView
+          <PullToRefreshScrollView
             className="-mx-6 flex-1"
             contentContainerStyle={{
               paddingBottom: 48,
               paddingHorizontal: 24,
             }}
-            refreshControl={
-              <RefreshControl
-                colors={[colors.primary]}
-                onRefresh={refresh}
-                refreshing={isRefreshing}
-                tintColor={colors.primary}
-              />
-            }
+            onRefresh={refresh}
             showsVerticalScrollIndicator={false}
           >
             {filteredBedspaces.length ? (
@@ -333,7 +315,7 @@ export default function BedspacesScreen() {
                   }
                 />
                 {!management.bedspaces.length ? (
-                  <AddButton
+                  <AddButton permission="bedspaces.create"
                     className="h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
                     onPress={management.openCreateForm}
                     title="Add first bedspace"
@@ -341,7 +323,7 @@ export default function BedspacesScreen() {
                 ) : null}
               </View>
             )}
-          </ScrollView>
+          </PullToRefreshScrollView>
         )}
       </View>
 

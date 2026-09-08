@@ -9,6 +9,7 @@ export function ProfileHeader({ onBack }: ProfileHeaderProps) {
   return (
     <ModuleHeader
       centerTitle
+      eyebrow="Account"
       leading={
         onBack ? (
           <BackButton

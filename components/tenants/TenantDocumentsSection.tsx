@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -26,11 +27,11 @@ export function TenantDocumentsSection({
     <TenantSection icon="document-text-outline" title="Documentation & files">
       <View className="mb-3 flex-row justify-end gap-2">
         <SectionAction icon="link-outline" label="Select" onPress={onSelect} />
-        <SectionAction
+        <PermissionGate permission="documents.create"><SectionAction
           icon="cloud-upload-outline"
           label="Add document"
           onPress={onAdd}
-        />
+        /></PermissionGate>
       </View>
 
       {isLoading ? (

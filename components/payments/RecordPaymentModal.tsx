@@ -90,7 +90,7 @@ export function RecordPaymentModal({
   }
 
   return (
-    <AddEditModal
+    <AddEditModal permission="payments.create"
       formError={error}
       isPending={isPending}
       isVisible={isVisible}

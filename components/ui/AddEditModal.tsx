@@ -1,20 +1,23 @@
+import { useAccess } from "../../hooks/auth/useAccess";
+import type { AppPermission } from "../../types/auth/access";
 import React, { useEffect, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Modal,
   KeyboardAvoidingView,
   Platform,
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { BackButton } from "./buttons/BackButton";
 import { BottomSheetHost } from "./BottomSheetModal";
 import { FormActionRow } from "./forms/FormActionRow";
 import { ModalActionFooter } from "./ModalActionFooter";
+import { ModalHeader } from "./ModalHeader";
+import { EntitlementLimitPrompt } from "../billing/EntitlementLimitPrompt";
 
 function AddEditModalHost({ children }: React.PropsWithChildren) {
   return (
@@ -25,6 +28,8 @@ function AddEditModalHost({ children }: React.PropsWithChildren) {
 }
 
 interface AddEditModalProps {
+  permission?: AppPermission;
+  propertyId?: string;
   appearance?: "default" | "card";
   backAccessibilityLabel?: string;
   cancelText?: string;
@@ -46,6 +51,8 @@ interface AddEditModalProps {
 }
 
 export const AddEditModal: React.FC<AddEditModalProps> = ({
+  permission,
+  propertyId,
   appearance = "default",
   backAccessibilityLabel,
   cancelText = "Cancel",
@@ -65,6 +72,8 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
   children,
   footer,
 }) => {
+  const { can } = useAccess();
+  const canSubmit = !permission || can(permission, propertyId);
   const scrollRef = useRef<ScrollView | null>(null);
   const isCardAppearance = appearance === "card";
 
@@ -87,76 +96,32 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
       visible={isVisible}
     >
       <AddEditModalHost>
+        <EntitlementLimitPrompt active={isVisible} priority={1} />
         {/* Explicit style layout string replaces 'modal-container' */}
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           className="flex-1 bg-surface"
         >
-          <View
-            className={
-              isCardAppearance
-                ? compactHeader
-                  ? "border-b border-textPrimary/10 bg-white px-5 py-3"
-                  : "bg-white px-6 pb-5 pt-6"
-                : "border-b border-textPrimary/10 bg-white px-5 py-4"
+          <ModalHeader
+            accessory={headerAccessory}
+            className={isCardAppearance && !compactHeader ? "border-b-0" : ""}
+            closeAccessibilityLabel={`Close ${title}`}
+            compact={compactHeader}
+            disabled={isPending}
+            leading={
+              onBack ? (
+                <BackButton
+                  accessibilityLabel={backAccessibilityLabel}
+                  disabled={isPending}
+                  onPress={onBack}
+                  variant="primary"
+                />
+              ) : undefined
             }
-          >
-            <View className="flex-row items-center">
-              {onBack ? (
-                <View className="mr-3 items-center justify-center">
-                  <BackButton
-                    accessibilityLabel={backAccessibilityLabel}
-                    disabled={isPending}
-                    onPress={onBack}
-                    variant="primary"
-                  />
-                </View>
-              ) : null}
-              <View className="flex-1 pr-4">
-                <Text
-                  className={
-                    isCardAppearance
-                      ? compactHeader
-                        ? "font-ralewayBold text-xl leading-7 text-textPrimary"
-                        : "font-ralewayBold text-[28px] leading-9 tracking-tight text-textPrimary"
-                      : "font-ralewayBold text-2xl text-textPrimary"
-                  }
-                  numberOfLines={2}
-                >
-                  {title}
-                </Text>
-                {subtitle ? (
-                  <Text
-                    className={
-                      isCardAppearance
-                        ? compactHeader
-                          ? "mt-0.5 font-ralewayMedium text-sm leading-5 text-description"
-                          : "mt-2 font-ralewayMedium text-base leading-6 text-description"
-                        : "mt-1 font-ralewayMedium text-sm text-description"
-                    }
-                    numberOfLines={2}
-                  >
-                    {subtitle}
-                  </Text>
-                ) : null}
-              </View>
-              {headerAccessory ? (
-                <View className="mr-2">{headerAccessory}</View>
-              ) : null}
-              <TouchableOpacity
-                accessibilityLabel={`Close ${title}`}
-                accessibilityRole="button"
-                activeOpacity={0.8}
-                className={`h-11 w-11 items-center justify-center rounded-full ${
-                  isCardAppearance ? "bg-transparent" : "bg-surface"
-                }`}
-                disabled={isPending}
-                onPress={handleClose}
-              >
-                <Ionicons name="close" color="#1E1F45" size={22} />
-              </TouchableOpacity>
-            </View>
-          </View>
+            onClose={handleClose}
+            subtitle={subtitle}
+            title={title}
+          />
 
           <ScrollView
             automaticallyAdjustKeyboardInsets
@@ -200,9 +165,9 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                   disabled={isPending}
                   isPending={isPending}
                   onCancel={onClose}
-                  onSubmit={onSubmit}
+                  onSubmit={() => { if (canSubmit) onSubmit(); }}
                   showCancelAction={showCancelAction}
-                  showSubmitAction={showSubmitAction}
+                  showSubmitAction={showSubmitAction && canSubmit}
                   submitText={submitText}
                 />
               )}

@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -140,7 +141,7 @@ export function PaymentCard({
       {/* Action footer for pending/overdue payments */}
       {!isPaid && onRecordPayment ? (
         <View className="mt-3 flex-row gap-2 pt-2 border-t border-primary/5">
-          <TouchableOpacity
+          <PermissionGate permission="payments.create"><TouchableOpacity
             activeOpacity={0.8}
             className="flex-1 h-11 flex-row items-center justify-center rounded-xl bg-primary"
             onPress={() => onRecordPayment(payment)}
@@ -149,7 +150,7 @@ export function PaymentCard({
             <Text className="ml-1.5 font-ralewayBold text-xs text-white">
               Record Collection
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity></PermissionGate>
 
           {onViewLedger ? (
             <TouchableOpacity

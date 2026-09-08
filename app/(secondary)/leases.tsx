@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { Text, View } from "react-native";
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { Screen } from "../../components/ui/Screen";
 import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import {
@@ -41,7 +42,6 @@ import { useSnackbar } from "../../hooks/useSnackbar";
 import { renewLease } from "../../api/leases";
 import { LeaseRenewalModal } from "../../components/leases/LeaseRenewalModal";
 import { useQueryClient } from "@tanstack/react-query";
-import { colors } from "../../constants/colors";
 import type { Lease } from "../../types";
 
 type Option = {
@@ -84,7 +84,6 @@ export default function LeasesScreen() {
     isAmendmentDatePickerOpen,
     isFormOpen,
     isLoading,
-    isRefreshing,
     isStartDatePickerOpen,
     leases,
     lesseeOptions,
@@ -165,8 +164,8 @@ export default function LeasesScreen() {
         {/* --- TOP HEADER: Title & Primary Action --- */}
         <View className="px-1">
           <ModuleHeader
-            action={<AddButton onPress={() => openCreateForm()} />}
-            eyebrow="Contract Management"
+            action={<AddButton permission="leases.create" onPress={() => openCreateForm()} />}
+            eyebrow="Operations"
             leading={
               <SecondaryBackButton
                 accessibilityLabel="Back from leases"
@@ -225,16 +224,9 @@ export default function LeasesScreen() {
             title="Loading leases"
           />
         ) : (
-          <ScrollView
+          <PullToRefreshScrollView
             className="flex-1"
-            refreshControl={
-              <RefreshControl
-                colors={[colors.primary]}
-                onRefresh={refresh}
-                refreshing={isRefreshing}
-                tintColor={colors.primary}
-              />
-            }
+            onRefresh={refresh}
             showsVerticalScrollIndicator={false}
           >
             <View className="gap-4 pb-8">
@@ -276,7 +268,7 @@ export default function LeasesScreen() {
                 />
               ) : null}
             </View>
-          </ScrollView>
+          </PullToRefreshScrollView>
         )}
       </View>
 
@@ -292,7 +284,7 @@ export default function LeasesScreen() {
         visible={isFilterVisible}
       />
 
-      <AddEditModal
+      <AddEditModal permission={editingLease ? "leases.update" : "leases.create"} propertyId={form.propertyId || undefined}
         appearance="card"
         isVisible={isFormOpen}
         onClose={closeForm}

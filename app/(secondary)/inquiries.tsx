@@ -2,14 +2,13 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  FlatList,
-  RefreshControl,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
+import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { LeadCard } from "../../components/leads/LeadCard";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
@@ -19,7 +18,10 @@ import { colors } from "../../constants/colors";
 import { useLeads, useUpdateLeadStatus } from "../../hooks/api/useLeads";
 import type { ListingLead, ListingLeadStatus } from "../../types/domain/leads";
 
-const STATUS_FILTERS: Array<{ label: string; value: ListingLeadStatus | "ALL" }> = [
+const STATUS_FILTERS: Array<{
+  label: string;
+  value: ListingLeadStatus | "ALL";
+}> = [
   { label: "All Leads", value: "ALL" },
   { label: "New", value: "new" },
   { label: "Contacted", value: "contacted" },
@@ -31,7 +33,7 @@ export default function InquiriesScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
 
-  const { data: leads = [], isLoading, isRefetching, refetch } = useLeads();
+  const { data: leads = [], isLoading, refetch } = useLeads();
   const updateStatusMutation = useUpdateLeadStatus();
 
   const filteredLeads = useMemo(() => {
@@ -76,7 +78,7 @@ export default function InquiriesScreen() {
     <Screen className="bg-surface">
       <View className="flex-1">
         <ModuleHeader
-          eyebrow="Marketplace"
+          eyebrow="Operations"
           leading={
             <SecondaryBackButton
               accessibilityLabel="Back from inquiries"
@@ -140,19 +142,12 @@ export default function InquiriesScreen() {
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : (
-          <FlatList
+          <PullToRefreshFlatList
             className="flex-1 -mx-1 px-1 mt-2"
             contentContainerClassName="pb-16 pt-1"
             data={filteredLeads}
             keyExtractor={(item) => `${item.leadType}-${item.id}`}
-            refreshControl={
-              <RefreshControl
-                colors={[colors.primary]}
-                refreshing={isRefetching}
-                tintColor={colors.primary}
-                onRefresh={refetch}
-              />
-            }
+            onRefresh={refetch}
             renderItem={({ item }) => (
               <LeadCard lead={item} onUpdateStatus={handleStatusChange} />
             )}

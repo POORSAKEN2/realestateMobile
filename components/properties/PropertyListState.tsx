@@ -31,10 +31,10 @@ export function PropertyListMessage({
   onAction,
   title,
 }: {
-  actionLabel: string;
+  actionLabel?: string;
   description: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  onAction: () => void;
+  onAction?: () => void;
   title: string;
 }) {
   return (
@@ -48,7 +48,7 @@ export function PropertyListMessage({
       <Text className="mt-1 text-center text-sm leading-5 text-description">
         {description}
       </Text>
-      <TouchableOpacity
+      {actionLabel && onAction ? <TouchableOpacity
         accessibilityRole="button"
         activeOpacity={0.85}
         className="mt-5 min-h-11 items-center justify-center rounded-2xl bg-primary px-5"
@@ -57,7 +57,7 @@ export function PropertyListMessage({
         <Text className="font-ralewayExtraBold text-sm text-white">
           {actionLabel}
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> : null}
     </View>
   );
 }

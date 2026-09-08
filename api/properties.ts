@@ -242,14 +242,19 @@ export function normalizeProperty(property: Record<string, any>): Property {
 }
 
 export async function fetchProperties(accessToken?: string) {
-  const response = await apiClient.get<
-    | ApiEnvelope<Property[]>
-    | ApiEnvelope<PaginatedApiData<Property>>
-    | Property[]
-  >("/properties", { headers: authHeaders(accessToken) });
-  const properties = unwrapList(response);
-
-  return properties.map((property) => normalizeProperty(property));
+  const properties: Property[] = [];
+  let page = 1;
+  let lastPage = 1;
+  do {
+    const response = await apiClient.get<any>(`/properties?page=${page}`, { headers: authHeaders(accessToken) });
+    properties.push(...unwrapList(response).map(normalizeProperty));
+    const payload = response?.data ?? response;
+    const pagination = payload?.meta ?? payload;
+    const advertisedLastPage = Number(pagination?.last_page ?? 1);
+    lastPage = Number.isInteger(advertisedLastPage) && advertisedLastPage > 0 ? advertisedLastPage : 1;
+    page += 1;
+  } while (page <= lastPage);
+  return [...new Map(properties.map((property) => [property.id, property])).values()];
 }
 
 export async function fetchProperty(id: string, accessToken?: string) {
@@ -261,6 +266,14 @@ export async function fetchProperty(id: string, accessToken?: string) {
   return normalizeProperty(
     unwrapData(response) as unknown as Record<string, any>,
   );
+}
+
+export async function syncPropertyManagers(id: string, managerIds: string[], accessToken?: string) {
+  const response = await apiClient.post<ApiEnvelope<Property>>(
+    `/properties/${encodeURIComponent(id)}/managers`, { manager_ids: managerIds },
+    { headers: authHeaders(accessToken), access: { permission: "staff.manage", propertyId: id } },
+  );
+  return normalizeProperty(unwrapData(response) as Property);
 }
 
 export async function createProperty(

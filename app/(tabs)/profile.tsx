@@ -1,5 +1,5 @@
-import { ProfileScreen } from "../(secondary)/profile";
+import { ProfileMenuScreen } from "../../components/profile/ProfileMenuScreen";
 
 export default function ProfileTabScreen() {
-  return <ProfileScreen navigationLevel="primary" />;
+  return <ProfileMenuScreen />;
 }

@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -98,7 +99,7 @@ export function LeaseCard({
           {/* Quick Actions (Top Right) */}
           <View className="shrink-0 flex-row items-center gap-1 rounded-full border border-primary/20 bg-primary/10 p-1">
             {onRenew && (isActive || isExpiring || isExpired) ? (
-              <TouchableOpacity
+              <PermissionGate permission="leases.update"><TouchableOpacity
                 accessibilityLabel="Renew lease"
                 activeOpacity={0.7}
                 onPress={(event) => {
@@ -108,9 +109,9 @@ export function LeaseCard({
                 className="rounded-full p-1.5 hover:bg-primary/20"
               >
                 <Ionicons name="refresh-circle" size={18} color={colors.primary} />
-              </TouchableOpacity>
+              </TouchableOpacity></PermissionGate>
             ) : null}
-            <TouchableOpacity
+            <PermissionGate permission="leases.update" propertyId={lease.propertyId}><TouchableOpacity
               activeOpacity={0.7}
               onPress={(event) => {
                 event.stopPropagation();
@@ -119,8 +120,8 @@ export function LeaseCard({
               className="rounded-full p-1.5 hover:bg-primary/10"
             >
               <Ionicons name="pencil" size={16} color={colors.primary} />
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity></PermissionGate>
+            <PermissionGate permission="leases.delete" propertyId={lease.propertyId}><TouchableOpacity
               activeOpacity={0.7}
               onPress={(event) => {
                 event.stopPropagation();
@@ -129,7 +130,7 @@ export function LeaseCard({
               className="rounded-full p-1.5 hover:bg-dangerSurface"
             >
               <Ionicons name="trash" size={16} color="#B42318" />
-            </TouchableOpacity>
+            </TouchableOpacity></PermissionGate>
           </View>
         </View>
 

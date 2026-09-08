@@ -16,8 +16,11 @@ import {
 import { Screen } from "../../components/ui/Screen";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { StaffManagementEntryCard } from "../../components/staff/StaffManagementEntryCard";
 import { useAuth } from "../../hooks/useAuth";
 import { colors } from "../../constants/colors";
+import { appRoutes } from "../../constants/navigation";
+import { canManageStaff } from "../../utils/auth/staffAccess";
 import {
   changePassword,
   exportUserData,
@@ -78,7 +81,7 @@ function PasswordField({
 }
 
 export default function SettingsScreen() {
-  const { hasCompletedOnboarding, setOnboardingCompleted } = useAuth();
+  const { hasCompletedOnboarding, session, setOnboardingCompleted } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -86,6 +89,7 @@ export default function SettingsScreen() {
   const [isExporting, setIsExporting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const shouldShowOnboarding = !hasCompletedOnboarding;
+  const showStaffManagement = canManageStaff(session?.user);
 
   async function handleChangePassword() {
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -217,8 +221,16 @@ export default function SettingsScreen() {
           contentContainerClassName="px-6 pb-10"
           showsVerticalScrollIndicator={false}
         >
+          {showStaffManagement ? (
+            <StaffManagementEntryCard
+              onPress={() => router.push(appRoutes.secondary.staffManagement)}
+            />
+          ) : null}
+
           {/* Onboarding preview section */}
-          <View className="mt-8 rounded-[28px] border border-primary/20 bg-primary/10 p-5 shadow-sm shadow-primary/10">
+          <View
+            className={`${showStaffManagement ? "mt-5" : "mt-8"} rounded-[28px] border border-primary/20 bg-primary/10 p-5 shadow-sm shadow-primary/10`}
+          >
             <View className="flex-row items-center justify-between gap-4">
               <View className="min-w-0 flex-1">
                 <View className="flex-row items-center gap-2">
@@ -421,4 +433,3 @@ export default function SettingsScreen() {
     </Screen>
   );
 }
-

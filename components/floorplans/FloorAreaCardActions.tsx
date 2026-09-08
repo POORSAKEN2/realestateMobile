@@ -1,3 +1,4 @@
+import { PermissionGate } from "../auth/PermissionGate";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
@@ -50,7 +51,7 @@ export function FloorAreaCardActions({
 }) {
   return (
     <View className="mt-4 flex-row gap-2 border-t border-textPrimary/10 pt-3">
-      <FloorAreaActionButton
+      <PermissionGate permission="areas.update"><FloorAreaActionButton
         disabled={!canDraw}
         icon={canDraw ? "vector-combine" : "image-off-outline"}
         label={
@@ -58,7 +59,7 @@ export function FloorAreaCardActions({
         }
         onPress={onChooseShape}
         primary
-      />
+      /></PermissionGate>
       {onManageRooms ? (
         <FloorAreaActionButton
           icon="door-open"

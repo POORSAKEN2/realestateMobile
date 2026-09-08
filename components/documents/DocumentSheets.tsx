@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ActionSheet, type ActionSheetItem } from "../ui/ActionSheet";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
+import { ModalHeader } from "../ui/ModalHeader";
 import type { PropertyDocument } from "../../types";
 import {
   DOCUMENT_SORT_OPTIONS,
@@ -95,6 +96,8 @@ export function DocumentActionSheet({
           description: "Update details or replace the uploaded file.",
           icon: "file-edit-outline",
           label: "Edit or replace",
+          permission: "documents.update" as const,
+          propertyId: document.propertyId,
           onPress: () => onEdit(document),
         },
         {
@@ -102,6 +105,8 @@ export function DocumentActionSheet({
           destructive: true,
           icon: "trash-can-outline",
           label: "Delete document",
+          permission: "documents.delete" as const,
+          propertyId: document.propertyId,
           onPress: () => onDelete(document),
         },
       ]
@@ -192,37 +197,16 @@ function BottomSheet({
     >
       <SafeAreaView
         accessibilityViewIsModal
-        className="rounded-t-[30px] bg-white px-5 pb-4"
+        className="rounded-t-[30px] bg-white"
         edges={["bottom"]}
       >
-        <View className="mb-5 flex-row items-start justify-between gap-3">
-          <View className="min-w-0 flex-1">
-            <Text
-              accessibilityRole="header"
-              className="font-ralewayExtraBold text-xl text-textPrimary"
-            >
-              {title}
-            </Text>
-            {subtitle ? (
-              <Text
-                className="mt-1 font-ralewayMedium text-xs text-description"
-                numberOfLines={1}
-              >
-                {subtitle}
-              </Text>
-            ) : null}
-          </View>
-          <TouchableOpacity
-            accessibilityLabel="Close"
-            accessibilityRole="button"
-            activeOpacity={0.75}
-            className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
-            onPress={onClose}
-          >
-            <MaterialCommunityIcons name="close" color="#8A77F4" size={21} />
-          </TouchableOpacity>
-        </View>
-        {children}
+        <ModalHeader
+          closeAccessibilityLabel={`Close ${title}`}
+          onClose={onClose}
+          subtitle={subtitle}
+          title={title}
+        />
+        <View className="px-5 pb-4 pt-5">{children}</View>
       </SafeAreaView>
     </BottomSheetModal>
   );

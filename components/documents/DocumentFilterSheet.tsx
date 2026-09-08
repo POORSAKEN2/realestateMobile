@@ -1,6 +1,5 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import type { Lessee, Property, PropertyDocument } from "../../types";
@@ -14,6 +13,7 @@ import {
   SearchFilterActions,
   SearchFilterSection,
 } from "../ui/SearchFilterSheet";
+import { ModalHeader } from "../ui/ModalHeader";
 import {
   SearchableOptionSelector,
   SelectionField,
@@ -127,27 +127,12 @@ export function DocumentFilterSheet({
           />
         ) : (
           <>
-            <View className="flex-row items-center justify-between border-b border-primary/20 px-5 pb-4">
-              <Text
-                accessibilityRole="header"
-                className="font-ralewayExtraBold text-xl text-textPrimary"
-              >
-                Filter documents
-              </Text>
-              <TouchableOpacity
-                accessibilityLabel="Close filters"
-                accessibilityRole="button"
-                activeOpacity={0.75}
-                className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
-                onPress={onClose}
-              >
-                <MaterialCommunityIcons
-                  name="close"
-                  color="#8A77F4"
-                  size={21}
-                />
-              </TouchableOpacity>
-            </View>
+            <ModalHeader
+              closeAccessibilityLabel="Close document filters"
+              onClose={onClose}
+              subtitle="Narrow documents by property, tenant, category, or file type."
+              title="Filter documents"
+            />
 
             <ScrollView
               contentContainerClassName="gap-5 p-5"

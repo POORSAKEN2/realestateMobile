@@ -11,7 +11,6 @@ const COMPLETION_FIELDS: Array<{
 }> = [
   { label: "name", select: (form) => form.fullName },
   { label: "company", select: (form) => form.companyName },
-  { label: "job title", select: (form) => form.jobTitle },
   { label: "phone", select: (form) => form.phoneNumber },
   { label: "photo", select: (form) => form.imageUri },
 ];
@@ -100,7 +99,7 @@ export function mergeUpdatedProfile(
     ...updatedUser,
     name: updatedUser.name?.trim() || form.fullName.trim(),
     company: updatedUser.company?.trim() || form.companyName.trim(),
-    role: updatedUser.role?.trim() || form.jobTitle.trim(),
+    role: updatedUser.role?.trim() || currentUser?.role,
     phone: updatedUser.phone?.trim() || form.phoneNumber.trim(),
     profile_image_url:
       getProfileImageUri(updatedUser) || form.imageUri.trim() || undefined,

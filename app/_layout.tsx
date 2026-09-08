@@ -1,3 +1,4 @@
+import { ApiError } from "../api/errors";
 import "react-native-gesture-handler";
 
 import {
@@ -21,6 +22,7 @@ import "../global.css";
 import { AppleMapsTokenBootstrap } from "../components/maps/AppleMapsTokenBootstrap";
 import { MapKitGeocodingProvider } from "../components/maps/MapKitGeocodingProvider";
 import { NotificationBootstrap } from "../components/notifications/NotificationBootstrap";
+import { EntitlementLimitPrompt } from "../components/billing/EntitlementLimitPrompt";
 import { AuthProvider } from "../context/AuthContext";
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
 
@@ -54,7 +56,11 @@ export default function RootLayout() {
       new QueryClient({
         defaultOptions: {
           queries: {
-            retry: 1,
+            retry: (count, error) =>
+              !(
+                error instanceof ApiError &&
+                [401, 403, 409].includes(error.status)
+              ) && count < 1,
             staleTime: 1000 * 60,
           },
         },
@@ -90,6 +96,7 @@ export default function RootLayout() {
                   options={{ headerShown: false }}
                 />
               </Stack>
+              <EntitlementLimitPrompt />
             </DefaultLocationProvider>
           </MapKitGeocodingProvider>
         </AuthProvider>

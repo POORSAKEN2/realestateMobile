@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
 
 import { useProperties } from "../api/useProperties";
 import { clientKeys } from "../api/useClients";
@@ -23,7 +22,6 @@ export function useDocumentLibrary(
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const { useList } = useProperties();
   const propertiesQuery = useList();
   const documentsQuery = useQuery({
@@ -89,16 +87,11 @@ export function useDocumentLibrary(
     propertiesQuery.isLoading;
 
   async function refresh() {
-    setIsRefreshing(true);
-    try {
-      await Promise.all([
-        documentsQuery.refetch(),
-        clientsQuery.refetch(),
-        propertiesQuery.refetch(),
-      ]);
-    } finally {
-      setIsRefreshing(false);
-    }
+    await Promise.all([
+      documentsQuery.refetch(),
+      clientsQuery.refetch(),
+      propertiesQuery.refetch(),
+    ]);
   }
 
   return {
@@ -108,7 +101,6 @@ export function useDocumentLibrary(
     isDeleting: deleteMutation.isPending,
     isError: documentsQuery.isError,
     isLoading,
-    isRefreshing,
     isSaving: saveMutation.isPending,
     lessees: clientsQuery.data ?? [],
     properties: propertiesQuery.data ?? [],

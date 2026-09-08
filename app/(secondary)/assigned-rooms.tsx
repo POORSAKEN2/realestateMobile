@@ -1,14 +1,9 @@
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
-import {
-  RefreshControl,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
+import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { FloorAssignedRoomsSection } from "../../components/floorplans/FloorAssignedRoomsSection";
 import { BackButton } from "../../components/ui/buttons/BackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
@@ -48,7 +43,6 @@ export default function AssignedRoomsScreen() {
   const roomsQuery = usePropertyRoomsQuery(propertyId, session?.accessToken);
   const commands = usePropertyRoomCommands(propertyId, session?.accessToken);
   const [notice, setNotice] = useState("");
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const rooms = useMemo(
     () => (roomsQuery.data ?? []).filter((room) => room.areaId === areaId),
     [areaId, roomsQuery.data],
@@ -56,12 +50,7 @@ export default function AssignedRoomsScreen() {
   const isBusy = commands.update.isPending;
 
   async function refreshRooms() {
-    setIsRefreshing(true);
-    try {
-      await roomsQuery.refetch();
-    } finally {
-      setIsRefreshing(false);
-    }
+    await roomsQuery.refetch();
   }
 
   async function updateStatus(room: PropertyRoom, status: PropertyRoomStatus) {
@@ -132,7 +121,7 @@ export default function AssignedRoomsScreen() {
               </Text>
             </View>
           }
-          eyebrow={`${floorName} · ${areaLabel}`}
+          eyebrow="Portfolio Intelligence"
           leading={
             <BackButton
               accessibilityLabel="Back to floor plans"
@@ -182,21 +171,14 @@ export default function AssignedRoomsScreen() {
             </TouchableOpacity>
           </View>
         ) : (
-          <ScrollView
+          <PullToRefreshScrollView
             className="-mx-6 mt-5 flex-1"
             contentContainerStyle={{
               paddingBottom: 48,
               paddingHorizontal: 24,
             }}
             keyboardShouldPersistTaps="handled"
-            refreshControl={
-              <RefreshControl
-                colors={["#8A77F4"]}
-                onRefresh={refreshRooms}
-                refreshing={isRefreshing}
-                tintColor="#8A77F4"
-              />
-            }
+            onRefresh={refreshRooms}
             showsVerticalScrollIndicator={false}
           >
             <FloorAssignedRoomsSection
@@ -216,7 +198,7 @@ export default function AssignedRoomsScreen() {
               onUnassign={unassign}
               rooms={rooms}
             />
-          </ScrollView>
+          </PullToRefreshScrollView>
         )}
       </View>
     </Screen>

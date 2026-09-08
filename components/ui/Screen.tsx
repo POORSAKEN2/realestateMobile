@@ -1,6 +1,13 @@
 import { PropsWithChildren } from "react";
 import { View } from "react-native";
-import { SafeAreaView, type Edge } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+  type Edge,
+} from "react-native-safe-area-context";
+
+import { getTabBarContentInset } from "../../constants/tabBar";
+import { ScreenScrollInsetContext } from "../../context/ScreenScrollInsetContext";
 
 export type ScreenBottomInset = "none" | "safe-area" | "tab-bar";
 export type ScreenHorizontalInset = "none" | "safe-area";
@@ -21,6 +28,7 @@ export function Screen({
   topInset = "safe-area",
 }: ScreenProps) {
   const usesTabBarInset = bottomInset === "tab-bar";
+  const insets = useSafeAreaInsets();
   const edges: Edge[] = [];
 
   if (topInset === "safe-area") edges.push("top");
@@ -29,8 +37,17 @@ export function Screen({
 
   return (
     <SafeAreaView className={`flex-1 bg-surface ${className}`} edges={edges}>
-      <View className={`flex-1 px-6 pt-6 ${usesTabBarInset ? "" : "pb-6"}`}>
-        {children}
+      <View
+        className="flex-1 px-6 pt-6"
+        style={{
+          paddingBottom: usesTabBarInset ? 0 : 24,
+        }}
+      >
+        <ScreenScrollInsetContext.Provider
+          value={usesTabBarInset ? getTabBarContentInset(insets.bottom) : 0}
+        >
+          {children}
+        </ScreenScrollInsetContext.Provider>
       </View>
     </SafeAreaView>
   );

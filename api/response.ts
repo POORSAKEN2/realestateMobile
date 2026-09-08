@@ -1,11 +1,12 @@
+import { toApiError } from "./errors";
 import type { ApiErrorResponse } from "../types";
 
-export function getFirstValidationError(errors?: Record<string, string[]>) {
+export function getFirstValidationError(errors?: Record<string, unknown>) {
   if (!errors) {
     return undefined;
   }
 
-  const [firstError] = Object.values(errors).flat();
+  const firstError = Object.values(errors).flat().find((value): value is string => typeof value === "string");
 
   return firstError;
 }
@@ -22,7 +23,7 @@ export async function parseApiResponse<T>(
   if (!response.ok) {
     const validationMessage = getFirstValidationError(data?.errors);
 
-    throw new Error(data?.message || validationMessage || fallbackMessage);
+    throw toApiError(response.status, { ...data, message: data?.message || validationMessage || (response.status === 403 ? undefined : fallbackMessage) });
   }
 
   if (!isJson) {
