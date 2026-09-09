@@ -3,6 +3,7 @@ import {
   type AppleMapsTokenGateway,
   type AppleMapsTokenResponse,
 } from "../../api/mapkit";
+import { isAppleMapsUnavailableError } from "../../utils/maps/appleMapsAvailability";
 
 const DEFAULT_MINIMUM_VALIDITY_SECONDS = 5 * 60;
 
@@ -26,6 +27,7 @@ export class AppleMapsTokenManager {
   private generation = 0;
   private inFlightRequest: InFlightRequest | null = null;
   private sessionScope: string | null = null;
+  private unavailableError: Error | null = null;
 
   constructor(
     private readonly gateway: AppleMapsTokenGateway,
@@ -42,6 +44,10 @@ export class AppleMapsTokenManager {
     }
 
     this.selectSession(sessionScope);
+
+    if (this.unavailableError && !options.forceRefresh) {
+      throw this.unavailableError;
+    }
 
     const minimumValiditySeconds =
       options.minimumValiditySeconds ?? DEFAULT_MINIMUM_VALIDITY_SECONDS;
@@ -77,6 +83,20 @@ export class AppleMapsTokenManager {
 
         return response.token;
       })
+      .catch((error: unknown) => {
+        if (
+          isAppleMapsUnavailableError(error) &&
+          this.generation === requestGeneration &&
+          this.sessionScope === sessionScope
+        ) {
+          this.unavailableError =
+            error instanceof Error
+              ? error
+              : new Error("Apple Maps is temporarily unavailable.");
+        }
+
+        throw error;
+      })
       .finally(() => {
         if (this.inFlightRequest?.promise === promise) {
           this.inFlightRequest = null;
@@ -104,6 +124,7 @@ export class AppleMapsTokenManager {
     this.cache = null;
     this.inFlightRequest = null;
     this.sessionScope = null;
+    this.unavailableError = null;
   }
 
   private isValidFor(

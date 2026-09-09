@@ -3,6 +3,7 @@ import { AppState, Platform } from "react-native";
 
 import { useAuth } from "../../hooks/useAuth";
 import { appleMapsTokenManager } from "../../services/maps/appleMapsTokenManager";
+import { isAppleMapsUnavailableError } from "../../utils/maps/appleMapsAvailability";
 
 const PREFETCH_RETRY_DELAY_MS = 60 * 1000;
 const MINIMUM_TIMER_DELAY_MS = 1000;
@@ -60,8 +61,9 @@ export function AppleMapsTokenBootstrap() {
           forceRefresh,
         });
         scheduleRefresh();
-      } catch {
+      } catch (error) {
         // Map UI owns user-facing errors. Bootstrap retries silently.
+        if (isAppleMapsUnavailableError(error)) return;
         scheduleRetry();
       }
     }
