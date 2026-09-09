@@ -39,13 +39,17 @@ function useFloorPlanInvalidation(propertyId: string) {
   };
 }
 
-export function useFloorPlanQueries(propertyId: string, accessToken?: string) {
+export function useFloorPlanQueries(
+  propertyId: string,
+  accessToken?: string,
+  enabled = true,
+) {
   const floorPlans = useQuery({
     queryKey: floorPlanKeys.property(propertyId),
     queryFn: () => fetchFloorPlans(propertyId, accessToken),
-    enabled: Boolean(propertyId),
+    enabled: Boolean(propertyId) && enabled,
   });
-  const rooms = usePropertyRoomsQuery(propertyId, accessToken);
+  const rooms = usePropertyRoomsQuery(propertyId, accessToken, enabled);
 
   return { floorPlans, rooms };
 }
@@ -53,11 +57,12 @@ export function useFloorPlanQueries(propertyId: string, accessToken?: string) {
 export function usePropertyRoomsQuery(
   propertyId: string,
   accessToken?: string,
+  enabled = true,
 ) {
   return useQuery({
     queryKey: floorPlanKeys.rooms(propertyId),
     queryFn: () => fetchPropertyRooms(propertyId, accessToken),
-    enabled: Boolean(propertyId),
+    enabled: Boolean(propertyId) && enabled,
   });
 }
 

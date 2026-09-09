@@ -5,6 +5,7 @@ import type {
   DevicePushToken,
   RegisterPushTokenPayload,
 } from "../types";
+import { filterUserVisibleNotifications } from "../utils/notifications/notificationVisibility";
 
 export type {
   AppNotification,
@@ -55,7 +56,7 @@ export async function fetchNotifications(accessToken?: string) {
     ApiEnvelope<AppNotification[]> | AppNotification[]
   >("/notifications", { headers: authHeaders(accessToken) });
 
-  return unwrapCollection(response);
+  return filterUserVisibleNotifications(unwrapCollection(response));
 }
 
 export async function markNotificationRead(

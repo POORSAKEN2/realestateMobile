@@ -13,12 +13,14 @@ import { useProperties } from "../api/useProperties";
 
 type PropertyLifecycleControllerOptions = {
   accessToken?: string;
+  enabled?: boolean;
   onUpdated?: (property: Property) => void;
   property: Property | null;
 };
 
 export function usePropertyLifecycleController({
   accessToken,
+  enabled = true,
   onUpdated,
   property,
 }: PropertyLifecycleControllerOptions) {
@@ -27,7 +29,7 @@ export function usePropertyLifecycleController({
   const transition = useTransitionLifecycle();
   const historyQuery = useLifecycleHistory(
     property?.id ?? "",
-    Boolean(property),
+    Boolean(property) && enabled,
   );
   const [history, setHistory] = useState<PropertyStatusHistoryEntry[]>([]);
   const [requestedStatus, setRequestedStatus] = useState<PropertyStatus | null>(

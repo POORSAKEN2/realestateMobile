@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import {
   Dimensions,
   Image,
@@ -37,11 +37,13 @@ import { getPropertyLifecycleLabel } from "../../utils/properties/propertyLifecy
 
 export function PropertyDetailsModal({
   accessToken,
+  mode = "sheet",
   onClose,
   onPropertyUpdated,
   property,
 }: {
   accessToken?: string;
+  mode?: "screen" | "sheet";
   onClose: () => void;
   onPropertyUpdated?: (property: Property) => void;
   property: Property | null;
@@ -50,8 +52,14 @@ export function PropertyDetailsModal({
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { can } = useAccess();
+  const pendingDetailsRoute = useRef<{
+    propertyId: string;
+    propertyTitle: string;
+  } | null>(null);
+  const showFullDetails = mode === "screen";
   const lifecycle = usePropertyLifecycleController({
     accessToken,
+    enabled: showFullDetails,
     onUpdated: onPropertyUpdated,
     property,
   });
@@ -69,7 +77,11 @@ export function PropertyDetailsModal({
     queryFn: () => fetchDocuments(accessToken, { propertyId: property?.id }),
     enabled: Boolean(property),
   });
-  const floorPlanQueries = useFloorPlanQueries(property?.id ?? "", accessToken);
+  const floorPlanQueries = useFloorPlanQueries(
+    property?.id ?? "",
+    accessToken,
+    showFullDetails,
+  );
   const floorPlans = floorPlanQueries.floorPlans.data ?? [];
   const rooms = floorPlanQueries.rooms.data ?? [];
   const floorManagerPolicy = resolveFloorManagerPolicy({
@@ -108,24 +120,42 @@ export function PropertyDetailsModal({
   const isLoading = isLoadingLeases || isLoadingLessees || isLoadingDocuments;
   const images = property ? getPropertyImages(property) : [];
 
-  return (
-    <BottomSheetModal
-      backdropAccessibilityLabel="Close property details"
-      onClose={onClose}
-      statusBarTranslucent
-      visible={Boolean(property)}
-    >
+  function openFullDetails() {
+    if (!property) return;
+
+    pendingDetailsRoute.current = {
+      propertyId: property.id,
+      propertyTitle: property.title,
+    };
+    onClose();
+  }
+
+  function handleDismiss() {
+    const routeParams = pendingDetailsRoute.current;
+    if (!routeParams) return;
+
+    pendingDetailsRoute.current = null;
+    router.push({
+      pathname: appRoutes.secondary.propertyDetails,
+      params: routeParams,
+    });
+  }
+
+  const content = (
+    <>
       {property ? (
         <View
-          className="overflow-hidden rounded-t-[30px] bg-white"
-          style={{ maxHeight: height * 0.86 }}
+          className={`overflow-hidden bg-white ${showFullDetails ? "flex-1" : "rounded-t-[30px]"}`}
+          style={showFullDetails ? undefined : { maxHeight: height * 0.76 }}
         >
           <ScrollView
             bounces={false}
             contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
             showsVerticalScrollIndicator={false}
           >
-            <View className="relative mt-4 h-56 overflow-hidden">
+            <View
+              className={`relative h-56 overflow-hidden ${showFullDetails ? "" : "mt-4"}`}
+            >
               <ScrollView
                 horizontal
                 pagingEnabled
@@ -143,13 +173,22 @@ export function PropertyDetailsModal({
               </ScrollView>
               <View className="absolute inset-0 bg-textPrimary/35" />
               <TouchableOpacity
-                accessibilityLabel="Close property details"
+                accessibilityLabel={
+                  showFullDetails
+                    ? "Back from property details"
+                    : "Close property details"
+                }
                 accessibilityRole="button"
                 activeOpacity={0.78}
-                className="absolute right-4 top-4 h-10 w-10 items-center justify-center rounded-full bg-textPrimary/45"
+                className={`absolute h-10 w-10 items-center justify-center rounded-full bg-textPrimary/45 ${showFullDetails ? "left-4" : "right-4"}`}
                 onPress={onClose}
+                style={{ top: showFullDetails ? insets.top + 8 : 16 }}
               >
-                <Feather name="x" color="#ffffff" size={20} />
+                <Feather
+                  name={showFullDetails ? "arrow-left" : "x"}
+                  color="#ffffff"
+                  size={20}
+                />
               </TouchableOpacity>
               <View className="absolute bottom-5 left-5 right-5">
                 {images.length > 1 ? (
@@ -238,6 +277,32 @@ export function PropertyDetailsModal({
                 />
               </View>
 
+              {!showFullDetails ? (
+                <TouchableOpacity
+                  accessibilityHint="Opens the complete property profile on a new page"
+                  accessibilityLabel="View more property details"
+                  accessibilityRole="button"
+                  activeOpacity={0.8}
+                  className="mt-4 flex-row items-center gap-3 rounded-2xl bg-primary px-4 py-4"
+                  onPress={openFullDetails}
+                >
+                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-white/15">
+                    <Feather name="maximize" color="#ffffff" size={17} />
+                  </View>
+                  <View className="min-w-0 flex-1">
+                    <Text className="font-ralewayExtraBold text-sm text-white">
+                      View more details
+                    </Text>
+                    <Text className="mt-0.5 text-[11px] text-white/75">
+                      Open complete property profile
+                    </Text>
+                  </View>
+                  <Feather name="chevron-right" color="#ffffff" size={19} />
+                </TouchableOpacity>
+              ) : null}
+
+              {showFullDetails ? (
+                <>
               <PropertyLifecyclePanel
                 allowedTransitions={lifecycle.allowedTransitions}
                 canUpdate={Boolean(
@@ -258,7 +323,6 @@ export function PropertyDetailsModal({
                 activeOpacity={0.8}
                 className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/10 p-4"
                 onPress={() => {
-                  onClose();
                   router.push({
                     pathname: appRoutes.secondary.bedspaces,
                     params: {
@@ -293,7 +357,6 @@ export function PropertyDetailsModal({
                   floorPlanQueries.rooms.isLoading
                 }
                 onManage={() => {
-                  onClose();
                   router.push({
                     pathname: appRoutes.secondary.floorPlans,
                     params: {
@@ -449,8 +512,10 @@ export function PropertyDetailsModal({
                   value={property.utilityScore || "A+"}
                 />
               </View>
+                </>
+              ) : null}
             </View>
-            {can("staff.manage") && <PropertyManagerAssignments key={property.id} propertyId={property.id} />}
+            {showFullDetails && can("staff.manage") && <PropertyManagerAssignments key={property.id} propertyId={property.id} />}
           </ScrollView>
         </View>
       ) : null}
@@ -467,6 +532,20 @@ export function PropertyDetailsModal({
         title="Change lifecycle state"
         visible={Boolean(property && lifecycle.requestedStatus)}
       />
+    </>
+  );
+
+  if (mode === "screen") return content;
+
+  return (
+    <BottomSheetModal
+      backdropAccessibilityLabel="Close property details"
+      onClose={onClose}
+      onDismiss={handleDismiss}
+      statusBarTranslucent
+      visible={Boolean(property)}
+    >
+      {content}
     </BottomSheetModal>
   );
 }
