@@ -7,6 +7,7 @@ export type NotificationModule =
   | "properties"
   | "documents"
   | "expenses"
+  | "inquiries"
   | "analytics"
   | "settings"
   | "system";

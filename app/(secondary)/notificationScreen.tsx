@@ -22,6 +22,11 @@ import { resolveModuleRoute } from "../../constants/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import type { AppNotification } from "../../types";
 import { openModuleRoute } from "../../utils/navigation/moduleNavigation";
+import {
+  inquiryNotificationRoute,
+  isInquiryNotification,
+} from "../../utils/inquiries/inquiryNotifications";
+import { inquiryKeys } from "../../hooks/api/useInquiries";
 
 const severityStyles = {
   SUCCESS: {
@@ -219,7 +224,23 @@ export default function NotificationScreen() {
       markReadMutation.mutate(notification.id);
     }
 
-    const targetRoute = resolveModuleRoute(notification.actionUrl);
+    const rawEntityId =
+      notification.metadata?.entityId ?? notification.metadata?.entity_id;
+    const entityId =
+      typeof rawEntityId === "string" || typeof rawEntityId === "number"
+        ? String(rawEntityId)
+        : undefined;
+    const inquiryData = {
+      entityId,
+      route: notification.actionUrl,
+      type: notification.type,
+    };
+    if (isInquiryNotification(inquiryData)) {
+      void queryClient.invalidateQueries({ queryKey: inquiryKeys.all });
+    }
+    const targetRoute = resolveModuleRoute(
+      inquiryNotificationRoute(inquiryData) ?? notification.actionUrl,
+    );
 
     if (targetRoute) {
       openModuleRoute(targetRoute);

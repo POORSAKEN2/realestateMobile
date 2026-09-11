@@ -10,6 +10,7 @@ import type {
 } from "../types";
 import { resolveModuleRoute } from "../constants/navigation";
 import { openModuleRoute } from "../utils/navigation/moduleNavigation";
+import { inquiryNotificationRoute } from "../utils/inquiries/inquiryNotifications";
 
 type NotificationsModule = typeof import("expo-notifications");
 
@@ -57,6 +58,7 @@ const MODULE_ROUTES: Record<NotificationModule, string> = {
   properties: "/properties",
   documents: "/documents",
   expenses: "/expenses",
+  inquiries: "/inquiries",
   analytics: "/analytics",
   settings: "/settings",
   system: "/dashboard",
@@ -84,6 +86,8 @@ function getPlatform(): PushTokenPlatform {
 }
 
 function getNotificationRoute(data?: PushNotificationData) {
+  const inquiryRoute = inquiryNotificationRoute(data);
+  if (inquiryRoute) return inquiryRoute;
   if (data?.route) return data.route;
   if (data?.module) return MODULE_ROUTES[data.module];
 
@@ -155,7 +159,11 @@ export async function getRegisterPushTokenPayload(): Promise<RegisterPushTokenPa
   };
 }
 
-export async function addNotificationResponseListener() {
+type NotificationDataListener = (data: PushNotificationData) => void;
+
+export async function addNotificationResponseListener(
+  onNotification?: NotificationDataListener,
+) {
   const Notifications = await getNotifications();
 
   if (!Notifications?.addNotificationResponseReceivedListener) return null;
@@ -163,13 +171,30 @@ export async function addNotificationResponseListener() {
   await configureNotificationHandler();
 
   return Notifications.addNotificationResponseReceivedListener((response) => {
-    openNotificationTarget(
-      response.notification.request.content.data as PushNotificationData,
-    );
+    const data = response.notification.request.content
+      .data as PushNotificationData;
+    onNotification?.(data);
+    openNotificationTarget(data);
   });
 }
 
-export async function openLastNotificationResponse() {
+export async function addNotificationReceivedListener(
+  onNotification: NotificationDataListener,
+) {
+  const Notifications = await getNotifications();
+
+  if (!Notifications?.addNotificationReceivedListener) return null;
+
+  await configureNotificationHandler();
+
+  return Notifications.addNotificationReceivedListener((notification) => {
+    onNotification(notification.request.content.data as PushNotificationData);
+  });
+}
+
+export async function openLastNotificationResponse(
+  onNotification?: NotificationDataListener,
+) {
   const Notifications = await getNotifications();
 
   if (!Notifications?.getLastNotificationResponseAsync) return;
@@ -178,7 +203,8 @@ export async function openLastNotificationResponse() {
 
   if (!response) return;
 
-  openNotificationTarget(
-    response.notification.request.content.data as PushNotificationData,
-  );
+  const data = response.notification.request.content
+    .data as PushNotificationData;
+  onNotification?.(data);
+  openNotificationTarget(data);
 }

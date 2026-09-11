@@ -5,6 +5,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { UpgradePlanModal } from "../../components/billing/UpgradePlanModal";
 import { EntitlementSummary } from "../../components/billing/EntitlementSummary";
+import { RevenueCatSubscriptionCard } from "../../components/billing/RevenueCatSubscriptionCard";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
@@ -45,9 +46,20 @@ export default function BillingScreen() {
             <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : isError || !entitlement ? (
-          <TouchableOpacity accessibilityRole="button" onPress={() => void refetch()} className="mt-6 p-5">
-            <Text className="text-danger">Plan information is unavailable. Tap to retry.</Text>
-          </TouchableOpacity>
+          <View className="mt-6 gap-5">
+            <TouchableOpacity
+              accessibilityRole="button"
+              className="p-5"
+              onPress={() => void refetch()}
+            >
+              <Text className="text-danger">
+                Plan information is unavailable. Tap to retry.
+              </Text>
+            </TouchableOpacity>
+            <RevenueCatSubscriptionCard
+              canManagePurchases={canStartCheckout}
+            />
+          </View>
         ) : (
           <PullToRefreshScrollView
             className="-mx-6 mt-6 flex-1"
@@ -134,6 +146,9 @@ export default function BillingScreen() {
               </View>
 
               <EntitlementSummary entitlement={entitlement} />
+              <RevenueCatSubscriptionCard
+                canManagePurchases={canStartCheckout}
+              />
               {/* Plan Catalog Grid */}
               <View className="gap-3">
                 <Text className="font-ralewayBold text-base text-textPrimary">
