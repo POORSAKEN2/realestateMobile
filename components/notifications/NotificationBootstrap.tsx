@@ -1,43 +1,68 @@
 import { useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { registerDevicePushToken } from "../../api/notifications";
 import { useAuth } from "../../hooks/useAuth";
 import {
+  addNotificationReceivedListener,
   addNotificationResponseListener,
   getRegisterPushTokenPayload,
   openLastNotificationResponse,
 } from "../../services/notifications";
+import { inquiryKeys } from "../../hooks/api/useInquiries";
+import { isInquiryNotification } from "../../utils/inquiries/inquiryNotifications";
 
 export function NotificationBootstrap() {
   const { session, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
   const registeredTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
-    let subscription: { remove: () => void } | null = null;
+    const subscriptions: Array<{ remove: () => void }> = [];
 
-    addNotificationResponseListener()
+    function refreshInquiryQueries(
+      data: Parameters<typeof isInquiryNotification>[0],
+    ) {
+      if (!isInquiryNotification(data)) return;
+      void queryClient.invalidateQueries({ queryKey: inquiryKeys.all });
+    }
+
+    addNotificationResponseListener(refreshInquiryQueries)
       .then((nextSubscription) => {
         if (!isMounted) {
           nextSubscription?.remove();
           return;
         }
 
-        subscription = nextSubscription;
+        if (nextSubscription) subscriptions.push(nextSubscription);
       })
       .catch(() => {
         // Listener setup should not block the rest of the app.
       });
 
-    openLastNotificationResponse().catch(() => {
+    addNotificationReceivedListener(refreshInquiryQueries)
+      .then((nextSubscription) => {
+        if (!isMounted) {
+          nextSubscription?.remove();
+          return;
+        }
+
+        if (nextSubscription) subscriptions.push(nextSubscription);
+      })
+      .catch(() => {
+        // Foreground refresh is best-effort.
+      });
+
+    openLastNotificationResponse(refreshInquiryQueries).catch(() => {
       // A stale notification response should never block app startup.
     });
 
     return () => {
       isMounted = false;
-      subscription?.remove();
+      subscriptions.forEach((subscription) => subscription.remove());
     };
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     let isMounted = true;

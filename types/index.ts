@@ -113,6 +113,15 @@ export type {
   UpdateLeadStatusPayload,
 } from "./domain/leads";
 export type {
+  Inquiry,
+  InquiryFilters,
+  InquiryGuest,
+  InquiryReference,
+  InquiryStatus,
+  InquiryStatusFilter,
+  UpdateInquiryStatusPayload,
+} from "./domain/inquiries";
+export type {
   CreateSupportTicketPayload,
   FAQItem,
   SupportTicket,

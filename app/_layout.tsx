@@ -26,6 +26,7 @@ import { EntitlementLimitPrompt } from "../components/billing/EntitlementLimitPr
 import { AccessDeniedPrompt } from "../components/auth/AccessDeniedPrompt";
 import { AuthProvider } from "../context/AuthContext";
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
+import { RevenueCatProvider } from "../context/RevenueCatContext";
 
 type TextWithDefaultProps = typeof Text & {
   defaultProps?: {
@@ -85,22 +86,24 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <MapKitGeocodingProvider>
-            <DefaultLocationProvider>
-              <AppleMapsTokenBootstrap />
-              <NotificationBootstrap />
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="(secondary)"
-                  options={{ headerShown: false }}
-                />
-              </Stack>
-              <EntitlementLimitPrompt />
-              <AccessDeniedPrompt />
-            </DefaultLocationProvider>
-          </MapKitGeocodingProvider>
+          <RevenueCatProvider>
+            <MapKitGeocodingProvider>
+              <DefaultLocationProvider>
+                <AppleMapsTokenBootstrap />
+                <NotificationBootstrap />
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(secondary)"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+                <EntitlementLimitPrompt />
+                <AccessDeniedPrompt />
+              </DefaultLocationProvider>
+            </MapKitGeocodingProvider>
+          </RevenueCatProvider>
         </AuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

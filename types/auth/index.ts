@@ -16,6 +16,8 @@ export type AuthUser = {
   property_permissions?: Record<string, string[]>;
   permissions?: string[];
   assigned_property_ids?: Array<string | number>;
+  tenant_id?: string | number;
+  tenantId?: string | number;
   id?: string | number;
   name?: string;
   email?: string;
