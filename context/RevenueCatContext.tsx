@@ -14,9 +14,14 @@ import Purchases, {
 } from "react-native-purchases";
 import type { PAYWALL_RESULT } from "react-native-purchases-ui";
 
+import { reconcileBillingEntitlement } from "../api/billing";
 import { BILLING_ENTITLEMENT_QUERY_KEY } from "../hooks/api/useBillingEntitlement";
-import type { RevenueCatProductKey } from "../constants/revenueCat";
+import {
+  revenueCatEntitlementForTier,
+  type RevenueCatProductKey,
+} from "../constants/revenueCat";
 import { useAuth } from "../hooks/useAuth";
+import type { SubscriptionTierKey } from "../types/domain/billing";
 import {
   configureRevenueCat,
   getRevenueCatSnapshot,
@@ -33,6 +38,7 @@ import {
 } from "../services/billing/revenueCatUi";
 import {
   hasRevenueCatPremium,
+  getActiveRevenueCatTier,
   indexRevenueCatPackages,
 } from "../utils/billing/revenueCatCustomer";
 
@@ -42,6 +48,7 @@ type RevenueCatIdentity = {
 };
 
 type RevenueCatContextValue = {
+  activeTier: SubscriptionTierKey;
   customerInfo: CustomerInfo | null;
   currentOffering: PurchasesOffering | null;
   error: string | null;
@@ -52,9 +59,13 @@ type RevenueCatContextValue = {
   presentCustomerCenter: () => Promise<void>;
   presentPaywall: () => Promise<PAYWALL_RESULT>;
   presentPaywallIfNeeded: () => Promise<PAYWALL_RESULT>;
+  presentPaywallForTier: (
+    tier: Exclude<SubscriptionTierKey, "free">,
+  ) => Promise<PAYWALL_RESULT>;
   purchasePackage: (pkg: PurchasesPackage) => Promise<CustomerInfo | null>;
   refresh: () => Promise<CustomerInfo | null>;
   restorePurchases: () => Promise<CustomerInfo>;
+  synchronizeServerEntitlement: () => Promise<void>;
 };
 
 export const RevenueCatContext = createContext<
@@ -103,6 +114,13 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
     },
     [queryClient],
   );
+
+  const synchronizeServerEntitlement = useCallback(async () => {
+    const entitlement = await reconcileBillingEntitlement(
+      session?.accessToken,
+    );
+    queryClient.setQueryData(BILLING_ENTITLEMENT_QUERY_KEY, entitlement);
+  }, [queryClient, session?.accessToken]);
 
   const refresh = useCallback(async () => {
     setIsLoading(true);
@@ -184,6 +202,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
 
   const value = useMemo<RevenueCatContextValue>(
     () => ({
+      activeTier: getActiveRevenueCatTier(customerInfo),
       customerInfo,
       currentOffering,
       error,
@@ -203,21 +222,37 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
           },
         });
         await refresh();
+        await synchronizeServerEntitlement();
       },
       presentPaywall: async () => {
         const result = await presentRevenueCatPaywall(currentOffering);
         await refresh();
+        await synchronizeServerEntitlement();
         return result;
       },
       presentPaywallIfNeeded: async () => {
-        const result = await presentRevenueCatPaywallIfNeeded(currentOffering);
+        const result = await presentRevenueCatPaywallIfNeeded(
+          currentOffering,
+          revenueCatEntitlementForTier("tier1"),
+        );
         await refresh();
+        await synchronizeServerEntitlement();
+        return result;
+      },
+      presentPaywallForTier: async (tier) => {
+        const result = await presentRevenueCatPaywallIfNeeded(
+          currentOffering,
+          revenueCatEntitlementForTier(tier),
+        );
+        await refresh();
+        await synchronizeServerEntitlement();
         return result;
       },
       purchasePackage: async (pkg) => {
         try {
           const purchased = await purchaseRevenueCatPackage(pkg);
           updateCustomerInfo(purchased);
+          await synchronizeServerEntitlement();
           return purchased;
         } catch (cause) {
           if (isRevenueCatCancellation(cause)) return null;
@@ -228,8 +263,10 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       restorePurchases: async () => {
         const restored = await restoreRevenueCatPurchases();
         updateCustomerInfo(restored);
+        await synchronizeServerEntitlement();
         return restored;
       },
+      synchronizeServerEntitlement,
     }),
     [
       customerInfo,
@@ -238,6 +275,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       isLoading,
       isReady,
       refresh,
+      synchronizeServerEntitlement,
       updateCustomerInfo,
     ],
   );

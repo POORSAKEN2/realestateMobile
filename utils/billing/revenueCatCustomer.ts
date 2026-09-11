@@ -1,22 +1,35 @@
 import type { CustomerInfo, PurchasesPackage } from "react-native-purchases";
 
 import {
-  REVENUECAT_ENTITLEMENT_ID,
+  REVENUECAT_ENTITLEMENT_IDS,
   REVENUECAT_PRODUCT_IDS,
   type RevenueCatProductKey,
 } from "../../constants/revenueCat";
+import type { SubscriptionTierKey } from "../../types/domain/billing";
 
 export function hasRevenueCatPremium(customerInfo: CustomerInfo | null) {
-  return Boolean(customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_ID]);
+  return getActiveRevenueCatTier(customerInfo) !== "free";
+}
+
+export function getActiveRevenueCatTier(
+  customerInfo: CustomerInfo | null,
+): SubscriptionTierKey {
+  if (customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS.all_in]) {
+    return "all_in";
+  }
+  if (customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS.tier1]) {
+    return "tier1";
+  }
+  return "free";
 }
 
 export function getActiveRevenueCatProductId(
   customerInfo: CustomerInfo | null,
 ) {
-  return (
-    customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_ID]
-      ?.productIdentifier ?? null
-  );
+  const tier = getActiveRevenueCatTier(customerInfo);
+  if (tier === "free") return null;
+  return customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS[tier]]
+    ?.productIdentifier ?? null;
 }
 
 export function getRevenueCatProductKey(

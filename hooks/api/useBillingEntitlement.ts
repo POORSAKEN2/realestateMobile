@@ -7,10 +7,11 @@ import type { CheckoutSessionPayload } from "../../types/domain/billing";
 
 export const BILLING_ENTITLEMENT_QUERY_KEY = ["billingEntitlement"] as const;
 
-export function useBillingEntitlement() {
+export function useBillingEntitlement(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: BILLING_ENTITLEMENT_QUERY_KEY,
     queryFn: () => fetchBillingEntitlement(),
+    enabled: options?.enabled,
   });
 }
 

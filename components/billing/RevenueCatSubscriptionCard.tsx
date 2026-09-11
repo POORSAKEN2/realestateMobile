@@ -74,6 +74,7 @@ export function RevenueCatSubscriptionCard({
   canManagePurchases: boolean;
 }) {
   const {
+    activeTier,
     customerInfo,
     error,
     isLoading,
@@ -98,9 +99,11 @@ export function RevenueCatSubscriptionCard({
     if (isPremium && productKey) {
       return `${REVENUECAT_PRODUCT_LABELS[productKey]} access is active.`;
     }
-    if (isPremium) return "Terrane Premium access is active.";
-    return "Choose Lifetime, Yearly, or Monthly access in the secure paywall.";
-  }, [isPremium, productKey]);
+    if (isPremium) {
+      return `${activeTier === "all_in" ? "All-In" : "Tier 1"} access is active.`;
+    }
+    return "Choose Tier 1 or All-In access in the secure paywall.";
+  }, [activeTier, isPremium, productKey]);
 
   async function runAction(
     action: RevenueCatAction,
@@ -140,7 +143,8 @@ export function RevenueCatSubscriptionCard({
     void runAction("restore", async () => {
       const restored = await restorePurchases();
       const premiumRestored = Boolean(
-        restored.entitlements.active.terrane_premium,
+        restored.entitlements.active.tier1_access ||
+          restored.entitlements.active.all_in_access,
       );
       snackbar.show(
         premiumRestored
@@ -165,7 +169,7 @@ export function RevenueCatSubscriptionCard({
         <View className="min-w-0 flex-1">
           <View className="flex-row items-center justify-between gap-2">
             <Text className="font-ralewayExtraBold text-base text-textPrimary">
-              Terrane Premium
+              Terrane subscription
             </Text>
             <View
               className={`rounded-full px-3 py-1 ${

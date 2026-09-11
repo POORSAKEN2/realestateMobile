@@ -1,5 +1,5 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { Linking, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 import { colors } from "../../constants/colors";
 import type { Inquiry, InquiryStatus } from "../../types/domain/inquiries";
@@ -36,17 +36,15 @@ export function InquiryDetail({
   canUpdate,
   inquiry,
   isUpdating,
+  onContactGuest,
   onStatusChange,
 }: {
   canUpdate: boolean;
   inquiry: Inquiry;
   isUpdating: boolean;
+  onContactGuest: () => void;
   onStatusChange: (status: InquiryStatus) => void;
 }) {
-  const contactUri = inquiry.guest.contact.includes("@")
-    ? `mailto:${inquiry.guest.contact}`
-    : `tel:${inquiry.guest.contact}`;
-
   return (
     <View className="gap-4 pb-8">
       <View className="rounded-[28px] border border-primary/15 bg-white p-5 shadow-sm shadow-primary/5">
@@ -92,7 +90,7 @@ export function InquiryDetail({
             accessibilityRole="link"
             activeOpacity={0.8}
             className="mt-2 min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary"
-            onPress={() => void Linking.openURL(contactUri)}
+            onPress={onContactGuest}
           >
             <Feather
               name={inquiry.guest.contact.includes("@") ? "mail" : "phone"}

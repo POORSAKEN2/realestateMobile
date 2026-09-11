@@ -11,13 +11,18 @@ import {
 } from "../../services/notifications";
 import { inquiryKeys } from "../../hooks/api/useInquiries";
 import { isInquiryNotification } from "../../utils/inquiries/inquiryNotifications";
+import { usePlanCapability } from "../../hooks/billing/usePlanCapability";
 
 export function NotificationBootstrap() {
   const { session, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
+  const notificationAccess = usePlanCapability("notifications", {
+    enabled: isAuthenticated,
+  });
   const registeredTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (!notificationAccess.hasAccess) return;
     let isMounted = true;
     const subscriptions: Array<{ remove: () => void }> = [];
 
@@ -62,14 +67,16 @@ export function NotificationBootstrap() {
       isMounted = false;
       subscriptions.forEach((subscription) => subscription.remove());
     };
-  }, [queryClient]);
+  }, [notificationAccess.hasAccess, queryClient]);
 
   useEffect(() => {
     let isMounted = true;
     const accessToken = session?.accessToken;
 
     async function registerPushToken() {
-      if (!isAuthenticated || !accessToken) return;
+      if (!isAuthenticated || !accessToken || !notificationAccess.hasAccess) {
+        return;
+      }
 
       try {
         const payload = await getRegisterPushTokenPayload();
@@ -91,7 +98,7 @@ export function NotificationBootstrap() {
     return () => {
       isMounted = false;
     };
-  }, [isAuthenticated, session?.accessToken]);
+  }, [isAuthenticated, notificationAccess.hasAccess, session?.accessToken]);
 
   return null;
 }

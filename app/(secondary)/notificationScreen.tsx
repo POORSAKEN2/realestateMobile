@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
@@ -27,6 +28,8 @@ import {
   isInquiryNotification,
 } from "../../utils/inquiries/inquiryNotifications";
 import { inquiryKeys } from "../../hooks/api/useInquiries";
+import { usePlanCapability } from "../../hooks/billing/usePlanCapability";
+import { UpgradePlanModal } from "../../components/billing/UpgradePlanModal";
 
 const severityStyles = {
   SUCCESS: {
@@ -183,12 +186,16 @@ export default function NotificationScreen() {
   const { session, isAuthenticated } = useAuth();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
+  const [isUpgradeVisible, setUpgradeVisible] = useState(false);
+  const notificationAccess = usePlanCapability("notifications", {
+    enabled: isAuthenticated,
+  });
   const queryKey = ["notifications", accessToken];
 
   const notificationsQuery = useQuery({
     queryKey,
     queryFn: () => fetchNotifications(accessToken),
-    enabled: isAuthenticated && !!accessToken,
+    enabled: isAuthenticated && !!accessToken && notificationAccess.hasAccess,
   });
 
   const notifications = notificationsQuery.data ?? [];
@@ -258,7 +265,7 @@ export default function NotificationScreen() {
     <Screen className="bg-surface">
       <View className="mb-5">
         <ModuleHeader
-          action={
+          action={notificationAccess.hasAccess ? (
             <TouchableOpacity
               activeOpacity={0.82}
               accessibilityRole="button"
@@ -281,13 +288,17 @@ export default function NotificationScreen() {
                 />
               )}
             </TouchableOpacity>
-          }
+          ) : undefined}
           eyebrow="Account"
           leading={
             <SecondaryBackButton accessibilityLabel="Back from notifications" />
           }
           supportingText={
-            isInitialLoading
+            notificationAccess.isLoading
+              ? "Checking plan access"
+              : !notificationAccess.hasAccess
+                ? "Tier 1 feature"
+                : isInitialLoading
               ? "Loading activity"
               : unreadCount > 0
                 ? `${unreadCount} unread update${unreadCount === 1 ? "" : "s"}`
@@ -297,7 +308,26 @@ export default function NotificationScreen() {
         />
       </View>
 
-      {notificationsQuery.isError ? (
+      {!notificationAccess.isLoading && !notificationAccess.hasAccess ? (
+        <View className="flex-1 items-center justify-center px-8 py-20">
+          <View className="mb-5 h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <Ionicons name="lock-closed-outline" size={30} color={colors.primary} />
+          </View>
+          <Text className="text-center font-ralewayBold text-xl text-textPrimary">
+            Notifications require Tier 1
+          </Text>
+          <Text className="mt-2 text-center text-sm leading-6 text-description">
+            Upgrade to Tier 1 or All-In for portfolio and inquiry notifications.
+          </Text>
+          <TouchableOpacity
+            accessibilityRole="button"
+            className="mt-6 rounded-full bg-primary px-5 py-3"
+            onPress={() => setUpgradeVisible(true)}
+          >
+            <Text className="font-ralewayBold text-sm text-white">View plans</Text>
+          </TouchableOpacity>
+        </View>
+      ) : notificationsQuery.isError ? (
         <View className="rounded-[24px] border border-danger/20 bg-dangerSurface p-4">
           <Text className="font-ralewayBold text-danger">
             Could not load notifications
@@ -310,7 +340,7 @@ export default function NotificationScreen() {
         </View>
       ) : null}
 
-      {isInitialLoading ? (
+      {notificationAccess.hasAccess && isInitialLoading ? (
         <SkeletonGroup
           accessibilityLabel="Loading notifications"
           className="flex-1 gap-3"
@@ -320,7 +350,7 @@ export default function NotificationScreen() {
             renderItem={() => <SkeletonListCard className="min-h-28" />}
           />
         </SkeletonGroup>
-      ) : (
+      ) : notificationAccess.hasAccess ? (
         <PullToRefreshFlatList
           data={notifications}
           keyExtractor={(item) => item.id}
@@ -340,7 +370,14 @@ export default function NotificationScreen() {
           )}
           showsVerticalScrollIndicator={false}
         />
-      )}
+      ) : null}
+
+      <UpgradePlanModal
+        isVisible={isUpgradeVisible}
+        message="Tier 1 or All-In is required for notifications."
+        onClose={() => setUpgradeVisible(false)}
+        requiredTier={notificationAccess.requiredTier}
+      />
     </Screen>
   );
 }
