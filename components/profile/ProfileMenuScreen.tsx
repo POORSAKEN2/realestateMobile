@@ -5,6 +5,7 @@ import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
+import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { useAuth } from "../../hooks/useAuth";
 import { hasAppPermission } from "../../utils/auth/accessPolicy";
 import { canManageStaff } from "../../utils/auth/staffAccess";
@@ -39,6 +40,12 @@ export function ProfileMenuScreen() {
   const name = user?.name?.trim() || "Your profile";
   const imageUri = getProfileImageUri(user);
   const roleLabel = getRoleLabel(user?.role);
+  const { data: entitlement } = useBillingEntitlement({
+    enabled: Boolean(user),
+  });
+  const planLabel = entitlement?.tier_label?.trim()
+    ? `${entitlement.tier_label.trim()} plan`
+    : undefined;
   const showTeamAccess = canManageStaff(user);
   const canManageBilling = hasAppPermission(user, "billing.checkout");
 
@@ -128,6 +135,7 @@ export function ProfileMenuScreen() {
           imageUri={imageUri}
           name={name}
           onPress={openAccountDetails}
+          planLabel={planLabel}
           roleLabel={roleLabel}
         />
 
