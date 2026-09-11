@@ -1,8 +1,8 @@
 # RevenueCat setup for Terrane
 
-Terrane uses `react-native-purchases` for customer and purchase state and
-`react-native-purchases-ui` for Paywalls and Customer Center. Client-side access
-checks recognize server-aligned entitlements `tier1_access` and
+Terrane uses `react-native-purchases` for customer state and native StoreKit /
+Google Play purchases. `react-native-purchases-ui` provides Customer Center.
+Client-side access checks recognize server-aligned entitlements `tier1_access` and
 `all_in_access`. Protected access still uses `/billing/entitlement`.
 
 ## 1. Install packages
@@ -75,9 +75,8 @@ Create offering `default`, mark it Current, and add:
 - Tier 1 lifetime, annual, and monthly packages.
 - All-In lifetime, annual, and monthly packages.
 
-Create a Paywall in RevenueCat, add all three packages, enable a close button,
-and attach the Paywall to offering `default`. Paywall copy, pricing, trials, and
-package order then remain remotely configurable without an app release.
+The app renders these packages in its own React Native paywall. A RevenueCat
+Paywall template or Web Purchase Link is not required.
 
 ## 4. App integration
 
@@ -88,8 +87,10 @@ package order then remain remotely configurable without an app release.
 - Calls `Purchases.logIn` after Terrane login and `Purchases.logOut` after logout.
 - Registers one `CustomerInfo` update listener and removes it on unmount.
 - Fetches CustomerInfo and Current Offering concurrently.
-- Calls `POST /billing/reconcile` after purchase/restore/paywall completion,
-  then replaces cached `/billing/entitlement` data with the server result.
+- Exposes offering packages to the app's native subscription modal.
+- Calls `Purchases.purchasePackage` for the selected billing period.
+- Invalidates `/billing/entitlement` when CustomerInfo changes. RevenueCat
+  webhooks remain authoritative for protected server access.
 
 Use RevenueCat state anywhere below the root provider:
 
@@ -97,14 +98,17 @@ Use RevenueCat state anywhere below the root provider:
 import { useRevenueCat } from "../hooks/useRevenueCat";
 
 function PremiumFeature() {
-  const { activeTier, isLoading, presentPaywallForTier } = useRevenueCat();
+  const { activeTier, isLoading, packages, purchasePackage } = useRevenueCat();
 
   if (isLoading) return null;
   if (activeTier === "free") {
     return (
       <Button
         title="Unlock Tier 1"
-        onPress={() => void presentPaywallForTier("tier1")}
+        onPress={() => {
+          const pkg = packages.tier1_monthly;
+          if (pkg) void purchasePackage(pkg);
+        }}
       />
     );
   }
@@ -121,7 +125,7 @@ const isTier1 = Boolean(customerInfo.entitlements.active.tier1_access);
 const isAllIn = Boolean(customerInfo.entitlements.active.all_in_access);
 ```
 
-Fetch packages and make a direct purchase when a custom UI is needed:
+Fetch packages and purchase from custom native UI:
 
 ```tsx
 const { packages, purchasePackage } = useRevenueCat();
@@ -133,8 +137,8 @@ if (monthlyPackage) {
 }
 ```
 
-Prefer RevenueCat Paywalls over a custom checkout UI. Direct package purchases
-remain available for special flows and testing.
+`UpgradePlanModal` presents available monthly, yearly, and lifetime packages.
+`purchasePackage` opens the native StoreKit or Google Play purchase sheet.
 
 ## 5. Customer info, restore, and errors
 
@@ -155,11 +159,11 @@ Always provide a visible Restore Purchases action. Never call
 `restorePurchases()` automatically because it can trigger store-account prompts
 and transfer/alias behavior.
 
-## 6. Paywall and Customer Center
+## 6. Native checkout and Customer Center
 
 `RevenueCatSubscriptionCard` is shown on Terrane's Plan & Billing screen. It
-presents tier-aware paywalls, restores purchases, and
-shows Customer Center only after purchase history exists.
+opens the custom native plan modal, restores purchases, and shows Customer
+Center only after purchase history exists.
 
 Customer Center makes sense for subscribers who need cancellation, plan changes,
 refund/support paths, or purchase restore. Configure it in RevenueCat Dashboard.
@@ -183,16 +187,18 @@ POST https://your-api.example/api/webhooks/revenuecat
 Authorization: value matching REVENUECAT_WEBHOOK_AUTH_HEADER
 ```
 
-The client and server both use `tier1_access` and `all_in_access`. After a store
-operation, the app calls `POST /billing/reconcile`; RevenueCat webhooks remain
-the normal asynchronous writer and scheduled reconciliation remains the
-backstop. Never grant sensitive server access solely from client CustomerInfo.
+The client and server both use `tier1_access` and `all_in_access`. RevenueCat
+webhooks are the normal asynchronous writer; scheduled server reconciliation
+remains the backstop. Client checkout does not call `POST /billing/reconcile`,
+so unavailable server reconciliation cannot turn a successful store purchase
+into a purchase error. Never grant sensitive server access solely from client
+CustomerInfo.
 
 ## 8. Release checklist
 
 - Confirm iOS bundle ID and Android package are `com.raze.terrane` in stores and RevenueCat.
 - Confirm all products show prices in `Purchases.getOfferings()`.
-- Confirm offering `default` is Current and has a published Paywall.
+- Confirm offering `default` is Current and contains all six packages.
 - Test new purchase, cancellation, renewal, expiration, restore, and lifetime access.
 - Test one tenant through owner and manager accounts; RevenueCat app user ID must match tenant UUID.
 - Confirm RevenueCat webhook delivery updates `GET /billing/entitlement`.

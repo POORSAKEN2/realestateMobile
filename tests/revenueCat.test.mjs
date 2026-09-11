@@ -6,6 +6,7 @@ import load from "./helpers/loadTs.cjs";
 const {
   getActiveRevenueCatProductId,
   getActiveRevenueCatTier,
+  getRevenueCatPackagesForTier,
   getRevenueCatProductKey,
   hasRevenueCatPremium,
   indexRevenueCatPackages,
@@ -63,4 +64,24 @@ test("offering packages are indexed by store product, independent of order", () 
   assert.equal(indexed.all_in_lifetime, lifetime);
   assert.equal(indexed.tier1_monthly, monthly);
   assert.equal(indexed.tier1_yearly, null);
+});
+
+test("native paywall groups available packages by tier and billing period", () => {
+  const tier1Monthly = { product: { identifier: "tier1_monthly" } };
+  const tier1Yearly = { product: { identifier: "tier1_yearly" } };
+  const allInMonthly = { product: { identifier: "all_in_monthly" } };
+  const indexed = indexRevenueCatPackages([
+    allInMonthly,
+    tier1Yearly,
+    tier1Monthly,
+  ]);
+
+  assert.deepEqual(
+    getRevenueCatPackagesForTier(indexed, "tier1").map(({ key }) => key),
+    ["tier1_monthly", "tier1_yearly"],
+  );
+  assert.deepEqual(
+    getRevenueCatPackagesForTier(indexed, "all_in").map(({ key }) => key),
+    ["all_in_monthly"],
+  );
 });

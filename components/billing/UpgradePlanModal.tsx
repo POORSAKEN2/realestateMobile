@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -12,17 +12,21 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "../../constants/colors";
-import {
-  useBillingEntitlement,
-} from "../../hooks/api/useBillingEntitlement";
+import type { RevenueCatProductKey } from "../../constants/revenueCat";
+import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { useRevenueCat } from "../../hooks/useRevenueCat";
 import type { PlanTier } from "../../types/domain/billing";
-import type { PlanChangePreview, SubscriptionTierKey } from "../../types/domain/billing";
+import type {
+  PlanChangePreview,
+  SubscriptionTierKey,
+} from "../../types/domain/billing";
 import { fetchPlanChangePreview } from "../../api/billing";
 import { useAccess } from "../../hooks/auth/useAccess";
 import { blockerMessage } from "../../utils/billing/entitlementPresentation";
 import { effectiveSubscriptionTier } from "../../utils/billing/planCapabilities";
+import { getRevenueCatPackagesForTier } from "../../utils/billing/revenueCatCustomer";
 import { ModalHeader } from "../ui/ModalHeader";
+import { RevenueCatPackagePicker } from "./RevenueCatPackagePicker";
 
 const TIER_RANK: Readonly<Record<string, number>> = {
   free: 0,
@@ -179,25 +183,80 @@ export function UpgradePlanModal({
   message,
   requiredTier,
 }: UpgradePlanModalProps) {
-  const { data: entitlement, isFetching, isError, refetch } = useBillingEntitlement();
+  const {
+    data: entitlement,
+    isFetching,
+    isError,
+    refetch,
+  } = useBillingEntitlement();
   const { can } = useAccess();
-  const { presentPaywallForTier } = useRevenueCat();
+  const {
+    isLoading: isRevenueCatLoading,
+    packages,
+    purchasePackage,
+  } = useRevenueCat();
   const [pendingTierKey, setPendingTierKey] = useState<string | null>(null);
-  const [preview, setPreview] = useState<{ tier: SubscriptionTierKey; result: PlanChangePreview } | null>(null);
+  const [preview, setPreview] = useState<{
+    tier: SubscriptionTierKey;
+    result: PlanChangePreview;
+  } | null>(null);
+  const [selectedProductKey, setSelectedProductKey] =
+    useState<RevenueCatProductKey | null>(null);
   const busy = useRef(false);
-  useEffect(() => { if (!isVisible) setPreview(null); }, [isVisible]);
+  useEffect(() => {
+    if (!isVisible) {
+      setPreview(null);
+      setSelectedProductKey(null);
+    }
+  }, [isVisible]);
   const tiers = entitlement?.tiers?.length ? entitlement.tiers : fallbackTiers;
   const currentTierKey = effectiveSubscriptionTier(entitlement);
+  const selectedPaidTier =
+    preview?.result.allowed &&
+    (preview.tier === "tier1" || preview.tier === "all_in")
+      ? preview.tier
+      : null;
+  const packageOptions = useMemo(
+    () =>
+      selectedPaidTier
+        ? getRevenueCatPackagesForTier(packages, selectedPaidTier)
+        : [],
+    [packages, selectedPaidTier],
+  );
+  const selectedPackage = packageOptions.find(
+    (option) => option.key === selectedProductKey,
+  )?.pkg;
+
+  useEffect(() => {
+    setSelectedProductKey((currentKey) =>
+      currentKey && packageOptions.some((option) => option.key === currentKey)
+        ? currentKey
+        : (packageOptions[0]?.key ?? null),
+    );
+  }, [packageOptions]);
+
   async function handleUpgrade(tierKey: string) {
-    if (busy.current || !can("billing.checkout") || !entitlement || isFetching || isError) return;
+    if (
+      busy.current ||
+      !can("billing.checkout") ||
+      !entitlement ||
+      isFetching ||
+      isError
+    )
+      return;
     if (!["free", "tier1", "all_in"].includes(tierKey)) return;
     busy.current = true;
     setPendingTierKey(tierKey);
     try {
-      const result = await fetchPlanChangePreview(tierKey as SubscriptionTierKey);
+      const result = await fetchPlanChangePreview(
+        tierKey as SubscriptionTierKey,
+      );
       setPreview({ tier: tierKey as SubscriptionTierKey, result });
     } catch (err) {
-      Alert.alert("Plan preview unavailable", err instanceof Error ? err.message : "Please try again.");
+      Alert.alert(
+        "Plan preview unavailable",
+        err instanceof Error ? err.message : "Please try again.",
+      );
     } finally {
       busy.current = false;
       setPendingTierKey(null);
@@ -205,7 +264,14 @@ export function UpgradePlanModal({
   }
 
   async function continuePurchase() {
-    if (busy.current || !preview?.result.allowed || preview.tier === "free" || !can("billing.checkout")) return;
+    if (
+      busy.current ||
+      !preview?.result.allowed ||
+      preview.tier === "free" ||
+      !selectedPackage ||
+      !can("billing.checkout")
+    )
+      return;
     busy.current = true;
     setPendingTierKey(preview.tier);
     try {
@@ -213,14 +279,13 @@ export function UpgradePlanModal({
       const latest = await fetchPlanChangePreview(preview.tier);
       setPreview({ ...preview, result: latest });
       if (!latest.allowed) return;
-      await presentPaywallForTier(preview.tier);
+      const purchased = await purchasePackage(selectedPackage);
+      if (!purchased) return;
       onClose();
     } catch (err) {
       Alert.alert(
         "Upgrade Plan",
-        err instanceof Error
-          ? err.message
-          : "RevenueCat could not open the requested plan.",
+        err instanceof Error ? err.message : "Purchase could not be completed.",
       );
     } finally {
       busy.current = false;
@@ -231,14 +296,18 @@ export function UpgradePlanModal({
   return (
     <Modal
       animationType="slide"
-      onRequestClose={() => { if (!busy.current) onClose(); }}
+      onRequestClose={() => {
+        if (!busy.current) onClose();
+      }}
       presentationStyle="pageSheet"
       visible={isVisible}
     >
       <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
         <ModalHeader
           closeAccessibilityLabel="Close upgrade subscription"
-          onClose={() => { if (!busy.current) onClose(); }}
+          onClose={() => {
+            if (!busy.current) onClose();
+          }}
           subtitle="Choose the property capacity that fits your portfolio."
           title="Choose subscription"
         />
@@ -248,19 +317,89 @@ export function UpgradePlanModal({
           contentContainerClassName="gap-4 px-6 pb-10 pt-5"
           showsVerticalScrollIndicator={false}
         >
-          {message && <Text accessibilityRole="alert" className="rounded-2xl bg-warningSurface p-4 text-textPrimary">{message}</Text>}
-          {requiredTier && <Text className="text-description">Suggested plan: {tiers.find(tier => tier.key === requiredTier)?.label ?? requiredTier}</Text>}
-          {isFetching && <Text className="text-description">Refreshing available plans…</Text>}
-          {isError && <TouchableOpacity accessibilityRole="button" onPress={() => void refetch()}><Text className="text-danger">Plans could not be loaded. Tap to retry.</Text></TouchableOpacity>}
-          {!can("billing.checkout") && <Text className="text-description">Ask your account owner to change the organization plan.</Text>}
-          {preview && <View className="gap-3 rounded-2xl bg-white p-4">
-            <Text className="font-ralewayBold text-textPrimary">Plan change preview: {tiers.find(tier => tier.key === preview.tier)?.label ?? preview.tier}</Text>
-            {preview.result.blockers.map(blocker => <Text key={blocker.dimension} accessibilityRole="alert" className="text-danger">{blockerMessage(blocker)}</Text>)}
-            {preview.result.allowed && <Text className="text-description">Your current usage fits this plan.</Text>}
-            {preview.result.allowed && preview.tier !== "free" && can("billing.checkout") && <TouchableOpacity accessibilityRole="button" disabled={pendingTierKey !== null} onPress={() => void continuePurchase()} className="rounded-2xl bg-primary p-4">
-              <Text className="text-center text-white">{pendingTierKey ? "Opening paywall…" : "Continue in RevenueCat"}</Text>
-            </TouchableOpacity>}
-          </View>}
+          {message && (
+            <Text
+              accessibilityRole="alert"
+              className="rounded-2xl bg-warningSurface p-4 text-textPrimary"
+            >
+              {message}
+            </Text>
+          )}
+          {requiredTier && (
+            <Text className="text-description">
+              Suggested plan:{" "}
+              {tiers.find((tier) => tier.key === requiredTier)?.label ??
+                requiredTier}
+            </Text>
+          )}
+          {isFetching && (
+            <Text className="text-description">
+              Refreshing available plans…
+            </Text>
+          )}
+          {isError && (
+            <TouchableOpacity
+              accessibilityRole="button"
+              onPress={() => void refetch()}
+            >
+              <Text className="text-danger">
+                Plans could not be loaded. Tap to retry.
+              </Text>
+            </TouchableOpacity>
+          )}
+          {!can("billing.checkout") && (
+            <Text className="text-description">
+              Ask your account owner to change the organization plan.
+            </Text>
+          )}
+          {preview && (
+            <View className="gap-3 rounded-2xl bg-white p-4">
+              <Text className="font-ralewayBold text-textPrimary">
+                Plan change preview:{" "}
+                {tiers.find((tier) => tier.key === preview.tier)?.label ??
+                  preview.tier}
+              </Text>
+              {preview.result.blockers.map((blocker) => (
+                <Text
+                  key={blocker.dimension}
+                  accessibilityRole="alert"
+                  className="text-danger"
+                >
+                  {blockerMessage(blocker)}
+                </Text>
+              ))}
+              {preview.result.allowed && (
+                <Text className="text-description">
+                  Your current usage fits this plan.
+                </Text>
+              )}
+              {selectedPaidTier && (
+                <RevenueCatPackagePicker
+                  disabled={pendingTierKey !== null}
+                  isLoading={isRevenueCatLoading}
+                  onSelect={setSelectedProductKey}
+                  options={packageOptions}
+                  selectedKey={selectedProductKey}
+                />
+              )}
+              {selectedPaidTier &&
+                can("billing.checkout") &&
+                selectedPackage && (
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    disabled={pendingTierKey !== null}
+                    onPress={() => void continuePurchase()}
+                    className="rounded-2xl bg-primary p-4"
+                  >
+                    <Text className="text-center font-ralewayBold text-white">
+                      {pendingTierKey
+                        ? "Processing purchase…"
+                        : `Purchase ${selectedPackage.product.priceString}`}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+            </View>
+          )}
           {tiers.map((tier) => {
             const isCurrent = currentTierKey === tier.key;
             const isFeatured = tier.key === "all_in";
@@ -277,7 +416,12 @@ export function UpgradePlanModal({
                 isCurrent={isCurrent}
                 isFeatured={isFeatured}
                 isPending={pendingTierKey === tier.key}
-                disabled={!entitlement || isFetching || isError || pendingTierKey !== null}
+                disabled={
+                  !entitlement ||
+                  isFetching ||
+                  isError ||
+                  pendingTierKey !== null
+                }
                 key={tier.key}
                 onUpgrade={() => handleUpgrade(tier.key)}
                 tier={tier}

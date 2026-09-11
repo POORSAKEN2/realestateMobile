@@ -35,7 +35,11 @@ export interface EntitlementLimitDetails {
   current: number | string;
   requested: number;
   current_plan: { key: string; label: string };
-  required_plan: { key: string; label: string; price_php?: number | null } | null;
+  required_plan: {
+    key: string;
+    label: string;
+    price_php?: number | null;
+  } | null;
   upgrade_path: string;
 }
 
@@ -73,15 +77,4 @@ export interface BillingEntitlement {
   property_count: number;
   price_php: number;
   tiers: PlanTier[];
-}
-
-export interface CheckoutSessionPayload {
-  tier: "tier1" | "all_in";
-  success_url?: string;
-  cancel_url?: string;
-}
-
-export interface CheckoutSessionResponse {
-  checkout_url?: string;
-  session_id?: string;
 }

@@ -3,6 +3,7 @@ import type { CustomerInfo, PurchasesPackage } from "react-native-purchases";
 import {
   REVENUECAT_ENTITLEMENT_IDS,
   REVENUECAT_PRODUCT_IDS,
+  REVENUECAT_PRODUCT_KEYS_BY_TIER,
   type RevenueCatProductKey,
 } from "../../constants/revenueCat";
 import type { SubscriptionTierKey } from "../../types/domain/billing";
@@ -28,8 +29,10 @@ export function getActiveRevenueCatProductId(
 ) {
   const tier = getActiveRevenueCatTier(customerInfo);
   if (tier === "free") return null;
-  return customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS[tier]]
-    ?.productIdentifier ?? null;
+  return (
+    customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS[tier]]
+      ?.productIdentifier ?? null
+  );
 }
 
 export function getRevenueCatProductKey(
@@ -55,4 +58,14 @@ export function indexRevenueCatPackages(packages: PurchasesPackage[]) {
       packageByProduct.get(productId) ?? null,
     ]),
   ) as Record<RevenueCatProductKey, PurchasesPackage | null>;
+}
+
+export function getRevenueCatPackagesForTier(
+  packages: Record<RevenueCatProductKey, PurchasesPackage | null>,
+  tier: Exclude<SubscriptionTierKey, "free">,
+) {
+  return REVENUECAT_PRODUCT_KEYS_BY_TIER[tier].flatMap((key) => {
+    const pkg = packages[key];
+    return pkg ? [{ key, pkg }] : [];
+  });
 }

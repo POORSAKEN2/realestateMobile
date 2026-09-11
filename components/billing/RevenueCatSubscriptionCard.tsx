@@ -12,14 +12,13 @@ import { REVENUECAT_PRODUCT_LABELS } from "../../constants/revenueCat";
 import { colors } from "../../constants/colors";
 import { useRevenueCat } from "../../hooks/useRevenueCat";
 import { useSnackbar } from "../../hooks/useSnackbar";
-import { PAYWALL_RESULT } from "../../services/billing/revenueCatUi";
 import {
   getActiveRevenueCatProductId,
   getRevenueCatProductKey,
 } from "../../utils/billing/revenueCatCustomer";
 import { Snackbar } from "../ui/Snackbar";
 
-type RevenueCatAction = "customer-center" | "paywall" | "restore";
+type RevenueCatAction = "customer-center" | "restore";
 
 function ActionButton({
   busy,
@@ -70,8 +69,10 @@ function ActionButton({
 
 export function RevenueCatSubscriptionCard({
   canManagePurchases,
+  onViewPlans,
 }: {
   canManagePurchases: boolean;
+  onViewPlans: () => void;
 }) {
   const {
     activeTier,
@@ -81,7 +82,6 @@ export function RevenueCatSubscriptionCard({
     isPremium,
     isReady,
     presentCustomerCenter,
-    presentPaywallIfNeeded,
     restorePurchases,
   } = useRevenueCat();
   const snackbar = useSnackbar();
@@ -102,7 +102,7 @@ export function RevenueCatSubscriptionCard({
     if (isPremium) {
       return `${activeTier === "all_in" ? "All-In" : "Tier 1"} access is active.`;
     }
-    return "Choose Tier 1 or All-In access in the secure paywall.";
+    return "Choose Tier 1 or All-In access with secure in-app purchase.";
   }, [activeTier, isPremium, productKey]);
 
   async function runAction(
@@ -123,28 +123,12 @@ export function RevenueCatSubscriptionCard({
     }
   }
 
-  function showPaywall() {
-    void runAction("paywall", async () => {
-      const result = await presentPaywallIfNeeded();
-      if (result === PAYWALL_RESULT.ERROR) {
-        throw new Error("Paywall could not complete the request.");
-      }
-      if (result === PAYWALL_RESULT.PURCHASED) {
-        snackbar.show("Terrane Premium purchase complete.");
-      } else if (result === PAYWALL_RESULT.RESTORED) {
-        snackbar.show("Purchases restored.");
-      } else if (result === PAYWALL_RESULT.NOT_PRESENTED) {
-        snackbar.show("Terrane Premium is already active.");
-      }
-    });
-  }
-
   function restore() {
     void runAction("restore", async () => {
       const restored = await restorePurchases();
       const premiumRestored = Boolean(
         restored.entitlements.active.tier1_access ||
-          restored.entitlements.active.all_in_access,
+        restored.entitlements.active.all_in_access,
       );
       snackbar.show(
         premiumRestored
@@ -200,10 +184,10 @@ export function RevenueCatSubscriptionCard({
       {canManagePurchases ? (
         <>
           <ActionButton
-            busy={activeAction === "paywall" || (isLoading && !isReady)}
+            busy={isLoading && !isReady}
             icon="credit-card"
-            label={isPremium ? "View premium access" : "View premium plans"}
-            onPress={showPaywall}
+            label={isPremium ? "View premium options" : "View premium plans"}
+            onPress={onViewPlans}
             primary
           />
 

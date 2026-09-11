@@ -18,7 +18,12 @@ export default function BillingScreen() {
   const { session } = useAuth();
   const canStartCheckout = hasAppPermission(session?.user, "billing.checkout");
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-  const { data: entitlement, isLoading, isError, refetch } = useBillingEntitlement();
+  const {
+    data: entitlement,
+    isLoading,
+    isError,
+    refetch,
+  } = useBillingEntitlement();
 
   const propertyCount = entitlement?.property_count ?? 0;
   const propertyLimit = entitlement?.property_limit;
@@ -58,6 +63,7 @@ export default function BillingScreen() {
             </TouchableOpacity>
             <RevenueCatSubscriptionCard
               canManagePurchases={canStartCheckout}
+              onViewPlans={() => setIsUpgradeModalOpen(true)}
             />
           </View>
         ) : (
@@ -148,6 +154,7 @@ export default function BillingScreen() {
               <EntitlementSummary entitlement={entitlement} />
               <RevenueCatSubscriptionCard
                 canManagePurchases={canStartCheckout}
+                onViewPlans={() => setIsUpgradeModalOpen(true)}
               />
               {/* Plan Catalog Grid */}
               <View className="gap-3">
