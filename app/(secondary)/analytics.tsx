@@ -1,6 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import Svg, {
   Circle,
@@ -28,6 +28,11 @@ import {
   hasAnalyticsDepth,
   retentionDescription,
 } from "../../utils/billing/entitlementCapabilities";
+import {
+  hasPlanCapability,
+  requiredTierForCapability,
+} from "../../utils/billing/planCapabilities";
+import { UpgradePlanModal } from "../../components/billing/UpgradePlanModal";
 
 type MetricCard = {
   label: string;
@@ -390,9 +395,14 @@ export default function AnalyticsScreen() {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const entitlementQuery = useBillingEntitlement();
+  const [isUpgradeVisible, setUpgradeVisible] = useState(false);
   const canViewHistory = hasAnalyticsDepth(
     entitlementQuery.data,
     "historical",
+  );
+  const canViewAdvancedAnalytics = hasPlanCapability(
+    entitlementQuery.data,
+    "advanced_analytics",
   );
   const retentionDays = entitlementQuery.data?.limits?.retention_days?.days;
   const {
@@ -551,7 +561,34 @@ export default function AnalyticsScreen() {
                 </View>
               </View>
             )}
-            <DistributionChart slices={distributionSlices} />
+            {canViewAdvancedAnalytics ? (
+              <DistributionChart slices={distributionSlices} />
+            ) : (
+              <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+                <View className="flex-row items-center gap-3">
+                  <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                    <Feather name="lock" size={18} color={colors.primary} />
+                  </View>
+                  <View className="min-w-0 flex-1">
+                    <Text className="font-ralewayBold text-base text-textPrimary">
+                      Advanced portfolio distribution
+                    </Text>
+                    <Text className="mt-1 text-xs leading-5 text-description">
+                      Upgrade to All-In for asset-mix analytics.
+                    </Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  className="mt-4 rounded-2xl bg-primary p-3"
+                  onPress={() => setUpgradeVisible(true)}
+                >
+                  <Text className="text-center font-ralewayBold text-sm text-white">
+                    View All-In
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
             {/* Financial Summary Export */}
             <View className="mt-4 rounded-3xl border border-primary/20 bg-white p-5 shadow-sm shadow-primary/5">
@@ -609,6 +646,15 @@ export default function AnalyticsScreen() {
           </>
         )}
       </PullToRefreshScrollView>
+      <UpgradePlanModal
+        isVisible={isUpgradeVisible}
+        message="All-In is required for advanced portfolio analytics."
+        onClose={() => setUpgradeVisible(false)}
+        requiredTier={requiredTierForCapability(
+          "advanced_analytics",
+          entitlementQuery.data,
+        )}
+      />
     </Screen>
   );
 }

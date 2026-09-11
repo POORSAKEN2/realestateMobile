@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Linking, Text, TouchableOpacity, View } from "react-native";
 
 import { UpgradePlanModal } from "../../components/billing/UpgradePlanModal";
 import { InquiryDetail } from "../../components/inquiries/InquiryDetail";
@@ -62,6 +62,20 @@ export default function InquiryDetailsScreen() {
               canUpdate={statusController.canUpdate(inquiryQuery.data)}
               inquiry={inquiryQuery.data}
               isUpdating={statusController.isUpdating(inquiryQuery.data.id)}
+              onContactGuest={async () => {
+                if (
+                  !(await statusController.requestInquiryAction(
+                    inquiryQuery.data,
+                  ))
+                ) {
+                  return;
+                }
+                const contact = inquiryQuery.data.guest.contact;
+                const uri = contact.includes("@")
+                  ? `mailto:${contact}`
+                  : `tel:${contact}`;
+                await Linking.openURL(uri);
+              }}
               onStatusChange={(status) =>
                 void statusController.requestStatusChange(
                   inquiryQuery.data,

@@ -2,7 +2,8 @@
 
 Terrane uses `react-native-purchases` for customer and purchase state and
 `react-native-purchases-ui` for Paywalls and Customer Center. Client-side access
-checks use entitlement `terrane_premium`.
+checks recognize server-aligned entitlements `tier1_access` and
+`all_in_access`. Protected access still uses `/billing/entitlement`.
 
 ## 1. Install packages
 
@@ -54,25 +55,25 @@ environment. Restart Metro after changing `.env`.
 
 ## 3. Configure RevenueCat dashboard
 
-In **Product catalog**, create/import these products for each target store:
+In **Product catalog**, create/import six products for each target store:
 
-- `lifetime`: non-consumable, one-time purchase.
-- `yearly`: auto-renewing annual subscription.
-- `monthly`: auto-renewing monthly subscription.
+- Tier 1: `tier1_lifetime`, `tier1_yearly`, `tier1_monthly`.
+- All-In: `all_in_lifetime`, `all_in_yearly`, `all_in_monthly`.
 
-For App Store Connect, put `yearly` and `monthly` in the same subscription
-group. For Google Play, create matching subscription products/base plans.
+For App Store Connect, put renewable Tier 1 and All-In products in the same
+subscription group so upgrades work correctly. For Google Play, create matching
+subscription products/base plans.
 Product identifiers must match exactly, including case.
 
-Create entitlement `terrane_premium`, then attach all three products to it.
-Lifetime grants the entitlement without expiry; yearly and monthly grant it
-while their subscriptions remain active.
+Create entitlements `tier1_access` and `all_in_access`. Attach all paid products
+to `tier1_access`; attach the three All-In products to `all_in_access` too. This
+lets All-In satisfy Tier 1 feature checks while the higher entitlement maps the
+server tier. Lifetime grants access without expiry.
 
 Create offering `default`, mark it Current, and add:
 
-- Lifetime package (`$rc_lifetime`) using product `lifetime`.
-- Annual package (`$rc_annual`) using product `yearly`.
-- Monthly package (`$rc_monthly`) using product `monthly`.
+- Tier 1 lifetime, annual, and monthly packages.
+- All-In lifetime, annual, and monthly packages.
 
 Create a Paywall in RevenueCat, add all three packages, enable a close button,
 and attach the Paywall to offering `default`. Paywall copy, pricing, trials, and
@@ -87,7 +88,8 @@ package order then remain remotely configurable without an app release.
 - Calls `Purchases.logIn` after Terrane login and `Purchases.logOut` after logout.
 - Registers one `CustomerInfo` update listener and removes it on unmount.
 - Fetches CustomerInfo and Current Offering concurrently.
-- Invalidates server entitlement data after purchase-state changes.
+- Calls `POST /billing/reconcile` after purchase/restore/paywall completion,
+  then replaces cached `/billing/entitlement` data with the server result.
 
 Use RevenueCat state anywhere below the root provider:
 
@@ -95,14 +97,14 @@ Use RevenueCat state anywhere below the root provider:
 import { useRevenueCat } from "../hooks/useRevenueCat";
 
 function PremiumFeature() {
-  const { isPremium, isLoading, presentPaywallIfNeeded } = useRevenueCat();
+  const { activeTier, isLoading, presentPaywallForTier } = useRevenueCat();
 
   if (isLoading) return null;
-  if (!isPremium) {
+  if (activeTier === "free") {
     return (
       <Button
-        title="Unlock Terrane Premium"
-        onPress={() => void presentPaywallIfNeeded()}
+        title="Unlock Tier 1"
+        onPress={() => void presentPaywallForTier("tier1")}
       />
     );
   }
@@ -115,18 +117,19 @@ The entitlement check is equivalent to:
 
 ```ts
 const customerInfo = await Purchases.getCustomerInfo();
-const isPremium = Boolean(customerInfo.entitlements.active.terrane_premium);
+const isTier1 = Boolean(customerInfo.entitlements.active.tier1_access);
+const isAllIn = Boolean(customerInfo.entitlements.active.all_in_access);
 ```
 
 Fetch packages and make a direct purchase when a custom UI is needed:
 
 ```tsx
 const { packages, purchasePackage } = useRevenueCat();
-const monthlyPackage = packages.monthly;
+const monthlyPackage = packages.tier1_monthly;
 
 if (monthlyPackage) {
   const customerInfo = await purchasePackage(monthlyPackage);
-  const unlocked = Boolean(customerInfo?.entitlements.active.terrane_premium);
+  const unlocked = Boolean(customerInfo?.entitlements.active.tier1_access);
 }
 ```
 
@@ -155,7 +158,7 @@ and transfer/alias behavior.
 ## 6. Paywall and Customer Center
 
 `RevenueCatSubscriptionCard` is shown on Terrane's Plan & Billing screen. It
-presents `presentPaywallIfNeeded` for `terrane_premium`, restores purchases, and
+presents tier-aware paywalls, restores purchases, and
 shows Customer Center only after purchase history exists.
 
 Customer Center makes sense for subscribers who need cancellation, plan changes,
@@ -180,11 +183,10 @@ POST https://your-api.example/api/webhooks/revenuecat
 Authorization: value matching REVENUECAT_WEBHOOK_AUTH_HEADER
 ```
 
-Current server tiers use `tier1_access` and `all_in_access`. Decide explicitly
-which server tier `terrane_premium` should grant before replacing those mappings.
-Until mapped, `isPremium` is valid client state, but server quota/feature gates
-remain authoritative and separate. Never grant sensitive server access solely
-from client CustomerInfo.
+The client and server both use `tier1_access` and `all_in_access`. After a store
+operation, the app calls `POST /billing/reconcile`; RevenueCat webhooks remain
+the normal asynchronous writer and scheduled reconciliation remains the
+backstop. Never grant sensitive server access solely from client CustomerInfo.
 
 ## 8. Release checklist
 

@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Linking,
   Modal,
   ScrollView,
   Text,
@@ -15,14 +14,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../constants/colors";
 import {
   useBillingEntitlement,
-  useCreateBillingCheckout,
 } from "../../hooks/api/useBillingEntitlement";
+import { useRevenueCat } from "../../hooks/useRevenueCat";
 import type { PlanTier } from "../../types/domain/billing";
 import type { PlanChangePreview, SubscriptionTierKey } from "../../types/domain/billing";
 import { fetchPlanChangePreview } from "../../api/billing";
 import { useAccess } from "../../hooks/auth/useAccess";
 import { blockerMessage } from "../../utils/billing/entitlementPresentation";
+import { effectiveSubscriptionTier } from "../../utils/billing/planCapabilities";
 import { ModalHeader } from "../ui/ModalHeader";
+
+const TIER_RANK: Readonly<Record<string, number>> = {
+  free: 0,
+  tier1: 1,
+  all_in: 2,
+};
 
 type UpgradePlanModalProps = {
   isVisible: boolean;
@@ -175,13 +181,13 @@ export function UpgradePlanModal({
 }: UpgradePlanModalProps) {
   const { data: entitlement, isFetching, isError, refetch } = useBillingEntitlement();
   const { can } = useAccess();
-  const checkoutMutation = useCreateBillingCheckout();
+  const { presentPaywallForTier } = useRevenueCat();
   const [pendingTierKey, setPendingTierKey] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ tier: SubscriptionTierKey; result: PlanChangePreview } | null>(null);
   const busy = useRef(false);
   useEffect(() => { if (!isVisible) setPreview(null); }, [isVisible]);
   const tiers = entitlement?.tiers?.length ? entitlement.tiers : fallbackTiers;
-  const currentTierKey = entitlement?.tier ?? "free";
+  const currentTierKey = effectiveSubscriptionTier(entitlement);
   async function handleUpgrade(tierKey: string) {
     if (busy.current || !can("billing.checkout") || !entitlement || isFetching || isError) return;
     if (!["free", "tier1", "all_in"].includes(tierKey)) return;
@@ -198,7 +204,7 @@ export function UpgradePlanModal({
     }
   }
 
-  async function continueCheckout() {
+  async function continuePurchase() {
     if (busy.current || !preview?.result.allowed || preview.tier === "free" || !can("billing.checkout")) return;
     busy.current = true;
     setPendingTierKey(preview.tier);
@@ -207,22 +213,14 @@ export function UpgradePlanModal({
       const latest = await fetchPlanChangePreview(preview.tier);
       setPreview({ ...preview, result: latest });
       if (!latest.allowed) return;
-      const response = await checkoutMutation.mutateAsync({ tier: preview.tier });
-      if (response.checkout_url) {
-        await Linking.openURL(response.checkout_url);
-        onClose();
-      } else {
-        Alert.alert(
-          "Upgrade Plan",
-          "Please visit your Terrane web dashboard to complete subscription payment via Stripe.",
-        );
-      }
+      await presentPaywallForTier(preview.tier);
+      onClose();
     } catch (err) {
       Alert.alert(
         "Upgrade Plan",
         err instanceof Error
           ? err.message
-          : "Billing checkout is currently configured via web portal.",
+          : "RevenueCat could not open the requested plan.",
       );
     } finally {
       busy.current = false;
@@ -259,15 +257,19 @@ export function UpgradePlanModal({
             <Text className="font-ralewayBold text-textPrimary">Plan change preview: {tiers.find(tier => tier.key === preview.tier)?.label ?? preview.tier}</Text>
             {preview.result.blockers.map(blocker => <Text key={blocker.dimension} accessibilityRole="alert" className="text-danger">{blockerMessage(blocker)}</Text>)}
             {preview.result.allowed && <Text className="text-description">Your current usage fits this plan.</Text>}
-            {preview.tier === "free" && preview.result.allowed && <Text className="text-description">Contact support to cancel renewal and return to Free at the end of your paid period.</Text>}
-            {preview.result.allowed && preview.tier !== "free" && can("billing.checkout") && <TouchableOpacity accessibilityRole="button" disabled={pendingTierKey !== null} onPress={() => void continueCheckout()} className="rounded-2xl bg-primary p-4">
-              <Text className="text-center text-white">{pendingTierKey ? "Opening checkout…" : "Continue to checkout"}</Text>
+            {preview.result.allowed && preview.tier !== "free" && can("billing.checkout") && <TouchableOpacity accessibilityRole="button" disabled={pendingTierKey !== null} onPress={() => void continuePurchase()} className="rounded-2xl bg-primary p-4">
+              <Text className="text-center text-white">{pendingTierKey ? "Opening paywall…" : "Continue in RevenueCat"}</Text>
             </TouchableOpacity>}
           </View>}
           {tiers.map((tier) => {
             const isCurrent = currentTierKey === tier.key;
             const isFeatured = tier.key === "all_in";
-            const canUpgrade = !isCurrent && can("billing.checkout") && ["free", "tier1", "all_in"].includes(tier.key);
+            const normalizedTier = tier.key as SubscriptionTierKey;
+            const candidateRank = TIER_RANK[normalizedTier];
+            const canUpgrade =
+              can("billing.checkout") &&
+              typeof candidateRank === "number" &&
+              candidateRank > TIER_RANK[currentTierKey];
 
             return (
               <PlanCard

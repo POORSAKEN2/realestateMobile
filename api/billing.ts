@@ -27,6 +27,18 @@ export async function fetchBillingEntitlement(
   return unwrapData<BillingEntitlement>(response);
 }
 
+export async function reconcileBillingEntitlement(
+  accessToken?: string,
+): Promise<BillingEntitlement> {
+  const response = await apiClient.post<
+    ApiEnvelope<BillingEntitlement> | BillingEntitlement
+  >("/billing/reconcile", undefined, {
+    headers: authHeaders(accessToken),
+  });
+
+  return unwrapData<BillingEntitlement>(response);
+}
+
 export async function createBillingCheckout(
   payload: CheckoutSessionPayload,
   accessToken?: string,

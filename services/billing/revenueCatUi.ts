@@ -4,7 +4,6 @@ import RevenueCatUI, {
 } from "react-native-purchases-ui";
 import type { PurchasesOffering } from "react-native-purchases";
 
-import { REVENUECAT_ENTITLEMENT_ID } from "../../constants/revenueCat";
 import {
   configureRevenueCat,
   toRevenueCatClientError,
@@ -28,11 +27,12 @@ export async function presentRevenueCatPaywall(
 
 export async function presentRevenueCatPaywallIfNeeded(
   offering?: PurchasesOffering | null,
+  requiredEntitlementIdentifier: string = "tier1_access",
 ) {
   await configureRevenueCat();
   try {
     return await RevenueCatUI.presentPaywallIfNeeded({
-      requiredEntitlementIdentifier: REVENUECAT_ENTITLEMENT_ID,
+      requiredEntitlementIdentifier,
       displayCloseButton: true,
       ...(offering ? { offering } : {}),
     });

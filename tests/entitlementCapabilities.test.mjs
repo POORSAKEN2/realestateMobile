@@ -10,6 +10,11 @@ const {
   supportLevelLabel,
   totalKnownUploadBytes,
 } = load("../../utils/billing/entitlementCapabilities.ts");
+const {
+  effectiveSubscriptionTier,
+  hasPlanCapability,
+  requiredTierForCapability,
+} = load("../../utils/billing/planCapabilities.ts");
 
 const entitlement = {
   gating_enabled: true,
@@ -37,4 +42,33 @@ test("storage preflight compares known upload bytes with remaining quota", () =>
 test("plan labels stay human-readable", () => {
   assert.equal(retentionDescription(entitlement), "History retained for 3 years");
   assert.equal(supportLevelLabel("named_escalation"), "Named escalation support");
+});
+
+test("feature gates prefer backend capabilities and retain tier fallback", () => {
+  assert.equal(hasPlanCapability({ tier: "tier1" }, "notifications"), true);
+  assert.equal(hasPlanCapability({ tier: "tier1" }, "reminders"), false);
+  assert.equal(
+    hasPlanCapability(
+      {
+        tier: "all_in",
+        capabilities: {
+          advanced_analytics: { enabled: false, required_tier: "all_in" },
+        },
+      },
+      "advanced_analytics",
+    ),
+    false,
+  );
+  assert.equal(
+    hasPlanCapability(
+      { tier: "free", gating_enabled: false },
+      "advanced_analytics",
+    ),
+    true,
+  );
+  assert.equal(
+    effectiveSubscriptionTier({ tier: "all_in", effective_tier: "tier1" }),
+    "tier1",
+  );
+  assert.equal(requiredTierForCapability("reminders"), "all_in");
 });

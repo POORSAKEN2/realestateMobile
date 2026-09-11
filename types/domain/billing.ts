@@ -1,5 +1,16 @@
 export type SubscriptionTierKey = "free" | "tier1" | "all_in";
 
+export type PlanCapabilityKey =
+  | "inquiry_actions"
+  | "notifications"
+  | "reminders"
+  | "advanced_analytics";
+
+export interface PlanCapability {
+  enabled: boolean;
+  required_tier: SubscriptionTierKey;
+}
+
 export interface UsageLimit {
   limit: number | null;
   used: number;
@@ -54,6 +65,7 @@ export interface BillingEntitlement {
     reports_level?: { level: string };
   };
   gating_enabled?: boolean;
+  capabilities?: Partial<Record<PlanCapabilityKey, PlanCapability>>;
   can_create_property?: boolean;
   tier: SubscriptionTierKey | string;
   tier_label: string;

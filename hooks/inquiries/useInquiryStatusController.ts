@@ -25,12 +25,10 @@ export function useInquiryStatusController() {
     );
   }
 
-  async function requestStatusChange(inquiry: Inquiry, status: InquiryStatus) {
-    if (status === inquiry.status || mutation.isPending) return;
-
+  async function requestInquiryAction(inquiry: Inquiry) {
     if (!hasWritePermission(inquiry)) {
-      snackbar.show("Your account cannot update this inquiry.");
-      return;
+      snackbar.show("Your account cannot manage this inquiry.");
+      return false;
     }
 
     let entitlement = entitlementQuery.data;
@@ -39,18 +37,23 @@ export function useInquiryStatusController() {
       entitlement = refreshed.data;
       if (!entitlement) {
         snackbar.show("Plan access could not be verified. Try again.");
-        return;
+        return false;
       }
     }
 
-    if (!hasInquiryWorkflowAccess(entitlement)) {
-      if (can("billing.checkout")) {
-        setUpgradeVisible(true);
-      } else {
-        snackbar.show("Tier 1 is required. Ask your account owner to upgrade.");
-      }
-      return;
+    if (hasInquiryWorkflowAccess(entitlement)) return true;
+
+    if (can("billing.checkout")) {
+      setUpgradeVisible(true);
+    } else {
+      snackbar.show("Tier 1 is required. Ask your account owner to upgrade.");
     }
+    return false;
+  }
+
+  async function requestStatusChange(inquiry: Inquiry, status: InquiryStatus) {
+    if (status === inquiry.status || mutation.isPending) return;
+    if (!(await requestInquiryAction(inquiry))) return;
 
     try {
       await mutation.mutateAsync({ id: inquiry.id, status });
@@ -68,6 +71,7 @@ export function useInquiryStatusController() {
     isUpdating: (inquiryId: string) =>
       mutation.isPending && mutation.variables?.id === inquiryId,
     isUpgradeVisible,
+    requestInquiryAction,
     requestStatusChange,
     snackbar,
   };

@@ -90,7 +90,7 @@ test("inquiry status management follows effective plan", () => {
   assert.equal(hasInquiryWorkflowAccess({ tier: "all_in" }), true);
   assert.equal(
     hasInquiryWorkflowAccess({ tier: "free", gating_enabled: false }),
-    false,
+    true,
   );
 });
 
