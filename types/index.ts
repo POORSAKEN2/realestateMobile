@@ -101,8 +101,6 @@ export type {
 } from "./domain/notifications";
 export type {
   BillingEntitlement,
-  CheckoutSessionPayload,
-  CheckoutSessionResponse,
   PlanTier,
   SubscriptionTierKey,
 } from "./domain/billing";

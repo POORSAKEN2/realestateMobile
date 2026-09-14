@@ -35,7 +35,11 @@ export interface EntitlementLimitDetails {
   current: number | string;
   requested: number;
   current_plan: { key: string; label: string };
-  required_plan: { key: string; label: string; price_php?: number | null } | null;
+  required_plan: {
+    key: string;
+    label: string;
+    price_php?: number | null;
+  } | null;
   upgrade_path: string;
 }
 
@@ -43,7 +47,15 @@ export interface PlanTier {
   key: SubscriptionTierKey | string;
   label: string;
   property_limit: number | null; // null means unlimited
-  price_php: number;
+  /** Dormant web-checkout metadata. Native purchase UI uses store prices. */
+  price_php?: number | null;
+  capabilities?: Partial<Record<PlanCapabilityKey, boolean>>;
+  limits?: {
+    analytics_depth?: string | null;
+    reports_level?: string | null;
+    retention_days?: number | null;
+    support_level?: string | null;
+  };
 }
 
 export interface BillingEntitlement {
@@ -71,17 +83,6 @@ export interface BillingEntitlement {
   tier_label: string;
   property_limit: number | null;
   property_count: number;
-  price_php: number;
+  price_php?: number | null;
   tiers: PlanTier[];
-}
-
-export interface CheckoutSessionPayload {
-  tier: "tier1" | "all_in";
-  success_url?: string;
-  cancel_url?: string;
-}
-
-export interface CheckoutSessionResponse {
-  checkout_url?: string;
-  session_id?: string;
 }

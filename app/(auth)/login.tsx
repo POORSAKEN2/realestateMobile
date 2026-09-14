@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import BrandCombinationVertical from "../../assets/branding/svg/brand-combination-vertical-white.svg";
+import { LegalLink } from "../../components/legal/LegalLink";
 import { colors } from "../../constants/colors";
 import { useLogin } from "../../hooks/useLogin";
 
@@ -287,13 +288,19 @@ export default function LoginScreen() {
             <View className="mt-auto items-center px-4 pt-12">
               <Text className="text-center font-ralewayMedium text-xs leading-5 text-white/60">
                 By signing in, you agree to our{" "}
-                <Text className="font-ralewayBold text-white underline">
+                <LegalLink
+                  className="font-ralewayBold text-white underline"
+                  document="terms"
+                >
                   Terms of Service
-                </Text>{" "}
+                </LegalLink>{" "}
                 and acknowledge our{" "}
-                <Text className="font-ralewayBold text-white underline">
+                <LegalLink
+                  className="font-ralewayBold text-white underline"
+                  document="privacy"
+                >
                   Privacy Policy
-                </Text>
+                </LegalLink>
                 .
               </Text>
             </View>

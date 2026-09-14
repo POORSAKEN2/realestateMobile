@@ -6,7 +6,12 @@ import load from "./helpers/loadTs.cjs";
 const {
   getActiveRevenueCatProductId,
   getActiveRevenueCatTier,
+  getMissingRevenueCatProductKeys,
+  getRevenueCatPackagesForTier,
   getRevenueCatProductKey,
+  hasActiveRevenueCatSubscription,
+  hasRevenueCatLifetimeAccess,
+  hasRevenueCatPurchaseHistory,
   hasRevenueCatPremium,
   indexRevenueCatPackages,
 } = load("../../utils/billing/revenueCatCustomer.ts");
@@ -63,4 +68,52 @@ test("offering packages are indexed by store product, independent of order", () 
   assert.equal(indexed.all_in_lifetime, lifetime);
   assert.equal(indexed.tier1_monthly, monthly);
   assert.equal(indexed.tier1_yearly, null);
+});
+
+test("native paywall groups available packages by tier and billing period", () => {
+  const tier1Monthly = { product: { identifier: "tier1_monthly" } };
+  const tier1Yearly = { product: { identifier: "tier1_yearly" } };
+  const allInMonthly = { product: { identifier: "all_in_monthly" } };
+  const indexed = indexRevenueCatPackages([
+    allInMonthly,
+    tier1Yearly,
+    tier1Monthly,
+  ]);
+
+  assert.deepEqual(
+    getRevenueCatPackagesForTier(indexed, "tier1").map(({ key }) => key),
+    ["tier1_monthly", "tier1_yearly"],
+  );
+  assert.deepEqual(
+    getRevenueCatPackagesForTier(indexed, "all_in").map(({ key }) => key),
+    ["all_in_monthly"],
+  );
+  assert.deepEqual(
+    getRevenueCatPackagesForTier(indexed, "tier1", {
+      includeLifetime: false,
+    }).map(({ key }) => key),
+    ["tier1_monthly", "tier1_yearly"],
+  );
+  assert.deepEqual(getMissingRevenueCatProductKeys(indexed, "all_in"), [
+    "all_in_yearly",
+    "all_in_lifetime",
+  ]);
+});
+
+test("purchase history and active purchase type drive checkout eligibility", () => {
+  const lifetime = customerInfo({
+    tier1_access: { productIdentifier: "tier1_lifetime" },
+  });
+  lifetime.allPurchasedProductIdentifiers = ["tier1_lifetime"];
+  assert.equal(hasRevenueCatPurchaseHistory(lifetime), true);
+  assert.equal(hasRevenueCatLifetimeAccess(lifetime), true);
+  assert.equal(hasActiveRevenueCatSubscription(lifetime), false);
+
+  const renewing = customerInfo({
+    all_in_access: { productIdentifier: "all_in_monthly" },
+  });
+  renewing.activeSubscriptions = ["all_in_monthly"];
+  renewing.allPurchasedProductIdentifiers = ["all_in_monthly"];
+  assert.equal(hasRevenueCatLifetimeAccess(renewing), false);
+  assert.equal(hasActiveRevenueCatSubscription(renewing), true);
 });
