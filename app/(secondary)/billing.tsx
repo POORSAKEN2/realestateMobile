@@ -1,23 +1,37 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { UpgradePlanModal } from "../../components/billing/UpgradePlanModal";
 import { EntitlementSummary } from "../../components/billing/EntitlementSummary";
 import { RevenueCatSubscriptionCard } from "../../components/billing/RevenueCatSubscriptionCard";
+import { LegalLink } from "../../components/legal/LegalLink";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
 import { colors } from "../../constants/colors";
 import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { useAuth } from "../../hooks/useAuth";
+import { useRevenueCat } from "../../hooks/useRevenueCat";
 import { hasAppPermission } from "../../utils/auth/accessPolicy";
+import {
+  FALLBACK_PLAN_TIERS,
+  getPlanTierFeatures,
+  getTierStorePriceLabel,
+} from "../../utils/billing/planCatalog";
 
 export default function BillingScreen() {
   const { session } = useAuth();
   const canStartCheckout = hasAppPermission(session?.user, "billing.checkout");
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+  const { isPremium, packages, presentCustomerCenter } = useRevenueCat();
   const {
     data: entitlement,
     isLoading,
@@ -31,6 +45,26 @@ export default function BillingScreen() {
   const usagePercentage = isUnlimited
     ? 0
     : Math.min(100, Math.round((propertyCount / (propertyLimit || 1)) * 100));
+  const tiers = entitlement?.tiers?.length
+    ? entitlement.tiers
+    : FALLBACK_PLAN_TIERS;
+
+  async function openBillingAction() {
+    if (!isPremium) {
+      setIsUpgradeModalOpen(true);
+      return;
+    }
+
+    try {
+      await presentCustomerCenter();
+      await refetch();
+    } catch (cause) {
+      Alert.alert(
+        "Subscription unavailable",
+        cause instanceof Error ? cause.message : "Please try again.",
+      );
+    }
+  }
 
   return (
     <Screen className="bg-surface">
@@ -97,10 +131,10 @@ export default function BillingScreen() {
                       accessibilityRole="button"
                       activeOpacity={0.8}
                       className="rounded-2xl bg-primary px-4 py-2.5"
-                      onPress={() => setIsUpgradeModalOpen(true)}
+                      onPress={() => void openBillingAction()}
                     >
                       <Text className="font-ralewayBold text-xs text-white">
-                        Change plan
+                        {isPremium ? "Manage billing" : "Change plan"}
                       </Text>
                     </TouchableOpacity>
                   ) : (
@@ -162,29 +196,9 @@ export default function BillingScreen() {
                   Available Subscription Tiers
                 </Text>
 
-                {(
-                  entitlement?.tiers || [
-                    {
-                      key: "free",
-                      label: "Free Tier",
-                      property_limit: 2,
-                      price_php: 0,
-                    },
-                    {
-                      key: "tier1",
-                      label: "Tier 1",
-                      property_limit: 5,
-                      price_php: 299.99,
-                    },
-                    {
-                      key: "all_in",
-                      label: "All-In",
-                      property_limit: null,
-                      price_php: 1499.99,
-                    },
-                  ]
-                ).map((tier) => {
+                {tiers.map((tier) => {
                   const isCurrent = entitlement?.tier === tier.key;
+                  const features = getPlanTierFeatures(tier);
 
                   return (
                     <View
@@ -192,22 +206,21 @@ export default function BillingScreen() {
                       className="rounded-2xl border border-primary/15 bg-white p-4 shadow-sm shadow-primary/5"
                     >
                       <View className="flex-row items-center justify-between">
-                        <View>
+                        <View className="min-w-0 flex-1 pr-3">
                           <Text className="font-ralewayBold text-base text-textPrimary">
                             {tier.label}
                           </Text>
                           <Text className="mt-0.5 text-xs text-description">
-                            {tier.property_limit === null
-                              ? "Unlimited properties"
-                              : `Up to ${tier.property_limit} properties`}
+                            {features.slice(0, 2).join(" · ")}
                           </Text>
                         </View>
 
-                        <View className="items-end">
-                          <Text className="font-ralewayExtraBold text-base text-primary">
-                            {tier.price_php === 0
-                              ? "Free"
-                              : `₱${tier.price_php.toLocaleString("en-PH", { minimumFractionDigits: 2 })}`}
+                        <View className="max-w-[42%] items-end">
+                          <Text
+                            className="text-right font-ralewayExtraBold text-sm text-primary"
+                            numberOfLines={2}
+                          >
+                            {getTierStorePriceLabel(packages, tier)}
                           </Text>
                           {isCurrent ? (
                             <Text className="font-ralewayBold text-[10px] uppercase text-success">
@@ -236,6 +249,24 @@ export default function BillingScreen() {
                 </Text>
               </View>
             </View>
+
+            <Text className="text-center font-ralewayMedium text-xs text-description">
+              Store purchases are governed by our{" "}
+              <LegalLink
+                className="font-ralewayBold text-primary underline"
+                document="terms"
+              >
+                Terms of Service
+              </LegalLink>{" "}
+              and{" "}
+              <LegalLink
+                className="font-ralewayBold text-primary underline"
+                document="privacy"
+              >
+                Privacy Policy
+              </LegalLink>
+              .
+            </Text>
           </PullToRefreshScrollView>
         )}
       </View>

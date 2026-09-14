@@ -15,6 +15,9 @@ import { useSnackbar } from "../../hooks/useSnackbar";
 import {
   getActiveRevenueCatProductId,
   getRevenueCatProductKey,
+  hasActiveRevenueCatSubscription,
+  hasRevenueCatLifetimeAccess,
+  hasRevenueCatPurchaseHistory,
 } from "../../utils/billing/revenueCatCustomer";
 import { Snackbar } from "../ui/Snackbar";
 
@@ -91,19 +94,20 @@ export function RevenueCatSubscriptionCard({
   const productKey = getRevenueCatProductKey(
     getActiveRevenueCatProductId(customerInfo),
   );
-  const hasPurchaseHistory = Boolean(
-    customerInfo?.activeSubscriptions.length ||
-    customerInfo?.allPurchasedProductIdentifiers.length,
-  );
+  const hasPurchaseHistory = hasRevenueCatPurchaseHistory(customerInfo);
+  const hasActiveSubscription = hasActiveRevenueCatSubscription(customerInfo);
+  const hasLifetimeAccess = hasRevenueCatLifetimeAccess(customerInfo);
   const statusDescription = useMemo(() => {
     if (isPremium && productKey) {
-      return `${REVENUECAT_PRODUCT_LABELS[productKey]} access is active.`;
+      return hasLifetimeAccess
+        ? `${REVENUECAT_PRODUCT_LABELS[productKey]} gives this organization permanent access.`
+        : `${REVENUECAT_PRODUCT_LABELS[productKey]} access is active.`;
     }
     if (isPremium) {
       return `${activeTier === "all_in" ? "All-In" : "Tier 1"} access is active.`;
     }
     return "Choose Tier 1 or All-In access with secure in-app purchase.";
-  }, [activeTier, isPremium, productKey]);
+  }, [activeTier, hasLifetimeAccess, isPremium, productKey]);
 
   async function runAction(
     action: RevenueCatAction,
@@ -184,10 +188,18 @@ export function RevenueCatSubscriptionCard({
       {canManagePurchases ? (
         <>
           <ActionButton
-            busy={isLoading && !isReady}
+            busy={(isLoading && !isReady) || activeAction === "customer-center"}
             icon="credit-card"
-            label={isPremium ? "View premium options" : "View premium plans"}
-            onPress={onViewPlans}
+            label={
+              hasLifetimeAccess
+                ? "View purchase support"
+                : hasActiveSubscription
+                  ? "Manage subscription"
+                  : isPremium
+                    ? "Manage purchase"
+                    : "View premium plans"
+            }
+            onPress={isPremium ? openCustomerCenter : onViewPlans}
             primary
           />
 
@@ -200,7 +212,7 @@ export function RevenueCatSubscriptionCard({
                 onPress={restore}
               />
             </View>
-            {hasPurchaseHistory ? (
+            {hasPurchaseHistory && !isPremium ? (
               <View className="flex-1">
                 <ActionButton
                   busy={activeAction === "customer-center"}

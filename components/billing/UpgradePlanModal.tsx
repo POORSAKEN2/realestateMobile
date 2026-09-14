@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -13,18 +14,39 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "../../constants/colors";
 import type { RevenueCatProductKey } from "../../constants/revenueCat";
-import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
+import {
+  BILLING_ENTITLEMENT_QUERY_KEY,
+  useBillingEntitlement,
+} from "../../hooks/api/useBillingEntitlement";
 import { useRevenueCat } from "../../hooks/useRevenueCat";
 import type { PlanTier } from "../../types/domain/billing";
 import type {
   PlanChangePreview,
   SubscriptionTierKey,
 } from "../../types/domain/billing";
-import { fetchPlanChangePreview } from "../../api/billing";
+import {
+  fetchBillingEntitlement,
+  fetchPlanChangePreview,
+} from "../../api/billing";
 import { useAccess } from "../../hooks/auth/useAccess";
 import { blockerMessage } from "../../utils/billing/entitlementPresentation";
 import { effectiveSubscriptionTier } from "../../utils/billing/planCapabilities";
-import { getRevenueCatPackagesForTier } from "../../utils/billing/revenueCatCustomer";
+import { waitForBillingTier } from "../../utils/billing/billingSync";
+import {
+  FALLBACK_PLAN_TIERS,
+  formatRevenueCatPackagePrice,
+  getMissingBillingPeriodLabels,
+  getPlanTierFeatures,
+  getTierStorePriceLabel,
+} from "../../utils/billing/planCatalog";
+import {
+  getMissingRevenueCatProductKeys,
+  getRevenueCatPackagesForTier,
+  hasActiveRevenueCatSubscription,
+  hasRevenueCatLifetimeAccess,
+  hasRevenueCatPurchaseHistory,
+} from "../../utils/billing/revenueCatCustomer";
+import { LegalLink } from "../legal/LegalLink";
 import { ModalHeader } from "../ui/ModalHeader";
 import { RevenueCatPackagePicker } from "./RevenueCatPackagePicker";
 
@@ -48,14 +70,9 @@ type PlanCardProps = {
   isPending: boolean;
   disabled: boolean;
   onUpgrade: () => void;
+  priceLabel: string;
   tier: PlanTier;
 };
-
-const fallbackTiers: PlanTier[] = [
-  { key: "free", label: "Free Tier", property_limit: 2, price_php: 0 },
-  { key: "tier1", label: "Tier 1", property_limit: 5, price_php: 299.99 },
-  { key: "all_in", label: "All-In", property_limit: null, price_php: 1499.99 },
-];
 
 function PlanBadge({
   isCurrent,
@@ -98,8 +115,11 @@ function PlanCard({
   isPending,
   disabled,
   onUpgrade,
+  priceLabel,
   tier,
 }: PlanCardProps) {
+  const features = getPlanTierFeatures(tier);
+
   return (
     <View
       className={`relative overflow-hidden rounded-[28px] border p-5 shadow-sm shadow-primary/5 ${
@@ -122,35 +142,18 @@ function PlanCard({
           >
             {tier.label}
           </Text>
-          <View className="mt-1.5 flex-row items-baseline gap-1">
-            <Text className="font-ralewayExtraBold text-2xl text-primary">
-              {tier.price_php === 0
-                ? "Free"
-                : `₱${tier.price_php.toLocaleString("en-PH", {
-                    minimumFractionDigits: 2,
-                  })}`}
-            </Text>
-            {tier.price_php > 0 ? (
-              <Text className="font-ralewayMedium text-xs text-description">
-                / month
-              </Text>
-            ) : null}
-          </View>
+          <Text className="mt-1.5 font-ralewayExtraBold text-base text-primary">
+            {priceLabel}
+          </Text>
         </View>
 
         <PlanBadge isCurrent={isCurrent} isFeatured={isFeatured} />
       </View>
 
       <View className="mt-4 gap-2.5 border-t border-primary/10 pt-4">
-        <PlanFeature>
-          {tier.property_limit === null
-            ? "Unlimited managed properties"
-            : `Up to ${tier.property_limit} properties`}
-        </PlanFeature>
-        <PlanFeature>Floor plans and bedspace management</PlanFeature>
-        <PlanFeature>
-          Rent tracking, financial ledger, and analytics
-        </PlanFeature>
+        {features.map((feature) => (
+          <PlanFeature key={feature}>{feature}</PlanFeature>
+        ))}
       </View>
 
       {canUpgrade ? (
@@ -183,6 +186,7 @@ export function UpgradePlanModal({
   message,
   requiredTier,
 }: UpgradePlanModalProps) {
+  const queryClient = useQueryClient();
   const {
     data: entitlement,
     isFetching,
@@ -191,9 +195,13 @@ export function UpgradePlanModal({
   } = useBillingEntitlement();
   const { can } = useAccess();
   const {
+    customerInfo,
     isLoading: isRevenueCatLoading,
+    isPremium,
     packages,
+    presentCustomerCenter,
     purchasePackage,
+    refresh: refreshRevenueCat,
   } = useRevenueCat();
   const [pendingTierKey, setPendingTierKey] = useState<string | null>(null);
   const [preview, setPreview] = useState<{
@@ -202,6 +210,7 @@ export function UpgradePlanModal({
   } | null>(null);
   const [selectedProductKey, setSelectedProductKey] =
     useState<RevenueCatProductKey | null>(null);
+  const [isSynchronizing, setIsSynchronizing] = useState(false);
   const busy = useRef(false);
   useEffect(() => {
     if (!isVisible) {
@@ -209,8 +218,13 @@ export function UpgradePlanModal({
       setSelectedProductKey(null);
     }
   }, [isVisible]);
-  const tiers = entitlement?.tiers?.length ? entitlement.tiers : fallbackTiers;
+  const tiers = entitlement?.tiers?.length
+    ? entitlement.tiers
+    : FALLBACK_PLAN_TIERS;
   const currentTierKey = effectiveSubscriptionTier(entitlement);
+  const hasPurchaseHistory = hasRevenueCatPurchaseHistory(customerInfo);
+  const hasActiveSubscription = hasActiveRevenueCatSubscription(customerInfo);
+  const hasLifetimeAccess = hasRevenueCatLifetimeAccess(customerInfo);
   const selectedPaidTier =
     preview?.result.allowed &&
     (preview.tier === "tier1" || preview.tier === "all_in")
@@ -219,13 +233,27 @@ export function UpgradePlanModal({
   const packageOptions = useMemo(
     () =>
       selectedPaidTier
-        ? getRevenueCatPackagesForTier(packages, selectedPaidTier)
+        ? getRevenueCatPackagesForTier(packages, selectedPaidTier, {
+            includeLifetime: !hasPurchaseHistory,
+          })
         : [],
-    [packages, selectedPaidTier],
+    [hasPurchaseHistory, packages, selectedPaidTier],
   );
-  const selectedPackage = packageOptions.find(
+  const missingPeriodLabels = useMemo(
+    () =>
+      selectedPaidTier
+        ? getMissingBillingPeriodLabels(
+            getMissingRevenueCatProductKeys(packages, selectedPaidTier, {
+              includeLifetime: !hasPurchaseHistory,
+            }),
+          )
+        : [],
+    [hasPurchaseHistory, packages, selectedPaidTier],
+  );
+  const selectedOption = packageOptions.find(
     (option) => option.key === selectedProductKey,
-  )?.pkg;
+  );
+  const selectedPackage = selectedOption?.pkg;
 
   useEffect(() => {
     setSelectedProductKey((currentKey) =>
@@ -281,7 +309,29 @@ export function UpgradePlanModal({
       if (!latest.allowed) return;
       const purchased = await purchasePackage(selectedPackage);
       if (!purchased) return;
+      setIsSynchronizing(true);
+      const syncResult = await waitForBillingTier(
+        fetchBillingEntitlement,
+        preview.tier,
+      );
+      await refetch();
       onClose();
+      if (!syncResult.synchronized) {
+        console.warn("billing_entitlement_sync_pending", {
+          targetTier: preview.tier,
+        });
+        setTimeout(() => {
+          void queryClient.invalidateQueries({
+            queryKey: BILLING_ENTITLEMENT_QUERY_KEY,
+          });
+        }, 30_000);
+      }
+      Alert.alert(
+        "Purchase complete",
+        syncResult.synchronized
+          ? "Your organization access is active."
+          : "Your store purchase succeeded. Organization access is still syncing and will update automatically.",
+      );
     } catch (err) {
       Alert.alert(
         "Upgrade Plan",
@@ -289,7 +339,35 @@ export function UpgradePlanModal({
       );
     } finally {
       busy.current = false;
+      setIsSynchronizing(false);
       setPendingTierKey(null);
+    }
+  }
+
+  async function reloadPurchaseOptions() {
+    try {
+      await refreshRevenueCat();
+    } catch (err) {
+      Alert.alert(
+        "Purchase options unavailable",
+        err instanceof Error ? err.message : "Please try again.",
+      );
+    }
+  }
+
+  async function managePurchase() {
+    if (busy.current) return;
+    busy.current = true;
+    try {
+      await presentCustomerCenter();
+      await refetch();
+    } catch (err) {
+      Alert.alert(
+        "Subscription unavailable",
+        err instanceof Error ? err.message : "Please try again.",
+      );
+    } finally {
+      busy.current = false;
     }
   }
 
@@ -352,7 +430,32 @@ export function UpgradePlanModal({
               Ask your account owner to change the organization plan.
             </Text>
           )}
-          {preview && (
+          {isPremium && can("billing.checkout") ? (
+            <View className="gap-3 rounded-2xl bg-white p-4">
+              <Text className="font-ralewayBold text-textPrimary">
+                {hasLifetimeAccess
+                  ? "Lifetime access is active"
+                  : "Manage your active subscription"}
+              </Text>
+              <Text className="text-description">
+                {hasLifetimeAccess
+                  ? "This organization owns permanent access. No additional plan purchase is needed."
+                  : "Use RevenueCat Customer Center to change billing periods, switch tiers, cancel, or get billing support."}
+              </Text>
+              <TouchableOpacity
+                accessibilityRole="button"
+                className="rounded-2xl bg-primary p-4"
+                onPress={() => void managePurchase()}
+              >
+                <Text className="text-center font-ralewayBold text-white">
+                  {hasActiveSubscription
+                    ? "Open subscription management"
+                    : "Open purchase support"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+          {!isPremium && preview && (
             <View className="gap-3 rounded-2xl bg-white p-4">
               <Text className="font-ralewayBold text-textPrimary">
                 Plan change preview:{" "}
@@ -377,14 +480,16 @@ export function UpgradePlanModal({
                 <RevenueCatPackagePicker
                   disabled={pendingTierKey !== null}
                   isLoading={isRevenueCatLoading}
+                  missingPeriodLabels={missingPeriodLabels}
                   onSelect={setSelectedProductKey}
+                  onRetry={() => void reloadPurchaseOptions()}
                   options={packageOptions}
                   selectedKey={selectedProductKey}
                 />
               )}
               {selectedPaidTier &&
                 can("billing.checkout") &&
-                selectedPackage && (
+                selectedOption && (
                   <TouchableOpacity
                     accessibilityRole="button"
                     disabled={pendingTierKey !== null}
@@ -393,41 +498,73 @@ export function UpgradePlanModal({
                   >
                     <Text className="text-center font-ralewayBold text-white">
                       {pendingTierKey
-                        ? "Processing purchase…"
-                        : `Purchase ${selectedPackage.product.priceString}`}
+                        ? isSynchronizing
+                          ? "Activating organization access…"
+                          : "Processing purchase…"
+                        : `Purchase ${formatRevenueCatPackagePrice(selectedOption.key, selectedOption.pkg)}`}
                     </Text>
                   </TouchableOpacity>
                 )}
             </View>
           )}
-          {tiers.map((tier) => {
-            const isCurrent = currentTierKey === tier.key;
-            const isFeatured = tier.key === "all_in";
-            const normalizedTier = tier.key as SubscriptionTierKey;
-            const candidateRank = TIER_RANK[normalizedTier];
-            const canUpgrade =
-              can("billing.checkout") &&
-              typeof candidateRank === "number" &&
-              candidateRank > TIER_RANK[currentTierKey];
+          {!isPremium &&
+            tiers.map((tier) => {
+              const isCurrent = currentTierKey === tier.key;
+              const isFeatured = tier.key === "all_in";
+              const normalizedTier = tier.key as SubscriptionTierKey;
+              const candidateRank = TIER_RANK[normalizedTier];
+              const canUpgrade =
+                can("billing.checkout") &&
+                typeof candidateRank === "number" &&
+                candidateRank > TIER_RANK[currentTierKey];
 
-            return (
-              <PlanCard
-                canUpgrade={canUpgrade}
-                isCurrent={isCurrent}
-                isFeatured={isFeatured}
-                isPending={pendingTierKey === tier.key}
-                disabled={
-                  !entitlement ||
-                  isFetching ||
-                  isError ||
-                  pendingTierKey !== null
-                }
-                key={tier.key}
-                onUpgrade={() => handleUpgrade(tier.key)}
-                tier={tier}
-              />
-            );
-          })}
+              return (
+                <PlanCard
+                  canUpgrade={canUpgrade}
+                  isCurrent={isCurrent}
+                  isFeatured={isFeatured}
+                  isPending={pendingTierKey === tier.key}
+                  disabled={
+                    !entitlement ||
+                    isFetching ||
+                    isError ||
+                    pendingTierKey !== null
+                  }
+                  key={tier.key}
+                  onUpgrade={() => handleUpgrade(tier.key)}
+                  priceLabel={getTierStorePriceLabel(packages, tier)}
+                  tier={tier}
+                />
+              );
+            })}
+
+          <View className="gap-2 rounded-2xl border border-primary/15 bg-white p-4">
+            <Text className="font-ralewayBold text-xs text-textPrimary">
+              Purchase terms
+            </Text>
+            <Text className="font-ralewayMedium text-xs leading-5 text-description">
+              Monthly and yearly purchases renew automatically until canceled.
+              Charges use the price shown by the App Store or Google Play and
+              grant organization-wide access. Manage or cancel through Customer
+              Center. Lifetime purchases are one-time purchases for eligible new
+              customers.
+            </Text>
+            <Text className="font-ralewayMedium text-xs text-description">
+              <LegalLink
+                className="font-ralewayBold text-primary underline"
+                document="terms"
+              >
+                Terms of Service
+              </LegalLink>{" "}
+              ·{" "}
+              <LegalLink
+                className="font-ralewayBold text-primary underline"
+                document="privacy"
+              >
+                Privacy Policy
+              </LegalLink>
+            </Text>
+          </View>
         </ScrollView>
       </SafeAreaView>
     </Modal>

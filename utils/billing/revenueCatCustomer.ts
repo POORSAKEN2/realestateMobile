@@ -63,9 +63,45 @@ export function indexRevenueCatPackages(packages: PurchasesPackage[]) {
 export function getRevenueCatPackagesForTier(
   packages: Record<RevenueCatProductKey, PurchasesPackage | null>,
   tier: Exclude<SubscriptionTierKey, "free">,
+  options: { includeLifetime?: boolean } = {},
 ) {
+  const includeLifetime = options.includeLifetime ?? true;
+
   return REVENUECAT_PRODUCT_KEYS_BY_TIER[tier].flatMap((key) => {
+    if (!includeLifetime && key.endsWith("_lifetime")) return [];
     const pkg = packages[key];
     return pkg ? [{ key, pkg }] : [];
   });
+}
+
+export function getMissingRevenueCatProductKeys(
+  packages: Record<RevenueCatProductKey, PurchasesPackage | null>,
+  tier: Exclude<SubscriptionTierKey, "free">,
+  options: { includeLifetime?: boolean } = {},
+) {
+  const includeLifetime = options.includeLifetime ?? true;
+
+  return REVENUECAT_PRODUCT_KEYS_BY_TIER[tier].filter(
+    (key) => (includeLifetime || !key.endsWith("_lifetime")) && !packages[key],
+  );
+}
+
+export function hasRevenueCatPurchaseHistory(
+  customerInfo: CustomerInfo | null,
+) {
+  return Boolean(customerInfo?.allPurchasedProductIdentifiers.length);
+}
+
+export function hasActiveRevenueCatSubscription(
+  customerInfo: CustomerInfo | null,
+) {
+  return Boolean(customerInfo?.activeSubscriptions.length);
+}
+
+export function hasRevenueCatLifetimeAccess(customerInfo: CustomerInfo | null) {
+  return Boolean(
+    getRevenueCatProductKey(
+      getActiveRevenueCatProductId(customerInfo),
+    )?.endsWith("_lifetime"),
+  );
 }

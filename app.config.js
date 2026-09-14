@@ -1,4 +1,7 @@
+const { validateBillingEnvironment } = require("./config/billingEnvironment");
+
 module.exports = ({ config }) => {
+  validateBillingEnvironment(process.env);
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 
   return {
@@ -53,6 +56,7 @@ module.exports = ({ config }) => {
       ],
       "expo-notifications",
       "expo-secure-store",
+      "./plugins/withInAppPurchaseCapability",
     ],
     extra: {
       ...config.extra,

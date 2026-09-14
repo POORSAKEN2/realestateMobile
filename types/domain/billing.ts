@@ -47,7 +47,15 @@ export interface PlanTier {
   key: SubscriptionTierKey | string;
   label: string;
   property_limit: number | null; // null means unlimited
-  price_php: number;
+  /** Dormant web-checkout metadata. Native purchase UI uses store prices. */
+  price_php?: number | null;
+  capabilities?: Partial<Record<PlanCapabilityKey, boolean>>;
+  limits?: {
+    analytics_depth?: string | null;
+    reports_level?: string | null;
+    retention_days?: number | null;
+    support_level?: string | null;
+  };
 }
 
 export interface BillingEntitlement {
@@ -75,6 +83,6 @@ export interface BillingEntitlement {
   tier_label: string;
   property_limit: number | null;
   property_count: number;
-  price_php: number;
+  price_php?: number | null;
   tiers: PlanTier[];
 }
