@@ -12,6 +12,8 @@ import { REVENUECAT_PRODUCT_LABELS } from "../../constants/revenueCat";
 import { colors } from "../../constants/colors";
 import { useRevenueCat } from "../../hooks/useRevenueCat";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import type { BillingEntitlement } from "../../types/domain/billing";
+import { getBillingAccountState } from "../../utils/billing/billingAccountState";
 import {
   getActiveRevenueCatProductId,
   getRevenueCatProductKey,
@@ -71,10 +73,14 @@ function ActionButton({
 }
 
 export function RevenueCatSubscriptionCard({
+  accountEmail,
   canManagePurchases,
+  entitlement,
   onViewPlans,
 }: {
+  accountEmail?: string;
   canManagePurchases: boolean;
+  entitlement?: BillingEntitlement | null;
   onViewPlans: () => void;
 }) {
   const {
@@ -86,6 +92,7 @@ export function RevenueCatSubscriptionCard({
     isReady,
     presentCustomerCenter,
     restorePurchases,
+    serverSyncStatus,
   } = useRevenueCat();
   const snackbar = useSnackbar();
   const [activeAction, setActiveAction] = useState<RevenueCatAction | null>(
@@ -97,6 +104,10 @@ export function RevenueCatSubscriptionCard({
   const hasPurchaseHistory = hasRevenueCatPurchaseHistory(customerInfo);
   const hasActiveSubscription = hasActiveRevenueCatSubscription(customerInfo);
   const hasLifetimeAccess = hasRevenueCatLifetimeAccess(customerInfo);
+  const billingState = useMemo(
+    () => getBillingAccountState(entitlement, customerInfo),
+    [customerInfo, entitlement],
+  );
   const statusDescription = useMemo(() => {
     if (isPremium && productKey) {
       return hasLifetimeAccess
@@ -149,7 +160,7 @@ export function RevenueCatSubscriptionCard({
   }
 
   return (
-    <View className="gap-4 rounded-[28px] border border-primary/15 bg-white p-5 shadow-sm shadow-primary/5">
+    <View className="gap-4 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/5">
       <View className="flex-row items-start gap-3">
         <View className="h-10 w-10 items-center justify-center rounded-2xl bg-accent/30">
           <Feather name="star" color={colors.primary} size={19} />
@@ -157,7 +168,7 @@ export function RevenueCatSubscriptionCard({
         <View className="min-w-0 flex-1">
           <View className="flex-row items-center justify-between gap-2">
             <Text className="font-ralewayExtraBold text-base text-textPrimary">
-              Terrane subscription
+              Plan actions
             </Text>
             <View
               className={`rounded-full px-3 py-1 ${
@@ -169,15 +180,57 @@ export function RevenueCatSubscriptionCard({
                   isPremium ? "text-success" : "text-description"
                 }`}
               >
-                {isPremium ? "Active" : "Inactive"}
+                {billingState.syncRequired
+                  ? serverSyncStatus === "delayed"
+                    ? "Sync delayed"
+                    : "Syncing"
+                  : isPremium
+                    ? "Active"
+                    : "Inactive"}
               </Text>
             </View>
           </View>
           <Text className="mt-1 font-ralewayMedium text-xs leading-5 text-description">
+            {accountEmail ? `Signed in as ${accountEmail}. ` : ""}
             {statusDescription}
           </Text>
         </View>
       </View>
+
+      <View className="gap-2 rounded-2xl bg-surface p-4">
+        <View className="flex-row items-center justify-between gap-3">
+          <Text className="font-ralewayMedium text-xs text-description">
+            Server access
+          </Text>
+          <Text className="font-ralewayExtraBold text-sm text-textPrimary">
+            {billingState.serverLabel}
+          </Text>
+        </View>
+        <View className="flex-row items-center justify-between gap-3">
+          <Text className="font-ralewayMedium text-xs text-description">
+            Store purchase
+          </Text>
+          <Text className="max-w-[65%] text-right font-ralewayExtraBold text-sm text-primary">
+            {billingState.storeLabel}
+          </Text>
+        </View>
+      </View>
+
+      {billingState.syncRequired ? (
+        <View className="flex-row items-start gap-2 rounded-2xl bg-warningSurface p-4">
+          <Feather name="alert-circle" color={colors.danger} size={18} />
+          <Text
+            accessibilityRole="alert"
+            className="min-w-0 flex-1 text-xs leading-5 text-textPrimary"
+          >
+            Your store purchase is active, but protected app access still uses
+            the {billingState.serverLabel} plan.{" "}
+            {serverSyncStatus === "delayed"
+              ? "Immediate verification is delayed; webhook and scheduled retries remain active."
+              : "Server verification is running automatically; upgraded features unlock after it completes."}
+          </Text>
+        </View>
+      ) : null}
 
       {error ? (
         <Text accessibilityRole="alert" className="text-xs text-danger">
@@ -212,7 +265,7 @@ export function RevenueCatSubscriptionCard({
                 onPress={restore}
               />
             </View>
-            {hasPurchaseHistory && !isPremium ? (
+            {billingState.syncRequired || (hasPurchaseHistory && !isPremium) ? (
               <View className="flex-1">
                 <ActionButton
                   busy={activeAction === "customer-center"}

@@ -26,9 +26,13 @@ import {
   getPlanTierFeatures,
   getTierStorePriceLabel,
 } from "../../utils/billing/planCatalog";
+import { isAuthUser } from "../../utils/profile/profileForm";
 
 export default function BillingScreen() {
   const { session } = useAuth();
+  const accountEmail = isAuthUser(session?.user)
+    ? session.user.email?.trim()
+    : undefined;
   const canStartCheckout = hasAppPermission(session?.user, "billing.checkout");
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const { isPremium, packages, presentCustomerCenter } = useRevenueCat();
@@ -96,7 +100,9 @@ export default function BillingScreen() {
               </Text>
             </TouchableOpacity>
             <RevenueCatSubscriptionCard
+              accountEmail={accountEmail}
               canManagePurchases={canStartCheckout}
+              entitlement={entitlement}
               onViewPlans={() => setIsUpgradeModalOpen(true)}
             />
           </View>
@@ -187,7 +193,9 @@ export default function BillingScreen() {
 
               <EntitlementSummary entitlement={entitlement} />
               <RevenueCatSubscriptionCard
+                accountEmail={accountEmail}
                 canManagePurchases={canStartCheckout}
+                entitlement={entitlement}
                 onViewPlans={() => setIsUpgradeModalOpen(true)}
               />
               {/* Plan Catalog Grid */}

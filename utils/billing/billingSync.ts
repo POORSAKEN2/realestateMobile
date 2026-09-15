@@ -12,6 +12,8 @@ const TIER_RANK: Readonly<Record<SubscriptionTierKey, number>> = {
 
 const DEFAULT_DELAYS_MS = [0, 2_000, 4_000, 8_000, 8_000, 8_000] as const;
 
+export type BillingSyncStatus = "idle" | "syncing" | "synchronized" | "delayed";
+
 export function isBillingTierActivated(
   entitlement: BillingEntitlement | null,
   targetTier: Exclude<SubscriptionTierKey, "free">,
@@ -22,9 +24,9 @@ export function isBillingTierActivated(
   );
 }
 
-export async function waitForBillingTier(
-  fetchEntitlement: () => Promise<BillingEntitlement>,
-  targetTier: Exclude<SubscriptionTierKey, "free">,
+export async function reconcileBillingWithBackoff(
+  reconcile: () => Promise<BillingEntitlement>,
+  targetTier: SubscriptionTierKey,
   options: {
     delaysMs?: readonly number[];
     sleep?: (milliseconds: number) => Promise<void>;
@@ -36,20 +38,29 @@ export async function waitForBillingTier(
     ((milliseconds: number) =>
       new Promise<void>((resolve) => setTimeout(resolve, milliseconds)));
   let latest: BillingEntitlement | null = null;
+  let lastError: unknown = null;
 
   for (const delayMs of delaysMs) {
     if (delayMs > 0) await sleep(delayMs);
 
     try {
-      latest = await fetchEntitlement();
-      if (isBillingTierActivated(latest, targetTier)) {
-        return { entitlement: latest, synchronized: true } as const;
+      latest = await reconcile();
+      lastError = null;
+      if (targetTier === "free" || isBillingTierActivated(latest, targetTier)) {
+        return {
+          entitlement: latest,
+          error: null,
+          synchronized: true,
+        } as const;
       }
-    } catch {
-      // A store purchase remains successful even when the server is briefly
-      // unreachable. Continue the bounded retries, then show sync-pending UI.
+    } catch (cause) {
+      lastError = cause;
     }
   }
 
-  return { entitlement: latest, synchronized: false } as const;
+  return {
+    entitlement: latest,
+    error: lastError,
+    synchronized: false,
+  } as const;
 }

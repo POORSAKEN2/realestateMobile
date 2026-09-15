@@ -6,6 +6,7 @@ import load from "./helpers/loadTs.cjs";
 const {
   getActiveRevenueCatProductId,
   getActiveRevenueCatTier,
+  getRevenueCatEntitlementFingerprint,
   getMissingRevenueCatProductKeys,
   getRevenueCatPackagesForTier,
   getRevenueCatProductKey,
@@ -21,6 +22,7 @@ function customerInfo(active = {}) {
     entitlements: { active },
     activeSubscriptions: [],
     allPurchasedProductIdentifiers: [],
+    originalAppUserId: "tenant-1",
   };
 }
 
@@ -116,4 +118,34 @@ test("purchase history and active purchase type drive checkout eligibility", () 
   renewing.allPurchasedProductIdentifiers = ["all_in_monthly"];
   assert.equal(hasRevenueCatLifetimeAccess(renewing), false);
   assert.equal(hasActiveRevenueCatSubscription(renewing), true);
+});
+
+test("entitlement fingerprint changes only when server-relevant state changes", () => {
+  const first = customerInfo({
+    tier1_access: {
+      expirationDate: "2026-10-01T00:00:00Z",
+      productIdentifier: "tier1_monthly",
+      willRenew: true,
+    },
+  });
+  const duplicate = {
+    ...first,
+    requestDate: "2026-09-15T10:00:00Z",
+  };
+  const renewed = customerInfo({
+    tier1_access: {
+      expirationDate: "2026-11-01T00:00:00Z",
+      productIdentifier: "tier1_monthly",
+      willRenew: true,
+    },
+  });
+
+  assert.equal(
+    getRevenueCatEntitlementFingerprint(first),
+    getRevenueCatEntitlementFingerprint(duplicate),
+  );
+  assert.notEqual(
+    getRevenueCatEntitlementFingerprint(first),
+    getRevenueCatEntitlementFingerprint(renewed),
+  );
 });
