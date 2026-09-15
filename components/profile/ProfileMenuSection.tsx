@@ -40,9 +40,23 @@ function ProfileMenuRow({
         <Ionicons name={item.icon} color={colors.primary} size={22} />
       </View>
       <View className="ml-3 min-w-0 flex-1">
-        <Text className="font-ralewayMedium text-[15px] text-textPrimary">
-          {item.label}
-        </Text>
+        <View className="flex-row items-center gap-2">
+          <Text className="min-w-0 flex-1 font-ralewayBold text-[15px] text-textPrimary">
+            {item.label}
+          </Text>
+          {item.badge ? (
+            <View className="rounded-full bg-primary/10 px-2.5 py-1">
+              <Text className="font-ralewayBold text-[9px] uppercase text-primary">
+                {item.badge}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+        {item.supportingText ? (
+          <Text className="mt-1 font-ralewayMedium text-xs leading-4 text-description">
+            {item.supportingText}
+          </Text>
+        ) : null}
       </View>
       <Ionicons
         name={item.trailingIcon ?? "chevron-forward"}

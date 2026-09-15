@@ -29,3 +29,18 @@ export async function fetchBillingEntitlement(
 
   return unwrapData<BillingEntitlement>(response);
 }
+
+export async function reconcileBillingEntitlement(
+  accessToken?: string,
+): Promise<BillingEntitlement> {
+  return unwrapData(
+    await apiClient.post<ApiEnvelope<BillingEntitlement>>(
+      "/billing/reconcile",
+      undefined,
+      {
+        access: { permission: "billing.checkout" },
+        headers: authHeaders(accessToken),
+      },
+    ),
+  );
+}

@@ -146,7 +146,11 @@ export function PropertyDetailsModal({
       {property ? (
         <View
           className={`overflow-hidden bg-white ${showFullDetails ? "flex-1" : "rounded-t-[30px]"}`}
-          style={showFullDetails ? undefined : { maxHeight: height * 0.76 }}
+          style={
+            showFullDetails
+              ? { paddingTop: insets.top }
+              : { maxHeight: height * 0.76 }
+          }
         >
           <ScrollView
             bounces={false}
@@ -182,7 +186,7 @@ export function PropertyDetailsModal({
                 activeOpacity={0.78}
                 className={`absolute h-10 w-10 items-center justify-center rounded-full bg-textPrimary/45 ${showFullDetails ? "left-4" : "right-4"}`}
                 onPress={onClose}
-                style={{ top: showFullDetails ? insets.top + 8 : 16 }}
+                style={{ top: showFullDetails ? 8 : 16 }}
               >
                 <Feather
                   name={showFullDetails ? "arrow-left" : "x"}

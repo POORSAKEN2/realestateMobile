@@ -204,12 +204,13 @@ For optional HMAC verification, enable webhook signing and set
 `X-RevenueCat-Webhook-Signature` against the raw body with a five-minute default
 tolerance while continuing to require the Authorization value.
 
-The client and server both use `tier1_access` and `all_in_access`. RevenueCat
-webhooks are the normal asynchronous writer; scheduled server reconciliation
-remains the backstop. Client checkout does not call `POST /billing/reconcile`,
-so unavailable server reconciliation cannot turn a successful store purchase
-into a purchase error. Never grant sensitive server access solely from client
-CustomerInfo.
+The client and server both use `tier1_access` and `all_in_access`. Every
+authenticated CustomerInfo update triggers `POST /billing/reconcile`, so a
+successful Test Store or real-store purchase is verified immediately through
+RevenueCat's server API. RevenueCat webhooks remain the normal asynchronous
+writer and scheduled reconciliation remains the backstop. Immediate sync errors
+are logged and never turn a completed store transaction into a purchase failure.
+Never grant sensitive server access solely from client CustomerInfo.
 
 ## 8. Release checklist
 

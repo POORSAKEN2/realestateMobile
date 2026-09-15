@@ -105,3 +105,18 @@ export function hasRevenueCatLifetimeAccess(customerInfo: CustomerInfo | null) {
     )?.endsWith("_lifetime"),
   );
 }
+
+export function getRevenueCatEntitlementFingerprint(
+  customerInfo: CustomerInfo,
+) {
+  const activeEntitlements = Object.entries(customerInfo.entitlements.active)
+    .sort(([first], [second]) => first.localeCompare(second))
+    .map(([identifier, entitlement]) => [
+      identifier,
+      entitlement.productIdentifier,
+      entitlement.expirationDate,
+      entitlement.willRenew,
+    ]);
+
+  return JSON.stringify([customerInfo.originalAppUserId, activeEntitlements]);
+}

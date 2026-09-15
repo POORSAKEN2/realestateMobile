@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import Purchases, {
@@ -13,10 +14,15 @@ import Purchases, {
   type PurchasesPackage,
 } from "react-native-purchases";
 
+import { reconcileBillingEntitlement } from "../api/billing";
 import { BILLING_ENTITLEMENT_QUERY_KEY } from "../hooks/api/useBillingEntitlement";
 import { type RevenueCatProductKey } from "../constants/revenueCat";
 import { useAuth } from "../hooks/useAuth";
 import type { SubscriptionTierKey } from "../types/domain/billing";
+import {
+  type BillingSyncStatus,
+  reconcileBillingWithBackoff,
+} from "../utils/billing/billingSync";
 import {
   configureRevenueCat,
   getRevenueCatSnapshot,
@@ -28,6 +34,7 @@ import {
 } from "../services/billing/revenueCatClient";
 import { presentRevenueCatCustomerCenter } from "../services/billing/revenueCatUi";
 import {
+  getRevenueCatEntitlementFingerprint,
   hasRevenueCatPremium,
   getActiveRevenueCatTier,
   indexRevenueCatPackages,
@@ -51,6 +58,7 @@ type RevenueCatContextValue = {
   purchasePackage: (pkg: PurchasesPackage) => Promise<CustomerInfo | null>;
   refresh: () => Promise<CustomerInfo | null>;
   restorePurchases: () => Promise<CustomerInfo>;
+  serverSyncStatus: BillingSyncStatus;
 };
 
 export const RevenueCatContext = createContext<
@@ -84,20 +92,83 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isReady, setIsReady] = useState(false);
+  const [serverSyncStatus, setServerSyncStatus] =
+    useState<BillingSyncStatus>("idle");
+  const pendingServerTier = useRef<SubscriptionTierKey>("free");
+  const lastServerSyncFingerprint = useRef<string | null>(null);
+  const serverSyncRequestVersion = useRef(0);
+  const serverSyncWorker = useRef<Promise<void> | null>(null);
   const identity = useMemo(
     () => getRevenueCatIdentity(session?.user),
     [session?.user],
+  );
+
+  const synchronizeServerEntitlement = useCallback(
+    (nextCustomerInfo: CustomerInfo) => {
+      if (!identity?.appUserId) return;
+      const fingerprint = JSON.stringify([
+        identity.appUserId,
+        getRevenueCatEntitlementFingerprint(nextCustomerInfo),
+      ]);
+      if (lastServerSyncFingerprint.current === fingerprint) return;
+      lastServerSyncFingerprint.current = fingerprint;
+      pendingServerTier.current = getActiveRevenueCatTier(nextCustomerInfo);
+      serverSyncRequestVersion.current += 1;
+      if (serverSyncWorker.current) return;
+
+      const worker = async () => {
+        let handledVersion = 0;
+
+        while (handledVersion < serverSyncRequestVersion.current) {
+          handledVersion = serverSyncRequestVersion.current;
+          const targetTier = pendingServerTier.current;
+          setServerSyncStatus("syncing");
+          const result = await reconcileBillingWithBackoff(
+            reconcileBillingEntitlement,
+            targetTier,
+          );
+
+          if (result.entitlement) {
+            queryClient.setQueryData(
+              BILLING_ENTITLEMENT_QUERY_KEY,
+              result.entitlement,
+            );
+          }
+
+          if (result.synchronized) {
+            setServerSyncStatus("synchronized");
+            continue;
+          }
+
+          setServerSyncStatus("delayed");
+          console.warn("billing_entitlement_auto_sync_delayed", {
+            appUserId: identity.appUserId,
+            message:
+              result.error instanceof Error
+                ? result.error.message
+                : "RevenueCat has not confirmed the server entitlement yet",
+            targetTier,
+          });
+          void queryClient.invalidateQueries({
+            queryKey: BILLING_ENTITLEMENT_QUERY_KEY,
+          });
+        }
+      };
+
+      serverSyncWorker.current = worker().finally(() => {
+        serverSyncWorker.current = null;
+      });
+    },
+    [identity?.appUserId, queryClient],
   );
 
   const updateCustomerInfo = useCallback(
     (nextCustomerInfo: CustomerInfo) => {
       setCustomerInfo(nextCustomerInfo);
       setError(null);
-      void queryClient.invalidateQueries({
-        queryKey: BILLING_ENTITLEMENT_QUERY_KEY,
-      });
+      synchronizeServerEntitlement(nextCustomerInfo);
     },
-    [queryClient],
+    [synchronizeServerEntitlement],
   );
 
   const refresh = useCallback(async () => {
@@ -217,6 +288,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
         updateCustomerInfo(restored);
         return restored;
       },
+      serverSyncStatus,
     }),
     [
       customerInfo,
@@ -225,6 +297,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       isLoading,
       isReady,
       refresh,
+      serverSyncStatus,
       updateCustomerInfo,
     ],
   );

@@ -7,7 +7,9 @@ import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { useAuth } from "../../hooks/useAuth";
+import { useRevenueCat } from "../../hooks/useRevenueCat";
 import { hasAppPermission } from "../../utils/auth/accessPolicy";
+import { getBillingAccountState } from "../../utils/billing/billingAccountState";
 import { canManageStaff } from "../../utils/auth/staffAccess";
 import {
   formatRole,
@@ -43,9 +45,14 @@ export function ProfileMenuScreen() {
   const { data: entitlement } = useBillingEntitlement({
     enabled: Boolean(user),
   });
-  const planLabel = entitlement?.tier_label?.trim()
-    ? `${entitlement.tier_label.trim()} plan`
-    : undefined;
+  const { customerInfo, serverSyncStatus } = useRevenueCat();
+  const billingState = useMemo(
+    () => getBillingAccountState(entitlement, customerInfo),
+    [customerInfo, entitlement],
+  );
+  const planLabel = billingState.syncRequired
+    ? `${billingState.storeLabel} · ${serverSyncStatus === "delayed" ? "sync delayed" : "syncing"}`
+    : `${billingState.serverLabel} plan`;
   const showTeamAccess = canManageStaff(user);
   const canManageBilling = hasAppPermission(user, "billing.checkout");
 
@@ -73,18 +80,26 @@ export function ProfileMenuScreen() {
       },
       {
         accessibilityHint: "Opens subscription and billing information",
-        badge: canManageBilling ? undefined : "View only",
+        badge: billingState.syncRequired
+          ? serverSyncStatus === "delayed"
+            ? "Sync delayed"
+            : "Syncing"
+          : canManageBilling
+            ? billingState.serverLabel
+            : "View only",
         icon: "card-outline",
         label: "Plan & Billing",
         onPress: () => router.push(appRoutes.secondary.billing),
-        supportingText: canManageBilling
-          ? "View subscription and property limits"
-          : "View plan details; changes require an administrator",
+        supportingText: billingState.syncRequired
+          ? `${billingState.storeLabel} found; server verification ${serverSyncStatus === "delayed" ? "will retry automatically" : "is running automatically"}`
+          : canManageBilling
+            ? `${billingState.serverLabel} access · View limits and plan actions`
+            : `${billingState.serverLabel} access · Changes require an administrator`,
       },
     );
 
     return items;
-  }, [canManageBilling, showTeamAccess]);
+  }, [billingState, canManageBilling, serverSyncStatus, showTeamAccess]);
   const supportItems = useMemo<ProfileMenuItem[]>(
     () => [
       {
