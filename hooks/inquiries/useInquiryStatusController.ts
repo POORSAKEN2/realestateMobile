@@ -46,7 +46,7 @@ export function useInquiryStatusController() {
     if (can("billing.checkout")) {
       setUpgradeVisible(true);
     } else {
-      snackbar.show("Tier 1 is required. Ask your account owner to upgrade.");
+      snackbar.show("Account access is unavailable. Ask your account owner to review billing.");
     }
     return false;
   }

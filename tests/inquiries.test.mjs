@@ -80,11 +80,11 @@ test("query builder sends inquiry, search, property, page, and legacy status", (
   assert.equal(params.get("page"), "3");
 });
 
-test("inquiry status management follows effective plan", () => {
+test("inquiry workflow requires verified metadata without a commercial gate", () => {
   assert.equal(hasInquiryWorkflowAccess(), false);
   assert.equal(
     hasInquiryWorkflowAccess({ tier: "tier1", effective_tier: "free" }),
-    false,
+    true,
   );
   assert.equal(hasInquiryWorkflowAccess({ tier: "tier1" }), true);
   assert.equal(hasInquiryWorkflowAccess({ tier: "all_in" }), true);

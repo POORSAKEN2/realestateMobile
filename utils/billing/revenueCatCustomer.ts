@@ -15,11 +15,8 @@ export function hasRevenueCatPremium(customerInfo: CustomerInfo | null) {
 export function getActiveRevenueCatTier(
   customerInfo: CustomerInfo | null,
 ): SubscriptionTierKey {
-  if (customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS.all_in]) {
-    return "all_in";
-  }
-  if (customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS.tier1]) {
-    return "tier1";
+  for (const tier of ["portfolio", "professional", "starter", "all_in", "tier1"] as const) {
+    if (customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS[tier]]) return tier;
   }
   return "free";
 }

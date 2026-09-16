@@ -46,12 +46,6 @@ import { ModalHeader } from "../ui/ModalHeader";
 import { RevenueCatPackagePicker } from "./RevenueCatPackagePicker";
 import { RevenueCatPurchaseSummaryCard } from "./RevenueCatPurchaseSummaryCard";
 
-const TIER_RANK: Readonly<Record<string, number>> = {
-  free: 0,
-  tier1: 1,
-  all_in: 2,
-};
-
 type UpgradePlanModalProps = {
   isVisible: boolean;
   onClose: () => void;
@@ -231,8 +225,8 @@ export function UpgradePlanModal({
   const hasLifetimeAccess = hasRevenueCatLifetimeAccess(customerInfo);
   const selectedPaidTier =
     preview?.result.allowed &&
-    (preview.tier === "tier1" || preview.tier === "all_in")
-      ? preview.tier
+    (["starter", "professional", "portfolio"].includes(preview.tier))
+      ? preview.tier as "starter" | "professional" | "portfolio"
       : null;
   const packageOptions = useMemo(
     () =>
@@ -296,7 +290,7 @@ export function UpgradePlanModal({
       isError
     )
       return;
-    if (!["free", "tier1", "all_in"].includes(tierKey)) return;
+    if (!["starter", "professional", "portfolio"].includes(tierKey)) return;
     busy.current = true;
     setPendingTierKey(tierKey);
     try {
@@ -340,7 +334,7 @@ export function UpgradePlanModal({
       if (!summary) {
         Alert.alert(
           "Purchase complete",
-          "Your transaction succeeded and organization access is activating automatically.",
+          "Store purchase complete. Server access is being checked.",
         );
         onClose();
         return;
@@ -473,7 +467,7 @@ export function UpgradePlanModal({
                   </Text>
                   <Text className="text-description">
                     {hasLifetimeAccess
-                      ? "This organization owns permanent access. No additional plan purchase is needed."
+                      ? "This organization owns grandfathered lifetime access. Review any new plan limits before changing plans."
                       : "Use RevenueCat Customer Center to change billing periods, switch tiers, cancel, or get billing support."}
                   </Text>
                   <TouchableOpacity
@@ -489,13 +483,14 @@ export function UpgradePlanModal({
                   </TouchableOpacity>
                 </View>
               ) : null}
-              {!isPremium && preview && (
+              {preview && (
                 <View className="gap-3 rounded-2xl bg-white p-4">
                   <Text className="font-ralewayBold text-textPrimary">
                     Plan change preview:{" "}
                     {tiers.find((tier) => tier.key === preview.tier)?.label ??
                       preview.tier}
                   </Text>
+                  {entitlement?.entitlement_source === "legacy" && <Text className="text-description">A new purchase uses this plan's quotas. Your grandfathered ownership remains preserved.</Text>}
                   {preview.result.blockers.map((blocker) => (
                     <Text
                       key={blocker.dimension}
@@ -539,16 +534,12 @@ export function UpgradePlanModal({
                     )}
                 </View>
               )}
-              {!isPremium &&
-                tiers.map((tier) => {
-                  const isCurrent = currentTierKey === tier.key;
-                  const isFeatured = tier.key === "all_in";
-                  const normalizedTier = tier.key as SubscriptionTierKey;
-                  const candidateRank = TIER_RANK[normalizedTier];
-                  const canUpgrade =
-                    can("billing.checkout") &&
-                    typeof candidateRank === "number" &&
-                    candidateRank > TIER_RANK[currentTierKey];
+              {tiers.map((tier) => {
+                  const isCurrent = currentTierKey === tier.key && entitlement?.entitlement_source !== "trial" && entitlement?.access_mode !== "read_only";
+                  const isFeatured = tier.key === "professional";
+                  const canUpgrade = can("billing.checkout") &&
+                    ["starter", "professional", "portfolio"].includes(tier.key) &&
+                    (!isCurrent || entitlement?.entitlement_source === "trial" || entitlement?.access_mode === "read_only");
 
                   return (
                     <PlanCard
@@ -578,8 +569,7 @@ export function UpgradePlanModal({
                   Monthly and yearly purchases renew automatically until
                   canceled. Charges use the price shown by the App Store or
                   Google Play and grant organization-wide access. Manage or
-                  cancel through Customer Center. Lifetime purchases are
-                  one-time purchases for eligible new customers.
+                  cancel through Customer Center. Existing lifetime ownership is preserved; new lifetime purchases are unavailable.
                 </Text>
                 <Text className="font-ralewayMedium text-xs text-description">
                   <LegalLink

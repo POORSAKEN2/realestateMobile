@@ -23,7 +23,7 @@ import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
 import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
 import { colors } from "../../constants/colors";
-import { shareFinancialSummaryCsv } from "../../api/reports";
+import { shareFinancialSummaryCsv, shareFinancialSummaryPdf } from "../../api/reports";
 import {
   hasAnalyticsDepth,
   retentionDescription,
@@ -555,7 +555,7 @@ export default function AnalyticsScreen() {
                       Historical analytics
                     </Text>
                     <Text className="mt-1 text-xs leading-5 text-description">
-                      Current-period metrics remain available. Upgrade to Tier 1 for portfolio history.
+                      Current-period metrics remain available. View plans with portfolio history.
                     </Text>
                   </View>
                 </View>
@@ -574,7 +574,7 @@ export default function AnalyticsScreen() {
                       Advanced portfolio distribution
                     </Text>
                     <Text className="mt-1 text-xs leading-5 text-description">
-                      Upgrade to All-In for asset-mix analytics.
+                      View plans with full analytics for asset-mix insights.
                     </Text>
                   </View>
                 </View>
@@ -584,7 +584,7 @@ export default function AnalyticsScreen() {
                   onPress={() => setUpgradeVisible(true)}
                 >
                   <Text className="text-center font-ralewayBold text-sm text-white">
-                    View All-In
+                    View plans
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -612,7 +612,7 @@ export default function AnalyticsScreen() {
                   className="flex-1 h-12 flex-row items-center justify-center rounded-2xl bg-primary"
                   onPress={async () => {
                     try {
-                      await shareFinancialSummaryCsv();
+                      await shareFinancialSummaryCsv(undefined, accessToken);
                     } catch (err) {
                       Alert.alert(
                         "Export Failed",
@@ -630,15 +630,16 @@ export default function AnalyticsScreen() {
                 <TouchableOpacity
                   activeOpacity={0.8}
                   className="h-12 px-4 flex-row items-center justify-center rounded-2xl border border-primary/20 bg-primary/5"
-                  onPress={() => {
-                    Alert.alert(
-                      "PDF Export Notice",
-                      "PDF report generator is being provisioned. Please use the server-reconciled CSV format.",
-                    );
+                  onPress={async () => {
+                    try {
+                      await shareFinancialSummaryPdf(undefined, accessToken);
+                    } catch (err) {
+                      Alert.alert("Export Failed", err instanceof Error ? err.message : "Could not export report.");
+                    }
                   }}
                 >
                   <Text className="font-ralewayBold text-xs text-primary">
-                    PDF Notice
+                    Export PDF
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -648,7 +649,7 @@ export default function AnalyticsScreen() {
       </PullToRefreshScrollView>
       <UpgradePlanModal
         isVisible={isUpgradeVisible}
-        message="All-In is required for advanced portfolio analytics."
+        message="View plans with full portfolio analytics."
         onClose={() => setUpgradeVisible(false)}
         requiredTier={requiredTierForCapability(
           "advanced_analytics",

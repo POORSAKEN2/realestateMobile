@@ -41,6 +41,7 @@ function details(payload: StaffManagerDetails, contract: StaffApiContract) {
 }
 export function createHttpStaffGateway(transport: StaffTransport, contract: StaffApiContract): StaffGateway {
   return {
+    billing: async (token) => unwrap(await transport.get("/billing/entitlement", token)),
     creationMode: contract.creationMode,
     supportsAssignments: contract.supportsAssignments,
     supportsPermissions: contract.supportsPermissions,

@@ -114,9 +114,9 @@ export default function InquiryDetailsScreen() {
 
       <UpgradePlanModal
         isVisible={statusController.isUpgradeVisible}
-        message="Tier 1 or All-In is required to update inquiry status."
+        message="Check your account's subscription access to resume inquiry changes."
         onClose={statusController.closeUpgrade}
-        requiredTier="tier1"
+        requiredTier="starter"
       />
       <ScreenSnackbar
         message={statusController.snackbar.message}

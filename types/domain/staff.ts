@@ -1,3 +1,4 @@
+import type { BillingEntitlement } from "./billing";
 export type StaffManagerStatus = "active" | "invited" | "disabled" | "unknown";
 export type StaffManager = {
   id: string;
@@ -24,6 +25,7 @@ export interface StaffGateway {
   supportsAssignments: boolean;
   supportsPermissions: boolean;
   create(payload: CreateStaffManagerPayload, token?: string): Promise<StaffManager>;
+  billing?(token?: string): Promise<BillingEntitlement>;
   list?(token?: string): Promise<StaffRoster>;
   update?(id: string, payload: StaffManagerDetails, token?: string): Promise<StaffManager>;
   setEnabled?(id: string, enabled: boolean, token?: string): Promise<StaffManager>;

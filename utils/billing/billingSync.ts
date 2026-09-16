@@ -5,6 +5,7 @@ import type {
 import { effectiveSubscriptionTier } from "./planCapabilities";
 
 const TIER_RANK: Readonly<Record<SubscriptionTierKey, number>> = {
+  starter: 1, professional: 2, portfolio: 3,
   free: 0,
   tier1: 1,
   all_in: 2,
@@ -19,6 +20,10 @@ export function isBillingTierActivated(
   targetTier: Exclude<SubscriptionTierKey, "free">,
 ) {
   if (!entitlement) return false;
+  if (entitlement.access_mode === "read_only" || entitlement.entitlement_source === "trial") return false;
+  const current = effectiveSubscriptionTier(entitlement);
+  const newPlans = ["starter", "professional", "portfolio"];
+  if (newPlans.includes(current) !== newPlans.includes(targetTier)) return false;
   return (
     TIER_RANK[effectiveSubscriptionTier(entitlement)] >= TIER_RANK[targetTier]
   );

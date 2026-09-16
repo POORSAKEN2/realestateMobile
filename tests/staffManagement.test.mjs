@@ -14,6 +14,7 @@ function fixture() {
   const gateway = {
     creationMode: 'account', supportsAssignments: true, supportsPermissions: true,
     create: async (...args) => { calls.push(['create', ...args]); return manager; },
+    billing: async () => ({ access_mode: 'active', limits: { users: { used: 2, limit: 3, unlimited: false } } }),
     list: async () => ({ managers: [manager], total: 1, complete: true }),
     update: async (...args) => { calls.push(['update', ...args]); return manager; },
     setEnabled: async (...args) => { calls.push(['setEnabled', ...args]); return manager; },
@@ -34,18 +35,19 @@ test('owner workflows dispatch through injected gateway', async () => {
   await service.create(details); await service.update('m1', details); await service.setEnabled('m1', false); await service.remove('m1');
   assert.deepEqual(calls.map(call => call[0]), ['create', 'update', 'setEnabled', 'remove']);
 });
-test('fresh server count blocks creation even when cached count is below two', async () => {
-  const { gateway, calls } = fixture(); gateway.list = async () => ({ managers: [], total: 2, complete: false });
-  await assert.rejects(() => createStaffService(gateway, () => owner).create(details, { managers: [], total: 0, complete: true }), /maximum 2/);
-  assert.deepEqual(calls, []); assert.equal(canAddManager({ total: 2 }), false);
+test('fresh server usage blocks creation despite available roster places', async () => {
+  const { gateway, calls } = fixture(); gateway.billing = async () => ({ access_mode: 'active', limits: { users: { used: 5, limit: 5 } } });
+  await assert.rejects(() => createStaffService(gateway, () => owner).create(details, { managers: [], total: 0, complete: true }), /User limit reached/);
+  assert.deepEqual(calls, []); assert.equal(canAddManager({ limits: { users: { used: 5, limit: 5 } } }), false);
 });
 test('disabled and pending managers still consume the limit', () => {
   const roster = normalizeStaffRoster({ data: [manager, { ...manager, id: 'm2', status: 'disabled' }] });
-  assert.equal(canAddManager(roster), false);
+  assert.equal(roster.total, 2);
+  assert.equal(canAddManager({ access_mode: 'active', limits: { users: { used: 3, limit: 3 } } }), false);
 });
 test('revoked owner permission during count refresh prevents creation', async () => {
   const { gateway, calls } = fixture(); let access = owner;
-  gateway.list = async () => { access = normalizeAccess({ role: 'MANAGER' }); return { managers: [], total: 0, complete: true }; };
+  gateway.billing = async () => { access = normalizeAccess({ role: 'MANAGER' }); return { managers: [], total: 0, complete: true }; };
   await assert.rejects(() => createStaffService(gateway, () => access).create(details), /Only account owners/);
   assert.deepEqual(calls, []);
 });
@@ -95,4 +97,12 @@ test('backend staff contract supports lifecycle, assignment and permission paylo
   assert.deepEqual(calls[1][2].assigned_property_ids, ['p1']);
   assert.deepEqual(calls[2][2].permissions, []);
   assert.deepEqual(calls[3][2], { is_active: false });
+});
+
+test('user limits follow server metadata and fail closed while unavailable or read only', () => {
+  assert.equal(canAddManager(), false);
+  assert.equal(canAddManager({ limits: { users: { used: 1, limit: 1 } } }), false);
+  assert.equal(canAddManager({ limits: { users: { used: 4, limit: 5 } } }), true);
+  assert.equal(canAddManager({ limits: { users: { used: 14, limit: 15 } } }), true);
+  assert.equal(canAddManager({ access_mode: 'read_only', limits: { users: { used: 1, limit: 5 } } }), false);
 });

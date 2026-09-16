@@ -5,6 +5,7 @@ import type {
 } from "../../types/domain/billing";
 
 const TIER_RANK: Readonly<Record<SubscriptionTierKey, number>> = {
+  starter: 1, professional: 2, portfolio: 3,
   free: 0,
   tier1: 1,
   all_in: 2,
@@ -13,14 +14,14 @@ const TIER_RANK: Readonly<Record<SubscriptionTierKey, number>> = {
 const FALLBACK_REQUIREMENTS: Readonly<
   Record<PlanCapabilityKey, SubscriptionTierKey>
 > = {
-  inquiry_actions: "tier1",
-  notifications: "tier1",
-  reminders: "all_in",
-  advanced_analytics: "all_in",
+  inquiry_actions: "starter",
+  notifications: "starter",
+  reminders: "starter",
+  advanced_analytics: "starter",
 };
 
 function normalizeTier(value?: string): SubscriptionTierKey {
-  return value === "tier1" || value === "all_in" ? value : "free";
+  return value && value in TIER_RANK ? value as SubscriptionTierKey : "free";
 }
 
 export function effectiveSubscriptionTier(
@@ -46,11 +47,11 @@ export function hasPlanCapability(
   if (!entitlement) return false;
   if (entitlement.gating_enabled === false) return true;
 
+  if (capability !== "advanced_analytics") return true;
   const serverCapability = entitlement.capabilities?.[capability];
   if (serverCapability) return serverCapability.enabled;
 
-  return (
-    TIER_RANK[effectiveSubscriptionTier(entitlement)] >=
-    TIER_RANK[FALLBACK_REQUIREMENTS[capability]]
+  return ["all_in", "starter", "professional", "portfolio"].includes(
+    effectiveSubscriptionTier(entitlement),
   );
 }

@@ -11,6 +11,7 @@ import {
 } from "./revenueCatCustomer";
 
 const TIER_LABELS = {
+  starter: "Starter", professional: "Professional", portfolio: "Portfolio",
   free: "Free",
   tier1: "Tier 1",
   all_in: "All-In",

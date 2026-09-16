@@ -39,6 +39,7 @@ export type RevenueCatPurchaseSummary = {
 };
 
 const PLAN_LABELS: Record<PaidSubscriptionTier, string> = {
+  starter: "Starter", professional: "Professional", portfolio: "Portfolio",
   tier1: "Tier 1",
   all_in: "All-In",
 };
@@ -123,7 +124,10 @@ function accessDateLabel(
 function tierForProduct(
   productKey: RevenueCatProductKey,
 ): PaidSubscriptionTier {
-  return productKey.startsWith("all_in_") ? "all_in" : "tier1";
+  for (const tier of ["starter", "professional", "portfolio", "all_in", "tier1"] as const) {
+    if (productKey.startsWith(`${tier}_`)) return tier;
+  }
+  throw new Error("Unknown purchased product.");
 }
 
 export function getRevenueCatPurchaseSummary(

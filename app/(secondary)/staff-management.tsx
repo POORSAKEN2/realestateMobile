@@ -8,7 +8,7 @@ import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
 import { useStaffManagement } from "../../hooks/api/useStaffManagement";
-import { canAddManager, MAX_MANAGERS } from "../../services/staff/staffService";
+import { canAddManager } from "../../services/staff/staffService";
 import { appRoutes } from "../../constants/navigation";
 import type { StaffManager } from "../../types/domain/staff";
 
@@ -19,7 +19,9 @@ export default function StaffManagementScreen() {
   const [error, setError] = useState("");
   const busy = staff.remove.isPending || staff.setEnabled.isPending;
   const rosterAvailable = Boolean(staff.gateway.list);
-  const limitReached = !canAddManager(staff.roster.data);
+  const users = staff.entitlement.data?.limits?.users;
+  const readOnly = staff.entitlement.data?.access_mode === "read_only";
+  const limitReached = !canAddManager(staff.entitlement.data);
   const enabling = confirmation?.action === "toggle" && confirmation.manager.status === "disabled";
   const actionLabel = confirmation?.action === "remove" ? "Remove" : enabling ? "Enable" : "Disable";
   async function confirm() {
@@ -36,28 +38,28 @@ export default function StaffManagementScreen() {
     <ScrollView className="mt-6" contentContainerClassName="gap-4 pb-8">
       <View className="gap-2 rounded-3xl bg-white p-5">
         <Text className="font-ralewayExtraBold text-xl">Property managers</Text>
-        <Text className="text-description">{staff.roster.data ? `${staff.roster.data.total} of ${MAX_MANAGERS} manager accounts` : `Up to ${MAX_MANAGERS} manager accounts`}</Text>
-        <Text className="text-description">Invited and disabled accounts count toward the limit. Remove an account to free a place.</Text>
+        <Text className="text-description">{users ? `${users.used} of ${users.limit === null ? "unlimited" : users.limit} user accounts` : "Loading account limit…"}</Text>
+        <Text className="text-description">The owner and disabled manager accounts count toward the limit. Remove an account to free a place.</Text>
       </View>
-      {(error || staff.roster.error) && <Text accessibilityRole="alert" className="rounded-2xl bg-dangerSurface p-4 text-danger">{error || staff.roster.error?.message}</Text>}
+      {(error || staff.roster.error || staff.entitlement.error) && <Text accessibilityRole="alert" className="rounded-2xl bg-dangerSurface p-4 text-danger">{error || staff.roster.error?.message || staff.entitlement.error?.message}</Text>}
       {notice ? <Text accessibilityRole="alert" className="rounded-2xl bg-successSurface p-4 text-description">{notice}</Text> : null}
       {rosterAvailable ? <>
-        <StaffActionButton label="Refresh managers" pending={staff.roster.isFetching} onPress={() => void staff.roster.refetch()} />
+        <StaffActionButton label="Refresh managers" pending={staff.roster.isFetching} onPress={() => { void staff.roster.refetch(); void staff.entitlement.refetch(); }} />
         {staff.roster.isPending ? <Text>Loading managers…</Text> : staff.roster.data?.managers.map((manager) =>
-          <StaffManagerCard key={manager.id} manager={manager} gateway={staff.gateway} busy={busy}
+          <StaffManagerCard key={manager.id} manager={manager} gateway={staff.gateway} busy={busy || readOnly}
             onEdit={() => router.push({ pathname: appRoutes.secondary.staffManagerForm, params: { managerId: manager.id } })}
             onToggle={() => setConfirmation({ manager, action: "toggle" })} onRemove={() => setConfirmation({ manager, action: "remove" })} />)}
         {staff.roster.data?.total === 0 && <Text className="text-description">No managers yet. Add someone to help manage your properties.</Text>}
         {staff.roster.data && !staff.roster.data.complete && <Text className="text-description">Some managers are not included in this list. The account total still applies to the limit.</Text>}
       </> : <Text className="rounded-2xl bg-warningSurface p-4 text-description">Your account supports manager creation. Viewing and changing existing managers is not available yet.</Text>}
-      {limitReached && <Text accessibilityRole="alert" className="text-description">Two-manager limit reached. Remove a manager before adding another.</Text>}
+      {limitReached && <Text accessibilityRole="alert" className="text-description">{readOnly ? "Subscription inactive. Subscribe to resume staff changes." : users ? "User limit reached. Remove a manager or change plans before adding another." : "Account limits must be verified before adding a manager."}</Text>}
       <StaffActionButton label={staff.gateway.creationMode === "invitation" ? "Invite manager" : "Create manager"}
         disabled={limitReached || busy || rosterAvailable && (staff.roster.isPending || staff.roster.isError)}
         onPress={() => router.push(appRoutes.secondary.staffManagerForm)} />
     </ScrollView>
     <ConfirmationModal visible={Boolean(confirmation)} title={`${actionLabel} manager?`} confirmLabel={actionLabel} isPending={busy}
       description={confirmation?.action === "remove" ? `Remove ${confirmation.manager.name} from your staff? They will lose manager access.` : enabling
-        ? `Restore ${confirmation?.manager.name}'s manager access?` : `Disable ${confirmation?.manager.name}'s manager access? Their account will still count toward the two-manager limit.`}
+        ? `Restore ${confirmation?.manager.name}'s manager access?` : `Disable ${confirmation?.manager.name}'s manager access? Their account will still count toward the plan user limit.`}
       onCancel={() => { if (!busy) setConfirmation(null); }} onConfirm={() => void confirm()} />
   </Screen>;
 }
