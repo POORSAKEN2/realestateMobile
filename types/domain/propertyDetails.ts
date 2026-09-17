@@ -9,6 +9,7 @@ export type Lessee = {
   name: string;
   contactEmail: string;
   phone: string;
+  propertyIds?: string[];
 };
 
 export type Lease = {
@@ -105,4 +106,5 @@ export type LesseePayload = {
   name: string;
   contactEmail: string;
   phone: string;
+  propertyIds?: string[];
 };

@@ -12,11 +12,11 @@ function firstParam(value?: string | string[]) {
 
 export default function StaffManagerCreatedScreen() {
   const params = useLocalSearchParams<{
-    mode?: string | string[];
+    deliveryStatus?: string | string[];
     managerEmail?: string | string[];
     managerName?: string | string[];
   }>();
-  const invited = firstParam(params.mode) === "invitation";
+  const deliveryStatus = firstParam(params.deliveryStatus) ?? "queued";
   const managerName = firstParam(params.managerName) ?? "Manager";
   const managerEmail = firstParam(params.managerEmail) ?? "";
 
@@ -28,10 +28,16 @@ export default function StaffManagerCreatedScreen() {
             <Ionicons name="checkmark" color={colors.success} size={48} />
           </View>
           <Text className="mt-7 text-center font-ralewayExtraBold text-[30px] text-textPrimary">
-            {invited ? "Invitation sent" : "Manager created"}
+            {deliveryStatus === "failed"
+              ? "Invitation saved"
+              : deliveryStatus === "sent"
+                ? "Invitation sent"
+                : "Invitation queued"}
           </Text>
           <Text className="mt-3 max-w-[320px] text-center text-base leading-6 text-description">
-            {invited ? `${managerName} will receive an invitation to join your staff.` : `${managerName} can now sign in using the account credentials you created.`}
+            {deliveryStatus === "failed"
+              ? `${managerName}'s details were saved, but delivery failed. Resend it from Staff management.`
+              : `${managerName} will receive an invitation to join your staff.`}
           </Text>
         </View>
 
@@ -78,7 +84,8 @@ export default function StaffManagerCreatedScreen() {
             size={20}
           />
           <Text className="ml-3 flex-1 text-sm leading-6 text-description">
-            {invited ? "Access begins after the manager accepts the invitation." : "Send the temporary password through a secure channel. It is not included on this screen."}
+            Access begins after the manager accepts the invitation. Pending
+            invitations reserve staff capacity.
           </Text>
         </View>
 

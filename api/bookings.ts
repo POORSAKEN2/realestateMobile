@@ -142,7 +142,10 @@ export function findTransientBookingConflict({
 export async function fetchTransientBookings(accessToken?: string) {
   const response = await apiClient.get<
     ApiEnvelope<Record<string, any>[]> | Record<string, any>[]
-  >("/leases?type=Transient", { headers: authHeaders(accessToken), access: { permission: "bookings.viewAny" } });
+  >("/leases?type=Transient", {
+    headers: authHeaders(accessToken),
+    access: { permission: "bookings.viewAny" },
+  });
 
   return unwrapCollection(response).map(normalizeBooking);
 }
@@ -174,6 +177,7 @@ export async function createTransientBooking(
         name: payload.guestName,
         contactEmail: payload.guestEmail,
         phone: payload.guestPhone,
+        propertyIds: [payload.propertyId],
       },
       accessToken,
     ));
@@ -209,7 +213,10 @@ export async function updateTransientBooking(
       notes: payload.notes,
       _method: "PUT",
     },
-    { headers: authHeaders(accessToken), access: { permission: "bookings.update" } },
+    {
+      headers: authHeaders(accessToken),
+      access: { permission: "bookings.update" },
+    },
   );
 
   return normalizeBooking(unwrapData(response));
@@ -221,7 +228,10 @@ export async function cancelTransientBooking(id: string, accessToken?: string) {
   >(
     `/leases/${id}?_method=PUT`,
     { status: "Terminated", _method: "PUT" },
-    { headers: authHeaders(accessToken), access: { permission: "bookings.update" } },
+    {
+      headers: authHeaders(accessToken),
+      access: { permission: "bookings.update" },
+    },
   );
 
   return normalizeBooking(unwrapData(response));

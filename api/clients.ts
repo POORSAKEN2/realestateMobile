@@ -11,6 +11,9 @@ export function normalizeClient(client: Record<string, any>): Lessee {
       client?.contactEmail ?? client?.contact_email ?? client?.domain ?? "",
     ),
     phone: String(client?.phone ?? client?.contact_number ?? ""),
+    propertyIds: Array.isArray(client?.property_ids)
+      ? client.property_ids.map(String)
+      : [],
   };
 }
 
@@ -21,11 +24,14 @@ export async function fetchClients(accessToken?: string) {
   return unwrapCollection(response).map(normalizeClient);
 }
 
-function toApiPayload(payload: LesseePayload) {
+function toApiPayload(payload: LesseePayload, includeProperties = false) {
   return {
     name: payload.name,
     contact_email: payload.contactEmail,
     phone: payload.phone,
+    ...(includeProperties && payload.propertyIds?.length
+      ? { property_ids: payload.propertyIds }
+      : {}),
   };
 }
 
@@ -35,7 +41,9 @@ export async function createClient(
 ) {
   const response = await apiClient.post<
     ApiEnvelope<Record<string, any>> | Record<string, any>
-  >("/clients", toApiPayload(payload), { headers: authHeaders(accessToken) });
+  >("/clients", toApiPayload(payload, true), {
+    headers: authHeaders(accessToken),
+  });
   return normalizeClient(unwrapData(response));
 }
 

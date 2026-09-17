@@ -32,6 +32,7 @@ import {
 import { formatCurrency } from "../../utils/formatters";
 import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { PropertyMultiSelect } from "../../components/properties/PropertyMultiSelect";
 
 type TenantsScreenProps = {
   bottomInset?: ScreenBottomInset;
@@ -194,7 +195,9 @@ export function TenantsScreen({
     <Screen bottomInset={bottomInset} className="bg-surface">
       <View className="px-1">
         <ModuleHeader
-          action={<AddButton permission="clients.create" onPress={openCreateForm} />}
+          action={
+            <AddButton permission="clients.create" onPress={openCreateForm} />
+          }
           eyebrow="Operations"
           leading={
             showBackButton ? (
@@ -314,7 +317,8 @@ export function TenantsScreen({
         visible={isFilterVisible}
       />
 
-      <AddEditModal permission={editingTenant ? "clients.update" : "clients.create"}
+      <AddEditModal
+        permission={editingTenant ? "clients.update" : "clients.create"}
         appearance="card"
         isVisible={isFormOpen}
         onClose={closeForm}
@@ -356,6 +360,21 @@ export function TenantsScreen({
             variant="filled"
           />
         </FormSection>
+        {!editingTenant && (
+          <FormSection
+            description="This association controls property-scoped access before a lease exists."
+            icon="home-outline"
+            title="Linked properties"
+            variant="card"
+          >
+            <PropertyMultiSelect
+              properties={properties}
+              selectedIds={form.propertyIds}
+              onChange={(value) => updateForm("propertyIds", value)}
+              description="Managers must select assigned properties. The tenant stays available only to managers assigned to every linked property."
+            />
+          </FormSection>
+        )}
       </AddEditModal>
 
       <TenantDetailsModal
