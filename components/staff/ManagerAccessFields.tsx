@@ -61,8 +61,8 @@ export function ManagerPermissionFields({
     <View className="gap-4">
       <Text className="font-ralewayExtraBold text-lg">Allowed actions</Text>
       <Text className="text-description">
-        New managers start with no operational access. Select only the actions
-        they need.
+        New invitations include basic viewing permissions. Review selected
+        actions; property access also requires assignments.
       </Text>
       {groups.map((group) => (
         <View key={group.label} className="gap-2">

@@ -10,6 +10,7 @@ import type {
 } from "../../types/domain/staff";
 import { useAuth } from "../../hooks/useAuth";
 import { validateManagerDetails } from "../../services/staff/staffService";
+import { resolveManagerEditorPermissions } from "../../services/staff/managerPermissionDefaults";
 import { BaseField } from "../ui/fields/BaseField";
 import { FormActionRow } from "../ui/forms/FormActionRow";
 import { FormSection } from "../ui/forms/FormSection";
@@ -41,8 +42,12 @@ export function StaffManagerEditor({
   const [name, setName] = useState(manager?.name ?? "");
   const [email, setEmail] = useState(manager?.email ?? "");
   const [propertyIds, setPropertyIds] = useState(manager?.propertyIds ?? []);
-  const [permissions, setPermissions] = useState<string[]>(
-    manager?.permissions ?? [],
+  const [selectedPermissions, setPermissions] = useState<string[] | undefined>(
+    manager?.permissions,
+  );
+  const permissions = resolveManagerEditorPermissions(
+    permissionGroups,
+    selectedPermissions,
   );
   const [validationError, setValidationError] = useState("");
   const properties = useQuery({

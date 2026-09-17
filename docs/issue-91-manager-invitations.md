@@ -10,7 +10,7 @@ Complete account-owner controlled manager invitations, explicit module/action gr
 
 - [ ] Replace direct temporary-password account creation with emailed, seven-day, single-use invitations.
 - [ ] Fix every staff invitation role to `MANAGER`; do not add subroles or additional `ADMIN` accounts.
-- [ ] Load manager permission groups from the backend policy catalog. New invitations start with no grants.
+- [ ] Load manager permission groups from the backend policy catalog. New invitations preselect catalog-approved viewing grants for properties, clients (tenants), billing, and notifications. Owners can change or clear defaults; existing records retain saved grants.
 - [ ] Intersect explicit manager grants with `config/permission-matrix.php`; unknown or malformed grants deny access.
 - [ ] Restrict managers to `assigned_property_ids`. Shared records require every linked property; unlinked property-dependent records stay unavailable.
 - [ ] Scope collections in SQL before pagination and scope downloads, uploads, search, reports, analytics, notifications, and aggregates on the server.
