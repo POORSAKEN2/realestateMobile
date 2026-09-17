@@ -57,27 +57,7 @@ export function ProfileMenuScreen() {
   const canManageBilling = hasAppPermission(user, "billing.checkout");
 
   const accountOrganizationItems = useMemo<ProfileMenuItem[]>(() => {
-    const items: ProfileMenuItem[] = [];
-
-    if (showTeamAccess) {
-      items.push({
-        accessibilityHint: "Opens property manager account setup",
-        badge: "Admin",
-        icon: "people-circle-outline",
-        label: "Team & Access",
-        onPress: () => router.push(appRoutes.secondary.staffManagement),
-        supportingText: "Create property manager accounts",
-      });
-    }
-
-    items.push(
-      {
-        accessibilityHint: "Opens notifications and reminders",
-        icon: "notifications-outline",
-        label: "Notifications",
-        onPress: () => router.push(appRoutes.secondary.notifications),
-        supportingText: "Review alerts and rent reminders",
-      },
+    const items: ProfileMenuItem[] = [
       {
         accessibilityHint: "Opens subscription and billing information",
         badge: billingState.syncRequired
@@ -96,7 +76,26 @@ export function ProfileMenuScreen() {
             ? `${billingState.serverLabel} access · View limits and plan actions`
             : `${billingState.serverLabel} access · Changes require an administrator`,
       },
-    );
+    ];
+
+    if (showTeamAccess) {
+      items.push({
+        accessibilityHint: "Opens property manager account setup",
+        badge: "Admin",
+        icon: "people-circle-outline",
+        label: "Team & Access",
+        onPress: () => router.push(appRoutes.secondary.staffManagement),
+        supportingText: "Create property manager accounts",
+      });
+    }
+
+    items.push({
+      accessibilityHint: "Opens notifications and reminders",
+      icon: "notifications-outline",
+      label: "Notifications",
+      onPress: () => router.push(appRoutes.secondary.notifications),
+      supportingText: "Review alerts and rent reminders",
+    });
 
     return items;
   }, [billingState, canManageBilling, serverSyncStatus, showTeamAccess]);

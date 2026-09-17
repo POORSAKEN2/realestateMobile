@@ -24,13 +24,15 @@ const NOTCH_OUTER_CONTROL = 28;
 const NOTCH_INNER_CONTROL = 56;
 const TAB_BAR_CONTENT_HEIGHT = tabBarLayout.contentHeight;
 const TAB_BAR_TOP = NOTCH_DEPTH;
-const PRIMARY_TABS = [
+const LEFT_TABS = [
   { label: "Home", name: "dashboard" },
   { label: "Properties", name: "properties" },
-  { label: "Add", name: "index" },
+] as const;
+const RIGHT_TABS = [
   { label: "Tenants", name: "tenants" },
   { label: "Profile", name: "profile" },
 ] as const;
+type PrimaryTab = (typeof LEFT_TABS)[number] | (typeof RIGHT_TABS)[number];
 
 function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
   const { can } = useAccess();
@@ -50,6 +52,58 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
     "H 0",
     "Z",
   ].join(" ");
+
+  function renderTab(tab: PrimaryTab) {
+    const permission = ROUTE_PERMISSIONS[tab.name];
+    if (permission && !can(permission)) return null;
+
+    const routeIndex = state.routes.findIndex(
+      (route) => route.name === tab.name,
+    );
+    const route = state.routes[routeIndex];
+
+    if (!route) return null;
+
+    const options = descriptors[route.key].options;
+    const focused = state.index === routeIndex;
+    const color = focused ? colors.primary : colors.muted;
+
+    return (
+      <TouchableOpacity
+        accessibilityLabel={options.tabBarAccessibilityLabel ?? tab.label}
+        accessibilityRole="button"
+        accessibilityState={{ selected: focused }}
+        activeOpacity={0.72}
+        className="flex-1 items-center justify-center pt-1"
+        key={tab.name}
+        onLongPress={() =>
+          navigation.emit({
+            target: route.key,
+            type: "tabLongPress",
+          })
+        }
+        onPress={() => {
+          const event = navigation.emit({
+            canPreventDefault: true,
+            target: route.key,
+            type: "tabPress",
+          });
+
+          if (!focused && !event.defaultPrevented) {
+            navigation.navigate(route.name, route.params);
+          }
+        }}
+      >
+        {options.tabBarIcon?.({ color, focused, size: 24 })}
+        <Text
+          className="mt-1 font-ralewayExtraBold text-[11px]"
+          style={{ color }}
+        >
+          {tab.label}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <View
@@ -112,60 +166,13 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
           zIndex: 2,
         }}
       >
-        {PRIMARY_TABS.map((tab) => {
-          const permission = ROUTE_PERMISSIONS[tab.name];
-          if (permission && !can(permission)) return <View className="flex-1" key={tab.name} />;
-          if (tab.name === "index") {
-            return <View className="flex-1" key={tab.name} />;
-          }
-
-          const routeIndex = state.routes.findIndex(
-            (route) => route.name === tab.name,
-          );
-          const route = state.routes[routeIndex];
-
-          if (!route) return <View className="flex-1" key={tab.name} />;
-
-          const options = descriptors[route.key].options;
-          const focused = state.index === routeIndex;
-          const color = focused ? colors.primary : colors.muted;
-
-          return (
-            <TouchableOpacity
-              accessibilityLabel={options.tabBarAccessibilityLabel ?? tab.label}
-              accessibilityRole="button"
-              accessibilityState={{ selected: focused }}
-              activeOpacity={0.72}
-              className="flex-1 items-center justify-center pt-1"
-              key={tab.name}
-              onLongPress={() =>
-                navigation.emit({
-                  target: route.key,
-                  type: "tabLongPress",
-                })
-              }
-              onPress={() => {
-                const event = navigation.emit({
-                  canPreventDefault: true,
-                  target: route.key,
-                  type: "tabPress",
-                });
-
-                if (!focused && !event.defaultPrevented) {
-                  navigation.navigate(route.name, route.params);
-                }
-              }}
-            >
-              {options.tabBarIcon?.({ color, focused, size: 24 })}
-              <Text
-                className="mt-1 font-ralewayExtraBold text-[11px]"
-                style={{ color }}
-              >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+        <View className="flex-row" style={{ flex: 2 }}>
+          {LEFT_TABS.map(renderTab)}
+        </View>
+        <View style={{ flex: 1 }} />
+        <View className="flex-row" style={{ flex: 2 }}>
+          {RIGHT_TABS.map(renderTab)}
+        </View>
       </View>
     </View>
   );
