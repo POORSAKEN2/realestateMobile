@@ -184,7 +184,7 @@ export function RevenueCatSubscriptionCard({
                     : "Syncing"
                   : isPremium
                     ? "Active"
-                    : "Inactive"}
+                    : "No store purchase"}
               </Text>
             </View>
           </View>
