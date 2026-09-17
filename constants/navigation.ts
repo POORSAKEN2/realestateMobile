@@ -3,6 +3,7 @@ import type { Href } from "expo-router";
 export const appRoutes = {
   auth: {
     login: "/(auth)/login",
+    acceptInvitation: "/(auth)/accept-invitation",
   },
   primary: {
     dashboard: "/(tabs)/dashboard",

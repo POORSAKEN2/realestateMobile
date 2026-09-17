@@ -22,8 +22,8 @@ function getErrorMessage(error: unknown) {
   return "Login failed. Please try again.";
 }
 
-export function useLogin() {
-  const [email, setEmail] = useState("");
+export function useLogin(initialEmail = "") {
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +65,21 @@ export function useLogin() {
 
       signIn({
         accessToken: access_token,
-        user: user && typeof user === "object" ? normalizeUser({ ...user, ...Object.fromEntries(Object.entries(result.data ?? {}).filter(([key]) => ["permissions", "assigned_property_ids", "property_permissions"].includes(key))) }) : user,
+        user:
+          user && typeof user === "object"
+            ? normalizeUser({
+                ...user,
+                ...Object.fromEntries(
+                  Object.entries(result.data ?? {}).filter(([key]) =>
+                    [
+                      "permissions",
+                      "assigned_property_ids",
+                      "property_permissions",
+                    ].includes(key),
+                  ),
+                ),
+              })
+            : user,
         onboarding,
       });
       router.replace("/(tabs)/dashboard");

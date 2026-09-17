@@ -18,6 +18,7 @@ import {
 import { useProperties } from "../api/useProperties";
 import { clientKeys, useClients } from "../api/useClients";
 import { useAuth } from "../useAuth";
+import { useAccess } from "../auth/useAccess";
 
 export type TenantSaveOperation = "created" | "updated";
 
@@ -27,6 +28,7 @@ export function useTenantManagement({
   onSaved?: (operation: TenantSaveOperation) => void;
 } = {}) {
   const { session } = useAuth();
+  const { access } = useAccess();
   const accessToken = session?.accessToken;
   const queryClient = useQueryClient();
   const params = useLocalSearchParams<{ action?: string }>();
@@ -139,7 +141,10 @@ export function useTenantManagement({
 
   function submit() {
     setFormError("");
-    const result = getTenantFormResult(form);
+    const result = getTenantFormResult(
+      form,
+      !editingTenant && access.role === "MANAGER",
+    );
     if (!result.isValid) {
       setFormError(result.error);
       return;

@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { Link, Stack, router } from "expo-router";
+import { Link, Stack, router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -24,6 +24,10 @@ import { useLogin } from "../../hooks/useLogin";
 type FocusedField = "email" | "password" | null;
 
 export default function LoginScreen() {
+  const params = useLocalSearchParams<{ email?: string | string[] }>();
+  const initialEmail = Array.isArray(params.email)
+    ? params.email[0]
+    : params.email;
   const {
     email,
     setEmail,
@@ -32,7 +36,7 @@ export default function LoginScreen() {
     isLoading,
     error,
     handleLogin,
-  } = useLogin();
+  } = useLogin(initialEmail);
 
   const passwordInputRef = useRef<TextInput>(null);
 
