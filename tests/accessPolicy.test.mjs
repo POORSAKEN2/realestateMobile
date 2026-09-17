@@ -41,6 +41,21 @@ test("owner alias and unknown roles use explicit permissions", () => {
   );
   assert.equal(permits(owner, "not.a.permission"), false);
 });
+test("nested ADMIN access null overrides the model permissions column", () => {
+  const admin = normalizeAccess({
+    role: "ADMIN",
+    permissions: [],
+    access: {
+      role: "ADMIN",
+      permissions: null,
+      propertyIds: [],
+      propertyPermissions: {},
+    },
+  });
+  assert.equal(permits(admin, "staff.manage"), true);
+  assert.equal(permits(admin, "billing.checkout"), true);
+  assert.equal(permits(admin, "properties.viewAny"), true);
+});
 test("manager cannot gain owner operations through supplied grants", () => {
   const access = normalizeAccess({
     role: "MANAGER",

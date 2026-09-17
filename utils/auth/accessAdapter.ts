@@ -5,6 +5,10 @@ function record(value: unknown): Record<string, unknown> {
     ? (value as Record<string, unknown>)
     : {};
 }
+
+function hasOwn(value: Record<string, unknown>, key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(value, key);
+}
 function strings(value: unknown): string[] | null {
   if (value === undefined) return null;
   if (!Array.isArray(value)) return [];
@@ -52,13 +56,18 @@ export function normalizeAccess(user: unknown): AccessSnapshot {
       record(access.propertyPermissions ?? source.property_permissions),
     ).map(([id, grants]) => [id, strings(grants) ?? []]),
   );
-  const rawPermissions = access.permissions ?? source.permissions;
+  const hasNestedPermissions = hasOwn(access, "permissions");
+  const rawPermissions = hasNestedPermissions
+    ? access.permissions
+    : source.permissions;
   const normalizedPermissions =
-    role === "MANAGER" &&
-    (!Array.isArray(rawPermissions) ||
-      rawPermissions.some((item) => typeof item !== "string"))
-      ? []
-      : strings(rawPermissions);
+    role === "ADMIN" && hasNestedPermissions && rawPermissions === null
+      ? null
+      : role === "MANAGER" &&
+          (!Array.isArray(rawPermissions) ||
+            rawPermissions.some((item) => typeof item !== "string"))
+        ? []
+        : strings(rawPermissions);
   return {
     role,
     permissions:

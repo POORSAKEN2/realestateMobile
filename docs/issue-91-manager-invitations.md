@@ -46,16 +46,13 @@ Complete account-owner controlled manager invitations, explicit module/action gr
 4. Run Laravel scheduler so `staff:expire-invitations` executes every fifteen minutes.
 5. Confirm mobile scheme `terrane` is registered in released iOS and Android builds.
 6. Smoke-test one hosted `https://…/accept-invitation#token=…` link and its `terrane:///accept-invitation?token=…` handoff on each platform. The HTTPS fragment stays out of server logs; the custom-scheme query never reaches an HTTP server.
-7. Run the PostgreSQL suite only with a dedicated disposable database and non-bypass-RLS role. The backend test guard must confirm an uncached `testing` environment, the `pgsql_testing` connection, and a database named with a `_test` or `_testing` suffix before any destructive setup runs:
+7. The PostgreSQL integration suite uses the backend's normal configured `pgsql` connection and rebuilds that database. Run it only when resetting the configured local database is intended:
 
    ```sh
-   APP_CONFIG_CACHE=/tmp/terrane-issue91-no-cache.php \
-   APP_ENV=testing \
-   DB_CONNECTION=pgsql_testing \
-   DB_URL='' \
-   ALLOW_DESTRUCTIVE_TEST_DATABASE=realestate_be \
    php vendor/bin/phpunit -c phpunit-pgsql.xml --do-not-cache-result
    ```
+
+   RLS assertions skip when the configured PostgreSQL role is a superuser or has `BYPASSRLS`; concurrency tests still run.
 
 8. Confirm queue failure produces `delivery_failed`, resend rotates the token, acceptance consumes one reservation, and account removal releases one seat.
 
@@ -63,7 +60,7 @@ Complete account-owner controlled manager invitations, explicit module/action gr
 
 - Mobile: TypeScript passes; full Node suite passes with 86 tests.
 - Backend: all #91-created and #91-changed tests pass on PostgreSQL (`58` tests, `268` assertions).
-- PostgreSQL RLS and concurrent invite/accept suite passes (`12` tests, `58` assertions) using the non-superuser `realestate_test_app` role.
+- PostgreSQL RLS and concurrent invite/accept suite previously passed (`12` tests, `58` assertions). With the normal local PostgreSQL superuser, RLS-only assertions skip and concurrency tests remain available.
 - All `49` changed PHP files pass syntax and Pint checks. SQLite is not a #91 runtime or acceptance dependency.
 - The broader legacy backend suite is not PostgreSQL-ready because many pre-existing fixtures omit tenant context; its PostgreSQL run produced `153` passing and `125` failing tests outside the #91 release gate.
 - Hosted invitation page HTTP smoke and iOS simulator deep-link acceptance/login handoff pass. Android and real mail-provider delivery remain release checks.
