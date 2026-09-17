@@ -57,14 +57,17 @@ export function formatBytes(bytes: number) {
 export function retentionDescription(
   entitlement: BillingEntitlement | undefined,
 ) {
+  const months = entitlement?.limits?.retention_months?.months;
+  if (months === null) return "Full history available";
+  if (typeof months === "number") return `History available for ${months} calendar months`;
   const days = entitlement?.limits?.retention_days?.days;
-  if (days === null) return "Plan allows unlimited history retention";
+  if (days === null) return "Full history available";
   if (typeof days !== "number") return "History availability follows your plan";
   if (days % 365 === 0) {
     const years = days / 365;
-    return `History retained for ${years} ${years === 1 ? "year" : "years"}`;
+    return `History available for ${years} ${years === 1 ? "year" : "years"}`;
   }
-  return `History retained for ${days} days`;
+  return `History available for ${days} days`;
 }
 
 export function supportLevelLabel(level?: string) {

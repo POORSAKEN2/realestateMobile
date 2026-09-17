@@ -1,9 +1,13 @@
 import type { AccessSnapshot } from "../../types/auth/access";
-import type { CreateStaffManagerPayload, StaffGateway, StaffManagerDetails, StaffRoster } from "../../types/domain/staff";
+import type { CreateStaffManagerPayload, StaffGateway, StaffManagerDetails } from "../../types/domain/staff";
 import { permits } from "../../utils/auth/accessPolicy";
 import { ApiError } from "../../api/errors";
-export const MAX_MANAGERS = 2;
-export function canAddManager(roster?: StaffRoster) { return !roster || roster.total < MAX_MANAGERS; }
+import type { BillingEntitlement } from "../../types/domain/billing";
+export function canAddManager(entitlement?: BillingEntitlement) {
+  const users = entitlement?.limits?.users;
+  if (!users || entitlement?.access_mode === "read_only") return false;
+  return users.limit === null || users.used < users.limit;
+}
 export function validateManagerDetails(payload: StaffManagerDetails) {
   if (!payload.name.trim()) throw new Error("Enter the manager's full name.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email.trim())) throw new Error("Enter a valid manager email address.");
@@ -19,13 +23,13 @@ export function createStaffService(gateway: StaffGateway, getAccess: () => Acces
   }
   return {
     async list() { authorize(); return available(gateway.list)(token); },
-    async create(payload: CreateStaffManagerPayload, knownRoster?: StaffRoster) {
+    async create(payload: CreateStaffManagerPayload) {
       authorize(); validateManagerDetails(payload);
       if (gateway.creationMode === "account" && (payload.password?.length ?? 0) < 8) throw new Error("Password must contain at least 8 characters.");
-      // Refresh the roster before provisioning; backend still owns the atomic limit.
-      const roster = gateway.list ? await gateway.list(token) : knownRoster;
+      // Refresh server usage, including the owner and disabled accounts.
+      const entitlement = await available(gateway.billing)(token);
       authorize();
-      if (!canAddManager(roster)) throw new ApiError("Manager limit reached (maximum 2).", 403, "MANAGER_LIMIT_REACHED");
+      if (!canAddManager(entitlement)) throw new ApiError("User limit reached or subscription inactive. Review Plan & Billing before adding a manager.", 403, "USER_LIMIT_REACHED");
       return gateway.create(payload, token);
     },
     async update(id: string, payload: StaffManagerDetails) {

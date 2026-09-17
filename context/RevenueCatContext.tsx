@@ -17,6 +17,8 @@ import Purchases, {
 import { reconcileBillingEntitlement } from "../api/billing";
 import { BILLING_ENTITLEMENT_QUERY_KEY } from "../hooks/api/useBillingEntitlement";
 import { type RevenueCatProductKey } from "../constants/revenueCat";
+import { hasAppPermission } from "../utils/auth/accessPolicy";
+import { authorizeBillingPurchase } from "../utils/billing/billingPurchasePolicy";
 import { useAuth } from "../hooks/useAuth";
 import type { SubscriptionTierKey } from "../types/domain/billing";
 import {
@@ -98,14 +100,19 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
   const lastServerSyncFingerprint = useRef<string | null>(null);
   const serverSyncRequestVersion = useRef(0);
   const serverSyncWorker = useRef<Promise<void> | null>(null);
+  const purchaseUser = useRef(session?.user);
+  purchaseUser.current = session?.user;
+  const currentTenant = useRef<string | null>(null);
   const identity = useMemo(
     () => getRevenueCatIdentity(session?.user),
     [session?.user],
   );
 
+  currentTenant.current = identity?.appUserId ?? null;
+
   const synchronizeServerEntitlement = useCallback(
     (nextCustomerInfo: CustomerInfo) => {
-      if (!identity?.appUserId) return;
+      if (!identity?.appUserId || !hasAppPermission(purchaseUser.current, "billing.checkout")) return;
       const fingerprint = JSON.stringify([
         identity.appUserId,
         getRevenueCatEntitlementFingerprint(nextCustomerInfo),
@@ -121,6 +128,8 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
 
         while (handledVersion < serverSyncRequestVersion.current) {
           handledVersion = serverSyncRequestVersion.current;
+          if (!hasAppPermission(purchaseUser.current, "billing.checkout")) return;
+          const tenantAtRequest = currentTenant.current;
           const targetTier = pendingServerTier.current;
           setServerSyncStatus("syncing");
           const result = await reconcileBillingWithBackoff(
@@ -128,6 +137,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
             targetTier,
           );
 
+          if (tenantAtRequest !== currentTenant.current || !hasAppPermission(purchaseUser.current, "billing.checkout")) continue;
           if (result.entitlement) {
             queryClient.setQueryData(
               BILLING_ENTITLEMENT_QUERY_KEY,
@@ -262,6 +272,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
         currentOffering?.availablePackages ?? [],
       ),
       presentCustomerCenter: async () => {
+        authorizeBillingPurchase(purchaseUser.current);
         await presentRevenueCatCustomerCenter({
           callbacks: {
             onRestoreCompleted: ({ customerInfo: restored }) =>
@@ -273,6 +284,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
         await refresh();
       },
       purchasePackage: async (pkg) => {
+        authorizeBillingPurchase(purchaseUser.current, pkg.product.identifier);
         try {
           const purchased = await purchaseRevenueCatPackage(pkg);
           updateCustomerInfo(purchased);
@@ -284,6 +296,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       },
       refresh,
       restorePurchases: async () => {
+        authorizeBillingPurchase(purchaseUser.current);
         const restored = await restoreRevenueCatPurchases();
         updateCustomerInfo(restored);
         return restored;

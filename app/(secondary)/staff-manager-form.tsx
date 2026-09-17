@@ -15,14 +15,14 @@ export default function StaffManagerFormScreen() {
   const manager = staff.roster.data?.managers.find((item) => item.id === managerId);
   const title = managerId ? "Edit manager" : staff.gateway.creationMode === "invitation" ? "Invite manager" : "Create manager";
   const unavailable = managerId && (!staff.gateway.update || !staff.gateway.list || !manager);
-  const limitReached = !managerId && !canAddManager(staff.roster.data);
-  const loading = Boolean(staff.gateway.list) && staff.roster.isPending;
+  const limitReached = !managerId && !canAddManager(staff.entitlement.data);
+  const loading = staff.entitlement.isPending || Boolean(staff.gateway.list) && staff.roster.isPending;
   return <Screen className="bg-surface"><ModuleHeader title={title} leading={<SecondaryBackButton />} />
     <View className="mt-6 flex-1">
       {loading ? <Text>Loading managers…</Text> : unavailable ? <Text>This manager is unavailable. Return to staff management and refresh.</Text> :
       <StaffManagerEditor key={manager?.id ?? "new"} gateway={staff.gateway} manager={manager}
-        pending={staff.create.isPending || staff.update.isPending} disabled={Boolean(limitReached || staff.roster.isError)}
-        error={limitReached ? "Manager limit reached (maximum 2). Remove a manager before adding another." : staff.roster.error?.message}
+        pending={staff.create.isPending || staff.update.isPending} disabled={Boolean(limitReached || staff.roster.isError || staff.entitlement.isError || staff.entitlement.data?.access_mode === "read_only")}
+        error={limitReached ? "User limit reached or subscription inactive. Review Plan & Billing." : staff.roster.error?.message || staff.entitlement.error?.message}
         onCancel={() => router.back()} onSubmit={async (payload) => {
           if (manager) {
             await staff.update.mutateAsync({ id: manager.id, payload });

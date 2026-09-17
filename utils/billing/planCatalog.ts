@@ -8,9 +8,9 @@ import type { PlanTier, SubscriptionTierKey } from "../../types/domain/billing";
 import { getRevenueCatPackagesForTier } from "./revenueCatCustomer";
 
 export const FALLBACK_PLAN_TIERS: PlanTier[] = [
-  { key: "free", label: "Free", property_limit: 2 },
-  { key: "tier1", label: "Tier 1", property_limit: 5 },
-  { key: "all_in", label: "All-In", property_limit: null },
+  { key: "starter", label: "Starter", property_limit: 3 },
+  { key: "professional", label: "Professional", property_limit: 15 },
+  { key: "portfolio", label: "Portfolio", property_limit: 50 },
 ];
 
 export function formatRevenueCatPackagePrice(
@@ -28,58 +28,28 @@ export function getTierStorePriceLabel(
   tier: PlanTier,
 ) {
   if (tier.key === "free") return "Free";
-  if (tier.key !== "tier1" && tier.key !== "all_in") {
+  if (!["starter", "professional", "portfolio", "tier1", "all_in"].includes(tier.key)) {
     return "Store price unavailable";
   }
 
-  const firstPackage = getRevenueCatPackagesForTier(packages, tier.key)[0];
+  const firstPackage = getRevenueCatPackagesForTier(packages, tier.key as Exclude<SubscriptionTierKey, "free">)[0];
   return firstPackage
     ? `From ${formatRevenueCatPackagePrice(firstPackage.key, firstPackage.pkg)}`
     : "Store price unavailable";
 }
 
 export function getPlanTierFeatures(tier: PlanTier) {
-  const tierKey = tier.key as SubscriptionTierKey;
-  const defaults = {
-    inquiryActions: tierKey === "tier1" || tierKey === "all_in",
-    notifications: tierKey === "tier1" || tierKey === "all_in",
-    reminders: tierKey === "all_in",
-    advancedAnalytics: tierKey === "all_in",
-  };
-  const capabilities = {
-    inquiryActions:
-      tier.capabilities?.inquiry_actions ?? defaults.inquiryActions,
-    notifications: tier.capabilities?.notifications ?? defaults.notifications,
-    reminders: tier.capabilities?.reminders ?? defaults.reminders,
-    advancedAnalytics:
-      tier.capabilities?.advanced_analytics ?? defaults.advancedAnalytics,
-  };
-  const propertyFeature =
-    tier.property_limit === null
-      ? "Unlimited managed properties"
-      : `Up to ${tier.property_limit} managed properties`;
-
-  if (capabilities.reminders || capabilities.advancedAnalytics) {
-    return [
-      propertyFeature,
-      "Automated payment reminders and portfolio notifications",
-      "Full analytics and scheduled reports",
-    ];
-  }
-
-  if (capabilities.inquiryActions || capabilities.notifications) {
-    return [
-      propertyFeature,
-      "Inquiry actions and portfolio notifications",
-      "Historical analytics and PDF reports",
-    ];
-  }
-
-  return [
-    propertyFeature,
-    "Core property, lease, and rent management",
-    "Current-period analytics and CSV reports",
-  ];
+  const limits = tier.limits;
+  const features = [tier.property_limit === null ? "Unlimited managed properties" : `Up to ${tier.property_limit} managed properties`];
+  if (limits?.users !== undefined) features.push(limits.users === null ? "Unlimited users, including account owner" : `${limits.users} total user${limits.users === 1 ? "" : "s"}, including account owner`);
+  if (limits?.storage_bytes !== undefined && limits.storage_bytes !== null) features.push(`${limits.storage_bytes / 1024 ** 3} GB storage`);
+  if (limits?.published_listings !== undefined) features.push(limits.published_listings === null ? "Unlimited published listings" : `${limits.published_listings} published listings`);
+  if (limits?.retention_months !== undefined) features.push(limits.retention_months === null ? "Full history" : `${limits.retention_months}-month history`);
+  features.push("Property, lease, rent, inquiry and reminder operations");
+  if (limits?.reports_level) features.push(limits.reports_level === "csv" ? "CSV reports" : "CSV and PDF reports");
+  if (limits?.analytics_depth === "full" || tier.capabilities?.advanced_analytics) features.push("Full analytics within available history");
+  if (limits?.support_level === "priority") features.push("Priority support ticket classification");
+  return features;
 }
 
 export function getMissingBillingPeriodLabels(keys: RevenueCatProductKey[]) {

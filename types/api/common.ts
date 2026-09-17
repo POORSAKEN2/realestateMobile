@@ -20,6 +20,7 @@ export type ApiErrorResponse = {
 
 export type RequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
+  responseType?: "json" | "text" | "arraybuffer";
   /** Semantic permission for operations using a shared backend endpoint. */
   access?: { permission: AppPermission; propertyId?: string };
 };

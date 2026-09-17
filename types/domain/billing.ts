@@ -1,4 +1,4 @@
-export type SubscriptionTierKey = "free" | "tier1" | "all_in";
+export type SubscriptionTierKey = "free" | "tier1" | "all_in" | "starter" | "professional" | "portfolio";
 
 export type PlanCapabilityKey =
   | "inquiry_actions"
@@ -34,6 +34,7 @@ export interface EntitlementLimitDetails {
   limit: number | string;
   current: number | string;
   requested: number;
+  excess?: number;
   current_plan: { key: string; label: string };
   required_plan: {
     key: string;
@@ -49,8 +50,14 @@ export interface PlanTier {
   property_limit: number | null; // null means unlimited
   /** Dormant web-checkout metadata. Native purchase UI uses store prices. */
   price_php?: number | null;
+  yearly_price_php?: number | null;
   capabilities?: Partial<Record<PlanCapabilityKey, boolean>>;
   limits?: {
+    properties?: number | null;
+    users?: number | null;
+    storage_bytes?: number | null;
+    published_listings?: number | null;
+    retention_months?: number | null;
     analytics_depth?: string | null;
     reports_level?: string | null;
     retention_days?: number | null;
@@ -58,7 +65,14 @@ export interface PlanTier {
   };
 }
 
+export type PurchasableTierKey = "starter" | "professional" | "portfolio";
+
 export interface BillingEntitlement {
+  catalog_version?: string;
+  entitlement_source?: "trial" | "purchase" | "legacy" | "override";
+  access_mode?: "active" | "read_only";
+  trial_starts_at?: string | null;
+  trial_ends_at?: string | null;
   subscribed_tier?: string;
   effective_tier?: string;
   status?: string | null;
@@ -74,6 +88,7 @@ export interface BillingEntitlement {
     analytics_depth?: { level: string };
     support_level?: { level: string };
     retention_days?: { days: number | null };
+    retention_months?: { months: number | null };
     reports_level?: { level: string };
   };
   gating_enabled?: boolean;

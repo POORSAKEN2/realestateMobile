@@ -16,11 +16,14 @@ export function blockerMessage(blocker: PlanChangeBlocker) {
 export function billingStatusMessage(entitlement: BillingEntitlement) {
   const date = (value?: string | null) => value && Number.isFinite(Date.parse(value))
     ? new Date(value).toLocaleDateString() : null;
+  if (entitlement.access_mode === "read_only") return "Subscription inactive. Existing data remains available; subscribe to resume changes.";
+  if (entitlement.entitlement_source === "trial") return `Professional trial${date(entitlement.trial_ends_at) ? ` ends on ${date(entitlement.trial_ends_at)}` : " active"}.`;
   if (entitlement.in_grace_period) return `Payment needs attention. Paid access continues${date(entitlement.grace_ends_at) ? ` until ${date(entitlement.grace_ends_at)}` : " during your grace period"}.`;
   if (entitlement.status === "canceled") return entitlement.effective_tier !== "free"
     ? `Renewal canceled. Paid access continues${date(entitlement.current_period_end) ? ` until ${date(entitlement.current_period_end)}` : " through your paid period"}.`
-    : "Subscription canceled. Free plan limits now apply.";
+    : "Subscription canceled. Subscribe to resume changes.";
   if (["expired", "paused", "past_due"].includes(entitlement.status ?? "")) return "Subscription is inactive. Your effective plan determines current access.";
+  if (entitlement.entitlement_source === "legacy") return "Grandfathered plan access. Existing purchase rights are preserved.";
   if (entitlement.status === "trialing") return "Trial subscription";
   return entitlement.status === "active" ? "Active subscription" : "Current plan";
 }

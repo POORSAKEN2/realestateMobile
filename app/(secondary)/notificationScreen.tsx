@@ -297,7 +297,7 @@ export default function NotificationScreen() {
             notificationAccess.isLoading
               ? "Checking plan access"
               : !notificationAccess.hasAccess
-                ? "Tier 1 feature"
+                ? "Account access unavailable"
                 : isInitialLoading
               ? "Loading activity"
               : unreadCount > 0
@@ -314,10 +314,10 @@ export default function NotificationScreen() {
             <Ionicons name="lock-closed-outline" size={30} color={colors.primary} />
           </View>
           <Text className="text-center font-ralewayBold text-xl text-textPrimary">
-            Notifications require Tier 1
+            Notification access unavailable
           </Text>
           <Text className="mt-2 text-center text-sm leading-6 text-description">
-            Upgrade to Tier 1 or All-In for portfolio and inquiry notifications.
+            Review your account access to load portfolio and inquiry notifications.
           </Text>
           <TouchableOpacity
             accessibilityRole="button"
@@ -374,7 +374,7 @@ export default function NotificationScreen() {
 
       <UpgradePlanModal
         isVisible={isUpgradeVisible}
-        message="Tier 1 or All-In is required for notifications."
+        message="Review your account's subscription access."
         onClose={() => setUpgradeVisible(false)}
         requiredTier={notificationAccess.requiredTier}
       />

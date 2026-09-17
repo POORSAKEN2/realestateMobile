@@ -22,6 +22,19 @@ export function entitlementLimitDetails(error: unknown): EntitlementLimitDetails
   return details as unknown as EntitlementLimitDetails;
 }
 
+/** Axios preserves the requested binary response type even for JSON errors. */
+export function decodeApiErrorPayload(data: unknown): any {
+  if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+    try {
+      const bytes = data instanceof ArrayBuffer ? new Uint8Array(data) : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+      return JSON.parse(new TextDecoder().decode(bytes));
+    } catch {
+      return undefined;
+    }
+  }
+  return data;
+}
+
 export function toApiError(status: number, data?: { message?: string; code?: string; error?: string; errors?: Record<string, unknown> }) {
   const serverMessage = data?.message;
   const message = status === 403

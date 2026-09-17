@@ -1,21 +1,35 @@
-# RevenueCat setup for Terrane
+# Issue #100: run the updated billing app
 
-Terrane uses `react-native-purchases` for customer state and native StoreKit /
-Google Play purchases. `react-native-purchases-ui` provides Customer Center.
-Client-side access checks recognize server-aligned entitlements `tier1_access` and
-`all_in_access`. Protected access still uses `/billing/entitlement`.
+Deploy the compatible backend and apply its migrations and idempotent trial/grandfathering command first. See the [backend rollout guide](../../realestate-be/docs/issue-100-billing-rollout.md) for catalog limits, rollout and release validation.
 
-## 1. Install packages
-
-From `/Users/pandesal/apps/realestateMobile`:
+## Local app setup
 
 ```bash
-npm install --save react-native-purchases react-native-purchases-ui
+npm install
+npx expo start --clear
 ```
 
-Installed versions are `10.9.1`. Both packages need a new native build after
-installation. Expo Go uses RevenueCat Preview API Mode, so real purchases must
-be tested in an Expo development build:
+Point `.env` at that backend, preserving `/api`:
+
+```dotenv
+EXPO_PUBLIC_API_BASE_URL=http://127.0.0.1:8000/api
+EXPO_PUBLIC_REVENUECAT_IOS_API_KEY=appl_your_public_key
+EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY=goog_your_public_key
+EXPO_PUBLIC_REVENUECAT_STARTER_MONTHLY_PRODUCT_ID=starter_monthly
+EXPO_PUBLIC_REVENUECAT_STARTER_YEARLY_PRODUCT_ID=starter_yearly
+EXPO_PUBLIC_REVENUECAT_PROFESSIONAL_MONTHLY_PRODUCT_ID=professional_monthly
+EXPO_PUBLIC_REVENUECAT_PROFESSIONAL_YEARLY_PRODUCT_ID=professional_yearly
+EXPO_PUBLIC_REVENUECAT_PORTFOLIO_MONTHLY_PRODUCT_ID=portfolio_monthly
+EXPO_PUBLIC_REVENUECAT_PORTFOLIO_YEARLY_PRODUCT_ID=portfolio_yearly
+```
+
+Use `10.0.2.2` on Android Emulator or the backend computer's LAN IP on a physical device. Restart Metro after changing environment variables. SDK keys are public platform keys from the same RevenueCat project as the backend's private REST key. Never put a private `sk_` key in `EXPO_PUBLIC_`. A local Test Store public key can use `EXPO_PUBLIC_REVENUECAT_API_KEY`; preview/production builds must use platform keys and configured `EXPO_PUBLIC_TERMS_URL`/`EXPO_PUBLIC_PRIVACY_URL`.
+
+## Products and native build
+
+Issue #97 must provision the six monthly/yearly store products in offering `default`, mapping each plan pair to `starter_access`, `professional_access` or `portfolio_access`. Product variables must match exact RevenueCat identifiers, including Google Play base-plan suffixes if present. Retain legacy Tier 1/All-In entitlements and identifiers for restore and existing ownership, but do not sell them or create new lifetime products.
+
+Rebuild native binaries for RevenueCat and the PDF file-sharing module:
 
 ```bash
 npx expo run:ios
@@ -23,224 +37,23 @@ npx expo run:ios
 npx expo run:android
 ```
 
-For an EAS development client, install `expo-dev-client`, then use the existing
-`development` build profile:
+Expo Go can preview UI/Test Store state; real store purchase testing needs a native development build, App Store sandbox/TestFlight or Google Play test track. For EAS, use the existing development profile with `expo-dev-client` installed. Configure matching `com.raze.terrane` store applications, agreements and RevenueCat store credentials. Use tenant UUID as RevenueCat app user ID and preserve original tenant ownership during restore/transfer configuration.
+
+## Where to open the implementation
+
+1. Sign in as **ADMIN**. Open the **Profile tab → Plan & Billing**. Inspect Professional trial dates, server access and quotas; open plan options for Starter/Professional/Portfolio, monthly/yearly packages and preview. Buy, restore and Customer Center actions are ADMIN only, including direct provider calls.
+2. Open **Team & Access** for server-driven user limits. Owner and disabled managers count. Starter allows one total user, so no additional manager.
+3. Open **Analytics → Financial Summary Report → Export CSV / Export PDF**. Native PDF opens the share sheet; web downloads the file. Dates are constrained by backend history availability.
+4. In an isolated test tenant, check asset creation/import, publication and property/document/floorplan/receipt/profile uploads at quota boundaries. Quota errors show required plan/excess. Trial expiry makes operational writes read-only while retaining records and listings.
+5. Sign in as an authorized **MANAGER**. Billing metadata remains readable, while purchase/restore/management and staff administration require ADMIN. Existing property permissions still apply.
+
+Missing offerings show unavailable purchase options rather than invented prices. Store purchase success does not guarantee server activation: the app displays store state and server access separately, and ADMIN reconciliation retries. Trial access is never presented as confirmed purchased access. Scheduled reports and automated support SLAs remain deferred.
+
+## Checks
 
 ```bash
-npx expo install expo-dev-client
-eas build --platform ios --profile development
-# or
-eas build --platform android --profile development
+npx tsc --noEmit
+node --test tests/*.test.mjs
 ```
 
-## 2. Configure public SDK keys
-
-Use the Test Store public key only in local development:
-
-```dotenv
-EXPO_PUBLIC_REVENUECAT_API_KEY=test_your_public_key
-```
-
-RevenueCat SDK keys are public app identifiers, not secret REST API keys. Never
-put a RevenueCat secret API key in an `EXPO_PUBLIC_` variable. Before production,
-connect each store and use its public platform key:
-
-```dotenv
-EXPO_PUBLIC_REVENUECAT_IOS_API_KEY=appl_your_public_key
-EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY=goog_your_public_key
-EXPO_PUBLIC_TERMS_URL=https://your-domain.example/terms
-EXPO_PUBLIC_PRIVACY_URL=https://your-domain.example/privacy
-```
-
-Remote EAS builds also need these variables configured in the selected EAS
-environment. `app.config.js` rejects preview/production builds that contain a
-Test Store key, omit either legal URL, or use a key with the wrong platform
-prefix. Restart Metro after changing `.env`.
-
-## 3. Configure RevenueCat dashboard
-
-In **Product catalog**, create/import six products for each target store:
-
-- Tier 1: `tier1_lifetime`, `tier1_yearly`, `tier1_monthly`.
-- All-In: `all_in_lifetime`, `all_in_yearly`, `all_in_monthly`.
-
-For App Store Connect, put renewable Tier 1 and All-In products in the same
-subscription group so upgrades work correctly. For Google Play, create matching
-subscription products/base plans.
-Product identifiers must match exactly, including case.
-
-Create entitlements `tier1_access` and `all_in_access`. Attach all paid products
-to `tier1_access`; attach the three All-In products to `all_in_access` too. This
-lets All-In satisfy Tier 1 feature checks while the higher entitlement maps the
-server tier. Lifetime grants access without expiry.
-
-Create offering `default`, mark it Current, and add:
-
-- Tier 1 lifetime, annual, and monthly packages.
-- All-In lifetime, annual, and monthly packages.
-
-The app renders these packages in its own React Native paywall. A RevenueCat
-Paywall template or Web Purchase Link is not required.
-
-In **Project settings → Restore behavior**, choose **Keep with original App
-User ID**. A store purchase must stay with its original Terrane tenant. Configure
-Customer Center with subscription management, cancellation, restore, and billing
-support actions.
-
-## 4. App integration
-
-`RevenueCatProvider` is mounted under `AuthProvider` in `app/_layout.tsx`. It:
-
-- Configures the SDK once, using tenant UUID immediately when restored auth is available.
-- Uses Terrane tenant UUID as RevenueCat `app_user_id`.
-- Calls `Purchases.logIn` after Terrane login and `Purchases.logOut` after logout.
-- Registers one `CustomerInfo` update listener and removes it on unmount.
-- Fetches CustomerInfo and Current Offering concurrently.
-- Exposes offering packages to the app's native subscription modal.
-- Calls `Purchases.purchasePackage` for the selected billing period.
-- Invalidates `/billing/entitlement` when CustomerInfo changes. RevenueCat
-  webhooks remain authoritative for protected server access.
-
-Use RevenueCat state anywhere below the root provider:
-
-```tsx
-import { useRevenueCat } from "../hooks/useRevenueCat";
-
-function PremiumFeature() {
-  const { activeTier, isLoading, packages, purchasePackage } = useRevenueCat();
-
-  if (isLoading) return null;
-  if (activeTier === "free") {
-    return (
-      <Button
-        title="Unlock Tier 1"
-        onPress={() => {
-          const pkg = packages.tier1_monthly;
-          if (pkg) void purchasePackage(pkg);
-        }}
-      />
-    );
-  }
-
-  return <PremiumContent />;
-}
-```
-
-The entitlement check is equivalent to:
-
-```ts
-const customerInfo = await Purchases.getCustomerInfo();
-const isTier1 = Boolean(customerInfo.entitlements.active.tier1_access);
-const isAllIn = Boolean(customerInfo.entitlements.active.all_in_access);
-```
-
-Fetch packages and purchase from custom native UI:
-
-```tsx
-const { packages, purchasePackage } = useRevenueCat();
-const monthlyPackage = packages.tier1_monthly;
-
-if (monthlyPackage) {
-  const customerInfo = await purchasePackage(monthlyPackage);
-  const unlocked = Boolean(customerInfo?.entitlements.active.tier1_access);
-}
-```
-
-`UpgradePlanModal` presents monthly and yearly packages to eligible customers.
-Lifetime is shown only when `allPurchasedProductIdentifiers` is empty. Active
-renewable subscribers manage changes in Customer Center; lifetime owners are not
-shown another purchase option.
-`purchasePackage` opens the native StoreKit or Google Play purchase sheet.
-
-## 5. Customer info, restore, and errors
-
-```tsx
-const { customerInfo, error, isPremium, refresh, restorePurchases } =
-  useRevenueCat();
-
-await refresh();
-const restoredInfo = await restorePurchases();
-```
-
-Purchase cancellation returns `null` from `purchasePackage` and should not show
-an error. Network, offline, pending payment, unavailable product, store
-restriction, and configuration errors receive specific user-safe messages.
-Never parse free-form error text; the client maps RevenueCat error codes.
-
-Always provide a visible Restore Purchases action. Never call
-`restorePurchases()` automatically because it can trigger store-account prompts
-and transfer/alias behavior.
-
-## 6. Native checkout and Customer Center
-
-`RevenueCatSubscriptionCard` is shown on Terrane's Plan & Billing screen. It
-opens the custom native plan modal, restores purchases, and shows Customer
-Center only after purchase history exists.
-
-Customer Center is the plan-management surface for active subscribers and the
-support surface for lifetime owners. Configure it in RevenueCat Dashboard.
-It is a RevenueCat Pro/Enterprise feature and needs iOS 15+ or Android API 24+.
-
-```tsx
-const { presentCustomerCenter } = useRevenueCat();
-await presentCustomerCenter();
-```
-
-## 7. Server entitlement sync
-
-Terrane server treats tenant UUID as RevenueCat `app_user_id`, so all managers in
-one organization share purchase state. Authenticated user responses now retain
-`tenant_id` for stable SDK identity.
-
-Configure RevenueCat webhook URL:
-
-```text
-POST https://your-api.example/api/webhooks/revenuecat
-Authorization: value matching REVENUECAT_WEBHOOK_AUTH_HEADER
-```
-
-For optional HMAC verification, enable webhook signing and set
-`REVENUECAT_WEBHOOK_SIGNING_SECRET`. The backend verifies
-`X-RevenueCat-Webhook-Signature` against the raw body with a five-minute default
-tolerance while continuing to require the Authorization value.
-
-The client and server both use `tier1_access` and `all_in_access`. Every
-authenticated CustomerInfo update triggers `POST /billing/reconcile`, so a
-successful Test Store or real-store purchase is verified immediately through
-RevenueCat's server API. RevenueCat webhooks remain the normal asynchronous
-writer and scheduled reconciliation remains the backstop. Immediate sync errors
-are logged and never turn a completed store transaction into a purchase failure.
-Never grant sensitive server access solely from client CustomerInfo.
-
-## 8. Release checklist
-
-- Confirm iOS bundle ID and Android package are `com.raze.terrane` in stores and RevenueCat.
-- Confirm all products show prices in `Purchases.getOfferings()`.
-- Confirm offering `default` is Current and contains all six packages.
-- Confirm restore behavior is **Keep with original App User ID**.
-- Confirm Customer Center exposes management, cancellation, restore, and support.
-- Test new purchase, cancellation, renewal, expiration, restore, and lifetime access.
-- Test subscription and lifetime refunds, refund reversal, subscription extension,
-  billing failure/grace, and paused subscriptions.
-- Test one tenant through owner and manager accounts; RevenueCat app user ID must match tenant UUID.
-- Confirm RevenueCat webhook delivery updates `GET /billing/entitlement`.
-- Use sandbox/TestFlight and Google Play test tracks before production.
-- Keep server-side entitlement checks for protected API operations.
-
-## 9. iOS production setup
-
-1. Complete App Store Connect agreements, tax, and banking.
-2. Create monthly/yearly auto-renewable products for both tiers in one
-   subscription group. Place Tier 1 below All-In in service level order.
-3. Create both lifetime products as non-consumable in-app purchases.
-4. Connect bundle ID `com.raze.terrane` to RevenueCat with the In-App Purchase
-   key, App Store Connect API key, shared secret, and App Store server
-   notifications.
-5. Import the products into the existing packages and entitlement mappings.
-6. Put the `appl_...` key and legal URLs in the EAS production environment.
-7. Test all products in App Store sandbox/TestFlight, then submit the products
-   with the app and include purchase instructions for App Review.
-
-Dashboard, App Store Connect, production secrets, public legal pages, webhook
-availability, and production scheduler installation are deployment prerequisites;
-they cannot be completed solely through this repository.
+Separately verify native purchase, restore, Customer Center, session/tenant switching, cancellation, renewal, refund, grace and delayed webhooks against the deployed backend. Code tests do not prove store configuration or native runtime behavior.

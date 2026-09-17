@@ -3,6 +3,7 @@ import { apiStaffGateway } from "../../api/staff";
 import { createStaffService } from "../../services/staff/staffService";
 import { getSessionAccess } from "../../services/access/sessionAccess";
 import type { CreateStaffManagerPayload, StaffGateway, StaffManagerDetails } from "../../types/domain/staff";
+import { useBillingEntitlement, BILLING_ENTITLEMENT_QUERY_KEY } from "./useBillingEntitlement";
 import { useAuth } from "../useAuth";
 import { useAccess } from "../auth/useAccess";
 
@@ -12,11 +13,12 @@ export function useStaffManagement(gateway: StaffGateway = apiStaffGateway) {
   const client = useQueryClient();
   const key = ["staff-managers", (session?.user as { id?: string })?.id];
   const service = createStaffService(gateway, () => getSessionAccess().access, session?.accessToken);
+  const entitlement = useBillingEntitlement({ enabled: can("staff.manage") });
   const roster = useQuery({ queryKey: key, queryFn: service.list, enabled: can("staff.manage") && Boolean(gateway.list) });
-  const invalidate = () => client.invalidateQueries({ queryKey: key });
-  const create = useMutation({ mutationFn: (payload: CreateStaffManagerPayload) => service.create(payload, roster.data), onSuccess: invalidate });
+  const invalidate = () => Promise.all([client.invalidateQueries({ queryKey: key }), client.invalidateQueries({ queryKey: BILLING_ENTITLEMENT_QUERY_KEY })]);
+  const create = useMutation({ mutationFn: (payload: CreateStaffManagerPayload) => service.create(payload), onSuccess: invalidate });
   const update = useMutation({ mutationFn: ({ id, payload }: { id: string; payload: StaffManagerDetails }) => service.update(id, payload), onSuccess: invalidate });
   const setEnabled = useMutation({ mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => service.setEnabled(id, enabled), onSuccess: invalidate });
   const remove = useMutation({ mutationFn: service.remove, onSuccess: invalidate });
-  return { gateway, roster, create, update, setEnabled, remove };
+  return { gateway, roster, entitlement, create, update, setEnabled, remove };
 }

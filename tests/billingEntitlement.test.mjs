@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import load from './helpers/loadTs.cjs';
-const { toApiError, entitlementLimitDetails } = load('../../api/errors.ts');
+const { toApiError, entitlementLimitDetails, decodeApiErrorPayload } = load('../../api/errors.ts');
 const { blockerMessage, billingStatusMessage, formatUsage } = load('../../utils/billing/entitlementPresentation.ts');
 
 test('quota payload keeps backend error key, plan, dimension and upgrade path', () => {
@@ -16,6 +16,13 @@ test('structured validation values never become non-string error messages', () =
   assert.equal(typeof toApiError(422, { errors: { current: 4, required_plan: {} } }).message, 'string');
   assert.equal(toApiError(422, { errors: { tier: ['Unknown tier.'] } }).message, 'Unknown tier.');
 });
+test('PDF binary responses preserve JSON error messages and quota metadata', () => {
+  const payload = { error: 'entitlement_limit_reached', message: 'Upgrade for PDF.', errors: { dimension: 'reports_level', excess: 1 } };
+  const bytes = new TextEncoder().encode(JSON.stringify(payload));
+  assert.deepEqual(decodeApiErrorPayload(bytes.buffer), payload);
+  assert.deepEqual(entitlementLimitDetails(toApiError(403, decodeApiErrorPayload(bytes))), payload.errors);
+  assert.equal(decodeApiErrorPayload(new TextEncoder().encode('%PDF-1.4')), undefined);
+});
 test('downgrade blockers name dimension, usage, ceiling and excess', () => {
   assert.equal(blockerMessage({ dimension: 'properties', current: 7, target_limit: 5, excess: 2 }), 'Properties: using 7, target allows 5. Reduce by 2.');
   assert.equal(formatUsage('storage_bytes', 2 * 1024 ** 3), '2 GB');
@@ -24,7 +31,7 @@ test('downgrade blockers name dimension, usage, ceiling and excess', () => {
 test('billing distinguishes grace, cancellation, expired access and healthy subscription', () => {
   assert.match(billingStatusMessage({ in_grace_period: true, grace_ends_at: '2026-09-09' }), /Payment needs attention/);
   assert.match(billingStatusMessage({ status: 'canceled', effective_tier: 'tier1' }), /Paid access continues/);
-  assert.match(billingStatusMessage({ status: 'canceled', effective_tier: 'free' }), /Free plan limits/);
+  assert.match(billingStatusMessage({ status: 'canceled', effective_tier: 'free' }), /Subscribe to resume changes/);
   assert.match(billingStatusMessage({ status: 'expired', effective_tier: 'free' }), /inactive/);
   assert.equal(billingStatusMessage({ status: 'active' }), 'Active subscription');
 });

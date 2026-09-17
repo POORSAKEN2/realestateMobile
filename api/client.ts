@@ -9,7 +9,7 @@ import type {
 export { API_BASE_URL } from "./config";
 
 import { axiosInstance } from "./axios";
-import { toApiError, ApiError, entitlementLimitDetails } from "./errors";
+import { toApiError, ApiError, entitlementLimitDetails, decodeApiErrorPayload } from "./errors";
 import { reportEntitlementLimit } from "../services/billing/entitlementEvents";
 import { getSessionAccess } from "../services/access/sessionAccess";
 import { assertRequestAccess, describeRequest, ResourceScopeIndex, scopeResponse } from "../services/access/requestPolicy";
@@ -98,6 +98,7 @@ async function request<T>(
       data: options.body,
       headers,
       signal: options.signal ?? undefined,
+      responseType: options.responseType,
     });
 
     if (getSessionAccess().revision !== session.revision) {
@@ -106,10 +107,10 @@ async function request<T>(
     return scopeResponse(response.data as T, session.access, accessRequest, index);
   } catch (error: any) {
     if (error.response) {
-      const data = error.response.data as ApiErrorResponse;
+      const data = decodeApiErrorPayload(error.response.data) as ApiErrorResponse;
       const failure = toApiError(error.response.status, data);
       if (failure.status === 403 && getSessionAccess().revision === session.revision) {
-        if (entitlementLimitDetails(failure)) reportEntitlementLimit(failure);
+        if (entitlementLimitDetails(failure) || failure.code === "subscription_inactive") reportEntitlementLimit(failure);
         else reportAccessDenied(failure.message);
       }
       throw failure;

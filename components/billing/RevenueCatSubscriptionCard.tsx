@@ -19,6 +19,7 @@ import {
   getRevenueCatProductKey,
   hasActiveRevenueCatSubscription,
   hasRevenueCatLifetimeAccess,
+  hasRevenueCatPremium,
   hasRevenueCatPurchaseHistory,
 } from "../../utils/billing/revenueCatCustomer";
 import { Snackbar } from "../ui/Snackbar";
@@ -115,10 +116,10 @@ export function RevenueCatSubscriptionCard({
         : `${REVENUECAT_PRODUCT_LABELS[productKey]} access is active.`;
     }
     if (isPremium) {
-      return `${activeTier === "all_in" ? "All-In" : "Tier 1"} access is active.`;
+      return `${billingState.storeLabel} is active.`;
     }
-    return "Choose Tier 1 or All-In access with secure in-app purchase.";
-  }, [activeTier, hasLifetimeAccess, isPremium, productKey]);
+    return "Choose Starter, Professional or Portfolio access with secure in-app purchase.";
+  }, [billingState.storeLabel, hasLifetimeAccess, isPremium, productKey]);
 
   async function runAction(
     action: RevenueCatAction,
@@ -141,13 +142,10 @@ export function RevenueCatSubscriptionCard({
   function restore() {
     void runAction("restore", async () => {
       const restored = await restorePurchases();
-      const premiumRestored = Boolean(
-        restored.entitlements.active.tier1_access ||
-        restored.entitlements.active.all_in_access,
-      );
+      const premiumRestored = hasRevenueCatPremium(restored);
       snackbar.show(
         premiumRestored
-          ? "Terrane Premium restored."
+          ? "Store purchase restored. Server access is being checked."
           : "No Terrane Premium purchase found for this store account.",
       );
     });
@@ -186,7 +184,7 @@ export function RevenueCatSubscriptionCard({
                     : "Syncing"
                   : isPremium
                     ? "Active"
-                    : "Inactive"}
+                    : "No store purchase"}
               </Text>
             </View>
           </View>

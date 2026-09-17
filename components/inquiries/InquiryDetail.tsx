@@ -122,7 +122,7 @@ export function InquiryDetail({
         />
         {!canUpdate ? (
           <Text className="mt-3 font-ralewayMedium text-xs leading-5 text-description">
-            Status changes require update permission and Tier 1 or All-In
+            Status changes require update permission and active account
             access.
           </Text>
         ) : null}

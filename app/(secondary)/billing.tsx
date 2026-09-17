@@ -45,7 +45,7 @@ export default function BillingScreen() {
 
   const propertyCount = entitlement?.property_count ?? 0;
   const propertyLimit = entitlement?.property_limit;
-  const isUnlimited = propertyLimit === null || propertyLimit === undefined;
+  const isUnlimited = propertyLimit === null;
   const usagePercentage = isUnlimited
     ? 0
     : Math.min(100, Math.round((propertyCount / (propertyLimit || 1)) * 100));
@@ -123,10 +123,17 @@ export default function BillingScreen() {
                     </View>
                     <View>
                       <Text className="font-ralewayExtraBold text-lg text-textPrimary">
-                        {entitlement?.tier_label || "Free Tier"}
+                        {entitlement?.tier_label || "Unavailable"}
                       </Text>
                       <Text className="font-ralewayBold text-xs text-primary">
                         Current access
+                        {entitlement.access_mode === "read_only"
+                          ? " · Read only"
+                          : entitlement.entitlement_source === "trial"
+                            ? " · Trial"
+                            : entitlement.entitlement_source === "legacy"
+                              ? " · Grandfathered"
+                              : ""}
                       </Text>
                     </View>
                   </View>
@@ -199,13 +206,13 @@ export default function BillingScreen() {
                 onViewPlans={() => setIsUpgradeModalOpen(true)}
               />
               {/* Plan Catalog Grid */}
-              <View className="gap-3">
+              {/* <View className="gap-3">
                 <Text className="font-ralewayBold text-base text-textPrimary">
                   Available Subscription Tiers
                 </Text>
 
                 {tiers.map((tier) => {
-                  const isCurrent = entitlement?.tier === tier.key;
+                  const isCurrent = entitlement?.tier === tier.key && entitlement?.entitlement_source !== "trial";
                   const features = getPlanTierFeatures(tier);
 
                   return (
@@ -240,7 +247,7 @@ export default function BillingScreen() {
                     </View>
                   );
                 })}
-              </View>
+              </View> */}
             </View>
 
             {/* Billing Engine Notice */}

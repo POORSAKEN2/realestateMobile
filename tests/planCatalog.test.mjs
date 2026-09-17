@@ -43,7 +43,18 @@ test("plan features follow server capability metadata", () => {
 
   assert.deepEqual(features, [
     "Unlimited managed properties",
-    "Automated payment reminders and portfolio notifications",
-    "Full analytics and scheduled reports",
+    "Property, lease, rent, inquiry and reminder operations",
+    "Full analytics within available history",
   ]);
+});
+
+test("new commercial cards describe actual limits and omit deferred services", () => {
+  const features = getPlanTierFeatures({ key: "professional", property_limit: 15, limits: {
+    users: 5, storage_bytes: 20 * 1024 ** 3, published_listings: 15, retention_months: 36,
+    analytics_depth: "full", reports_level: "csv_pdf", support_level: "priority",
+  } });
+  assert.ok(features.includes("5 total users, including account owner"));
+  assert.ok(features.includes("36-month history"));
+  assert.ok(features.includes("CSV and PDF reports"));
+  assert.ok(features.every(item => !/scheduled|SLA/i.test(item)));
 });
