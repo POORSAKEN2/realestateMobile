@@ -108,6 +108,8 @@ export function describeRequest(
       permission = "expenses.approve";
   }
   if (segments[0] === "users") permission = "staff.manage";
+  if (segments[0] === "audit-events")
+    permission = segments[1] === "export" ? "audit.export" : "audit.view";
   if (segments[0] === "staff") permission = "staff.manage";
   if (segments[0] === "properties" && segments[2] === "managers")
     permission = "staff.manage";

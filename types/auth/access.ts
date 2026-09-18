@@ -22,6 +22,8 @@ export type ResourceAction =
   | "update"
   | "delete";
 export type AppPermission =
+  | "audit.view"
+  | "audit.export"
   | `${Resource}.${ResourceAction}`
   | "dashboard.admin"
   | "dashboard.manager"

@@ -24,6 +24,8 @@ export const OPERATIONAL_RESOURCES: readonly Resource[] = [
   "lessors",
 ];
 const OWNER_ONLY = new Set<AppPermission>([
+  "audit.view",
+  "audit.export",
   "staff.manage",
   "dashboard.admin",
   "billing.checkout",

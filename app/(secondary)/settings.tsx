@@ -21,6 +21,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 import { canManageStaff } from "../../utils/auth/staffAccess";
+import { useAccess } from "../../hooks/auth/useAccess";
 import {
   changePassword,
   exportUserData,
@@ -81,6 +82,7 @@ function PasswordField({
 }
 
 export default function SettingsScreen() {
+  const { can } = useAccess();
   const { hasCompletedOnboarding, session, setOnboardingCompleted } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -225,6 +227,21 @@ export default function SettingsScreen() {
             <StaffManagementEntryCard
               onPress={() => router.push(appRoutes.secondary.staffManagement)}
             />
+          ) : null}
+
+          {can("audit.view") ? (
+            <TouchableOpacity
+              accessibilityRole="button"
+              className="mt-5 rounded-2xl border border-primary/20 bg-white p-5"
+              onPress={() => router.push(appRoutes.secondary.auditHistory)}
+            >
+              <Text className="font-ralewayExtraBold text-base text-textPrimary">
+                Audit History
+              </Text>
+              <Text className="mt-1 text-sm text-description">
+                Investigate account changes and security events.
+              </Text>
+            </TouchableOpacity>
           ) : null}
 
           {/* Onboarding preview section */}
