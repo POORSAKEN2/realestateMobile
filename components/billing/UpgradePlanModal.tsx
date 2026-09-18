@@ -1,7 +1,5 @@
-import { Feather } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Modal,
   ScrollView,
@@ -12,11 +10,9 @@ import {
 import type { CustomerInfo } from "react-native-purchases";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { colors } from "../../constants/colors";
 import type { RevenueCatProductKey } from "../../constants/revenueCat";
 import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { useRevenueCat } from "../../hooks/useRevenueCat";
-import type { PlanTier } from "../../types/domain/billing";
 import type {
   PlanChangePreview,
   SubscriptionTierKey,
@@ -30,7 +26,6 @@ import {
   FALLBACK_PLAN_TIERS,
   formatRevenueCatPackagePrice,
   getMissingBillingPeriodLabels,
-  getPlanTierFeatures,
   getTierStorePriceLabel,
 } from "../../utils/billing/planCatalog";
 import {
@@ -43,6 +38,8 @@ import {
 import { getRevenueCatPurchaseSummary } from "../../utils/billing/revenueCatPurchaseSummary";
 import { LegalLink } from "../legal/LegalLink";
 import { ModalHeader } from "../ui/ModalHeader";
+import { BillingPlanCard } from "./BillingPlanCard";
+import { BillingActionButton } from "./BillingActionButton";
 import { RevenueCatPackagePicker } from "./RevenueCatPackagePicker";
 import { RevenueCatPurchaseSummaryCard } from "./RevenueCatPurchaseSummaryCard";
 
@@ -58,123 +55,6 @@ type CompletedPurchase = {
   productKey: RevenueCatProductKey;
 };
 
-type PlanCardProps = {
-  canUpgrade: boolean;
-  isCurrent: boolean;
-  isFeatured: boolean;
-  isPending: boolean;
-  disabled: boolean;
-  onUpgrade: () => void;
-  priceLabel: string;
-  tier: PlanTier;
-};
-
-function PlanBadge({
-  isCurrent,
-  isFeatured,
-}: {
-  isCurrent: boolean;
-  isFeatured: boolean;
-}) {
-  if (!isCurrent && !isFeatured) return null;
-
-  return (
-    <View className="rounded-full bg-accent px-3 py-1.5">
-      <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wide text-success">
-        {isCurrent ? "Current plan" : "Best value"}
-      </Text>
-    </View>
-  );
-}
-
-function PlanFeature({ children }: { children: string }) {
-  return (
-    <View className="flex-row items-start gap-2.5">
-      <Feather
-        name="check-circle"
-        color={colors.primary}
-        size={17}
-        style={{ marginTop: 1 }}
-      />
-      <Text className="min-w-0 flex-1 font-ralewayMedium text-xs leading-5 text-textPrimary">
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function PlanCard({
-  canUpgrade,
-  isCurrent,
-  isFeatured,
-  isPending,
-  disabled,
-  onUpgrade,
-  priceLabel,
-  tier,
-}: PlanCardProps) {
-  const features = getPlanTierFeatures(tier);
-
-  return (
-    <View
-      className={`relative overflow-hidden rounded-[28px] border p-5 shadow-sm shadow-primary/5 ${
-        isCurrent
-          ? "border-primary/25 bg-primary/10"
-          : isFeatured
-            ? "border-primary/25 bg-primary/5"
-            : "border-primary/15 bg-white"
-      }`}
-    >
-      {isFeatured ? (
-        <View className="absolute -right-10 -top-12 h-28 w-28 rounded-full bg-accent/30" />
-      ) : null}
-
-      <View className="flex-row items-start justify-between gap-3">
-        <View className="min-w-0 flex-1">
-          <Text
-            className="font-ralewayExtraBold text-lg text-textPrimary"
-            numberOfLines={1}
-          >
-            {tier.label}
-          </Text>
-          <Text className="mt-1.5 font-ralewayExtraBold text-base text-primary">
-            {priceLabel}
-          </Text>
-        </View>
-
-        <PlanBadge isCurrent={isCurrent} isFeatured={isFeatured} />
-      </View>
-
-      <View className="mt-4 gap-2.5 border-t border-primary/10 pt-4">
-        {features.map((feature) => (
-          <PlanFeature key={feature}>{feature}</PlanFeature>
-        ))}
-      </View>
-
-      {canUpgrade ? (
-        <TouchableOpacity
-          accessibilityLabel={`Choose ${tier.label}`}
-          accessibilityRole="button"
-          accessibilityState={{ busy: isPending, disabled }}
-          activeOpacity={0.8}
-          className={`mt-5 min-h-12 flex-row items-center justify-center gap-2 rounded-2xl bg-primary px-4 ${
-            isPending ? "opacity-70" : ""
-          }`}
-          disabled={disabled}
-          onPress={onUpgrade}
-        >
-          {isPending ? (
-            <ActivityIndicator color={colors.whitePrimary} size="small" />
-          ) : null}
-          <Text className="font-ralewayExtraBold text-sm text-white">
-            {isPending ? "Checking plan…" : `Choose ${tier.label}`}
-          </Text>
-        </TouchableOpacity>
-      ) : null}
-    </View>
-  );
-}
-
 export function UpgradePlanModal({
   isVisible,
   onClose,
@@ -186,7 +66,7 @@ export function UpgradePlanModal({
     isFetching,
     isError,
     refetch,
-  } = useBillingEntitlement();
+  } = useBillingEntitlement({ enabled: isVisible });
   const { can } = useAccess();
   const {
     customerInfo,
@@ -225,8 +105,8 @@ export function UpgradePlanModal({
   const hasLifetimeAccess = hasRevenueCatLifetimeAccess(customerInfo);
   const selectedPaidTier =
     preview?.result.allowed &&
-    (["starter", "professional", "portfolio"].includes(preview.tier))
-      ? preview.tier as "starter" | "professional" | "portfolio"
+    ["starter", "professional", "portfolio"].includes(preview.tier)
+      ? (preview.tier as "starter" | "professional" | "portfolio")
       : null;
   const packageOptions = useMemo(
     () =>
@@ -385,18 +265,23 @@ export function UpgradePlanModal({
     }
   }
 
+  const actionPending = pendingTierKey !== null || isManagingPurchase;
+  const handleClose = () => {
+    if (!actionPending && !busy.current) onClose();
+  };
   return (
     <Modal
-      allowSwipeDismissal
+      allowSwipeDismissal={!actionPending}
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       presentationStyle="pageSheet"
       visible={isVisible}
     >
       <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
         <ModalHeader
           closeAccessibilityLabel="Close upgrade subscription"
-          onClose={onClose}
+          onClose={handleClose}
+          disabled={actionPending}
           subtitle={
             completedPurchase
               ? "Your transaction was successful."
@@ -470,17 +355,17 @@ export function UpgradePlanModal({
                       ? "This organization owns grandfathered lifetime access. Review any new plan limits before changing plans."
                       : "Use RevenueCat Customer Center to change billing periods, switch tiers, cancel, or get billing support."}
                   </Text>
-                  <TouchableOpacity
-                    accessibilityRole="button"
-                    className="rounded-2xl bg-primary p-4"
-                    onPress={() => void managePurchase()}
-                  >
-                    <Text className="text-center font-ralewayBold text-white">
-                      {hasActiveSubscription
+                  <BillingActionButton
+                    label={
+                      hasActiveSubscription
                         ? "Open subscription management"
-                        : "Open purchase support"}
-                    </Text>
-                  </TouchableOpacity>
+                        : "Open purchase support"
+                    }
+                    disabled={pendingTierKey !== null}
+                    isLoading={isManagingPurchase}
+                    onPress={() => void managePurchase()}
+                    primary
+                  />
                 </View>
               ) : null}
               {preview && (
@@ -490,7 +375,12 @@ export function UpgradePlanModal({
                     {tiers.find((tier) => tier.key === preview.tier)?.label ??
                       preview.tier}
                   </Text>
-                  {entitlement?.entitlement_source === "legacy" && <Text className="text-description">A new purchase uses this plan's quotas. Your grandfathered ownership remains preserved.</Text>}
+                  {entitlement?.entitlement_source === "legacy" && (
+                    <Text className="text-description">
+                      A new purchase uses this plan's quotas. Your grandfathered
+                      ownership remains preserved.
+                    </Text>
+                  )}
                   {preview.result.blockers.map((blocker) => (
                     <Text
                       key={blocker.dimension}
@@ -507,7 +397,7 @@ export function UpgradePlanModal({
                   )}
                   {selectedPaidTier && (
                     <RevenueCatPackagePicker
-                      disabled={pendingTierKey !== null}
+                      disabled={pendingTierKey !== null || isManagingPurchase}
                       isLoading={isRevenueCatLoading}
                       missingPeriodLabels={missingPeriodLabels}
                       onSelect={setSelectedProductKey}
@@ -519,47 +409,53 @@ export function UpgradePlanModal({
                   {selectedPaidTier &&
                     can("billing.checkout") &&
                     selectedOption && (
-                      <TouchableOpacity
-                        accessibilityRole="button"
-                        disabled={pendingTierKey !== null}
-                        onPress={() => void continuePurchase()}
-                        className="rounded-2xl bg-primary p-4"
-                      >
-                        <Text className="text-center font-ralewayBold text-white">
-                          {pendingTierKey
+                      <BillingActionButton
+                        label={
+                          pendingTierKey
                             ? "Processing purchase…"
-                            : `Purchase ${formatRevenueCatPackagePrice(selectedOption.key, selectedOption.pkg)}`}
-                        </Text>
-                      </TouchableOpacity>
+                            : `Purchase ${formatRevenueCatPackagePrice(selectedOption.key, selectedOption.pkg)}`
+                        }
+                        isLoading={pendingTierKey !== null}
+                        disabled={isManagingPurchase || isRevenueCatLoading}
+                        onPress={() => void continuePurchase()}
+                        primary
+                      />
                     )}
                 </View>
               )}
               {tiers.map((tier) => {
-                  const isCurrent = currentTierKey === tier.key && entitlement?.entitlement_source !== "trial" && entitlement?.access_mode !== "read_only";
-                  const isFeatured = tier.key === "professional";
-                  const canUpgrade = can("billing.checkout") &&
-                    ["starter", "professional", "portfolio"].includes(tier.key) &&
-                    (!isCurrent || entitlement?.entitlement_source === "trial" || entitlement?.access_mode === "read_only");
+                const isCurrent =
+                  currentTierKey === tier.key &&
+                  entitlement?.entitlement_source !== "trial" &&
+                  entitlement?.access_mode !== "read_only";
+                const isFeatured = tier.key === "professional";
+                const canUpgrade =
+                  can("billing.checkout") &&
+                  ["starter", "professional", "portfolio"].includes(tier.key) &&
+                  (!isCurrent ||
+                    entitlement?.entitlement_source === "trial" ||
+                    entitlement?.access_mode === "read_only");
 
-                  return (
-                    <PlanCard
-                      canUpgrade={canUpgrade}
-                      isCurrent={isCurrent}
-                      isFeatured={isFeatured}
-                      isPending={pendingTierKey === tier.key}
-                      disabled={
-                        !entitlement ||
-                        isFetching ||
-                        isError ||
-                        pendingTierKey !== null
-                      }
-                      key={tier.key}
-                      onUpgrade={() => handleUpgrade(tier.key)}
-                      priceLabel={getTierStorePriceLabel(packages, tier)}
-                      tier={tier}
-                    />
-                  );
-                })}
+                return (
+                  <BillingPlanCard
+                    canUpgrade={canUpgrade}
+                    isCurrent={isCurrent}
+                    isFeatured={isFeatured}
+                    isPending={pendingTierKey === tier.key}
+                    disabled={
+                      !entitlement ||
+                      isFetching ||
+                      isError ||
+                      pendingTierKey !== null ||
+                      isManagingPurchase
+                    }
+                    key={tier.key}
+                    onUpgrade={() => handleUpgrade(tier.key)}
+                    priceLabel={getTierStorePriceLabel(packages, tier)}
+                    tier={tier}
+                  />
+                );
+              })}
 
               <View className="gap-2 rounded-2xl border border-primary/15 bg-white p-4">
                 <Text className="font-ralewayBold text-xs text-textPrimary">
@@ -569,7 +465,8 @@ export function UpgradePlanModal({
                   Monthly and yearly purchases renew automatically until
                   canceled. Charges use the price shown by the App Store or
                   Google Play and grant organization-wide access. Manage or
-                  cancel through Customer Center. Existing lifetime ownership is preserved; new lifetime purchases are unavailable.
+                  cancel through Customer Center. Existing lifetime ownership is
+                  preserved; new lifetime purchases are unavailable.
                 </Text>
                 <Text className="font-ralewayMedium text-xs text-description">
                   <LegalLink

@@ -4,20 +4,8 @@ import { Text, View } from "react-native";
 import { colors } from "../../constants/colors";
 import type { BillingSyncStatus } from "../../utils/billing/billingSync";
 import type { RevenueCatPurchaseSummary } from "../../utils/billing/revenueCatPurchaseSummary";
+import { BillingSummaryRow } from "./BillingSummaryRow";
 import { Button } from "../ui/buttons/Button";
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View className="flex-row items-start justify-between gap-4 border-b border-primary/10 py-3 last:border-b-0">
-      <Text className="font-ralewayMedium text-xs text-description">
-        {label}
-      </Text>
-      <Text className="max-w-[65%] text-right font-ralewayExtraBold text-sm text-textPrimary">
-        {value}
-      </Text>
-    </View>
-  );
-}
 
 function ActivationStatus({
   serverSyncStatus,
@@ -106,11 +94,14 @@ export function RevenueCatPurchaseSummaryCard({
       </View>
 
       <View className="rounded-2xl border border-primary/15 bg-white px-4">
-        <SummaryRow label="Plan" value={summary.planLabel} />
-        <SummaryRow label="Billing" value={summary.billingPeriodLabel} />
-        <SummaryRow label="Status" value={summary.lifecycleLabel} />
-        <SummaryRow label="Access" value={summary.accessDateLabel} />
-        <SummaryRow label="Applies to" value="Everyone in this organization" />
+        <BillingSummaryRow label="Plan" value={summary.planLabel} />
+        <BillingSummaryRow label="Billing" value={summary.billingPeriodLabel} />
+        <BillingSummaryRow label="Status" value={summary.lifecycleLabel} />
+        <BillingSummaryRow label="Access" value={summary.accessDateLabel} />
+        <BillingSummaryRow
+          label="Applies to"
+          value="Everyone in this organization"
+        />
       </View>
 
       <ActivationStatus

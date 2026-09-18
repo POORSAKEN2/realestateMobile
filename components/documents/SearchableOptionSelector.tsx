@@ -69,7 +69,10 @@ export function SearchableOptionSelector({
   );
 
   return (
-    <SafeAreaView className="min-h-[500px] bg-surface" edges={["bottom"]}>
+    <SafeAreaView
+      className="h-[500px] max-h-full shrink bg-surface"
+      edges={["bottom"]}
+    >
       <View className="flex-row items-center gap-3 bg-white px-5 pb-5 pt-2">
         <TouchableOpacity
           accessibilityLabel={backAccessibilityLabel}

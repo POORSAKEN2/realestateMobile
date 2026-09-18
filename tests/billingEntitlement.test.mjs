@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import load from './helpers/loadTs.cjs';
 const { toApiError, entitlementLimitDetails, decodeApiErrorPayload } = load('../../api/errors.ts');
-const { blockerMessage, billingStatusMessage, formatUsage } = load('../../utils/billing/entitlementPresentation.ts');
+const { blockerMessage, billingStatusMessage, formatUsage, usagePercentage } = load('../../utils/billing/entitlementPresentation.ts');
 
 test('quota payload keeps backend error key, plan, dimension and upgrade path', () => {
   const details = { dimension: 'storage_bytes', limit: 1024, current: 1000, requested: 100,
@@ -34,4 +34,12 @@ test('billing distinguishes grace, cancellation, expired access and healthy subs
   assert.match(billingStatusMessage({ status: 'canceled', effective_tier: 'free' }), /Subscribe to resume changes/);
   assert.match(billingStatusMessage({ status: 'expired', effective_tier: 'free' }), /inactive/);
   assert.equal(billingStatusMessage({ status: 'active' }), 'Active subscription');
+});
+
+test('usage display handles unlimited, zero and exceeded quotas', () => {
+  assert.equal(usagePercentage({ used: 50, limit: null }), 0);
+  assert.equal(usagePercentage({ used: 0, limit: 0 }), 0);
+  assert.equal(usagePercentage({ used: 1, limit: 0 }), 100);
+  assert.equal(usagePercentage({ used: 15, limit: 10 }), 100);
+  assert.equal(usagePercentage({ used: 3, limit: 10 }), 30);
 });

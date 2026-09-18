@@ -41,6 +41,7 @@ export type AuditPage = {
     effective_end: string;
     retention_days: number | null;
     capture_started_at: string;
+    entities?: string[];
   };
 };
 

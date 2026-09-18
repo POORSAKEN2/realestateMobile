@@ -25,6 +25,7 @@ export function useAuditHistory(
       fetchAuditHistory(filters, pageParam, signal),
     getNextPageParam: (page) => page.next_cursor ?? undefined,
     enabled,
+    staleTime: 0,
   });
   const detail = useQuery({
     queryKey: ["audit-event", ...identity, eventId],

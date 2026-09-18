@@ -1,19 +1,18 @@
 import { Feather } from "@expo/vector-icons";
-import { useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { Alert, Text, View } from "react-native";
 
 import { REVENUECAT_PRODUCT_LABELS } from "../../constants/revenueCat";
 import { colors } from "../../constants/colors";
 import { useRevenueCat } from "../../hooks/useRevenueCat";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import type { BillingEntitlement } from "../../types/domain/billing";
-import { getBillingAccountState } from "../../utils/billing/billingAccountState";
+import { BillingActionButton } from "./BillingActionButton";
+import { BillingSummaryRow } from "./BillingSummaryRow";
+import {
+  getBillingAccountState,
+  getBillingStoreStatus,
+} from "../../utils/billing/billingAccountState";
 import {
   getActiveRevenueCatProductId,
   getRevenueCatProductKey,
@@ -26,66 +25,16 @@ import { Snackbar } from "../ui/Snackbar";
 
 type RevenueCatAction = "customer-center" | "restore";
 
-function ActionButton({
-  busy,
-  icon,
-  label,
-  onPress,
-  primary = false,
-}: {
-  busy: boolean;
-  icon: keyof typeof Feather.glyphMap;
-  label: string;
-  onPress: () => void;
-  primary?: boolean;
-}) {
-  return (
-    <TouchableOpacity
-      accessibilityRole="button"
-      accessibilityState={{ busy, disabled: busy }}
-      activeOpacity={0.8}
-      className={`min-h-12 flex-row items-center justify-center gap-2 rounded-2xl border px-4 ${
-        primary ? "border-primary bg-primary" : "border-primary/20 bg-white"
-      }`}
-      disabled={busy}
-      onPress={onPress}
-    >
-      {busy ? (
-        <ActivityIndicator
-          color={primary ? colors.whitePrimary : colors.primary}
-          size="small"
-        />
-      ) : (
-        <Feather
-          color={primary ? colors.whitePrimary : colors.primary}
-          name={icon}
-          size={17}
-        />
-      )}
-      <Text
-        className={`font-ralewayExtraBold text-sm ${
-          primary ? "text-white" : "text-primary"
-        }`}
-      >
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
 export function RevenueCatSubscriptionCard({
-  accountEmail,
   canManagePurchases,
   entitlement,
   onViewPlans,
 }: {
-  accountEmail?: string;
   canManagePurchases: boolean;
   entitlement?: BillingEntitlement | null;
   onViewPlans: () => void;
 }) {
   const {
-    activeTier,
     customerInfo,
     error,
     isLoading,
@@ -99,6 +48,9 @@ export function RevenueCatSubscriptionCard({
   const [activeAction, setActiveAction] = useState<RevenueCatAction | null>(
     null,
   );
+  const actionBusy = useRef(false);
+  const actionsDisabled = activeAction !== null || (isLoading && !isReady);
+  const storeStatus = getBillingStoreStatus(customerInfo, { isLoading, error });
   const productKey = getRevenueCatProductKey(
     getActiveRevenueCatProductId(customerInfo),
   );
@@ -109,23 +61,18 @@ export function RevenueCatSubscriptionCard({
     () => getBillingAccountState(entitlement, customerInfo),
     [customerInfo, entitlement],
   );
-  const statusDescription = useMemo(() => {
-    if (isPremium && productKey) {
-      return hasLifetimeAccess
-        ? `${REVENUECAT_PRODUCT_LABELS[productKey]} gives this organization permanent access.`
-        : `${REVENUECAT_PRODUCT_LABELS[productKey]} access is active.`;
-    }
-    if (isPremium) {
-      return `${billingState.storeLabel} is active.`;
-    }
-    return "Choose Starter, Professional or Portfolio access with secure in-app purchase.";
-  }, [billingState.storeLabel, hasLifetimeAccess, isPremium, productKey]);
+  const statusDescription = customerInfo
+    ? isPremium
+      ? `Your store account owns ${productKey ? REVENUECAT_PRODUCT_LABELS[productKey] : billingState.storeLabel}${hasLifetimeAccess ? ", a lifetime purchase" : ""}. App access is confirmed separately by the server.`
+      : "Choose Starter, Professional or Portfolio with secure in-app purchase."
+    : "Store status has not been confirmed. Refresh to check purchases and prices.";
 
   async function runAction(
     action: RevenueCatAction,
     operation: () => Promise<void>,
   ) {
-    if (activeAction) return;
+    if (actionBusy.current) return;
+    actionBusy.current = true;
     setActiveAction(action);
     try {
       await operation();
@@ -135,6 +82,7 @@ export function RevenueCatSubscriptionCard({
         cause instanceof Error ? cause.message : "Please try again.",
       );
     } finally {
+      actionBusy.current = false;
       setActiveAction(null);
     }
   }
@@ -164,54 +112,47 @@ export function RevenueCatSubscriptionCard({
           <Feather name="star" color={colors.primary} size={19} />
         </View>
         <View className="min-w-0 flex-1">
-          <View className="flex-row items-center justify-between gap-2">
+          <View className="flex-row flex-wrap items-center justify-between gap-2">
             <Text className="font-ralewayExtraBold text-base text-textPrimary">
-              Plan actions
+              Store purchase
             </Text>
             <View
               className={`rounded-full px-3 py-1 ${
-                isPremium ? "bg-success/10" : "bg-surface"
+                storeStatus.tone === "success"
+                  ? "bg-success/10"
+                  : storeStatus.tone === "warning"
+                    ? "bg-warningSurface"
+                    : "bg-surface"
               }`}
             >
               <Text
                 className={`font-ralewayBold text-[10px] uppercase ${
-                  isPremium ? "text-success" : "text-description"
+                  storeStatus.tone === "success"
+                    ? "text-success"
+                    : storeStatus.tone === "warning"
+                      ? "text-warning"
+                      : "text-description"
                 }`}
               >
-                {billingState.syncRequired
-                  ? serverSyncStatus === "delayed"
-                    ? "Sync delayed"
-                    : "Syncing"
-                  : isPremium
-                    ? "Active"
-                    : "No store purchase"}
+                {storeStatus.label}
               </Text>
             </View>
           </View>
           <Text className="mt-1 font-ralewayMedium text-xs leading-5 text-description">
-            {accountEmail ? `Signed in as ${accountEmail}. ` : ""}
             {statusDescription}
           </Text>
         </View>
       </View>
 
-      <View className="gap-2 rounded-2xl bg-surface p-4">
-        <View className="flex-row items-center justify-between gap-3">
-          <Text className="font-ralewayMedium text-xs text-description">
-            Server access
-          </Text>
-          <Text className="font-ralewayExtraBold text-sm text-textPrimary">
-            {billingState.serverLabel}
-          </Text>
-        </View>
-        <View className="flex-row items-center justify-between gap-3">
-          <Text className="font-ralewayMedium text-xs text-description">
-            Store purchase
-          </Text>
-          <Text className="max-w-[65%] text-right font-ralewayExtraBold text-sm text-primary">
-            {billingState.storeLabel}
-          </Text>
-        </View>
+      <View className="rounded-2xl bg-surface px-4 py-2">
+        <BillingSummaryRow
+          label="Server access"
+          value={billingState.serverLabel}
+        />
+        <BillingSummaryRow
+          label="Store purchase"
+          value={billingState.storeLabel}
+        />
       </View>
 
       {billingState.syncRequired ? (
@@ -221,11 +162,14 @@ export function RevenueCatSubscriptionCard({
             accessibilityRole="alert"
             className="min-w-0 flex-1 text-xs leading-5 text-textPrimary"
           >
-            Your store purchase is active, but protected app access still uses
-            the {billingState.serverLabel} plan.{" "}
+            {entitlement
+              ? `Your store purchase is active, but protected app access still uses the ${billingState.serverLabel} plan.`
+              : "Your store purchase is active. Server access could not be confirmed; retry the plan refresh."}{" "}
             {serverSyncStatus === "delayed"
               ? "Immediate verification is delayed; webhook and scheduled retries remain active."
-              : "Server verification is running automatically; upgraded features unlock after it completes."}
+              : serverSyncStatus === "syncing"
+                ? "Server verification is running; upgraded features unlock after confirmation."
+                : "Refresh to check server access. Upgraded features require server confirmation."}
           </Text>
         </View>
       ) : null}
@@ -238,8 +182,9 @@ export function RevenueCatSubscriptionCard({
 
       {canManagePurchases ? (
         <>
-          <ActionButton
-            busy={(isLoading && !isReady) || activeAction === "customer-center"}
+          <BillingActionButton
+            disabled={actionsDisabled}
+            isLoading={activeAction === "customer-center"}
             icon="credit-card"
             label={
               hasLifetimeAccess
@@ -256,17 +201,19 @@ export function RevenueCatSubscriptionCard({
 
           <View className="gap-3 sm:flex-row">
             <View className="flex-1">
-              <ActionButton
-                busy={activeAction === "restore"}
+              <BillingActionButton
+                disabled={actionsDisabled}
+                isLoading={activeAction === "restore"}
                 icon="refresh-cw"
                 label="Restore purchases"
                 onPress={restore}
               />
             </View>
-            {billingState.syncRequired || (hasPurchaseHistory && !isPremium) ? (
+            {hasPurchaseHistory && !isPremium ? (
               <View className="flex-1">
-                <ActionButton
-                  busy={activeAction === "customer-center"}
+                <BillingActionButton
+                  disabled={actionsDisabled}
+                  isLoading={activeAction === "customer-center"}
                   icon="settings"
                   label="Manage purchase"
                   onPress={openCustomerCenter}

@@ -101,7 +101,7 @@ export function DocumentFilterSheet({
     >
       <View
         accessibilityViewIsModal
-        className="max-h-[90%] min-h-[520px] rounded-t-[30px] bg-white"
+        className="h-[520px] max-h-full shrink rounded-t-[30px] bg-white"
       >
         {selectorMode ? (
           <SearchableOptionSelector

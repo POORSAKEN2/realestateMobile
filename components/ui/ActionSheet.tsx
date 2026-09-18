@@ -44,13 +44,20 @@ export function ActionSheet({
   visible: boolean;
 }) {
   const { can } = useAccess();
-  const visibleActions = actions.filter((action) => !action.permission || can(action.permission, action.propertyId));
+  const visibleActions = actions.filter(
+    (action) => !action.permission || can(action.permission, action.propertyId),
+  );
   const pendingAction = useRef<(() => void) | null>(null);
   const { height } = useWindowDimensions();
   const maxSheetHeight = getStandardModalSheetHeight(height);
 
   function handleAction(action: ActionSheetItem) {
-    if (action.disabled || action.permission && !can(action.permission, action.propertyId)) return;
+    if (
+      pendingAction.current ||
+      action.disabled ||
+      (action.permission && !can(action.permission, action.propertyId))
+    )
+      return;
     if (action.dismissOnPress === false) {
       action.onPress();
       return;

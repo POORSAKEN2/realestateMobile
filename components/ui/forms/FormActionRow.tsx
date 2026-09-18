@@ -37,13 +37,13 @@ export function FormActionRow({
           accessibilityRole="button"
           accessibilityState={{ disabled: isCancelDisabled }}
           activeOpacity={0.85}
-          className={`h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white ${
+          className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white px-3 py-3 ${
             isCancelDisabled ? "opacity-60" : ""
           }`}
           disabled={isCancelDisabled}
           onPress={onCancel}
         >
-          <Text className="font-ralewayBold text-base text-primary">
+          <Text className="text-center font-ralewayBold text-base text-primary">
             {cancelText}
           </Text>
         </TouchableOpacity>
@@ -54,7 +54,7 @@ export function FormActionRow({
           accessibilityRole="button"
           accessibilityState={{ disabled: isSubmitDisabled, busy: isPending }}
           activeOpacity={0.85}
-          className={`h-14 flex-auto items-center justify-center rounded-2xl bg-primary ${
+          className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-primary px-3 py-3 ${
             isSubmitDisabled ? "opacity-60" : ""
           }`}
           disabled={isSubmitDisabled}
@@ -66,8 +66,8 @@ export function FormActionRow({
             <Text
               className={
                 appearance === "card"
-                  ? "font-ralewayBold text-base text-white"
-                  : "font-ralewayBold text-lg text-white"
+                  ? "text-center font-ralewayBold text-base text-white"
+                  : "text-center font-ralewayBold text-lg text-white"
               }
             >
               {submitText}

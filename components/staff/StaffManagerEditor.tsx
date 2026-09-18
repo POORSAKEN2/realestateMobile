@@ -1,5 +1,11 @@
-import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProperties } from "../../api/properties";
 import type {
@@ -8,9 +14,11 @@ import type {
   StaffGateway,
   StaffManager,
 } from "../../types/domain/staff";
+import { isAuthUser } from "../../utils/profile/profileForm";
 import { useAuth } from "../../hooks/useAuth";
 import { validateManagerDetails } from "../../services/staff/staffService";
 import { resolveManagerEditorPermissions } from "../../services/staff/managerPermissionDefaults";
+import { StaffActionButton } from "./StaffActionButton";
 import { BaseField } from "../ui/fields/BaseField";
 import { FormActionRow } from "../ui/forms/FormActionRow";
 import { FormSection } from "../ui/forms/FormSection";
@@ -27,6 +35,8 @@ export function StaffManagerEditor({
   disabled,
   error,
   onCancel,
+  onRetry,
+  retrying = false,
   onSubmit,
 }: {
   gateway: StaffGateway;
@@ -36,6 +46,8 @@ export function StaffManagerEditor({
   error?: string;
   permissionGroups: ManagerPermissionGroup[];
   onCancel: () => void;
+  onRetry?: () => void;
+  retrying?: boolean;
   onSubmit: (payload: CreateStaffManagerPayload) => Promise<void>;
 }) {
   const { session } = useAuth();
@@ -45,22 +57,38 @@ export function StaffManagerEditor({
   const [selectedPermissions, setPermissions] = useState<string[] | undefined>(
     manager?.permissions,
   );
-  const permissions = resolveManagerEditorPermissions(
-    permissionGroups,
-    selectedPermissions,
+  const permissions = useMemo(
+    () =>
+      resolveManagerEditorPermissions(permissionGroups, selectedPermissions),
+    [permissionGroups, selectedPermissions],
   );
+  const submitting = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const busy = pending || isSubmitting;
   const [validationError, setValidationError] = useState("");
   const properties = useQuery({
-    queryKey: ["staff-property-options"],
+    queryKey: [
+      "staff-property-options",
+      isAuthUser(session?.user) ? session.user.id : undefined,
+    ],
     queryFn: () => fetchProperties(session?.accessToken),
     enabled: gateway.supportsAssignments,
   });
   async function submit() {
-    if (pending || disabled) return;
+    if (
+      submitting.current ||
+      busy ||
+      disabled ||
+      (gateway.supportsAssignments &&
+        (properties.isPending || properties.isError))
+    )
+      return;
+    submitting.current = true;
+    setIsSubmitting(true);
     try {
       const payload = {
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim(),
         ...(gateway.supportsAssignments ? { propertyIds } : {}),
         ...(gateway.supportsPermissions ? { permissions } : {}),
       };
@@ -73,10 +101,16 @@ export function StaffManagerEditor({
           ? failure.message
           : "Manager could not be saved.",
       );
+    } finally {
+      submitting.current = false;
+      setIsSubmitting(false);
     }
   }
   return (
-    <View className="flex-1">
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerClassName="gap-5 pb-6"
@@ -89,9 +123,21 @@ export function StaffManagerEditor({
             {validationError || error}
           </Text>
         )}
+        {error && onRetry ? (
+          <StaffActionButton
+            label="Retry staff information"
+            pending={retrying}
+            disabled={busy}
+            onPress={onRetry}
+          />
+        ) : null}
         <FormSection
           title="Manager details"
-          description="The property manager role is fixed."
+          description={
+            manager
+              ? "Update manager details and access. The Manager role is fixed."
+              : "Send an invitation. Access begins only after acceptance; pending invitations reserve a staff seat."
+          }
           icon="account-outline"
           variant="card"
         >
@@ -101,7 +147,7 @@ export function StaffManagerEditor({
             onChangeText={setName}
             required
             variant="filled"
-            editable={!pending}
+            editable={!busy}
           />
           <BaseField
             label="Email"
@@ -111,23 +157,27 @@ export function StaffManagerEditor({
             autoCapitalize="none"
             keyboardType="email-address"
             variant="filled"
-            editable={!pending}
+            editable={!busy}
           />
         </FormSection>
         {gateway.supportsAssignments ? (
           properties.isPending ? (
             <Text>Loading properties…</Text>
           ) : properties.isError ? (
-            <Text
-              accessibilityRole="alert"
-              className="text-danger"
-              onPress={() => void properties.refetch()}
-            >
-              Properties could not be loaded. Tap to retry.
-            </Text>
+            <View className="gap-3 rounded-2xl bg-dangerSurface p-4">
+              <Text accessibilityRole="alert" className="text-danger">
+                Properties could not be loaded. Your selections are preserved.
+              </Text>
+              <StaffActionButton
+                label="Retry properties"
+                pending={properties.isFetching}
+                onPress={() => void properties.refetch()}
+              />
+            </View>
           ) : (
-            <View pointerEvents={pending ? "none" : "auto"}>
+            <View pointerEvents={busy ? "none" : "auto"}>
               <PropertyAssignmentFields
+                disabled={busy}
                 properties={properties.data ?? []}
                 selectedIds={propertyIds}
                 onChange={setPropertyIds}
@@ -141,8 +191,9 @@ export function StaffManagerEditor({
           </Text>
         )}
         {gateway.supportsPermissions && (
-          <View pointerEvents={pending ? "none" : "auto"}>
+          <View pointerEvents={busy ? "none" : "auto"}>
             <ManagerPermissionFields
+              disabled={busy}
               groups={permissionGroups}
               permissions={permissions}
               onChange={setPermissions}
@@ -151,7 +202,7 @@ export function StaffManagerEditor({
         )}
       </ScrollView>
       <FormActionRow
-        isPending={pending}
+        isPending={busy}
         onCancel={onCancel}
         onSubmit={() => void submit()}
         submitDisabled={
@@ -161,6 +212,6 @@ export function StaffManagerEditor({
         }
         submitText={manager ? "Save changes" : "Send invitation"}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
