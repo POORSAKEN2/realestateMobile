@@ -34,9 +34,9 @@ export function AuditValues({
             <Text
               className={`${compact ? "min-w-0 flex-1" : ""} font-ralewayBold text-xs text-description`}
             >
-              {auditLabel(key).replace(/\bids?\b/gi, (label) =>
-                label.toUpperCase(),
-              )}
+              {auditLabel(key)
+                .replace(/\bids\b/gi, "IDs")
+                .replace(/\bid\b/gi, "ID")}
             </Text>
             <Text
               selectable
