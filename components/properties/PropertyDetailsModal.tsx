@@ -544,6 +544,7 @@ export function PropertyDetailsModal({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel="Close property details"
+      topInsetMode={showFullDetails ? "none" : "safe-area"}
       onClose={onClose}
       onDismiss={handleDismiss}
       statusBarTranslucent

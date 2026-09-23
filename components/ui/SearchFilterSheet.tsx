@@ -26,11 +26,12 @@ export function SearchFilterSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title.toLowerCase()}`}
+      keyboardAvoiding
       onClose={onClose}
       visible={visible}
     >
       <SafeAreaView
-        className="max-h-[90%] rounded-t-[30px] bg-white"
+        className="max-h-full shrink rounded-t-[30px] bg-white"
         edges={footer ? [] : ["bottom"]}
       >
         <ModalHeader
@@ -43,6 +44,8 @@ export function SearchFilterSheet({
         <ScrollView
           contentContainerClassName="gap-5 px-5 pb-5 pt-5"
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+          style={{ flexShrink: 1 }}
           showsVerticalScrollIndicator={false}
         >
           {children}

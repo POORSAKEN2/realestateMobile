@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
+import { Button } from "../../components/ui/buttons/Button";
 import { Screen } from "../../components/ui/Screen";
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
@@ -17,15 +18,30 @@ export default function StaffManagerCreatedScreen() {
     managerName?: string | string[];
   }>();
   const deliveryStatus = firstParam(params.deliveryStatus) ?? "queued";
+  const deliveryFailed = deliveryStatus === "failed";
   const managerName = firstParam(params.managerName) ?? "Manager";
   const managerEmail = firstParam(params.managerEmail) ?? "";
 
   return (
     <Screen bottomInset="safe-area" className="bg-surface">
-      <View className="flex-1 justify-center">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingBottom: 16,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
         <View className="items-center">
-          <View className="h-24 w-24 items-center justify-center rounded-[32px] bg-successSurface">
-            <Ionicons name="checkmark" color={colors.success} size={48} />
+          <View
+            className={`h-24 w-24 items-center justify-center rounded-[32px] ${deliveryFailed ? "bg-warningSurface" : "bg-successSurface"}`}
+          >
+            <Ionicons
+              name={deliveryFailed ? "alert-circle-outline" : "checkmark"}
+              color={deliveryFailed ? colors.warning : colors.success}
+              size={48}
+            />
           </View>
           <Text className="mt-7 text-center font-ralewayExtraBold text-[30px] text-textPrimary">
             {deliveryStatus === "failed"
@@ -50,10 +66,7 @@ export default function StaffManagerCreatedScreen() {
               <Text className="font-ralewayBold text-xs text-description">
                 Account email
               </Text>
-              <Text
-                className="mt-1 font-ralewayBold text-base text-textPrimary"
-                numberOfLines={1}
-              >
+              <Text className="mt-1 font-ralewayBold text-base text-textPrimary">
                 {managerEmail}
               </Text>
             </View>
@@ -89,17 +102,15 @@ export default function StaffManagerCreatedScreen() {
           </Text>
         </View>
 
-        <TouchableOpacity
-          accessibilityRole="button"
-          activeOpacity={0.84}
-          className="mt-8 h-14 items-center justify-center rounded-2xl bg-primary"
-          onPress={() => router.dismissTo(appRoutes.secondary.staffManagement)}
-        >
-          <Text className="font-ralewayExtraBold text-base text-white">
-            Done
-          </Text>
-        </TouchableOpacity>
-      </View>
+        <View className="mt-8">
+          <Button
+            title="Done"
+            onPress={() =>
+              router.dismissTo(appRoutes.secondary.staffManagement)
+            }
+          />
+        </View>
+      </ScrollView>
     </Screen>
   );
 }

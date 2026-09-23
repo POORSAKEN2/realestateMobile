@@ -64,10 +64,20 @@ test("manager cannot gain owner operations through supplied grants", () => {
       "billing.checkout",
       "expenses.approve",
       "payments.delete",
+      "audit.view",
+      "audit.export",
     ],
   });
   for (const permission of access.permissions)
     assert.equal(permits(access, permission), false);
+});
+test("audit history and exports require owner permissions", () => {
+  for (const path of ["/audit-events", "/audit-events/event-id", "/audit-events/event-id/record", "/audit-events/export"]) {
+    const request = describeRequest(path, "GET");
+    assert.equal(request.permission, path.endsWith("/export") ? "audit.export" : "audit.view");
+    assert.doesNotThrow(() => assertRequestAccess(owner, request, new ResourceScopeIndex()));
+    assert.throws(() => assertRequestAccess(manager, request, new ResourceScopeIndex()), ApiError);
+  }
 });
 test("explicit empty and malformed grants deny rather than use defaults", () => {
   for (const permissions of [[], null, "all", {}]) {

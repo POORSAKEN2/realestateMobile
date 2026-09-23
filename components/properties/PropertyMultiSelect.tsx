@@ -1,42 +1,18 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
+import { SelectionCheckbox } from "../ui/SelectionCheckbox";
 
-function Choice({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <TouchableOpacity
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked: selected }}
-      onPress={onPress}
-      className={`min-h-11 justify-center rounded-xl border px-3 py-2 ${selected ? "border-primary bg-primary/10" : "border-primary/20"}`}
-    >
-      <Text
-        className={
-          selected ? "font-ralewayBold text-primary" : "text-description"
-        }
-      >
-        {selected ? "✓ " : ""}
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-}
 export function PropertyMultiSelect({
   properties,
   selectedIds,
   onChange,
+  disabled = false,
   title = "Assigned properties",
   description = "Select the properties linked to this record.",
 }: {
   properties: Array<{ id: string; title: string }>;
   selectedIds: string[];
   onChange: (ids: string[]) => void;
+  disabled?: boolean;
   title?: string;
   description?: string;
 }) {
@@ -46,8 +22,14 @@ export function PropertyMultiSelect({
     <View className="gap-3">
       <Text className="font-ralewayExtraBold text-lg">{title}</Text>
       <Text className="text-description">{description}</Text>
+      {!properties.length && !selectedIds.length ? (
+        <Text className="rounded-2xl bg-primary/5 p-4 text-sm text-description">
+          No properties available to assign.
+        </Text>
+      ) : null}
       {properties.map((property) => (
-        <Choice
+        <SelectionCheckbox
+          disabled={disabled}
           key={property.id}
           label={property.title}
           selected={selected.has(property.id)}
@@ -63,7 +45,8 @@ export function PropertyMultiSelect({
       {selectedIds
         .filter((id) => !available.has(id))
         .map((id) => (
-          <Choice
+          <SelectionCheckbox
+            disabled={disabled}
             key={id}
             label={`Unavailable property (${id})`}
             selected

@@ -102,6 +102,7 @@ export function DocumentFormModal({
   }
 
   function handleClose() {
+    if (isSaving) return;
     if (selectorMode) {
       closeSelector();
       return;
@@ -113,13 +114,14 @@ export function DocumentFormModal({
     <BottomSheetModal
       backdropAccessibilityLabel="Close document form"
       closeOnBackdropPress={false}
+      dismissDisabled={isSaving}
       keyboardAvoiding
       onClose={handleClose}
       visible={visible}
     >
       <View
         accessibilityViewIsModal
-        className="max-h-[94%] min-h-[620px] overflow-hidden rounded-t-[30px] bg-surface"
+        className="h-[620px] max-h-full shrink overflow-hidden rounded-t-[30px] bg-surface"
       >
         {selectorMode ? (
           <SearchableOptionSelector
@@ -288,7 +290,13 @@ export function DocumentFormModal({
                 isPending={isSaving}
                 onCancel={onClose}
                 onSubmit={onSubmit}
-                submitDisabled={!canSubmit || !can(editingDocument ? "documents.update" : "documents.create", form.propertyId || undefined)}
+                submitDisabled={
+                  !canSubmit ||
+                  !can(
+                    editingDocument ? "documents.update" : "documents.create",
+                    form.propertyId || undefined,
+                  )
+                }
                 submitText={
                   editingDocument ? "Save changes" : "Upload document"
                 }

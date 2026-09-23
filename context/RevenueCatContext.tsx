@@ -112,7 +112,11 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
 
   const synchronizeServerEntitlement = useCallback(
     (nextCustomerInfo: CustomerInfo) => {
-      if (!identity?.appUserId || !hasAppPermission(purchaseUser.current, "billing.checkout")) return;
+      if (
+        !identity?.appUserId ||
+        !hasAppPermission(purchaseUser.current, "billing.checkout")
+      )
+        return;
       const fingerprint = JSON.stringify([
         identity.appUserId,
         getRevenueCatEntitlementFingerprint(nextCustomerInfo),
@@ -128,7 +132,8 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
 
         while (handledVersion < serverSyncRequestVersion.current) {
           handledVersion = serverSyncRequestVersion.current;
-          if (!hasAppPermission(purchaseUser.current, "billing.checkout")) return;
+          if (!hasAppPermission(purchaseUser.current, "billing.checkout"))
+            return;
           const tenantAtRequest = currentTenant.current;
           const targetTier = pendingServerTier.current;
           setServerSyncStatus("syncing");
@@ -137,7 +142,11 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
             targetTier,
           );
 
-          if (tenantAtRequest !== currentTenant.current || !hasAppPermission(purchaseUser.current, "billing.checkout")) continue;
+          if (
+            tenantAtRequest !== currentTenant.current ||
+            !hasAppPermission(purchaseUser.current, "billing.checkout")
+          )
+            continue;
           if (result.entitlement) {
             queryClient.setQueryData(
               BILLING_ENTITLEMENT_QUERY_KEY,
@@ -259,6 +268,11 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
     updateCustomerInfo,
   ]);
 
+  const packages = useMemo(
+    () => indexRevenueCatPackages(currentOffering?.availablePackages ?? []),
+    [currentOffering],
+  );
+
   const value = useMemo<RevenueCatContextValue>(
     () => ({
       activeTier: getActiveRevenueCatTier(customerInfo),
@@ -268,9 +282,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       isLoading,
       isPremium: hasRevenueCatPremium(customerInfo),
       isReady,
-      packages: indexRevenueCatPackages(
-        currentOffering?.availablePackages ?? [],
-      ),
+      packages,
       presentCustomerCenter: async () => {
         authorizeBillingPurchase(purchaseUser.current);
         await presentRevenueCatCustomerCenter({
@@ -309,6 +321,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       error,
       isLoading,
       isReady,
+      packages,
       refresh,
       serverSyncStatus,
       updateCustomerInfo,

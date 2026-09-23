@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { Button } from "./buttons/Button";
 import { searchGlobal } from "../../api/search";
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
@@ -27,10 +28,15 @@ type GlobalSearchModalProps = { onClose: () => void };
 export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GlobalSearchResults | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    let active = true;
     const trimmed = query.trim();
+    setError(null);
+    setResults(null);
     if (trimmed.length < 2) {
       setResults(null);
       setIsLoading(false);
@@ -41,16 +47,24 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
     const timeoutId = setTimeout(async () => {
       try {
         const data = await searchGlobal(trimmed);
-        setResults(data);
+        if (active) setResults(data);
       } catch (err) {
-        console.warn("Global search error:", err);
+        if (active)
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Search could not be completed. Please retry.",
+          );
       } finally {
-        setIsLoading(false);
+        if (active) setIsLoading(false);
       }
     }, 300);
 
-    return () => clearTimeout(timeoutId);
-  }, [query]);
+    return () => {
+      active = false;
+      clearTimeout(timeoutId);
+    };
+  }, [query, retry]);
 
   function navigateTo(route: Href) {
     onClose();
@@ -91,18 +105,31 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                 value={query}
               />
               {query ? (
-                <TouchableOpacity onPress={() => setQuery("")}>
-                  <Ionicons name="close-circle" size={18} color={colors.description} />
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear search"
+                  className="h-11 w-11 items-center justify-center"
+                  onPress={() => setQuery("")}
+                >
+                  <Ionicons
+                    name="close-circle"
+                    size={18}
+                    color={colors.description}
+                  />
                 </TouchableOpacity>
               ) : null}
             </View>
 
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Cancel search"
               activeOpacity={0.7}
-              className="h-12 px-3 items-center justify-center rounded-2xl"
+              className="h-12 items-center justify-center rounded-2xl px-3"
               onPress={onClose}
             >
-              <Text className="font-ralewayBold text-sm text-primary">Cancel</Text>
+              <Text className="font-ralewayBold text-sm text-primary">
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -116,6 +143,8 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
           <ScrollView
             className="flex-1 px-5 pt-4"
             contentContainerClassName="pb-12 gap-5"
+            automaticallyAdjustKeyboardInsets
+            keyboardDismissMode="interactive"
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
@@ -126,12 +155,28 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                   Type at least 2 characters
                 </Text>
                 <Text className="mt-1 text-center text-xs text-description">
-                  Universal search across Properties, Leases, Tenants, Expenses, Documents, and Bookings.
+                  Universal search across Properties, Leases, Tenants, Expenses,
+                  Documents, and Bookings.
                 </Text>
               </View>
+            ) : error ? (
+              <View className="gap-3 rounded-2xl bg-dangerSurface p-4">
+                <Text accessibilityRole="alert" className="text-danger">
+                  {error}
+                </Text>
+                <Button
+                  title="Retry search"
+                  variant="secondary"
+                  onPress={() => setRetry((value) => value + 1)}
+                />
+              </View>
             ) : !hasResults ? (
-              <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-white p-8 mt-4">
-                <Ionicons name="alert-circle-outline" size={36} color={colors.description} />
+              <View className="mt-4 items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-white p-8">
+                <Ionicons
+                  name="alert-circle-outline"
+                  size={36}
+                  color={colors.description}
+                />
                 <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
                   No matching records found
                 </Text>
@@ -156,7 +201,11 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       >
                         <View className="flex-row items-center gap-3">
                           <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                            <Ionicons name="business-outline" size={18} color={colors.primary} />
+                            <Ionicons
+                              name="business-outline"
+                              size={18}
+                              color={colors.primary}
+                            />
                           </View>
                           <View>
                             <Text className="font-ralewayBold text-sm text-textPrimary">
@@ -167,7 +216,11 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                             </Text>
                           </View>
                         </View>
-                        <Ionicons name="chevron-forward" size={16} color={colors.description} />
+                        <Ionicons
+                          name="chevron-forward"
+                          size={16}
+                          color={colors.description}
+                        />
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -188,18 +241,29 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       >
                         <View className="flex-row items-center gap-3">
                           <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                            <Ionicons name="document-text-outline" size={18} color={colors.primary} />
+                            <Ionicons
+                              name="document-text-outline"
+                              size={18}
+                              color={colors.primary}
+                            />
                           </View>
                           <View>
                             <Text className="font-ralewayBold text-sm text-textPrimary">
                               {item.client?.name || "Lease Contract"}
                             </Text>
                             <Text className="text-xs text-description">
-                              Status: {item.status || "Active"} {item.room_number ? `• Room ${item.room_number}` : ""}
+                              Status: {item.status || "Active"}{" "}
+                              {item.room_number
+                                ? `• Room ${item.room_number}`
+                                : ""}
                             </Text>
                           </View>
                         </View>
-                        <Ionicons name="chevron-forward" size={16} color={colors.description} />
+                        <Ionicons
+                          name="chevron-forward"
+                          size={16}
+                          color={colors.description}
+                        />
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -220,7 +284,11 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       >
                         <View className="flex-row items-center gap-3">
                           <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                            <Ionicons name="person-outline" size={18} color={colors.primary} />
+                            <Ionicons
+                              name="person-outline"
+                              size={18}
+                              color={colors.primary}
+                            />
                           </View>
                           <View>
                             <Text className="font-ralewayBold text-sm text-textPrimary">
@@ -231,7 +299,11 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                             </Text>
                           </View>
                         </View>
-                        <Ionicons name="chevron-forward" size={16} color={colors.description} />
+                        <Ionicons
+                          name="chevron-forward"
+                          size={16}
+                          color={colors.description}
+                        />
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -252,18 +324,30 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       >
                         <View className="flex-row items-center gap-3">
                           <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                            <Ionicons name="receipt-outline" size={18} color={colors.primary} />
+                            <Ionicons
+                              name="receipt-outline"
+                              size={18}
+                              color={colors.primary}
+                            />
                           </View>
                           <View>
                             <Text className="font-ralewayBold text-sm text-textPrimary">
                               {item.description || item.category || "Expense"}
                             </Text>
-                            <Text className="text-xs text-primary font-ralewayBold">
-                              ₱{Number(item.amount || 0).toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                            <Text className="font-ralewayBold text-xs text-primary">
+                              ₱
+                              {Number(item.amount || 0).toLocaleString(
+                                "en-PH",
+                                { minimumFractionDigits: 2 },
+                              )}
                             </Text>
                           </View>
                         </View>
-                        <Ionicons name="chevron-forward" size={16} color={colors.description} />
+                        <Ionicons
+                          name="chevron-forward"
+                          size={16}
+                          color={colors.description}
+                        />
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -280,11 +364,17 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                         key={item.id}
                         activeOpacity={0.7}
                         className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-white p-3.5"
-                        onPress={() => navigateTo(appRoutes.secondary.documents)}
+                        onPress={() =>
+                          navigateTo(appRoutes.secondary.documents)
+                        }
                       >
                         <View className="flex-row items-center gap-3">
                           <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                            <MaterialCommunityIcons name="file-document-outline" size={18} color={colors.primary} />
+                            <MaterialCommunityIcons
+                              name="file-document-outline"
+                              size={18}
+                              color={colors.primary}
+                            />
                           </View>
                           <View>
                             <Text className="font-ralewayBold text-sm text-textPrimary">
@@ -295,7 +385,11 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                             </Text>
                           </View>
                         </View>
-                        <Ionicons name="chevron-forward" size={16} color={colors.description} />
+                        <Ionicons
+                          name="chevron-forward"
+                          size={16}
+                          color={colors.description}
+                        />
                       </TouchableOpacity>
                     ))}
                   </View>
@@ -316,18 +410,29 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       >
                         <View className="flex-row items-center gap-3">
                           <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                            <Ionicons name="calendar-outline" size={18} color={colors.primary} />
+                            <Ionicons
+                              name="calendar-outline"
+                              size={18}
+                              color={colors.primary}
+                            />
                           </View>
                           <View>
                             <Text className="font-ralewayBold text-sm text-textPrimary">
                               {item.client?.name || "Transient Guest"}
                             </Text>
                             <Text className="text-xs text-description">
-                              Status: {item.status || "Booked"} {item.room_number ? `• Room ${item.room_number}` : ""}
+                              Status: {item.status || "Booked"}{" "}
+                              {item.room_number
+                                ? `• Room ${item.room_number}`
+                                : ""}
                             </Text>
                           </View>
                         </View>
-                        <Ionicons name="chevron-forward" size={16} color={colors.description} />
+                        <Ionicons
+                          name="chevron-forward"
+                          size={16}
+                          color={colors.description}
+                        />
                       </TouchableOpacity>
                     ))}
                   </View>

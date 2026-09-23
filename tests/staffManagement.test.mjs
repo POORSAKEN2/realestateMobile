@@ -11,6 +11,9 @@ const {
 } = load("../../services/staff/httpStaffGateway.ts");
 const { normalizeAccess } = load("../../utils/auth/accessAdapter.ts");
 const { staffApiContract } = load("../../api/staffContract.ts");
+const { resolveManagerEditorPermissions } = load(
+  "../../services/staff/managerPermissionDefaults.ts",
+);
 const owner = normalizeAccess({ role: "ADMIN" });
 const capacity = {
   limit: 5,
@@ -42,6 +45,51 @@ const details = {
   propertyIds: [],
   permissions: [],
 };
+test("new invitation defaults use only catalog-approved core viewing grants", () => {
+  const catalog = [
+    {
+      label: "Properties",
+      options: [
+        { label: "View", grants: ["properties.viewAny", "properties.view"] },
+        { label: "Add", grants: ["properties.create"] },
+        { label: "Delete", grants: ["properties.delete"] },
+      ],
+    },
+    {
+      label: "Clients",
+      options: [{ label: "View", grants: ["clients.viewAny", "clients.view"] }],
+    },
+    {
+      label: "Billing",
+      options: [
+        { label: "View Entitlement", grants: ["billing.viewEntitlement"] },
+      ],
+    },
+    {
+      label: "Notifications",
+      options: [{ label: "View", grants: ["notifications.viewAny"] }],
+    },
+  ];
+  assert.deepEqual(resolveManagerEditorPermissions(catalog), [
+    "properties.viewAny",
+    "properties.view",
+    "clients.viewAny",
+    "clients.view",
+    "billing.viewEntitlement",
+    "notifications.viewAny",
+  ]);
+  assert.deepEqual(resolveManagerEditorPermissions([]), []);
+  assert.deepEqual(resolveManagerEditorPermissions(catalog.slice(0, 1)), [
+    "properties.viewAny",
+    "properties.view",
+  ]);
+  // Catalog refreshes must not reapply defaults after deselection or editing.
+  assert.deepEqual(resolveManagerEditorPermissions(catalog, []), []);
+  assert.deepEqual(
+    resolveManagerEditorPermissions(catalog, ["properties.update"]),
+    ["properties.update"],
+  );
+});
 function fixture() {
   const calls = [];
   const gateway = {
