@@ -104,6 +104,7 @@ export type Property = {
   listing_description?: string;
   listing_monthly_rent?: number;
   listing_available_from?: string;
+  archivedAt?: string | null;
 };
 
 export type PropertyImageUpload = {

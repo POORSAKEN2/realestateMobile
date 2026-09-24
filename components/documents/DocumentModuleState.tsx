@@ -10,6 +10,7 @@ export function DocumentModuleState({
   onClearFilters,
   onRetry,
   onUpload,
+  uploadEnabled = true,
 }: {
   isError: boolean;
   isFiltered: boolean;
@@ -17,6 +18,7 @@ export function DocumentModuleState({
   onClearFilters: () => void;
   onRetry: () => void;
   onUpload: () => void;
+  uploadEnabled?: boolean;
 }) {
   if (isLoading) {
     return (
@@ -55,11 +57,11 @@ export function DocumentModuleState({
 
   return (
     <StateCard
-      actionLabel="Upload document"
-      description="Add leases, compliance files, contracts, and maintenance records to your library."
-      icon="file-document-plus-outline"
-      onAction={onUpload}
-      title="Build your document library"
+      actionLabel={uploadEnabled ? "Upload document" : undefined}
+      description={uploadEnabled ? "Add leases, compliance files, contracts, and maintenance records to your library." : "Archived documents appear here and can be restored by an administrator."}
+      icon={uploadEnabled ? "file-document-plus-outline" : "archive-outline"}
+      onAction={uploadEnabled ? onUpload : undefined}
+      title={uploadEnabled ? "Build your document library" : "No archived documents"}
     />
   );
 }
@@ -71,10 +73,10 @@ function StateCard({
   onAction,
   title,
 }: {
-  actionLabel: string;
+  actionLabel?: string;
   description: string;
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  onAction: () => void;
+  onAction?: () => void;
   title: string;
 }) {
   return (
@@ -88,7 +90,7 @@ function StateCard({
       <Text className="mt-2 text-center font-ralewayMedium text-sm leading-6 text-description">
         {description}
       </Text>
-      <TouchableOpacity
+      {actionLabel && onAction ? <TouchableOpacity
         accessibilityRole="button"
         activeOpacity={0.85}
         className="mt-5 min-h-12 justify-center rounded-2xl bg-primary px-5"
@@ -97,7 +99,7 @@ function StateCard({
         <Text className="font-ralewayExtraBold text-sm text-white">
           {actionLabel}
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> : null}
     </View>
   );
 }

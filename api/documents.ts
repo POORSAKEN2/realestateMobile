@@ -97,6 +97,7 @@ function normalizeDocument(document: Record<string, any>): PropertyDocument {
       document?.lesseeId ??
       document?.lessee_id ??
       undefined,
+    archivedAt: document?.archivedAt ?? document?.archived_at ?? null,
   };
 }
 

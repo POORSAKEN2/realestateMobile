@@ -110,6 +110,15 @@ export function describeRequest(
   if (segments[0] === "users") permission = "staff.manage";
   if (segments[0] === "audit-events")
     permission = segments[1] === "export" ? "audit.export" : "audit.view";
+  if (segments[0] === "governance") permission = "deletion.preview";
+  if (segments[0] === "properties" && segments[2] === "archive")
+    permission = "properties.archive";
+  if (segments[0] === "properties" && segments[2] === "restore")
+    permission = "properties.restore";
+  if (segments[0] === "documents" && segments[2] === "archive")
+    permission = "documents.archive";
+  if (segments[0] === "documents" && segments[2] === "restore")
+    permission = "documents.restore";
   if (segments[0] === "staff") permission = "staff.manage";
   if (segments[0] === "properties" && segments[2] === "managers")
     permission = "staff.manage";

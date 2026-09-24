@@ -9,7 +9,7 @@ import { BedspaceCard } from "../../components/bedspaces/BedspaceCard";
 import { BedspaceFormFields } from "../../components/bedspaces/BedspaceFormFields";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { AddEditModal } from "../../components/ui/AddEditModal";
-import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
+import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import {
   ModuleEmptyState,
@@ -32,6 +32,7 @@ import { useBedspaceManagement } from "../../hooks/bedspaces/useBedspaceManageme
 import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import type { Bedspace } from "../../types";
+import { useDeletionGovernance } from "../../hooks/useDeletionGovernance";
 
 function firstParam(value?: string | string[]) {
   return Array.isArray(value) ? value[0] : (value ?? "");
@@ -50,6 +51,7 @@ export default function BedspacesScreen() {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
   const snackbar = useSnackbar();
+  const governance = useDeletionGovernance(() => snackbar.show("Bedspace deleted."));
   const roomsQuery = usePropertyRoomsQuery(propertyId, accessToken);
   const rooms = roomsQuery.data ?? [];
   const [selectedRoomId, setSelectedRoomId] = useState(initialRoomId);
@@ -334,7 +336,7 @@ export default function BedspacesScreen() {
         onClose={() => setActionTarget(null)}
         onDelete={(bedspace) => {
           setActionTarget(null);
-          management.setDeleteTarget(bedspace);
+          governance.open({ resource: "bedspaces", id: bedspace.id, label: `Bedspace ${bedspace.bedspaceNumber}` });
         }}
         onEdit={(bedspace) => {
           setActionTarget(null);
@@ -368,13 +370,16 @@ export default function BedspacesScreen() {
         />
       </AddEditModal>
 
-      <ConfirmationModal
-        description={`Delete Bedspace ${management.deleteTarget?.bedspaceNumber ?? ""}? Bedspaces with lease history are protected by the backend.`}
-        isPending={management.isDeleting}
-        onCancel={() => management.setDeleteTarget(null)}
-        onConfirm={() => void management.confirmDelete()}
-        title="Delete bedspace?"
-        visible={Boolean(management.deleteTarget)}
+      <DeletionImpactSheet
+        error={governance.error}
+        impact={governance.impact}
+        isLoading={governance.isLoading}
+        isPending={governance.isPending}
+        label={governance.target?.label}
+        onClose={governance.close}
+        onConfirm={governance.confirm}
+        onRetry={() => void governance.refetch()}
+        visible={Boolean(governance.target)}
       />
 
       <ScreenSnackbar

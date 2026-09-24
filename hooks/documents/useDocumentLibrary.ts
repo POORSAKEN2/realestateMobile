@@ -27,6 +27,7 @@ type SaveDocumentInput = {
 
 export function useDocumentLibrary(
   repository: DocumentRepository = apiDocumentRepository,
+  archiveState: "active" | "archived" = "active",
 ) {
   const { session } = useAuth();
   const accessToken = session?.accessToken;
@@ -36,8 +37,8 @@ export function useDocumentLibrary(
   const propertiesQuery = useList();
   const documentsQuery = useQuery({
     enabled: Boolean(accessToken),
-    queryFn: () => repository.list(accessToken),
-    queryKey: ["documents", accessToken],
+    queryFn: () => repository.list(accessToken, undefined, archiveState),
+    queryKey: ["documents", accessToken, archiveState],
   });
   const clientsQuery = useQuery({
     enabled: Boolean(accessToken),
@@ -93,16 +94,6 @@ export function useDocumentLibrary(
       ]),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (documentId: string) =>
-      repository.remove(documentId, accessToken),
-    onSuccess: () =>
-      Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["documents"] }),
-        queryClient.invalidateQueries({ queryKey: BILLING_ENTITLEMENT_QUERY_KEY }),
-      ]),
-  });
-
   const isLoading =
     documentsQuery.isLoading ||
     clientsQuery.isLoading ||
@@ -117,10 +108,8 @@ export function useDocumentLibrary(
   }
 
   return {
-    deleteDocument: deleteMutation.mutateAsync,
     documents: documentsQuery.data ?? [],
     error: documentsQuery.error,
-    isDeleting: deleteMutation.isPending,
     isError: documentsQuery.isError,
     isLoading,
     isSaving: saveMutation.isPending,

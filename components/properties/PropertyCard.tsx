@@ -83,13 +83,17 @@ export function PropertyCard({
   onOpenFloorPlans,
   onOpenBedspaces,
   onOpenBookings,
+  onArchive,
+  onRestore,
 }: {
   property: Property;
-  onEdit: () => void;
+  onEdit?: () => void;
   onOpenDetails: () => void;
-  onOpenFloorPlans: () => void;
-  onOpenBedspaces: () => void;
+  onOpenFloorPlans?: () => void;
+  onOpenBedspaces?: () => void;
   onOpenBookings?: () => void;
+  onArchive?: () => void;
+  onRestore?: () => void;
 }) {
   const occupancy = property.occupancy ?? 0;
   const propertyImages = getPropertyImages(property);
@@ -236,7 +240,18 @@ export function PropertyCard({
           <PropertyMetric label="Occupancy" value={`${occupancy}%`} />
         </View>
 
-        <TouchableOpacity
+        {property.archivedAt ? (
+          <View className="mt-4 rounded-2xl bg-primary/10 p-3.5">
+            <Text className="font-ralewayBold text-xs uppercase text-secondary">
+              Archived
+            </Text>
+            <Text className="mt-1 text-xs text-description">
+              {new Date(property.archivedAt).toLocaleString()}
+            </Text>
+          </View>
+        ) : null}
+
+        {!property.archivedAt && onOpenBedspaces ? <TouchableOpacity
           accessibilityLabel={`Manage bedspaces for ${property.title}`}
           accessibilityRole="button"
           activeOpacity={0.82}
@@ -275,9 +290,9 @@ export function PropertyCard({
             color="#8A77F4"
             size={21}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> : null}
 
-        {floorManagerPolicy.showFloorSummary ? (
+        {!property.archivedAt && onOpenFloorPlans && floorManagerPolicy.showFloorSummary ? (
           <TouchableOpacity
             accessibilityLabel={`Manage floor plans for ${property.title}`}
             accessibilityRole="button"
@@ -369,19 +384,31 @@ export function PropertyCard({
             ) : null}
           </View>
 
-          {onOpenBookings ? (
+          {!property.archivedAt && onOpenBookings ? (
             <PermissionGate permission="bookings.viewAny" propertyId={property.id}><PropertyAction
               icon="calendar-clock"
               label="Bookings"
               onPress={onOpenBookings}
             /></PermissionGate>
           ) : null}
-          <PermissionGate permission="properties.update" propertyId={property.id}><PropertyAction
-            icon="pencil-outline"
-            label="Edit"
-            onPress={onEdit}
-            primary
-          /></PermissionGate>
+          {property.archivedAt && onRestore ? (
+            <PermissionGate permission="properties.restore">
+              <PropertyAction icon="restore" label="Restore" onPress={onRestore} primary />
+            </PermissionGate>
+          ) : null}
+          {!property.archivedAt && onArchive ? (
+            <PermissionGate permission="properties.archive">
+              <PropertyAction icon="archive-outline" label="Archive" onPress={onArchive} />
+            </PermissionGate>
+          ) : null}
+          {!property.archivedAt && onEdit ? (
+            <PermissionGate permission="properties.update" propertyId={property.id}><PropertyAction
+              icon="pencil-outline"
+              label="Edit"
+              onPress={onEdit}
+              primary
+            /></PermissionGate>
+          ) : null}
         </View>
       </View>
     </TouchableOpacity>

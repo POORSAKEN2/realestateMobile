@@ -13,7 +13,7 @@ import {
   MissingFloorState,
   MissingPropertyState,
 } from "../../components/floorplans/FloorPlanManagerState";
-import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
+import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
 import { Screen } from "../../components/ui/Screen";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { appRoutes } from "../../constants/navigation";
@@ -21,6 +21,7 @@ import { useProperties } from "../../hooks/api/useProperties";
 import { useFloorPlanManagerController } from "../../hooks/floorplans/useFloorPlanManagerController";
 import { useFloorPlanSnackbar } from "../../hooks/floorplans/useFloorPlanSnackbar";
 import { useAuth } from "../../hooks/useAuth";
+import { useDeletionGovernance } from "../../hooks/useDeletionGovernance";
 import { deviceFloorPlanDependencies } from "../../services/floorplans/deviceFloorPlanServices";
 import {
   getRoomManagementGuidance,
@@ -69,6 +70,7 @@ export default function FloorAreasScreen() {
     isImageUploading: controller.pending.imageUpload,
     notice: controller.notice,
   });
+  const governance = useDeletionGovernance();
 
   if (!propertyId) {
     return (
@@ -134,7 +136,7 @@ export default function FloorAreasScreen() {
             hiddenAreaIds={controller.visibility.hiddenAreaIds}
             isShapeSaving={controller.pending.shape}
             onCancelDrawing={actions.closeDrawing}
-            onDeleteArea={actions.openAreaDelete}
+            onDeleteArea={(area) => governance.open({ resource: "areas", id: area.id, label: area.label })}
             onDrawArea={actions.openDrawing}
             onManageRooms={roomBatch.open}
             onRefresh={refreshFloorAreas}
@@ -199,18 +201,16 @@ export default function FloorAreasScreen() {
         selectedRoomId={roomBatch.selectedRoomId}
         snackbarMessage={roomBatch.batchSnackbar.message}
       />
-      <ConfirmationModal
-        confirmLabel="Delete"
-        description={
-          controller.deleteTarget?.kind === "area"
-            ? `Delete ${controller.deleteTarget.item.label}? Assigned rooms remain but become unassigned.`
-            : ""
-        }
-        isPending={controller.pending.delete}
-        onCancel={() => actions.setDeleteTarget(null)}
-        onConfirm={actions.confirmDelete}
-        title="Delete area?"
-        visible={controller.deleteTarget?.kind === "area"}
+      <DeletionImpactSheet
+        error={governance.error}
+        impact={governance.impact}
+        isLoading={governance.isLoading}
+        isPending={governance.isPending}
+        label={governance.target?.label}
+        onClose={governance.close}
+        onConfirm={governance.confirm}
+        onRetry={() => void governance.refetch()}
+        visible={Boolean(governance.target)}
       />
       <ScreenSnackbar
         icon={floorPlanSnackbar.icon}

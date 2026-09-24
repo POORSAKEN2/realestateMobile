@@ -250,7 +250,7 @@ export function BookingFormModal({
               The reservation will remain in your records as cancelled.
             </Text>
           </View>
-          <PermissionGate permission="bookings.update"><TouchableOpacity
+          <PermissionGate permission="bookings.delete"><TouchableOpacity
             accessibilityRole="button"
             activeOpacity={0.85}
             className="h-12 items-center justify-center rounded-2xl border border-danger/20 bg-white"

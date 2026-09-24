@@ -23,12 +23,14 @@ import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
 import { SearchToolbar } from "../../components/ui/SearchToolbar";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
+import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useClients } from "../../hooks/api/useClients";
 import { usePropertyRoomsQuery } from "../../hooks/api/useFloorPlans";
 import { useBookingCalendar, useBookingForm } from "../../hooks/bookings";
 import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { useDeletionGovernance } from "../../hooks/useDeletionGovernance";
 import {
   getParamValue,
   type StatusFilter,
@@ -142,6 +144,7 @@ export default function BookingsScreen() {
     availabilityBookings: selectedBuildingBookings,
   });
   const bookingSnackbar = useSnackbar();
+  const governance = useDeletionGovernance(() => bookingSnackbar.show("Booking cancelled."));
   const bookingForm = useBookingForm({
     accessToken,
     bookings,
@@ -287,12 +290,17 @@ export default function BookingsScreen() {
         formError={bookingForm.message}
         guests={guests}
         isAddingGuest={bookingForm.isAddingGuest}
-        isCancelling={bookingForm.isCancelling}
+        isCancelling={governance.isPending}
         isLoadingRooms={bookingForm.isLoadingRooms}
         isSaving={bookingForm.isSaving}
         isVisible={bookingForm.isOpen}
         mode={bookingForm.mode}
-        onCancelBooking={bookingForm.cancel}
+        onCancelBooking={() => {
+          const booking = bookingForm.editingBooking;
+          if (!booking) return;
+          bookingForm.close();
+          governance.open({ resource: "bookings", id: booking.id, label: booking.guestName });
+        }}
         onClose={bookingForm.close}
         onSelectBuilding={bookingForm.selectBuilding}
         onSelectRoom={bookingForm.selectRoom}
@@ -303,6 +311,18 @@ export default function BookingsScreen() {
         selectedBuilding={bookingForm.selectedBuilding}
         selectedGuestId={bookingForm.selectedGuestId}
         selectedRoom={bookingForm.selectedRoom}
+      />
+
+      <DeletionImpactSheet
+        error={governance.error}
+        impact={governance.impact}
+        isLoading={governance.isLoading}
+        isPending={governance.isPending}
+        label={governance.target?.label}
+        onClose={governance.close}
+        onConfirm={governance.confirm}
+        onRetry={() => void governance.refetch()}
+        visible={Boolean(governance.target)}
       />
 
       <ScreenSnackbar

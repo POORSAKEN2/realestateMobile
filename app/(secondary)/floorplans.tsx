@@ -11,7 +11,7 @@ import {
   MissingPropertyState,
 } from "../../components/floorplans/FloorPlanManagerState";
 import { FloorPlanWorkspace } from "../../components/floorplans/FloorPlanWorkspace";
-import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
+import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
 import { Screen } from "../../components/ui/Screen";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { appRoutes } from "../../constants/navigation";
@@ -19,6 +19,7 @@ import { useFloorPlanManagerController } from "../../hooks/floorplans/useFloorPl
 import { useFloorPlanSnackbar } from "../../hooks/floorplans/useFloorPlanSnackbar";
 import { useProperties } from "../../hooks/api/useProperties";
 import { useAuth } from "../../hooks/useAuth";
+import { useDeletionGovernance } from "../../hooks/useDeletionGovernance";
 import { deviceFloorPlanDependencies } from "../../services/floorplans/deviceFloorPlanServices";
 import {
   getFloorManagerGuidance,
@@ -28,15 +29,6 @@ import {
 
 function firstParam(value?: string | string[]) {
   return Array.isArray(value) ? value[0] : (value ?? "");
-}
-
-function floorDeleteDescription(
-  target: ReturnType<typeof useFloorPlanManagerController>["deleteTarget"],
-) {
-  if (target?.kind === "floor") {
-    return `Delete ${target.item.name}? Its areas and plan image will also be removed. Rooms remain in property.`;
-  }
-  return "";
 }
 
 export default function FloorPlansScreen() {
@@ -71,6 +63,7 @@ export default function FloorPlansScreen() {
     isImageUploading: controller.pending.imageUpload,
     notice: controller.notice,
   });
+  const governance = useDeletionGovernance();
 
   if (!propertyId) {
     return (
@@ -142,7 +135,7 @@ export default function FloorPlansScreen() {
             activeFloor={controller.activeFloor}
             floorPlans={controller.floorPlans}
             hiddenAreaIds={controller.visibility.hiddenAreaIds}
-            onDeleteFloor={actions.openFloorDelete}
+            onDeleteFloor={(floor) => governance.open({ resource: "floorplans", id: floor.id, label: floor.name })}
             onManageAreas={(floor) =>
               router.push({
                 pathname: appRoutes.secondary.floorAreas,
@@ -173,14 +166,16 @@ export default function FloorPlansScreen() {
         value={controller.floorForm?.value ?? ""}
         visible={Boolean(controller.floorForm)}
       />
-      <ConfirmationModal
-        confirmLabel="Delete"
-        description={floorDeleteDescription(controller.deleteTarget)}
-        isPending={controller.pending.delete}
-        onCancel={() => actions.setDeleteTarget(null)}
-        onConfirm={actions.confirmDelete}
-        title="Delete floor?"
-        visible={controller.deleteTarget?.kind === "floor"}
+      <DeletionImpactSheet
+        error={governance.error}
+        impact={governance.impact}
+        isLoading={governance.isLoading}
+        isPending={governance.isPending}
+        label={governance.target?.label}
+        onClose={governance.close}
+        onConfirm={governance.confirm}
+        onRetry={() => void governance.refetch()}
+        visible={Boolean(governance.target)}
       />
       <ScreenSnackbar
         icon={floorPlanSnackbar.icon}

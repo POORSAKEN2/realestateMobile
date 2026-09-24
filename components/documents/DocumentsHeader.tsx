@@ -9,14 +9,16 @@ export function DocumentsHeader({
   documentCount,
   isLoading = false,
   onUpload,
+  showUpload = true,
 }: {
   documentCount: number;
   isLoading?: boolean;
   onUpload: () => void;
+  showUpload?: boolean;
 }) {
   return (
     <ModuleHeader
-      action={
+      action={showUpload ? (
         <PermissionGate permission="documents.create"><TouchableOpacity
           accessibilityLabel="Upload document"
           accessibilityRole="button"
@@ -29,7 +31,7 @@ export function DocumentsHeader({
             Upload
           </Text>
         </TouchableOpacity></PermissionGate>
-      }
+      ) : undefined}
       eyebrow="Operations"
       leading={
         <SecondaryBackButton
