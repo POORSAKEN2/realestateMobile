@@ -24,7 +24,9 @@ export function DocumentCard({
   const category = getCategoryPresentation(document.category);
   const documentType = getDocumentTypePresentation(document.type);
   const metadata = [
-    `Updated ${formatDocumentDate(document.date)}`,
+    document.archivedAt
+      ? `Archived ${formatDocumentDate(document.archivedAt)}`
+      : `Updated ${formatDocumentDate(document.date)}`,
     document.size,
   ]
     .filter(Boolean)

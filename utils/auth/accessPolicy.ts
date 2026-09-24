@@ -33,6 +33,20 @@ const OWNER_ONLY = new Set<AppPermission>([
   "payments.delete",
   "expenses.delete",
   "notifications.create",
+  "deletion.preview",
+  "properties.archive",
+  "properties.restore",
+  "documents.archive",
+  "documents.restore",
+  "properties.delete",
+  "documents.delete",
+  "clients.delete",
+  "leases.delete",
+  "bookings.delete",
+  "rooms.delete",
+  "floorplans.delete",
+  "areas.delete",
+  "bedspaces.delete",
 ]);
 const SHARED = new Set<AppPermission>([
   "billing.viewEntitlement",
@@ -66,7 +80,7 @@ export function permits(
     OWNER_ONLY.has(permission) ||
     SHARED.has(permission) ||
     (OPERATIONAL_RESOURCES.includes(resource as Resource) &&
-      ["view", "viewAny", "create", "update", "delete"].includes(action));
+      ["view", "viewAny", "create", "update", "delete", "archive", "restore"].includes(action));
   if (!known) return false;
   if (access.role === "MANAGER" && !access.permissions?.includes(permission))
     return false;

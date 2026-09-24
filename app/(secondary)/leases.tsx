@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { Screen } from "../../components/ui/Screen";
-import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
+import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
 import {
   ModuleEmptyState,
   ModuleLoadingState,
@@ -43,6 +43,7 @@ import { renewLease } from "../../api/leases";
 import { LeaseRenewalModal } from "../../components/leases/LeaseRenewalModal";
 import { useQueryClient } from "@tanstack/react-query";
 import type { Lease } from "../../types";
+import { useDeletionGovernance } from "../../hooks/useDeletionGovernance";
 
 type Option = {
   label: string;
@@ -61,6 +62,7 @@ function cleanNumber(value: string) {
 
 export default function LeasesScreen() {
   const leaseSnackbar = useSnackbar();
+  const governance = useDeletionGovernance(() => leaseSnackbar.show("Lease archived."));
   const [filters, setFilters] = useState<LeaseFilters>(EMPTY_LEASE_FILTERS);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const {
@@ -73,8 +75,6 @@ export default function LeasesScreen() {
     closeAmendmentDatePicker,
     closeForm,
     closeStartDatePicker,
-    deleteMutation,
-    deleteTarget,
     editingLease,
     filteredLeases,
     form,
@@ -101,7 +101,6 @@ export default function LeasesScreen() {
     saveMutation,
     searchQuery,
     selectedTenant,
-    setDeleteTarget,
     setSearchQuery,
     setSelectedTenant,
     selectBedspace,
@@ -243,7 +242,7 @@ export default function LeasesScreen() {
                     key={lease.id}
                     lease={lease}
                     lessee={lessee}
-                    onDelete={() => setDeleteTarget(lease)}
+                    onDelete={() => governance.open({ resource: "leases", id: lease.id, label: `Lease ${lease.id.slice(0, 8)}` })}
                     onEdit={() => openEditForm(lease)}
                     onOpenTenant={() => lessee && setSelectedTenant(lessee)}
                     onRenew={() => setRenewingLease(lease)}
@@ -518,13 +517,16 @@ export default function LeasesScreen() {
         tenant={selectedTenant}
       />
 
-      <ConfirmationModal
-        description="This lease will be removed permanently."
-        isPending={deleteMutation.isPending}
-        onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
-        title="Delete Lease"
-        visible={Boolean(deleteTarget)}
+      <DeletionImpactSheet
+        error={governance.error}
+        impact={governance.impact}
+        isLoading={governance.isLoading}
+        isPending={governance.isPending}
+        label={governance.target?.label}
+        onClose={governance.close}
+        onConfirm={governance.confirm}
+        onRetry={() => void governance.refetch()}
+        visible={Boolean(governance.target)}
       />
 
       <ScreenSnackbar

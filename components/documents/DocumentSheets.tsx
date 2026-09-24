@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ActionSheet, type ActionSheetItem } from "../ui/ActionSheet";
@@ -67,6 +67,7 @@ export function DocumentActionSheet({
   onDelete,
   onEdit,
   onOpen,
+  onRestore,
   onShare,
 }: {
   document: PropertyDocument | null;
@@ -74,10 +75,19 @@ export function DocumentActionSheet({
   onDelete: (document: PropertyDocument) => void;
   onEdit: (document: PropertyDocument) => void;
   onOpen: (document: PropertyDocument) => void;
+  onRestore: (document: PropertyDocument) => void;
   onShare: (document: PropertyDocument) => void;
 }) {
   const actions: ActionSheetItem[] = document
-    ? [
+    ? document.archivedAt
+      ? [{
+          description: "Return this document to the active library.",
+          icon: "restore",
+          label: "Restore document",
+          permission: "documents.restore" as const,
+          onPress: () => onRestore(document),
+        }]
+      : [
         {
           description: "View this file in a supported app.",
           disabled: !document.url,
@@ -101,11 +111,11 @@ export function DocumentActionSheet({
           onPress: () => onEdit(document),
         },
         {
-          description: "Permanently remove this document.",
+          description: "Archive this document while retaining its file history.",
           destructive: true,
           icon: "trash-can-outline",
-          label: "Delete document",
-          permission: "documents.delete" as const,
+          label: "Archive document",
+          permission: "documents.archive" as const,
           propertyId: document.propertyId,
           onPress: () => onDelete(document),
         },
@@ -120,59 +130,6 @@ export function DocumentActionSheet({
       title="Document actions"
       visible={Boolean(document)}
     />
-  );
-}
-
-export function DeleteDocumentSheet({
-  document,
-  isDeleting,
-  onCancel,
-  onConfirm,
-}: {
-  document: PropertyDocument | null;
-  isDeleting: boolean;
-  onCancel: () => void;
-  onConfirm: (document: PropertyDocument) => void;
-}) {
-  return (
-    <BottomSheet
-      onClose={onCancel}
-      title="Delete document?"
-      visible={Boolean(document)}
-    >
-      <Text className="font-ralewayMedium text-sm leading-6 text-description">
-        “{document?.name ?? "This document"}” will be permanently removed from
-        your library. This action can’t be undone.
-      </Text>
-      <View className="mt-5 flex-row gap-3">
-        <TouchableOpacity
-          accessibilityRole="button"
-          activeOpacity={0.82}
-          className="min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white"
-          disabled={isDeleting}
-          onPress={onCancel}
-        >
-          <Text className="font-ralewayBold text-base text-primary">
-            Cancel
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          accessibilityRole="button"
-          activeOpacity={0.82}
-          className="min-h-14 flex-1 items-center justify-center rounded-2xl bg-danger"
-          disabled={isDeleting}
-          onPress={() => document && onConfirm(document)}
-        >
-          {isDeleting ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text className="font-ralewayBold text-base text-white">
-              Delete
-            </Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </BottomSheet>
   );
 }
 

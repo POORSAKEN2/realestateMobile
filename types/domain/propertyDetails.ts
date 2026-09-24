@@ -63,6 +63,7 @@ export type PropertyDocument = {
   mimeType?: string;
   propertyId?: string;
   lesseeId?: string;
+  archivedAt?: string | null;
 };
 
 export type DocumentUpload = {

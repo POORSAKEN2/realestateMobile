@@ -1,11 +1,11 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { Alert, Linking, Share, View } from "react-native";
+import { Alert, Linking, Share, Text, TouchableOpacity, View } from "react-native";
 
 import {
   DocumentActionSheet,
-  DeleteDocumentSheet,
 } from "../../components/documents/DocumentSheets";
+import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
 import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { DocumentCard } from "../../components/documents/DocumentCard";
 import { DocumentModuleState } from "../../components/documents/DocumentModuleState";
@@ -17,6 +17,8 @@ import { Screen } from "../../components/ui/Screen";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useDocumentLibrary } from "../../hooks/documents/useDocumentLibrary";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { useAccess } from "../../hooks/auth/useAccess";
+import { useDeletionGovernance, useRestoreGovernedRecord } from "../../hooks/useDeletionGovernance";
 import type { DocumentUpload, PropertyDocument } from "../../types";
 import { chooseDocumentFile } from "../../utils/documents/documentFiles";
 import {
@@ -37,11 +39,11 @@ import {
 } from "../../utils/documents/documentPresentation";
 
 export default function DocumentsScreen() {
+  const { access } = useAccess();
+  const [archiveState, setArchiveState] = useState<"active" | "archived">("active");
   const params = useLocalSearchParams<{ action?: string; tenantId?: string }>();
   const {
-    deleteDocument,
     documents,
-    isDeleting,
     isError,
     isLoading,
     isSaving,
@@ -50,7 +52,7 @@ export default function DocumentsScreen() {
     refresh,
     saveDocument,
     storageRemainingLabel,
-  } = useDocumentLibrary();
+  } = useDocumentLibrary(undefined, archiveState);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState<DocumentCategoryFilter>("All");
@@ -61,9 +63,6 @@ export default function DocumentsScreen() {
   const [actionTarget, setActionTarget] = useState<PropertyDocument | null>(
     null,
   );
-  const [deleteTarget, setDeleteTarget] = useState<PropertyDocument | null>(
-    null,
-  );
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingDocument, setEditingDocument] =
     useState<PropertyDocument | null>(null);
@@ -72,6 +71,10 @@ export default function DocumentsScreen() {
   const [formErrors, setFormErrors] = useState<DocumentFormErrors>({});
   const [formError, setFormError] = useState("");
   const feedbackSnackbar = useSnackbar({ autoHideDuration: 3000 });
+  const governance = useDeletionGovernance((impact) =>
+    feedbackSnackbar.show(impact.action === "archive" ? "Document archived." : "Document removed."),
+  );
+  const restoreMutation = useRestoreGovernedRecord(() => feedbackSnackbar.show("Document restored."));
 
   useEffect(() => {
     if (!params.tenantId) return;
@@ -185,21 +188,6 @@ export default function DocumentsScreen() {
     }
   }
 
-  async function confirmDelete(document: PropertyDocument) {
-    try {
-      await deleteDocument(document.id);
-      setDeleteTarget(null);
-      feedbackSnackbar.show("Document deleted.");
-    } catch (error) {
-      Alert.alert(
-        "Cannot delete document",
-        error instanceof Error
-          ? error.message
-          : "The document could not be deleted.",
-      );
-    }
-  }
-
   function clearFilters() {
     setSearchQuery("");
     setCategory("All");
@@ -212,7 +200,17 @@ export default function DocumentsScreen() {
         documentCount={documents.length}
         isLoading={isLoading}
         onUpload={openCreateForm}
+        showUpload={archiveState === "active"}
       />
+      {access.role === "ADMIN" ? (
+        <View className="mb-2 flex-row rounded-2xl bg-primary/10 p-1">
+          {(["active", "archived"] as const).map((state) => (
+            <TouchableOpacity className={`min-h-10 flex-1 items-center justify-center rounded-xl ${archiveState === state ? "bg-white" : ""}`} key={state} onPress={() => setArchiveState(state)}>
+              <Text className="font-ralewayBold text-sm capitalize text-textPrimary">{state}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      ) : null}
 
       <PullToRefreshFlatList
         className="flex-1"
@@ -238,6 +236,7 @@ export default function DocumentsScreen() {
             onClearFilters={clearFilters}
             onRetry={() => void refresh()}
             onUpload={openCreateForm}
+            uploadEnabled={archiveState === "active"}
           />
         }
         onRefresh={refresh}
@@ -277,7 +276,7 @@ export default function DocumentsScreen() {
         onClose={() => setActionTarget(null)}
         onDelete={(document) => {
           setActionTarget(null);
-          setDeleteTarget(document);
+          governance.open({ resource: "documents", id: document.id, label: document.name });
         }}
         onEdit={openEditForm}
         onOpen={(document) => {
@@ -288,12 +287,21 @@ export default function DocumentsScreen() {
           setActionTarget(null);
           void shareDocument(document);
         }}
+        onRestore={(document) => {
+          setActionTarget(null);
+          restoreMutation.mutate({ resource: "documents", id: document.id });
+        }}
       />
-      <DeleteDocumentSheet
-        document={deleteTarget}
-        isDeleting={isDeleting}
-        onCancel={() => setDeleteTarget(null)}
-        onConfirm={(document) => void confirmDelete(document)}
+      <DeletionImpactSheet
+        error={governance.error}
+        impact={governance.impact}
+        isLoading={governance.isLoading}
+        isPending={governance.isPending}
+        label={governance.target?.label}
+        onClose={governance.close}
+        onConfirm={governance.confirm}
+        onRetry={() => void governance.refetch()}
+        visible={Boolean(governance.target)}
       />
       <DocumentFormModal
         editingDocument={editingDocument}

@@ -32,10 +32,10 @@ export const propertyKeys = {
 
 export const propertyFetchers = {
   getList: async (filters?: any, accessToken?: string) => {
-    // Note: The backend may not support all filters yet, but we pass them down.
-    // fetchProperties in api/properties.ts currently doesn't take filters natively,
-    // so we just call it. In the future, it should accept filters.
-    const results = await fetchProperties(accessToken);
+    const results = await fetchProperties(
+      accessToken,
+      filters?.archiveState ?? "active",
+    );
     // We mock the PaginatedApiData format for now since fetchProperties returns Property[] directly
     // based on unwrapList.
     return {

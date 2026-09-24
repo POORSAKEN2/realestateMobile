@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { PullToRefreshScrollView } from "../../components/ui/PullToRefreshScrollView";
 import { Screen, type ScreenBottomInset } from "../../components/ui/Screen";
-import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
+import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
 import { ModuleEmptyState } from "../../components/ui/ModuleState";
 import { TenantDetailsModal } from "../../components/tenants/TenantDetailsModal";
 import { TenantCard } from "../../components/tenants/TenantCard";
@@ -33,6 +33,7 @@ import { formatCurrency } from "../../utils/formatters";
 import { useTenantManagement } from "../../hooks/tenants/useTenantManagement";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { PropertyMultiSelect } from "../../components/properties/PropertyMultiSelect";
+import { useDeletionGovernance } from "../../hooks/useDeletionGovernance";
 
 type TenantsScreenProps = {
   bottomInset?: ScreenBottomInset;
@@ -123,12 +124,11 @@ export function TenantsScreen({
   showBackButton = true,
 }: TenantsScreenProps) {
   const tenantSnackbar = useSnackbar();
+  const governance = useDeletionGovernance(() => tenantSnackbar.show("Tenant archived."));
   const [filters, setFilters] = useState<TenantFilters>(EMPTY_TENANT_FILTERS);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const {
     closeForm,
-    deleteMutation,
-    deleteTarget,
     editingTenant,
     filteredTenants,
     form,
@@ -147,7 +147,6 @@ export function TenantsScreen({
     saveMutation,
     searchQuery,
     selectedTenant,
-    setDeleteTarget,
     setSearchQuery,
     setSelectedTenant,
     submit,
@@ -277,7 +276,7 @@ export function TenantsScreen({
                     key={tenant.id}
                     leaseCount={tenantLeases.length}
                     monthlyRent={monthlyRent}
-                    onDelete={() => setDeleteTarget(tenant)}
+                    onDelete={() => governance.open({ resource: "clients", id: tenant.id, label: tenant.name })}
                     onEdit={() => openEditForm(tenant)}
                     onOpen={() => setSelectedTenant(tenant)}
                     propertyNames={getLinkedProperties(tenant.id)}
@@ -390,13 +389,16 @@ export function TenantsScreen({
         tenant={selectedTenant}
       />
 
-      <ConfirmationModal
-        description="This tenant profile will be removed permanently."
-        isPending={deleteMutation.isPending}
-        onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
-        title="Delete Tenant"
-        visible={Boolean(deleteTarget)}
+      <DeletionImpactSheet
+        error={governance.error}
+        impact={governance.impact}
+        isLoading={governance.isLoading}
+        isPending={governance.isPending}
+        label={governance.target?.label}
+        onClose={governance.close}
+        onConfirm={governance.confirm}
+        onRetry={() => void governance.refetch()}
+        visible={Boolean(governance.target)}
       />
 
       <ScreenSnackbar

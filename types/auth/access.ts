@@ -20,7 +20,9 @@ export type ResourceAction =
   | "view"
   | "create"
   | "update"
-  | "delete";
+  | "delete"
+  | "archive"
+  | "restore";
 export type AppPermission =
   | "audit.view"
   | "audit.export"
@@ -35,7 +37,8 @@ export type AppPermission =
   | "notifications.viewAny"
   | "notifications.create"
   | "support-tickets.viewAny"
-  | "search.viewAny";
+  | "search.viewAny"
+  | "deletion.preview";
 
 export interface AccessSnapshot {
   role?: AppRole;

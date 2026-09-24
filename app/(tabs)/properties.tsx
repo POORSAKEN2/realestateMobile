@@ -1,7 +1,7 @@
 import { useAccess } from "../../hooks/auth/useAccess";
 import { useRouter } from "expo-router";
-import { useMemo, useRef, useState } from "react";
-import { View } from "react-native";
+import { useMemo, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
 import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { PropertyCard } from "../../components/properties/PropertyCard";
@@ -31,6 +31,8 @@ import {
 } from "../../utils/properties/propertyForm";
 import AddButton from "../../components/ui/buttons/AddButton";
 import { appRoutes } from "../../constants/navigation";
+import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
+import { useDeletionGovernance, useRestoreGovernedRecord } from "../../hooks/useDeletionGovernance";
 
 type PropertyListItem =
   | { kind: "property"; property: Property }
@@ -45,13 +47,16 @@ export default function PropertiesScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [archiveState, setArchiveState] = useState<"active" | "archived">("active");
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
   );
 
   const { useList } = useProperties(accessToken);
-  const { data: properties = [], isError, isLoading, refetch, error } = useList();
+  const { data: properties = [], isError, isLoading, refetch, error } = useList({ archiveState });
   const propertySnackbar = useSnackbar();
+  const governance = useDeletionGovernance(() => propertySnackbar.show("Property archived."));
+  const restoreMutation = useRestoreGovernedRecord(() => propertySnackbar.show("Property restored."));
   const propertyForm = usePropertyFormController(accessToken, {
     onSaved: (_property, operation) =>
       propertySnackbar.show(
@@ -139,11 +144,25 @@ export default function PropertiesScreen() {
       <View className="flex-1">
         <View className="px-1 pb-5">
           <ModuleHeader
-            action={<AddButton permission="properties.create" title="Add" onPress={openForm} />}
+            action={archiveState === "active" ? <AddButton permission="properties.create" title="Add" onPress={openForm} /> : undefined}
             eyebrow="Portfolio Intelligence"
             title="Properties"
           />
         </View>
+
+        {access.role === "ADMIN" ? (
+          <View className="mb-4 flex-row rounded-2xl bg-primary/10 p-1">
+            {(["active", "archived"] as const).map((state) => (
+              <TouchableOpacity
+                className={`min-h-10 flex-1 items-center justify-center rounded-xl ${archiveState === state ? "bg-white" : ""}`}
+                key={state}
+                onPress={() => setArchiveState(state)}
+              >
+                <Text className="font-ralewayBold text-sm capitalize text-textPrimary">{state}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : null}
 
         <View className="z-10 pb-4">
           <PropertyListToolbar
@@ -204,7 +223,7 @@ export default function PropertiesScreen() {
                   description={
                     isFiltered
                       ? "Change your search or reset filters to see more results."
-                      : access.role === "MANAGER" ? "No assigned properties are available. Ask your account owner to review your access." : "Add your first property to start tracking portfolio performance."
+                      : archiveState === "archived" ? "Archived properties appear here and can be restored by an administrator." : access.role === "MANAGER" ? "No assigned properties are available. Ask your account owner to review your access." : "Add your first property to start tracking portfolio performance."
                   }
                   icon={
                     isFiltered ? "home-search-outline" : "home-plus-outline"
@@ -215,7 +234,7 @@ export default function PropertiesScreen() {
                           setSearchQuery("");
                           setStatusFilter("ALL");
                         }
-                      : can("properties.create") ? openForm : undefined
+                      : archiveState === "active" && can("properties.create") ? openForm : undefined
                   }
                   title={
                     isFiltered ? "No matching properties" : "No properties yet"
@@ -229,6 +248,8 @@ export default function PropertiesScreen() {
                 property={item.property}
                 onEdit={() => openEditForm(item.property)}
                 onOpenDetails={() => setSelectedProperty(item.property)}
+                onArchive={() => governance.open({ resource: "properties", id: item.property.id, label: item.property.title })}
+                onRestore={() => restoreMutation.mutate({ resource: "properties", id: item.property.id })}
                 onOpenBedspaces={() =>
                   router.push({
                     pathname: appRoutes.secondary.bedspaces,
@@ -270,6 +291,18 @@ export default function PropertiesScreen() {
         onClose={() => setSelectedProperty(null)}
         onPropertyUpdated={setSelectedProperty}
         property={selectedProperty}
+      />
+
+      <DeletionImpactSheet
+        error={governance.error}
+        impact={governance.impact}
+        isLoading={governance.isLoading}
+        isPending={governance.isPending}
+        label={governance.target?.label}
+        onClose={governance.close}
+        onConfirm={governance.confirm}
+        onRetry={() => void governance.refetch()}
+        visible={Boolean(governance.target)}
       />
 
       <AddEditModal permission={editingProperty ? "properties.update" : "properties.create"} propertyId={editingProperty?.id}

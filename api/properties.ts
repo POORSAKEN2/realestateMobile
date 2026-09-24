@@ -305,15 +305,16 @@ export function normalizeProperty(property: Record<string, any>): Property {
     spatialCapabilities: normalizeSpatialCapabilities(
       property?.spatialCapabilities ?? property?.spatial_capabilities,
     ),
+    archivedAt: property?.archivedAt ?? property?.archived_at ?? null,
   };
 }
 
-export async function fetchProperties(accessToken?: string) {
+export async function fetchProperties(accessToken?: string, archiveState: "active" | "archived" = "active") {
   const properties: Property[] = [];
   let page = 1;
   let lastPage = 1;
   do {
-    const response = await apiClient.get<any>(`/properties?page=${page}`, { headers: authHeaders(accessToken) });
+    const response = await apiClient.get<any>(`/properties?page=${page}&archive_state=${archiveState}`, { headers: authHeaders(accessToken) });
     properties.push(...unwrapList(response).map(normalizeProperty));
     const payload = response?.data ?? response;
     const pagination = payload?.meta ?? payload;

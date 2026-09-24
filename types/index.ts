@@ -23,6 +23,13 @@ export type {
 } from "./auth";
 export type { PortfolioSnapshot, PortfolioStats } from "./domain/analytics";
 export type {
+  DeletionImpact,
+  DeletionImpactGroup,
+  DeletionImpactRecord,
+  GovernedAction,
+  GovernedResource,
+} from "./domain/deletionGovernance";
+export type {
   GeocodingClient,
   LocationSearchResult,
   ReverseGeocodeResult,
