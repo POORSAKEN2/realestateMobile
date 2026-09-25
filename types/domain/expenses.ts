@@ -11,7 +11,12 @@ export type ExpenseCategory =
   | "MARKETING"
   | "OTHER";
 
-export type ExpenseApprovalStatus = "Pending" | "Approved" | "Rejected";
+export type ExpenseApprovalStatus =
+  | "Pending"
+  | "Approved"
+  | "Rejected"
+  | "Voided";
+export type ExpenseLifecycleStatus = ExpenseApprovalStatus | "Paid";
 
 export interface ExpenseReceipt {
   id: string;
@@ -20,6 +25,7 @@ export interface ExpenseReceipt {
   file_name?: string;
   size?: number;
   mime_type?: string;
+  state: "Active" | "Retired";
 }
 
 export type Expense = {
@@ -35,6 +41,12 @@ export type Expense = {
   status: "Pending" | "Paid" | "Cancelled";
   approval_status?: ExpenseApprovalStatus;
   approvalStatus?: ExpenseApprovalStatus;
+  lifecycle_status: ExpenseLifecycleStatus;
+  payment_status: "Pending" | "Paid";
+  allowed_transitions: Array<{
+    status: ExpenseLifecycleStatus;
+    requires_reason: boolean;
+  }>;
   description: string | null;
   receipts?: ExpenseReceipt[];
 };
@@ -55,10 +67,24 @@ export type CreateExpensePayload = {
   amount: number;
   date: string;
   reference_no?: string | null;
-  status?: string;
-  approval_status?: ExpenseApprovalStatus;
   description?: string | null;
   receipts?: ExpenseImageUpload[];
 };
 
 export type UpdateExpensePayload = CreateExpensePayload;
+
+export type ExpenseActivity = {
+  id: string;
+  type: "edit" | "transition" | "evidence";
+  action: string;
+  actor: { id: string; name: string | null; role: string | null } | null;
+  occurred_at: string;
+  reason: string | null;
+  before_values: Record<string, unknown>;
+  after_values: Record<string, unknown>;
+};
+
+export type ExpenseActivityPage = {
+  items: ExpenseActivity[];
+  next_cursor: string | null;
+};

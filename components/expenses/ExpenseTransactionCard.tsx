@@ -23,14 +23,16 @@ function formatExpenseCategory(category: string) {
 type ExpenseTransactionCardProps = {
   expense: Expense;
   formattedAmount: string;
+  onPress?: () => void;
 };
 
 export function ExpenseTransactionCard({
   expense,
   formattedAmount,
+  onPress,
 }: ExpenseTransactionCardProps) {
-  const isPaid = expense.status === "Paid";
-  const isCancelled = expense.status === "Cancelled";
+  const isPaid = expense.lifecycle_status === "Paid";
+  const isCancelled = ["Rejected", "Voided"].includes(expense.lifecycle_status);
   const statusContainerClass = isPaid
     ? "bg-accent"
     : isCancelled
@@ -44,7 +46,9 @@ export function ExpenseTransactionCard({
 
   return (
     <Pressable
-      accessibilityLabel={`${expense.category}, ${expense.description ?? "Expense"}, ${formattedAmount}, ${expense.status}`}
+      accessibilityLabel={`${expense.category}, ${expense.description ?? "Expense"}, ${formattedAmount}, ${expense.lifecycle_status}`}
+      accessibilityRole={onPress ? "button" : undefined}
+      onPress={onPress}
       className="min-h-[84px] flex-row items-center rounded-[20px] border border-primary/20 bg-white px-3.5 py-3"
       style={{
         shadowColor: "#8A77F4",
@@ -97,7 +101,7 @@ export function ExpenseTransactionCard({
           <Text
             className={`font-ralewayExtraBold text-[9px] uppercase ${statusTextClass}`}
           >
-            {expense.status}
+            {expense.lifecycle_status}
           </Text>
         </View>
       </View>

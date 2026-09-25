@@ -8,5 +8,6 @@ export {
   type ExpenseFilters,
 } from "./ExpenseFilterSheet";
 export { ExpenseHeader } from "./ExpenseHeader";
+export { ExpenseGovernanceSheet } from "./ExpenseGovernanceSheet";
 export { ExpenseTransactionCard } from "./ExpenseTransactionCard";
 export { ExpenseTransactionList } from "./ExpenseTransactionList";

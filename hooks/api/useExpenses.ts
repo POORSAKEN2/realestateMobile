@@ -13,6 +13,7 @@ import {
 } from "../../types/domain/expenses";
 import {
   fetchExpenses,
+  fetchExpense,
   createExpense,
   updateExpense,
 } from "../../api/expenses";
@@ -39,8 +40,7 @@ export const expenseFetchers = {
     };
   },
   getDetail: async (id: string) => {
-    // Placeholder fallback
-    throw new Error("getDetail not implemented in api/expenses.ts");
+    return await fetchExpense(id);
   },
   create: async (payload: CreateExpensePayload) => {
     return await createExpense(payload);
@@ -65,7 +65,10 @@ export function useExpenses() {
         expenseFetchers.getList(filters),
       );
     },
-    useDetail: (id: string, options?: UseQueryOptions<Expense, Error>) => {
+    useDetail: (
+      id: string,
+      options?: Omit<UseQueryOptions<Expense, Error>, "queryKey" | "queryFn">,
+    ) => {
       return useQuery({
         queryKey: expenseKeys.detail(id),
         queryFn: () => expenseFetchers.getDetail(id),

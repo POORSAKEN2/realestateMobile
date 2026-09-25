@@ -104,7 +104,11 @@ export function describeRequest(
             ? "update"
             : "create";
     permission = `${resource}.${action}`;
-    if (resource === "expenses" && segments[2] === "approve")
+    if (
+      resource === "expenses" &&
+      (["approve", "reject", "transitions", "activity"].includes(segments[2]) ||
+        segments[4] === "retire")
+    )
       permission = "expenses.approve";
   }
   if (segments[0] === "users") permission = "staff.manage";

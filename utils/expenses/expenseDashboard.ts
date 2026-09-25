@@ -45,7 +45,10 @@ export function getMonthlyExpenseSummary(
   let total = 0;
 
   for (const expense of expenses) {
-    if (expense.status === "Cancelled" || !expense.date.startsWith(monthKey)) {
+    if (
+      ["Rejected", "Voided"].includes(expense.lifecycle_status) ||
+      !expense.date.startsWith(monthKey)
+    ) {
       continue;
     }
 

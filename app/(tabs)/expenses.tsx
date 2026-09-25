@@ -8,6 +8,7 @@ import {
   ExpenseFilterSheet,
   ExpenseFormModal,
   ExpenseHeader,
+  ExpenseGovernanceSheet,
   ExpenseTransactionList,
   type ExpenseFilters,
 } from "../../components/expenses";
@@ -27,7 +28,6 @@ import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useExpenseForm } from "../../hooks/expenses/useExpenseForm";
 import { useAuth } from "../../hooks/useAuth";
 import { useSnackbar } from "../../hooks/useSnackbar";
-import { approveExpense, rejectExpense } from "../../api/expenses";
 import type { Expense } from "../../types/domain/expenses";
 import { hasAppPermission } from "../../utils/auth/accessPolicy";
 
@@ -80,8 +80,13 @@ export default function ExpensesScreen() {
     session?.user,
     "expenses.approve",
   );
+  const isAdmin =
+    (session?.user as { role?: string } | undefined)?.role === "ADMIN";
   const expenseSnackbar = useSnackbar();
   const [actionExpense, setActionExpense] = useState<Expense | null>(null);
+  const [governanceExpenseId, setGovernanceExpenseId] = useState<string | null>(
+    null,
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<ExpenseFilters>(EMPTY_EXPENSE_FILTERS);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -119,7 +124,7 @@ export default function ExpensesScreen() {
           expense.category,
           expense.description,
           expense.reference_no,
-          expense.status,
+          expense.lifecycle_status,
           expense.property?.title,
           expense.property?.location,
         ]
@@ -133,7 +138,7 @@ export default function ExpensesScreen() {
       const matchesCategory =
         filters.category === "ALL" || expense.category === filters.category;
       const matchesStatus =
-        filters.status === "ALL" || expense.status === filters.status;
+        filters.status === "ALL" || expense.lifecycle_status === filters.status;
 
       return (
         matchesSearch && matchesProperty && matchesCategory && matchesStatus
@@ -196,6 +201,11 @@ export default function ExpensesScreen() {
                 expenses={filteredExpenses}
                 isFiltered={Boolean(searchQuery.trim() || activeFilterCount)}
                 onOpenActions={setActionExpense}
+                onOpenDetails={
+                  isAdmin
+                    ? (expense) => setGovernanceExpenseId(expense.id)
+                    : undefined
+                }
               />
             </>
           )}
@@ -217,44 +227,30 @@ export default function ExpensesScreen() {
       <ExpenseActionSheet
         expense={actionExpense}
         onClose={() => setActionExpense(null)}
-        onEdit={openEditForm}
-        onApprove={
-          canApproveExpenses
-            ? async (expense) => {
-                setActionExpense(null);
-                try {
-                  await approveExpense(expense.id);
-                  await refetch();
-                  expenseSnackbar.show("Expense approved successfully.");
-                } catch (err) {
-                  expenseSnackbar.show(
-                    err instanceof Error
-                      ? err.message
-                      : "Failed to approve expense.",
-                  );
-                }
-              }
+        onEdit={
+          actionExpense &&
+          (actionExpense.lifecycle_status === "Pending" || isAdmin)
+            ? openEditForm
             : undefined
         }
-        onReject={
+        onView={
           canApproveExpenses
-            ? async (expense) => {
-                setActionExpense(null);
-                try {
-                  await rejectExpense(expense.id, "Rejected by administrator");
-                  await refetch();
-                  expenseSnackbar.show("Expense rejected.");
-                } catch (err) {
-                  expenseSnackbar.show(
-                    err instanceof Error
-                      ? err.message
-                      : "Failed to reject expense.",
-                  );
-                }
-              }
+            ? (expense) => setGovernanceExpenseId(expense.id)
             : undefined
         }
       />
+
+      {isAdmin ? (
+        <ExpenseGovernanceSheet
+          expenseId={governanceExpenseId}
+          onClose={() => setGovernanceExpenseId(null)}
+          onEdit={(id) => {
+            const expense = expenses.find((item) => item.id === id);
+            setGovernanceExpenseId(null);
+            if (expense) openEditForm(expense);
+          }}
+        />
+      ) : null}
 
       <ExpenseFormModal
         editingExpense={editingExpense}
