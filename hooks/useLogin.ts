@@ -5,6 +5,7 @@ import { Alert } from "react-native";
 import { API_BASE_URL } from "../api/client";
 import { parseApiResponse } from "../api/response";
 import { normalizeUser } from "../api/user";
+import { restorationNotice } from "../utils/accountDeletion/accountDeletion";
 import type { AuthResponse } from "../types";
 import { useAuth } from "./useAuth";
 
@@ -61,7 +62,8 @@ export function useLogin(initialEmail = "") {
         "Login failed. Please check your credentials.",
       );
 
-      const { access_token, user, onboarding } = result.data ?? {};
+      const { access_token, user, onboarding, deletion_recovery } =
+        result.data ?? {};
 
       signIn({
         accessToken: access_token,
@@ -81,7 +83,14 @@ export function useLogin(initialEmail = "") {
               })
             : user,
         onboarding,
+        deletionRecovery: deletion_recovery,
       });
+      if (deletion_recovery?.cancelled) {
+        Alert.alert(
+          "Deletion cancelled",
+          restorationNotice(deletion_recovery.scope),
+        );
+      }
       router.replace("/(tabs)/dashboard");
     } catch (err) {
       const message = getErrorMessage(err);

@@ -34,6 +34,7 @@ const OWNER_ONLY = new Set<AppPermission>([
   "expenses.delete",
   "notifications.create",
   "deletion.preview",
+  "account.reviewDeletionRequests",
   "properties.archive",
   "properties.restore",
   "documents.archive",
@@ -72,6 +73,8 @@ export function permits(
   propertyId?: string,
 ): boolean {
   if (!access.role) return false;
+  if (permission === "account.requestDeletion")
+    return access.role === "ADMIN" || access.role === "MANAGER";
   if (permission === "dashboard.manager") return access.role === "MANAGER";
   if (permission === "dashboard.admin") return access.role === "ADMIN";
   if (OWNER_ONLY.has(permission) && access.role !== "ADMIN") return false;
@@ -80,7 +83,15 @@ export function permits(
     OWNER_ONLY.has(permission) ||
     SHARED.has(permission) ||
     (OPERATIONAL_RESOURCES.includes(resource as Resource) &&
-      ["view", "viewAny", "create", "update", "delete", "archive", "restore"].includes(action));
+      [
+        "view",
+        "viewAny",
+        "create",
+        "update",
+        "delete",
+        "archive",
+        "restore",
+      ].includes(action));
   if (!known) return false;
   if (access.role === "MANAGER" && !access.permissions?.includes(permission))
     return false;

@@ -7,6 +7,7 @@ export type AuthResponse = {
     permissions?: string[];
     assigned_property_ids?: Array<string | number>;
     property_permissions?: Record<string, string[]>;
+    deletion_recovery?: { cancelled: boolean; scope: "user" | "tenant" } | null;
   };
   message?: string;
 };
@@ -36,6 +37,7 @@ export type AuthSession = {
   accessToken?: string;
   user?: unknown;
   onboarding?: unknown;
+  deletionRecovery?: { cancelled: boolean; scope: "user" | "tenant" } | null;
 };
 
 export type AuthContextValue = {
@@ -87,4 +89,5 @@ export type ChangePasswordPayload = {
 export type AccountDeletionRequestPayload = {
   reason?: string;
   confirmation: boolean;
+  current_password: string;
 };

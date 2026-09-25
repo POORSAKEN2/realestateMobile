@@ -38,6 +38,8 @@ export type AppPermission =
   | "notifications.create"
   | "support-tickets.viewAny"
   | "search.viewAny"
+  | "account.requestDeletion"
+  | "account.reviewDeletionRequests"
   | "deletion.preview";
 
 export interface AccessSnapshot {

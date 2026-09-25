@@ -17,16 +17,13 @@ import { Screen } from "../../components/ui/Screen";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { StaffManagementEntryCard } from "../../components/staff/StaffManagementEntryCard";
+import { AccountDeletionCard } from "../../components/account/AccountDeletionCard";
 import { useAuth } from "../../hooks/useAuth";
 import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 import { canManageStaff } from "../../utils/auth/staffAccess";
 import { useAccess } from "../../hooks/auth/useAccess";
-import {
-  changePassword,
-  exportUserData,
-  requestAccountDeletion,
-} from "../../api/user";
+import { changePassword, exportUserData } from "../../api/user";
 
 type PasswordFieldProps = {
   label: string;
@@ -89,7 +86,6 @@ export default function SettingsScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const shouldShowOnboarding = !hasCompletedOnboarding;
   const showStaffManagement = canManageStaff(session?.user);
 
@@ -166,41 +162,6 @@ export default function SettingsScreen() {
     }
   }
 
-  function handleRequestAccountDeletion() {
-    Alert.alert(
-      "Request Account Deletion",
-      "Are you sure you want to submit an account deletion request? An administrator will review and process your request per DPA guidelines.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Submit Request",
-          style: "destructive",
-          onPress: async () => {
-            setIsDeleting(true);
-            try {
-              await requestAccountDeletion({
-                reason: "Self-service deletion requested from mobile settings",
-                confirmation: true,
-              });
-              Alert.alert(
-                "Request Submitted",
-                "Your account deletion request has been submitted for administrative review.",
-              );
-            } catch (err) {
-              const message =
-                err instanceof Error
-                  ? err.message
-                  : "Could not submit deletion request.";
-              Alert.alert("Request Failed", message);
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-        },
-      ],
-    );
-  }
-
   return (
     <Screen className="bg-surface">
       <View className="flex-1">
@@ -229,19 +190,39 @@ export default function SettingsScreen() {
             />
           ) : null}
 
-          {can("audit.view") ? (
-            <TouchableOpacity
-              accessibilityRole="button"
-              className="mt-5 rounded-2xl border border-primary/20 bg-white p-5"
-              onPress={() => router.push(appRoutes.secondary.auditHistory)}
-            >
-              <Text className="font-ralewayExtraBold text-base text-textPrimary">
-                Audit History
-              </Text>
-              <Text className="mt-1 text-sm text-description">
-                Investigate account changes and security events.
-              </Text>
-            </TouchableOpacity>
+          {can("audit.view") || can("account.reviewDeletionRequests") ? (
+            <View className="gap-3">
+              {can("audit.view") ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  className="mt-5 rounded-2xl border border-primary/20 bg-white p-5"
+                  onPress={() => router.push(appRoutes.secondary.auditHistory)}
+                >
+                  <Text className="font-ralewayExtraBold text-base text-textPrimary">
+                    Audit History
+                  </Text>
+                  <Text className="mt-1 text-sm text-description">
+                    Investigate account changes and security events.
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+              {can("account.reviewDeletionRequests") ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  className="rounded-2xl border border-primary/20 bg-white p-5"
+                  onPress={() =>
+                    router.push(appRoutes.secondary.deletionRequests)
+                  }
+                >
+                  <Text className="font-ralewayExtraBold text-base text-textPrimary">
+                    Deletion requests
+                  </Text>
+                  <Text className="mt-1 text-sm text-description">
+                    Review verified personal-data and tenant-closure requests.
+                  </Text>
+                </TouchableOpacity>
+              ) : null}
+            </View>
           ) : null}
 
           {/* Onboarding preview section */}
@@ -416,35 +397,9 @@ export default function SettingsScreen() {
                   />
                 )}
               </TouchableOpacity>
-
-              <TouchableOpacity
-                activeOpacity={0.8}
-                className="h-13 flex-row items-center justify-between rounded-2xl border border-danger/25 bg-dangerSurface px-4 py-3.5"
-                disabled={isDeleting}
-                onPress={handleRequestAccountDeletion}
-              >
-                <View className="flex-row items-center gap-3">
-                  <Ionicons
-                    name="trash-outline"
-                    color={colors.danger}
-                    size={20}
-                  />
-                  <Text className="font-ralewayBold text-sm text-danger">
-                    Request Account Deletion
-                  </Text>
-                </View>
-                {isDeleting ? (
-                  <ActivityIndicator size="small" color={colors.danger} />
-                ) : (
-                  <Ionicons
-                    name="chevron-forward"
-                    size={16}
-                    color={colors.danger}
-                  />
-                )}
-              </TouchableOpacity>
             </View>
           </View>
+          <AccountDeletionCard />
         </ScrollView>
       </View>
     </Screen>
