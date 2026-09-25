@@ -10,12 +10,14 @@ type ExpenseTransactionListProps = {
   expenses: Expense[];
   isFiltered?: boolean;
   onOpenActions: (expense: Expense) => void;
+  onOpenDetails?: (expense: Expense) => void;
 };
 
 export function ExpenseTransactionList({
   expenses,
   isFiltered = false,
   onOpenActions,
+  onOpenDetails,
 }: ExpenseTransactionListProps) {
   return (
     <View className="mt-4">
@@ -36,6 +38,9 @@ export function ExpenseTransactionList({
               <ExpenseTransactionCard
                 expense={expense}
                 formattedAmount={formatPeso(expense.amount)}
+                onPress={
+                  onOpenDetails ? () => onOpenDetails(expense) : undefined
+                }
               />
             </SwipeActionCard>
           ))

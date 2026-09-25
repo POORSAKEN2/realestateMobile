@@ -4,6 +4,8 @@ import {
   CreateExpensePayload,
   UpdateExpensePayload,
   ExpenseImageUpload,
+  ExpenseActivityPage,
+  ExpenseLifecycleStatus,
 } from "../types/domain/expenses";
 import { apiClient, authHeaders, unwrapData } from "./client";
 
@@ -49,15 +51,18 @@ function normalizeApprovalStatus(status: unknown): Expense["approval_status"] {
   const value = String(status ?? "").toUpperCase();
   if (value === "APPROVED") return "Approved";
   if (value === "REJECTED") return "Rejected";
+  if (value === "VOIDED") return "Voided";
   return "Pending";
 }
 
 function toExpenseApiPayload(payload: CreateExpensePayload) {
-  return {
-    ...payload,
-    status: normalizeExpenseStatus(payload.status),
-    approval_status: payload.approval_status ?? "Pending",
-  };
+  const {
+    tenant_id: _tenantId,
+    property: _property,
+    receipts: _receipts,
+    ...data
+  } = payload;
+  return data;
 }
 
 function normalizeExpense(expense: Record<string, any>): Expense {
@@ -77,12 +82,78 @@ function normalizeExpense(expense: Record<string, any>): Expense {
     amount: Number(expense?.amount ?? 0),
     date: formattedDate,
     status: normalizeExpenseStatus(expense?.status),
-    approval_status: normalizeApprovalStatus(expense?.approval_status ?? expense?.approvalStatus),
-    approvalStatus: normalizeApprovalStatus(expense?.approval_status ?? expense?.approvalStatus),
+    payment_status:
+      normalizeExpenseStatus(expense?.payment_status ?? expense?.status) ===
+      "Paid"
+        ? "Paid"
+        : "Pending",
+    approval_status: normalizeApprovalStatus(
+      expense?.approval_status ?? expense?.approvalStatus,
+    ),
+    approvalStatus: normalizeApprovalStatus(
+      expense?.approval_status ?? expense?.approvalStatus,
+    ),
+    lifecycle_status: expense?.lifecycle_status ?? "Pending",
+    allowed_transitions: Array.isArray(expense?.allowed_transitions)
+      ? expense.allowed_transitions
+      : [],
     reference_no: expense?.reference_no ?? expense?.referenceNumber ?? null,
     description: expense?.description ?? null,
     receipts: Array.isArray(expense?.receipts) ? expense.receipts : [],
   } as Expense;
+}
+
+export async function fetchExpense(
+  id: string,
+  accessToken?: string,
+): Promise<Expense> {
+  const response = await apiClient.get<ApiEnvelope<Expense> | Expense>(
+    `/expenses/${encodeURIComponent(id)}`,
+    { headers: authHeaders(accessToken) },
+  );
+  return normalizeExpense(unwrapData<Expense>(response));
+}
+
+export async function fetchExpenseActivity(
+  id: string,
+  cursor?: string,
+  accessToken?: string,
+): Promise<ExpenseActivityPage> {
+  const query = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
+  const response = await apiClient.get<
+    ApiEnvelope<ExpenseActivityPage> | ExpenseActivityPage
+  >(`/expenses/${encodeURIComponent(id)}/activity${query}`, {
+    headers: authHeaders(accessToken),
+  });
+  return unwrapData<ExpenseActivityPage>(response);
+}
+
+export async function transitionExpense(
+  id: string,
+  targetStatus: ExpenseLifecycleStatus,
+  reason?: string,
+  accessToken?: string,
+): Promise<Expense> {
+  const response = await apiClient.post<ApiEnvelope<Expense> | Expense>(
+    `/expenses/${encodeURIComponent(id)}/transitions`,
+    { target_status: targetStatus, reason: reason?.trim() || undefined },
+    { headers: authHeaders(accessToken) },
+  );
+  return normalizeExpense(unwrapData<Expense>(response));
+}
+
+export async function retireExpenseReceipt(
+  expenseId: string,
+  mediaId: string,
+  reason: string,
+  accessToken?: string,
+): Promise<Expense> {
+  const response = await apiClient.post<ApiEnvelope<Expense> | Expense>(
+    `/expenses/${encodeURIComponent(expenseId)}/receipts/${encodeURIComponent(mediaId)}/retire`,
+    { reason },
+    { headers: authHeaders(accessToken) },
+  );
+  return normalizeExpense(unwrapData<Expense>(response));
 }
 
 export async function fetchExpenses(accessToken?: string): Promise<Expense[]> {
@@ -141,44 +212,6 @@ export async function uploadExpenseReceipts(
   const response = await apiClient.post<ApiEnvelope<Expense> | Expense>(
     `/expenses/${expenseId}/receipts`,
     formData,
-    { headers: authHeaders(accessToken) },
-  );
-
-  return normalizeExpense(unwrapData<Expense>(response));
-}
-
-export async function deleteExpenseReceipt(
-  expenseId: string,
-  mediaId: string,
-  accessToken?: string,
-): Promise<void> {
-  await apiClient.delete(`/expenses/${expenseId}/receipts/${mediaId}`, {
-    headers: authHeaders(accessToken),
-  });
-}
-
-export async function approveExpense(
-  expenseId: string,
-  notes?: string,
-  accessToken?: string,
-): Promise<Expense> {
-  const response = await apiClient.post<ApiEnvelope<Expense> | Expense>(
-    `/expenses/${expenseId}/approve`,
-    { notes },
-    { headers: authHeaders(accessToken) },
-  );
-
-  return normalizeExpense(unwrapData<Expense>(response));
-}
-
-export async function rejectExpense(
-  expenseId: string,
-  reason?: string,
-  accessToken?: string,
-): Promise<Expense> {
-  const response = await apiClient.post<ApiEnvelope<Expense> | Expense>(
-    `/expenses/${expenseId}/reject`,
-    { reason },
     { headers: authHeaders(accessToken) },
   );
 

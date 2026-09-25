@@ -5,48 +5,38 @@ export function ExpenseActionSheet({
   expense,
   onClose,
   onEdit,
-  onApprove,
-  onReject,
+  onView,
 }: {
   expense: Expense | null;
   onClose: () => void;
-  onEdit: (expense: Expense) => void;
-  onApprove?: (expense: Expense) => void;
-  onReject?: (expense: Expense) => void;
+  onEdit?: (expense: Expense) => void;
+  onView?: (expense: Expense) => void;
 }) {
-  const isPendingApproval = !expense?.approval_status || expense.approval_status === "Pending";
-
   const actions: ActionSheetItem[] = expense
     ? [
-        {
-          description: "Update expense details, payment status, or notes.",
-          icon: "pencil-outline",
-          label: "Edit expense",
-          permission: "expenses.update" as const,
-          propertyId: expense.property_id,
-          onPress: () => onEdit(expense),
-        },
-        ...(isPendingApproval && onApprove
+        ...(onView
           ? [
               {
-                description: "Authorize and approve this operating expense.",
-                icon: "check-circle-outline" as const,
-                label: "Approve expense",
-          permission: "expenses.approve" as const,
-          propertyId: expense.property_id,
-                onPress: () => onApprove(expense),
+                description:
+                  "Review lifecycle, evidence, and immutable activity.",
+                icon: "shield-check-outline" as const,
+                label: "Open governance",
+                permission: "expenses.approve" as const,
+                propertyId: expense.property_id,
+                onPress: () => onView(expense),
               },
             ]
           : []),
-        ...(isPendingApproval && onReject
+        ...(onEdit
           ? [
               {
-                description: "Decline and reject this expense item.",
-                icon: "close-circle-outline" as const,
-                label: "Reject expense",
-          permission: "expenses.approve" as const,
-          propertyId: expense.property_id,
-                onPress: () => onReject(expense),
+                description:
+                  "Update expense details, payment status, or notes.",
+                icon: "pencil-outline" as const,
+                label: "Edit expense",
+                permission: "expenses.update" as const,
+                propertyId: expense.property_id,
+                onPress: () => onEdit(expense),
               },
             ]
           : []),

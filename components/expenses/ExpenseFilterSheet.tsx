@@ -12,7 +12,7 @@ import { formatExpenseCategory } from "../../utils/expenses/expenseDashboard";
 export type ExpenseFilters = {
   category: string;
   propertyId: string;
-  status: "ALL" | Expense["status"];
+  status: "ALL" | Expense["lifecycle_status"];
 };
 
 export const EMPTY_EXPENSE_FILTERS: ExpenseFilters = {
@@ -27,8 +27,10 @@ const statusOptions: Array<{
 }> = [
   { label: "All statuses", value: "ALL" },
   { label: "Pending", value: "Pending" },
+  { label: "Approved", value: "Approved" },
   { label: "Paid", value: "Paid" },
-  { label: "Cancelled", value: "Cancelled" },
+  { label: "Rejected", value: "Rejected" },
+  { label: "Voided", value: "Voided" },
 ];
 
 export function ExpenseFilterSheet({

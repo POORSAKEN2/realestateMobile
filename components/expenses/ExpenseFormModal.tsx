@@ -8,7 +8,6 @@ import { DropdownField } from "../ui/fields/DropdownField";
 import { DateTimePickerModal } from "../ui/fields/DateTimePickerModal";
 import { PickerField } from "../ui/fields/PickerField";
 import { FormSection } from "../ui/forms/FormSection";
-import { ChoiceGroup } from "../ui/groups/ChoiceGroup";
 import type { Expense } from "../../types/domain/expenses";
 import {
   cleanDecimal,
@@ -23,14 +22,6 @@ const expenseCategoryChoices = [
   { label: "Insurance", value: "INSURANCE" },
   { label: "Management Fees", value: "MANAGEMENT_FEES" },
   { label: "Other Operations", value: "OTHER" },
-];
-
-const expenseStatusChoices: {
-  label: string;
-  value: Expense["status"];
-}[] = [
-  { label: "Pending Approval", value: "Pending" },
-  { label: "Paid", value: "Paid" },
 ];
 
 const expenseDateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -74,7 +65,9 @@ export function ExpenseFormModal({
   onUpdateForm,
 }: ExpenseFormModalProps) {
   return (
-    <AddEditModal permission={editingExpense ? "expenses.update" : "expenses.create"} propertyId={form.propertyId || undefined}
+    <AddEditModal
+      permission={editingExpense ? "expenses.update" : "expenses.create"}
+      propertyId={form.propertyId || undefined}
       appearance="card"
       isVisible={isVisible}
       onClose={onClose}
@@ -172,18 +165,7 @@ export function ExpenseFormModal({
         ) : null}
       </FormSection>
 
-      <FormSection
-        icon="clipboard-text-outline"
-        title="Status & notes"
-        variant="card"
-      >
-        <ChoiceGroup
-          choices={expenseStatusChoices}
-          label="Transaction status"
-          value={form.status}
-          onSelect={(value) => onUpdateForm("status", value)}
-          variant="segmented"
-        />
+      <FormSection icon="clipboard-text-outline" title="Notes" variant="card">
         <BaseField
           label="Description"
           multiline

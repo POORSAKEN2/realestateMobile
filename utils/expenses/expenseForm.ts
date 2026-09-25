@@ -7,7 +7,6 @@ export type FormState = {
   date: string;
   referenceNumber: string;
   description: string;
-  status: Expense["status"];
 };
 
 export const emptyForm: FormState = {
@@ -15,7 +14,6 @@ export const emptyForm: FormState = {
   category: "",
   amount: "",
   date: "",
-  status: "Pending",
   referenceNumber: "",
   description: "",
 };

@@ -102,7 +102,6 @@ export function useExpenseForm({
       date: expense.date || new Date().toISOString().split("T")[0],
       referenceNumber: expense.reference_no || "",
       description: expense.description || "",
-      status: expense.status || "PENDING",
     });
     setFormError("");
     setEditingExpense(expense);
@@ -159,7 +158,6 @@ export function useExpenseForm({
       date:
         form.date.trim().split("T")[0] ||
         new Date().toISOString().split("T")[0],
-      status: form.status,
       reference_no: form.referenceNumber.trim() || null,
       description: form.description.trim() || null,
     });

@@ -195,6 +195,21 @@ test("method overrides and financial approvals resolve to the actual mutation", 
     describeRequest("/expenses/e1/approve", "POST").permission,
     "expenses.approve",
   );
+  for (const [path, method] of [
+    ["/expenses/e1/transitions", "POST"],
+    ["/expenses/e1/activity", "GET"],
+    ["/expenses/e1/receipts/7/retire", "POST"],
+  ]) {
+    const request = describeRequest(path, method);
+    assert.equal(request.permission, "expenses.approve");
+    assert.doesNotThrow(() =>
+      assertRequestAccess(owner, request, new ResourceScopeIndex()),
+    );
+    assert.throws(
+      () => assertRequestAccess(manager, request, new ResourceScopeIndex()),
+      ApiError,
+    );
+  }
 });
 test("direct links and mutations against another property fail before transport", () => {
   const index = new ResourceScopeIndex();
