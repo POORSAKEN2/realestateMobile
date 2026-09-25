@@ -72,12 +72,45 @@ test("manager cannot gain owner operations through supplied grants", () => {
     assert.equal(permits(access, permission), false);
 });
 test("audit history and exports require owner permissions", () => {
-  for (const path of ["/audit-events", "/audit-events/event-id", "/audit-events/event-id/record", "/audit-events/export"]) {
+  for (const path of [
+    "/audit-events",
+    "/audit-events/event-id",
+    "/audit-events/event-id/record",
+    "/audit-events/export",
+  ]) {
     const request = describeRequest(path, "GET");
-    assert.equal(request.permission, path.endsWith("/export") ? "audit.export" : "audit.view");
-    assert.doesNotThrow(() => assertRequestAccess(owner, request, new ResourceScopeIndex()));
-    assert.throws(() => assertRequestAccess(manager, request, new ResourceScopeIndex()), ApiError);
+    assert.equal(
+      request.permission,
+      path.endsWith("/export") ? "audit.export" : "audit.view",
+    );
+    assert.doesNotThrow(() =>
+      assertRequestAccess(owner, request, new ResourceScopeIndex()),
+    );
+    assert.throws(
+      () => assertRequestAccess(manager, request, new ResourceScopeIndex()),
+      ApiError,
+    );
   }
+});
+test("deletion submission is self-service while review stays owner-only", () => {
+  const managerWithoutGrants = normalizeAccess({
+    role: "MANAGER",
+    permissions: [],
+  });
+  assert.equal(permits(managerWithoutGrants, "account.requestDeletion"), true);
+  assert.equal(
+    permits(managerWithoutGrants, "account.reviewDeletionRequests"),
+    false,
+  );
+  assert.equal(permits(owner, "account.reviewDeletionRequests"), true);
+  assert.equal(
+    describeRequest("/account/deletion-request", "POST").permission,
+    "account.requestDeletion",
+  );
+  assert.equal(
+    describeRequest("/admin/deletion-requests", "GET").permission,
+    "account.reviewDeletionRequests",
+  );
 });
 test("explicit empty and malformed grants deny rather than use defaults", () => {
   for (const permissions of [[], null, "all", {}]) {

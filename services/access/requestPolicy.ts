@@ -133,6 +133,10 @@ export function describeRequest(
       verb === "POST" && !id ? "notifications.create" : "notifications.viewAny";
   if (segments[0] === "support-tickets") permission = "support-tickets.viewAny";
   if (segments[0] === "search") permission = "search.viewAny";
+  if (segments[0] === "account" && segments[1] === "deletion-request")
+    permission = "account.requestDeletion";
+  if (segments[0] === "admin" && segments[1] === "deletion-requests")
+    permission = "account.reviewDeletionRequests";
   if (segments[0] === "faqs")
     permission = verb === "GET" ? "faqs.viewAny" : undefined;
   // These responses cannot be safely reduced to assigned properties on the device.

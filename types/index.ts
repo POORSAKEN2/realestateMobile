@@ -30,6 +30,16 @@ export type {
   GovernedResource,
 } from "./domain/deletionGovernance";
 export type {
+  AccountDeletionImpact,
+  AccountDeletionPage,
+  AccountDeletionRequest,
+  DeletionAction,
+  DeletionHistoryItem,
+  DeletionScope,
+  DeletionStatus,
+  SubscriptionCancellationRequiredError,
+} from "./domain/accountDeletion";
+export type {
   GeocodingClient,
   LocationSearchResult,
   ReverseGeocodeResult,
