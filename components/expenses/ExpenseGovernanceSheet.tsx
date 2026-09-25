@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "../../constants/colors";
 import { useExpenseGovernance } from "../../hooks/expenses/useExpenseGovernance";
+import { validateExpenseTransitionReason } from "../../utils/expenses/expenseGovernance";
 import type { ExpenseLifecycleStatus } from "../../types/domain/expenses";
 import { formatPeso } from "../../utils/expenses/expenseForm";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
@@ -77,8 +78,9 @@ export function ExpenseGovernanceSheet({
   }
 
   async function submitReason() {
-    if (!pendingAction || !reason.trim()) {
-      setError("Reason is required.");
+    const validationError = validateExpenseTransitionReason(true, reason);
+    if (!pendingAction || validationError) {
+      setError(validationError ?? "Action unavailable.");
       return;
     }
     try {
