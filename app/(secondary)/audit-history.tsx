@@ -18,6 +18,7 @@ import { useAuth } from "../../hooks/useAuth";
 import type { AuditFilters } from "../../types/domain/audit";
 import {
   auditDate,
+  auditStoragePolicyNotice,
   normalizeAuditFilters,
 } from "../../utils/audit/presentation";
 
@@ -62,6 +63,7 @@ export default function AuditHistoryScreen() {
     setEventId(linkedId ?? null);
   }, [user?.id, user?.tenant_id, linkedId]);
   const meta = audit.history.data?.pages[0]?.meta;
+  const storagePolicyNotice = auditStoragePolicyNotice(meta?.storage_policy);
   const events = useMemo(
     () => audit.history.data?.pages.flatMap((page) => page.events) ?? [],
     [audit.history.data],
@@ -171,6 +173,11 @@ export default function AuditHistoryScreen() {
                 {meta.capture_started_at
                   ? ` Full capture began ${auditDate(meta.capture_started_at)}.`
                   : ""}
+              </Text>
+            ) : null}
+            {storagePolicyNotice ? (
+              <Text className="text-xs leading-5 text-description">
+                {storagePolicyNotice}
               </Text>
             ) : null}
             {notice ? (

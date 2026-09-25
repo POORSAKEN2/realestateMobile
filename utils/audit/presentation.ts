@@ -29,6 +29,14 @@ export function auditDate(
   return includeTime ? date.toLocaleString() : date.toLocaleDateString();
 }
 
+export function auditStoragePolicyNotice(
+  policy: "append_only" | undefined,
+): string | null {
+  return policy === "append_only"
+    ? "Audit entries are append-only. Existing events cannot be edited or deleted."
+    : null;
+}
+
 export function localAuditDate(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
