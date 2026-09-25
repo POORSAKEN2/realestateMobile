@@ -6,6 +6,7 @@ const {
   auditDate,
   auditFilterErrors,
   auditLabel,
+  auditStoragePolicyNotice,
   localAuditDate,
   normalizeAuditFilters,
 } = load("../../utils/audit/presentation.ts");
@@ -61,4 +62,12 @@ test("audit presentation retains date-only calendar day across time zones", () =
     "Property status changed",
   );
   assert.equal(auditLabel("DocumentRevision"), "Document Revision");
+});
+
+test("describes append-only storage only when server declares it", () => {
+  assert.equal(
+    auditStoragePolicyNotice("append_only"),
+    "Audit entries are append-only. Existing events cannot be edited or deleted.",
+  );
+  assert.equal(auditStoragePolicyNotice(undefined), null);
 });

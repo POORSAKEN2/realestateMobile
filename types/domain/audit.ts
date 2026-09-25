@@ -42,6 +42,7 @@ export type AuditPage = {
     retention_days: number | null;
     capture_started_at: string;
     entities?: string[];
+    storage_policy?: "append_only";
   };
 };
 
