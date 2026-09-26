@@ -14,9 +14,12 @@ import {
   type DefaultDashboardLocation,
 } from "../constants/defaultLocation";
 import { useAuth } from "../hooks/useAuth";
+import { useWorkspacePresentation } from "./WorkspacePresentationContext";
+import { resolveDashboardLocation } from "../utils/workspaceSettings";
 
 type DefaultLocationContextValue = {
   defaultLocation: DefaultDashboardLocation | null;
+  effectiveLocation: DefaultDashboardLocation;
   hasDefaultLocation: boolean;
   isLoadingDefaultLocation: boolean;
   setDefaultLocation: (location: DefaultDashboardLocation) => Promise<void>;
@@ -101,6 +104,7 @@ async function deleteStoredItem(key: string) {
 
 export function DefaultLocationProvider({ children }: PropsWithChildren) {
   const { isAuthenticated, session } = useAuth();
+  const { workspaceLocation } = useWorkspacePresentation();
   const [defaultLocation, setDefaultLocationState] =
     useState<DefaultDashboardLocation | null>(null);
   const [isLoadingDefaultLocation, setIsLoadingDefaultLocation] =
@@ -165,6 +169,7 @@ export function DefaultLocationProvider({ children }: PropsWithChildren) {
   const value = useMemo(
     () => ({
       defaultLocation,
+      effectiveLocation: resolveDashboardLocation(defaultLocation, workspaceLocation),
       hasDefaultLocation: Boolean(defaultLocation),
       isLoadingDefaultLocation,
       setDefaultLocation,
@@ -173,6 +178,7 @@ export function DefaultLocationProvider({ children }: PropsWithChildren) {
     [
       clearDefaultLocation,
       defaultLocation,
+      workspaceLocation,
       isLoadingDefaultLocation,
       setDefaultLocation,
     ],

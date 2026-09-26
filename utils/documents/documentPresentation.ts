@@ -5,6 +5,7 @@ import type {
   PropertyDocument,
 } from "../../types";
 import { colors } from "../../constants/colors";
+import { formatLocalizedDate } from "../formatters";
 
 export const DOCUMENT_CATEGORIES: DocumentCategory[] = [
   "Leases",
@@ -111,7 +112,7 @@ export function formatDocumentDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value || "Date unavailable";
 
-  return date.toLocaleDateString("en-US", {
+  return formatLocalizedDate(date, {
     day: "numeric",
     month: "short",
     ...(date.getFullYear() === new Date().getFullYear()

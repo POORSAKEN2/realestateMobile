@@ -12,7 +12,7 @@ export function FaqAccordion({ faq }: { faq: FAQItem }) {
   const answer = faq.answer || faq.content || "";
 
   return (
-    <View className="mb-2.5 overflow-hidden rounded-2xl border border-primary/15 bg-white shadow-sm shadow-primary/5">
+    <View className="mb-2.5 overflow-hidden rounded-2xl border border-primary/15 bg-panel shadow-sm shadow-primary/5">
       <TouchableOpacity
         activeOpacity={0.8}
         className="flex-row items-center justify-between p-4"

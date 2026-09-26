@@ -76,7 +76,7 @@ export function LocationPinPicker({
   );
 
   return (
-    <View className="gap-3 rounded-2xl border border-primary/20 bg-white p-4">
+    <View className="gap-3 rounded-2xl border border-primary/20 bg-panel p-4">
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
           <Text className="font-ralewayBold text-xs text-description">
@@ -150,7 +150,7 @@ export function LocationPinPicker({
         onRequestClose={() => setIsMapVisible(false)}
         visible={isMapVisible}
       >
-        <View className="flex-1 bg-whitePrimary">
+        <View className="flex-1 bg-panel">
           {isMapVisible ? (
             <AdaptiveMap
               onMapPress={handleMapCoordinateChange}
@@ -160,7 +160,7 @@ export function LocationPinPicker({
               viewportRevision={viewportRevision}
             />
           ) : null}
-          <View className="absolute left-5 right-8 top-16 rounded-3xl border border-primary/20 bg-whitePrimary px-4 py-6 shadow-sm shadow-primary/10">
+          <View className="absolute left-5 right-8 top-16 rounded-3xl border border-primary/20 bg-panel px-4 py-6 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between gap-3">
               <View className="min-w-0 flex-1">
                 <Text className="font-ralewayBold text-xs text-description">
@@ -186,7 +186,7 @@ export function LocationPinPicker({
                 />
               </TouchableOpacity>
             </View>
-            <View className="mt-3 h-14 flex-row items-center gap-2 overflow-hidden rounded-[22px] border border-primary/20 bg-white px-3.5">
+            <View className="mt-3 h-14 flex-row items-center gap-2 overflow-hidden rounded-[22px] border border-primary/20 bg-panel px-3.5">
               <MaterialCommunityIcons
                 name="magnify"
                 color="#6F6D6D"
@@ -246,7 +246,7 @@ export function LocationPinPicker({
               </Text>
             ) : null}
             {searchResults.length > 0 ? (
-              <View className="mt-2 overflow-hidden rounded-2xl border border-primary/20 bg-whitePrimary">
+              <View className="mt-2 overflow-hidden rounded-2xl border border-primary/20 bg-panel">
                 {searchResults.map((result, index) => (
                   <TouchableOpacity
                     activeOpacity={0.75}

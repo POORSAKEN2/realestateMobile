@@ -49,7 +49,7 @@ export function FloorAreaLoadingState() {
         <SkeletonBlock className="h-14 w-full rounded-2xl" />
       </View>
 
-      <View className="mt-4 rounded-[24px] border border-primary/20 bg-white p-4">
+      <View className="mt-4 rounded-[24px] border border-primary/20 bg-panel p-4">
         <View className="flex-row items-center gap-3">
           <SkeletonBlock className="h-4 w-4 rounded-full bg-primary/20" />
           <View className="min-w-0 flex-1 gap-2">
@@ -75,7 +75,7 @@ function FloorTabsSkeleton() {
 
 function FloorImageSkeleton() {
   return (
-    <View className="mt-4 overflow-hidden rounded-[24px] border border-primary/20 bg-white p-3">
+    <View className="mt-4 overflow-hidden rounded-[24px] border border-primary/20 bg-panel p-3">
       <SkeletonBlock className="h-52 w-full rounded-2xl bg-primary/10" />
       <View className="mt-3 flex-row items-center justify-center gap-2">
         <SkeletonBlock className="h-2.5 w-2.5 rounded-full bg-primary/20" />
@@ -87,7 +87,7 @@ function FloorImageSkeleton() {
 
 function FloorActionsSkeleton() {
   return (
-    <View className="mt-4 flex-row items-center justify-between rounded-2xl border border-primary/20 bg-white p-3">
+    <View className="mt-4 flex-row items-center justify-between rounded-2xl border border-primary/20 bg-panel p-3">
       <View className="min-w-0 flex-1 gap-2">
         <SkeletonBlock className="h-5 w-28" />
         <SkeletonBlock className="h-3 w-20" />

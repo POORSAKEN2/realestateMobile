@@ -73,7 +73,7 @@ export function ProfileMenuSection({ items, title }: ProfileMenuSectionProps) {
       <Text className="mb-3 font-ralewayBold text-lg text-textPrimary">
         {title}
       </Text>
-      <View className="overflow-hidden rounded-[28px] border border-primary/20 bg-white shadow-sm shadow-primary/10">
+      <View className="overflow-hidden rounded-[28px] border border-primary/20 bg-panel shadow-sm shadow-primary/10">
         {items.map((item, index) => (
           <ProfileMenuRow
             isLast={index === items.length - 1}

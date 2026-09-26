@@ -4,6 +4,7 @@ import type {
   InquiryFilters,
   InquiryStatus,
 } from "../../types/domain/inquiries";
+import { formatLocalizedDate } from "../formatters";
 
 export const INQUIRY_PAGE_SIZE = 20;
 
@@ -182,8 +183,8 @@ export function buildInquiryQuery(
 export function formatInquiryDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Date unavailable";
-  return new Intl.DateTimeFormat("en-US", {
+  return formatLocalizedDate(date, {
     dateStyle: "medium",
     timeStyle: "short",
-  }).format(date);
+  });
 }

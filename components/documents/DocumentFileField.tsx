@@ -35,7 +35,7 @@ export function DocumentFileField({
           className="min-h-14 min-w-0 flex-1 flex-row items-center gap-3 px-2"
           onPress={onPick}
         >
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-white">
+          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-panel">
             <MaterialCommunityIcons
               name={
                 selectedFile ? "file-check-outline" : "cloud-upload-outline"
@@ -69,7 +69,7 @@ export function DocumentFileField({
             accessibilityLabel={`Remove ${selectedFile.name}`}
             accessibilityRole="button"
             activeOpacity={0.75}
-            className="h-11 w-11 items-center justify-center rounded-full bg-white"
+            className="h-11 w-11 items-center justify-center rounded-full bg-panel"
             onPress={onClear}
           >
             <MaterialCommunityIcons name="close" color="#6F6D6D" size={19} />

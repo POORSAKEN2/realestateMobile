@@ -86,7 +86,7 @@ export function DeletionImpactSheet({
   const disabled = Boolean(error) || isLoading || !impact?.canExecute || impact.pagination.hasMore || isPending;
   return (
     <BottomSheetModal dismissDisabled={isPending} onClose={onClose} visible={visible}>
-      <SafeAreaView className="max-h-[85%] rounded-t-[28px] bg-white" edges={["bottom"]}>
+      <SafeAreaView className="max-h-[85%] rounded-t-[28px] bg-panel" edges={["bottom"]}>
         <ModalHeader onClose={onClose} subtitle={impact?.target.label ?? label} title={title} />
         <ScrollView contentContainerStyle={{ gap: 16, padding: 20 }}>
           {isLoading ? <ActivityIndicator color="#8A77F4" /> : null}

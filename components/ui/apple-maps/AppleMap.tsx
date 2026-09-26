@@ -250,7 +250,7 @@ export function AppleMap({
             className="w-full items-center px-8"
           >
             <SkeletonBlock className="h-16 w-16 rounded-full bg-primary/20" />
-            <View className="mt-4 w-full max-w-64 rounded-3xl bg-white p-4">
+            <View className="mt-4 w-full max-w-64 rounded-3xl bg-panel p-4">
               <SkeletonBlock className="h-4 w-2/3 bg-primary/20" />
               <SkeletonBlock className="mt-3 h-3 w-full" />
               <SkeletonBlock className="mt-2 h-3 w-3/4" />

@@ -36,7 +36,7 @@ export function OnboardingFour() {
       visual={
         <View className="w-full flex-1 items-center justify-center">
           <View
-            className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary p-6"
+            className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-panel p-6"
             style={analyticsCardShadow}
           >
             <View className="absolute inset-0 bg-dangerSurface" />
@@ -53,7 +53,7 @@ export function OnboardingFour() {
                 </Text>
               </View>
 
-              <View className="h-11 w-11 items-center justify-center rounded-2xl border border-danger/20 bg-whitePrimary/90 shadow-sm">
+              <View className="h-11 w-11 items-center justify-center rounded-2xl border border-danger/20 bg-panel/90 shadow-sm">
                 <Feather name="trending-up" size={20} color="#1E1F45" />
               </View>
             </View>
@@ -67,7 +67,7 @@ export function OnboardingFour() {
             </View>
 
             <View className=" flex-row gap-3">
-              <View className="flex-1 rounded-2xl border border-white/80 bg-whitePrimary/85 p-3 shadow-sm">
+              <View className="flex-1 rounded-2xl border border-white/80 bg-panel/85 p-3 shadow-sm">
                 <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Return
                 </Text>
@@ -75,7 +75,7 @@ export function OnboardingFour() {
                   +18%
                 </Text>
               </View>
-              <View className="flex-1 rounded-2xl border border-white/80 bg-whitePrimary/85 p-3 shadow-sm">
+              <View className="flex-1 rounded-2xl border border-white/80 bg-panel/85 p-3 shadow-sm">
                 <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                   Expenses
                 </Text>

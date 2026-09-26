@@ -49,7 +49,7 @@ function NavigationButton({
       disabled={!isAvailable}
       onPress={href ? () => onNavigate(href) : undefined}
     >
-      <View className="h-16 w-16 items-center justify-center rounded-[22px] border border-primary/30 bg-white">
+      <View className="h-16 w-16 items-center justify-center rounded-[22px] border border-primary/30 bg-panel">
         <NavigationIcon icon={item.icon} />
       </View>
 

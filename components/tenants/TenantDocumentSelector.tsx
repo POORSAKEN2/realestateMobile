@@ -42,7 +42,7 @@ export function TenantDocumentSelector({
   return (
     <View
       accessibilityViewIsModal
-      className="overflow-hidden rounded-t-[30px] bg-white"
+      className="overflow-hidden rounded-t-[30px] bg-panel"
       style={{ height: height * 0.84, paddingBottom: insets.bottom + 8 }}
     >
       <View className="flex-row items-center border-b border-textPrimary/10 px-5 pb-4 pt-2">
@@ -139,7 +139,7 @@ function DocumentOption({
   onLink: () => void;
 }) {
   return (
-    <View className="flex-row items-center gap-3 rounded-2xl border border-textPrimary/10 bg-white p-4">
+    <View className="flex-row items-center gap-3 rounded-2xl border border-textPrimary/10 bg-panel p-4">
       <View className="h-11 w-11 items-center justify-center rounded-xl bg-dangerSurface">
         <Ionicons color="#B42318" name="document-outline" size={21} />
       </View>

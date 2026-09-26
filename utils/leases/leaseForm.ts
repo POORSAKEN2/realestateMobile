@@ -1,4 +1,5 @@
 import type { Lease, LeasePayload } from "../../types";
+import { formatLocalizedDate } from "../formatters";
 
 const DEFAULT_DURATION_MONTHS = 12;
 
@@ -50,7 +51,7 @@ export function parseLeaseDateValue(value: string) {
 export function formatLeaseDateLabel(value: string) {
   if (!value) return "";
 
-  return parseLeaseDateValue(value).toLocaleDateString("en-PH", {
+  return formatLocalizedDate(parseLeaseDateValue(value), {
     month: "short",
     day: "numeric",
     year: "numeric",

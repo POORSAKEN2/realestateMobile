@@ -83,7 +83,7 @@ export function ActionSheet({
     >
       <SafeAreaView
         accessibilityViewIsModal
-        className="overflow-hidden rounded-t-[28px] bg-white"
+        className="overflow-hidden rounded-t-[28px] bg-panel"
         edges={["bottom"]}
         style={{ maxHeight: maxSheetHeight }}
       >

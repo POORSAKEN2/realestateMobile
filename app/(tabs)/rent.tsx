@@ -19,6 +19,7 @@ import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { colors } from "../../constants/colors";
 import { usePayments, useRecordPayment } from "../../hooks/api/usePayments";
 import type { Payment, PaymentStatus, RecordPaymentPayload } from "../../types";
+import { formatCurrency } from "../../utils/formatters";
 
 const STATUS_FILTERS: Array<{ label: string; value: PaymentStatus | "ALL" }> = [
   { label: "All", value: "ALL" },
@@ -155,7 +156,7 @@ export function RentScreen({
               Collected
             </Text>
             <Text className="mt-1 font-ralewayExtraBold text-sm text-success" numberOfLines={1}>
-              ₱{totalCollected.toLocaleString("en-PH", { maximumFractionDigits: 0 })}
+              {formatCurrency(totalCollected)}
             </Text>
           </View>
 
@@ -164,7 +165,7 @@ export function RentScreen({
               Pending
             </Text>
             <Text className="mt-1 font-ralewayExtraBold text-sm text-warning" numberOfLines={1}>
-              ₱{totalPending.toLocaleString("en-PH", { maximumFractionDigits: 0 })}
+              {formatCurrency(totalPending)}
             </Text>
           </View>
 
@@ -173,13 +174,13 @@ export function RentScreen({
               Overdue
             </Text>
             <Text className="mt-1 font-ralewayExtraBold text-sm text-danger" numberOfLines={1}>
-              ₱{totalOverdue.toLocaleString("en-PH", { maximumFractionDigits: 0 })}
+              {formatCurrency(totalOverdue)}
             </Text>
           </View>
         </View>
 
         {/* Search Bar */}
-        <View className="mt-4 h-12 flex-row items-center rounded-2xl border border-primary/20 bg-white px-3.5 shadow-sm shadow-primary/5">
+        <View className="mt-4 h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 shadow-sm shadow-primary/5">
           <Feather name="search" size={16} color={colors.description} />
           <TextInput
             accessibilityLabel="Search payments"
@@ -207,7 +208,7 @@ export function RentScreen({
                 className={`rounded-full border px-3.5 py-1.5 ${
                   isSelected
                     ? "border-primary bg-primary"
-                    : "border-primary/15 bg-white"
+                    : "border-primary/15 bg-panel"
                 }`}
                 onPress={() => setStatusFilter(tab.value)}
               >
@@ -244,7 +245,7 @@ export function RentScreen({
               />
             )}
             ListEmptyComponent={
-              <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-white p-8 mt-4">
+              <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8 mt-4">
                 <Ionicons name="wallet-outline" size={40} color={colors.description} />
                 <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
                   No payment records found

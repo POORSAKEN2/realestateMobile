@@ -15,27 +15,13 @@ import {
   weekdayLabels,
 } from "../../utils/bookings/bookingCalendar";
 import { BOOKING_CALENDAR_LEGEND } from "../../utils/bookings/bookingPresentation";
+import { formatLocalizedDate } from "../../utils/formatters";
 
-const monthFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "long",
-  year: "numeric",
-});
-const shortMonthFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-});
-const dayFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "long",
-  day: "numeric",
-  year: "numeric",
-});
-const weekdayFormatter = new Intl.DateTimeFormat("en-US", {
-  weekday: "long",
-});
-const spokenDateFormatter = new Intl.DateTimeFormat("en-US", {
-  weekday: "long",
-  month: "long",
-  day: "numeric",
-});
+const monthLabel = (date: Date) => formatLocalizedDate(date, { month: "long", year: "numeric" });
+const shortMonthLabel = (date: Date) => formatLocalizedDate(date, { month: "short" });
+const dayLabel = (date: Date) => formatLocalizedDate(date, { month: "long", day: "numeric", year: "numeric" });
+const weekdayLabel = (date: Date) => formatLocalizedDate(date, { weekday: "long" });
+const spokenDateLabel = (date: Date) => formatLocalizedDate(date, { weekday: "long", month: "long", day: "numeric" });
 
 type BookingCalendarProps = {
   availabilityBookings: TransientBooking[];
@@ -81,7 +67,7 @@ export function BookingCalendar({
   const periodLabel = getPeriodLabel(mode, currentMonth, selectedDay, weekDays);
 
   return (
-    <View className="overflow-hidden rounded-[24px] border border-primary/15 bg-white">
+    <View className="overflow-hidden rounded-[24px] border border-primary/15 bg-panel">
       <View className="flex-row items-center gap-2 px-4 py-4">
         <View className="min-w-0 flex-1">
           <Text
@@ -132,7 +118,7 @@ export function BookingCalendar({
         />
       ) : (
         <>
-          <View className="flex-row border-y border-primary/10 bg-white py-3">
+          <View className="flex-row border-y border-primary/10 bg-panel py-3">
             {weekdayLabels.map((day) => (
               <Text
                 key={day}
@@ -187,8 +173,8 @@ function getPeriodLabel(
   selectedDay: Date,
   weekDays: Date[],
 ) {
-  if (mode === "month") return monthFormatter.format(currentMonth);
-  if (mode === "day") return dayFormatter.format(selectedDay);
+  if (mode === "month") return monthLabel(currentMonth);
+  if (mode === "day") return dayLabel(selectedDay);
 
   const start = weekDays[0];
   const end = weekDays[6];
@@ -196,12 +182,12 @@ function getPeriodLabel(
   const sameMonth = sameYear && start.getMonth() === end.getMonth();
 
   if (sameMonth) {
-    return `${shortMonthFormatter.format(start)} ${start.getDate()}–${end.getDate()}, ${end.getFullYear()}`;
+    return `${shortMonthLabel(start)} ${start.getDate()}–${end.getDate()}, ${end.getFullYear()}`;
   }
   if (sameYear) {
-    return `${shortMonthFormatter.format(start)} ${start.getDate()}–${shortMonthFormatter.format(end)} ${end.getDate()}, ${end.getFullYear()}`;
+    return `${shortMonthLabel(start)} ${start.getDate()}–${shortMonthLabel(end)} ${end.getDate()}, ${end.getFullYear()}`;
   }
-  return `${shortMonthFormatter.format(start)} ${start.getDate()}, ${start.getFullYear()}–${shortMonthFormatter.format(end)} ${end.getDate()}, ${end.getFullYear()}`;
+  return `${shortMonthLabel(start)} ${start.getDate()}, ${start.getFullYear()}–${shortMonthLabel(end)} ${end.getDate()}, ${end.getFullYear()}`;
 }
 
 function isPeriodContainingToday(
@@ -250,7 +236,7 @@ function CalendarDaySummary({
       </View>
       <View className="min-w-0 flex-1">
         <Text className="font-ralewayExtraBold text-sm text-textPrimary">
-          {weekdayFormatter.format(day)}
+          {weekdayLabel(day)}
         </Text>
         <Text className="mt-0.5 font-ralewaySemiBold text-xs text-description">
           {dayBookings.length}{" "}
@@ -282,7 +268,7 @@ function MonthButton({
       activeOpacity={0.78}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
-      className="h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-white"
+      className="h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-panel"
       onPress={onPress}
     >
       <Ionicons name={icon} color="#8A77F4" size={19} />
@@ -342,7 +328,7 @@ function CalendarDay({
     <TouchableOpacity
       activeOpacity={0.72}
       accessibilityHint="Shows this day's schedule"
-      accessibilityLabel={`${spokenDateFormatter.format(day)}. ${calendarStateLabel}. ${availability.label}. ${activeBookingCount} active ${activeBookingCount === 1 ? "booking" : "bookings"}.${cancelledBookingCount ? ` ${cancelledBookingCount} cancelled.` : ""}`}
+      accessibilityLabel={`${spokenDateLabel(day)}. ${calendarStateLabel}. ${availability.label}. ${activeBookingCount} active ${activeBookingCount === 1 ? "booking" : "bookings"}.${cancelledBookingCount ? ` ${cancelledBookingCount} cancelled.` : ""}`}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
       className={`${isMonthView ? "h-16" : "h-14"} items-center justify-center ${isInVisiblePeriod ? "" : "opacity-40"}`}
@@ -354,7 +340,7 @@ function CalendarDay({
           isSelected
             ? "bg-primary"
             : isToday
-              ? "border-2 border-primary bg-white"
+              ? "border-2 border-primary bg-panel"
               : "bg-transparent"
         }`}
       >

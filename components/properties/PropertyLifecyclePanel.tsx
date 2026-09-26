@@ -2,6 +2,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 import { colors } from "../../constants/colors";
+import { formatLocalizedDate } from "../../utils/formatters";
 import type { PropertyStatus, PropertyStatusHistoryEntry } from "../../types";
 import {
   getPropertyLifecycleDescription,
@@ -26,7 +27,7 @@ function formatTransitionTime(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Date unavailable";
 
-  return date.toLocaleString("en-PH", {
+  return formatLocalizedDate(date, {
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
@@ -49,7 +50,7 @@ export function PropertyLifecyclePanel({
   const currentStep = getPropertyLifecycleStepIndex(currentStatus);
 
   return (
-    <View className="mt-5 rounded-[24px] border border-primary/20 bg-white p-4">
+    <View className="mt-5 rounded-[24px] border border-primary/20 bg-panel p-4">
       <View className="flex-row items-start justify-between gap-3">
         <View className="min-w-0 flex-1">
           <Text className="font-ralewayBold text-xs uppercase text-secondary">

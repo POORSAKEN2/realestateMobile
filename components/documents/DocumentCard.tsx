@@ -33,7 +33,7 @@ export function DocumentCard({
     .join(" · ");
 
   return (
-    <View className="overflow-hidden rounded-[24px] border border-primary/20 bg-white shadow-sm shadow-primary/10">
+    <View className="overflow-hidden rounded-[24px] border border-primary/20 bg-panel shadow-sm shadow-primary/10">
       <View className="flex-row items-start gap-2 p-4">
         <TouchableOpacity
           accessibilityHint="Opens the document"

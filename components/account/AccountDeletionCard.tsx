@@ -17,6 +17,7 @@ import {
 } from "../../api/user";
 import { colors } from "../../constants/colors";
 import { deletionStatusLabel } from "../../utils/accountDeletion/accountDeletion";
+import { formatDateTime } from "../../utils/formatters";
 
 const key = ["account-deletion-request"] as const;
 const label = (value: string) =>
@@ -77,7 +78,7 @@ export function AccountDeletionCard() {
     );
 
   return (
-    <View className="mt-5 rounded-[28px] border border-danger/25 bg-white p-5 shadow-sm shadow-primary/10">
+    <View className="mt-5 rounded-[28px] border border-danger/25 bg-panel p-5 shadow-sm shadow-primary/10">
       <Text className="font-ralewayExtraBold text-lg text-textPrimary">
         Account deletion
       </Text>
@@ -109,7 +110,7 @@ export function AccountDeletionCard() {
             {current.scheduled_for ? (
               <Text className="mt-2 font-ralewayBold text-sm text-danger">
                 Final deletion:{" "}
-                {new Date(current.scheduled_for).toLocaleString()}
+                {formatDateTime(current.scheduled_for)}
               </Text>
             ) : null}
             {current.decision_reason ? (
@@ -138,7 +139,7 @@ export function AccountDeletionCard() {
                     {event.label}
                   </Text>
                   <Text className="text-xs text-description">
-                    {new Date(event.at).toLocaleString()}
+                    {formatDateTime(event.at)}
                   </Text>
                 </View>
               ))}

@@ -26,7 +26,7 @@ export function BuildingChoices({
             accessibilityLabel={`Show calendar for ${building.title}`}
             accessibilityRole="button"
             accessibilityState={{ selected }}
-            className={`min-h-11 justify-center rounded-full border px-4 ${selected ? "border-primary bg-primary" : "border-primary/20 bg-whitePrimary"}`}
+            className={`min-h-11 justify-center rounded-full border px-4 ${selected ? "border-primary bg-primary" : "border-primary/20 bg-panel"}`}
             onPress={() => onSelect(building.id)}
           >
             <Text

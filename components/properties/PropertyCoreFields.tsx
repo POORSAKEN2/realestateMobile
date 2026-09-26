@@ -18,6 +18,7 @@ import { BaseField } from "../ui/fields/BaseField";
 import { DropdownField } from "../ui/fields/DropdownField";
 import { LocationPinPicker } from "./LocationPinPicker";
 import { PropertyFormSection } from "./PropertyFormSection";
+import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
 
 type UpdateForm = <K extends keyof FormState>(
   key: K,
@@ -53,6 +54,7 @@ export function PropertyCoreFields({
   propertyTypeChoices: Choice<PropertyType>[];
   statusEditable?: boolean;
 }) {
+  const { settings } = useWorkspacePresentation();
   const filteredLocationSuggestions = locationSuggestions;
   const selectLocation = onSelectSuggestedLocation;
   const updateClassification = onClassificationChange;
@@ -257,7 +259,7 @@ export function PropertyCoreFields({
           <View className="flex-1">
             <BaseField
               keyboardType="decimal-pad"
-              label="Market value (PHP)"
+              label={`Market value (${settings.currency})`}
               onChangeText={(value) => updateForm("value", cleanDecimal(value))}
               placeholder="0"
               value={form.value}

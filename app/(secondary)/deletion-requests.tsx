@@ -25,6 +25,7 @@ import { Screen } from "../../components/ui/Screen";
 import { colors } from "../../constants/colors";
 import { useAccess } from "../../hooks/auth/useAccess";
 import { useRevenueCat } from "../../hooks/useRevenueCat";
+import { formatDateTime } from "../../utils/formatters";
 import type {
   AccountDeletionRequest,
   DeletionAction,
@@ -153,7 +154,7 @@ export default function DeletionRequestsScreen() {
                 {statusFilters.map((value) => (
                   <TouchableOpacity
                     key={value ?? "all"}
-                    className={`rounded-full px-3 py-2 ${status === value ? "bg-primary" : "border border-primary/20 bg-white"}`}
+                    className={`rounded-full px-3 py-2 ${status === value ? "bg-primary" : "border border-primary/20 bg-panel"}`}
                     onPress={() => {
                       setStatus(value);
                       setPage(1);
@@ -174,7 +175,7 @@ export default function DeletionRequestsScreen() {
                 {scopeFilters.map((value) => (
                   <TouchableOpacity
                     key={value ?? "all"}
-                    className={`rounded-full px-3 py-2 ${scope === value ? "bg-primary" : "border border-primary/20 bg-white"}`}
+                    className={`rounded-full px-3 py-2 ${scope === value ? "bg-primary" : "border border-primary/20 bg-panel"}`}
                     onPress={() => {
                       setScope(value);
                       setPage(1);
@@ -245,7 +246,7 @@ export default function DeletionRequestsScreen() {
         }
         renderItem={({ item }) => (
           <TouchableOpacity
-            className="rounded-2xl border border-primary/20 bg-white p-4"
+            className="rounded-2xl border border-primary/20 bg-panel p-4"
             onPress={() => setSelectedId(item.id)}
           >
             <View className="flex-row justify-between gap-3">
@@ -259,14 +260,14 @@ export default function DeletionRequestsScreen() {
             <Text className="mt-1 text-sm text-description">
               {words(item.scope)} ·{" "}
               {item.requested_at
-                ? new Date(item.requested_at).toLocaleString()
+                ? formatDateTime(item.requested_at)
                 : "Unknown date"}
             </Text>
           </TouchableOpacity>
         )}
         ListFooterComponent={
           selectedId ? (
-            <View className="mt-5 rounded-[28px] border border-primary/20 bg-white p-5">
+            <View className="mt-5 rounded-[28px] border border-primary/20 bg-panel p-5">
               {detail.isPending ? (
                 <ActivityIndicator color={colors.primary} />
               ) : selected ? (
@@ -343,7 +344,7 @@ export default function DeletionRequestsScreen() {
                             {event.label}
                           </Text>
                           <Text className="text-xs text-description">
-                            {new Date(event.at).toLocaleString()}
+                            {formatDateTime(event.at)}
                           </Text>
                         </View>
                       ))}

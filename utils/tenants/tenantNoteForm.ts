@@ -48,7 +48,7 @@ export function getTenantNoteFormResult(
   }
   if (content.length > TENANT_NOTE_CONTENT_LIMIT) {
     return {
-      error: `Notes cannot exceed ${TENANT_NOTE_CONTENT_LIMIT.toLocaleString()} characters.`,
+      error: `Notes cannot exceed ${TENANT_NOTE_CONTENT_LIMIT} characters.`,
       isValid: false,
     };
   }

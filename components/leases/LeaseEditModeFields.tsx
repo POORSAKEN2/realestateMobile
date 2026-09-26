@@ -45,7 +45,7 @@ export function LeaseEditModeFields({
               activeOpacity={0.8}
               className={`h-12 flex-1 flex-row items-center justify-center gap-2 rounded-[14px] border ${
                 selected
-                  ? "border-primary/20 bg-white"
+                  ? "border-primary/20 bg-panel"
                   : "border-transparent bg-transparent"
               }`}
               key={mode.value}

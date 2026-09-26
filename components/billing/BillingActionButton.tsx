@@ -25,7 +25,7 @@ export function BillingActionButton({
       accessibilityLabel={label}
       accessibilityState={{ busy: isLoading, disabled: blocked }}
       activeOpacity={0.8}
-      className={`min-h-12 flex-row items-center justify-center gap-2 rounded-2xl border px-4 py-3 ${primary ? "border-primary bg-primary" : "border-primary/20 bg-white"} ${blocked ? "opacity-60" : ""}`}
+      className={`min-h-12 flex-row items-center justify-center gap-2 rounded-2xl border px-4 py-3 ${primary ? "border-primary bg-primary" : "border-primary/20 bg-panel"} ${blocked ? "opacity-60" : ""}`}
       disabled={blocked}
       onPress={onPress}
     >

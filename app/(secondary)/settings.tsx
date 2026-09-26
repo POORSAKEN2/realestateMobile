@@ -45,7 +45,7 @@ function PasswordField({
       <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
         {label}
       </Text>
-      <View className="h-14 flex-row items-center rounded-2xl border border-primary/20 bg-white px-4 shadow-sm shadow-primary/10">
+      <View className="h-14 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-4 shadow-sm shadow-primary/10">
         <Ionicons
           name="lock-closed-outline"
           color={colors.description}
@@ -190,12 +190,22 @@ export default function SettingsScreen() {
             />
           ) : null}
 
-          {can("audit.view") || can("account.reviewDeletionRequests") ? (
+          {can("settings.view") || can("audit.view") || can("account.reviewDeletionRequests") ? (
             <View className="gap-3">
+              {can("settings.view") ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  className="mt-5 rounded-2xl border border-primary/20 bg-panel p-5"
+                  onPress={() => router.push(appRoutes.secondary.workspaceSettings)}
+                >
+                  <Text className="font-ralewayExtraBold text-base text-textPrimary">Workspace Settings</Text>
+                  <Text className="mt-1 text-sm text-description">Configure account identity, region, appearance, and map defaults.</Text>
+                </TouchableOpacity>
+              ) : null}
               {can("audit.view") ? (
                 <TouchableOpacity
                   accessibilityRole="button"
-                  className="mt-5 rounded-2xl border border-primary/20 bg-white p-5"
+                  className={`${can("settings.view") ? "" : "mt-5"} rounded-2xl border border-primary/20 bg-panel p-5`}
                   onPress={() => router.push(appRoutes.secondary.auditHistory)}
                 >
                   <Text className="font-ralewayExtraBold text-base text-textPrimary">
@@ -209,7 +219,7 @@ export default function SettingsScreen() {
               {can("account.reviewDeletionRequests") ? (
                 <TouchableOpacity
                   accessibilityRole="button"
-                  className="rounded-2xl border border-primary/20 bg-white p-5"
+                  className="rounded-2xl border border-primary/20 bg-panel p-5"
                   onPress={() =>
                     router.push(appRoutes.secondary.deletionRequests)
                   }
@@ -279,7 +289,7 @@ export default function SettingsScreen() {
           </View>
 
           {/* Change Password section */}
-          <View className="mt-5 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+          <View className="mt-5 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between">
               <View>
                 <Text className="font-ralewayExtraBold text-lg text-textPrimary">
@@ -351,7 +361,7 @@ export default function SettingsScreen() {
           </View>
 
           {/* Data & Privacy (DPA) section */}
-          <View className="mt-5 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+          <View className="mt-5 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
             <View className="flex-row items-center justify-between">
               <View>
                 <Text className="font-ralewayExtraBold text-lg text-textPrimary">

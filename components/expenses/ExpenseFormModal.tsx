@@ -9,6 +9,8 @@ import { DateTimePickerModal } from "../ui/fields/DateTimePickerModal";
 import { PickerField } from "../ui/fields/PickerField";
 import { FormSection } from "../ui/forms/FormSection";
 import type { Expense } from "../../types/domain/expenses";
+import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
+import { formatLocalizedDate } from "../../utils/formatters";
 import {
   cleanDecimal,
   parseDateValue,
@@ -23,12 +25,6 @@ const expenseCategoryChoices = [
   { label: "Management Fees", value: "MANAGEMENT_FEES" },
   { label: "Other Operations", value: "OTHER" },
 ];
-
-const expenseDateFormatter = new Intl.DateTimeFormat("en-US", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-});
 
 type ExpenseFormUpdater = <K extends keyof FormState>(
   key: K,
@@ -64,6 +60,7 @@ export function ExpenseFormModal({
   onSubmit,
   onUpdateForm,
 }: ExpenseFormModalProps) {
+  const { settings } = useWorkspacePresentation();
   return (
     <AddEditModal
       permission={editingExpense ? "expenses.update" : "expenses.create"}
@@ -122,7 +119,7 @@ export function ExpenseFormModal({
       <FormSection icon="cash-multiple" title="Payment details" variant="card">
         <BaseField
           keyboardType="decimal-pad"
-          label="Amount (PHP)"
+          label={`Amount (${settings.currency})`}
           placeholder="0.00"
           value={form.amount}
           onChangeText={(value) => onUpdateForm("amount", cleanDecimal(value))}
@@ -138,7 +135,11 @@ export function ExpenseFormModal({
             required
             value={
               form.date
-                ? expenseDateFormatter.format(parseDateValue(form.date))
+                ? formatLocalizedDate(parseDateValue(form.date), {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })
                 : ""
             }
             onPress={() => onSetDatePickerVisible(true)}

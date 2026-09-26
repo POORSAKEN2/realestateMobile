@@ -51,7 +51,7 @@ export function OnboardingFive() {
       }
       visual={
         <View className="w-full flex-1 items-center justify-center">
-          <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary/95 p-5 shadow-2xl">
+          <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-panel/95 p-5 shadow-2xl">
             <View className="absolute inset-0">
               <View className="absolute left-6 top-0 h-full w-px bg-textPrimary/10" />
               <View className="absolute left-12 top-0 h-full w-px bg-textPrimary/10" />
@@ -86,7 +86,7 @@ export function OnboardingFive() {
             <View className="mt-7 gap-4">
               {folderRows.map((row) => (
                 <View
-                  className="rounded-3xl border border-white/80 bg-whitePrimary/85 p-3 shadow-sm"
+                  className="rounded-3xl border border-white/80 bg-panel/85 p-3 shadow-sm"
                   key={row.label}
                 >
                   <View className="flex-row items-center gap-3">

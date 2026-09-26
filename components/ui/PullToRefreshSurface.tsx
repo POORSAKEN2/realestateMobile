@@ -148,7 +148,7 @@ export function PullToRefreshSurface({
             accessibilityLabel="Refreshing content"
             accessibilityRole="progressbar"
             accessibilityState={{ busy: refreshing }}
-            className="h-[48px] w-[48px] items-center justify-center rounded-full bg-whitePrimary"
+            className="h-[48px] w-[48px] items-center justify-center rounded-full bg-panel"
             importantForAccessibility={
               refreshing ? "yes" : "no-hide-descendants"
             }

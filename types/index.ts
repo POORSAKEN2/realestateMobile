@@ -146,6 +146,16 @@ export type {
 export type { GlobalSearchResults } from "./domain/search";
 export type { CreateStaffManagerPayload, StaffManager } from "./domain/staff";
 export type {
+  EffectiveWorkspaceSettings,
+  UpdateWorkspaceSettings,
+  WorkspaceLocationOption,
+  WorkspaceSettingOption,
+  WorkspaceSettings,
+  WorkspaceSettingsOptions,
+  WorkspaceSettingsResponse,
+  WorkspaceTheme,
+} from "./domain/workspaceSettings";
+export type {
   EditableProfileField,
   ProfileCompletion,
   ProfileForm,

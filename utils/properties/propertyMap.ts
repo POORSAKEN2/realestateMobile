@@ -17,8 +17,11 @@ export function getSelectedPropertyRegion(property: MappedProperty): MapRegion {
   };
 }
 
-export function getPortfolioRegion(properties: MappedProperty[]): MapRegion {
-  if (!properties.length) return DEFAULT_PHILIPPINES_REGION;
+export function getPortfolioRegion(
+  properties: MappedProperty[],
+  fallback: MapRegion = DEFAULT_PHILIPPINES_REGION,
+): MapRegion {
+  if (!properties.length) return fallback;
   if (properties.length === 1) return getSelectedPropertyRegion(properties[0]);
 
   let minimumLatitude = properties[0].lat;

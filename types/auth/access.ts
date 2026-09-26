@@ -26,6 +26,8 @@ export type ResourceAction =
 export type AppPermission =
   | "audit.view"
   | "audit.export"
+  | "settings.view"
+  | "settings.update"
   | `${Resource}.${ResourceAction}`
   | "dashboard.admin"
   | "dashboard.manager"

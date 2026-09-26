@@ -50,7 +50,7 @@ function SubMetric({
 
   return (
     <View
-      className={`flex-1 rounded-2xl border border-textPrimary/10 bg-white shadow-sm shadow-textPrimary/10 ${
+      className={`flex-1 rounded-2xl border border-textPrimary/10 bg-panel shadow-sm shadow-textPrimary/10 ${
         compact ? "min-h-0 px-3 py-2" : "min-h-24 p-4"
       }`}
     >
@@ -156,7 +156,7 @@ function MainMetric({
       className={`overflow-hidden rounded-2xl border p-4 shadow-sm ${
         split
           ? "min-h-[216px] flex-1 items-start justify-between border-primary/25 bg-secondary shadow-secondary/25"
-          : "min-h-32 flex-row items-center gap-4 border-textPrimary/10 bg-white shadow-textPrimary/10"
+          : "min-h-32 flex-row items-center gap-4 border-textPrimary/10 bg-panel shadow-textPrimary/10"
       }`}
     >
       {split ? (

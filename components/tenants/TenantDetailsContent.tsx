@@ -77,7 +77,7 @@ export function TenantDetailsContent({
 
   return (
     <View
-      className="overflow-hidden rounded-t-[30px] bg-white"
+      className="overflow-hidden rounded-t-[30px] bg-panel"
       style={{ maxHeight: height * 0.84 }}
     >
       <ScrollView

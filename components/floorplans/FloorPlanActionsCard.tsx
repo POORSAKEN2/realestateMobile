@@ -27,7 +27,7 @@ export function FloorPlanActionsCard({
   const roomCount = getFloorRoomCount(floor, rooms);
 
   return (
-    <View className="flex-row items-center justify-between rounded-2xl border border-primary/20 bg-white p-3 shadow-sm shadow-primary/10">
+    <View className="flex-row items-center justify-between rounded-2xl border border-primary/20 bg-panel p-3 shadow-sm shadow-primary/10">
       <View className="min-w-0 flex-1">
         <Text
           className="font-ralewayBold text-base text-textPrimary"

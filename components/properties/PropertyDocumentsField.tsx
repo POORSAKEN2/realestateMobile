@@ -27,7 +27,7 @@ export function PropertyDocumentsField({
   storageHint?: string;
 }) {
   return (
-    <View className="gap-4 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+    <View className="gap-4 rounded-[24px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
           <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary/20">
@@ -74,7 +74,7 @@ export function PropertyDocumentsField({
             Attached documents
           </Text>
           {isLoadingExistingDocuments ? (
-            <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3">
+            <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3">
               <SkeletonBlock className="h-10 w-10 rounded-xl bg-primary/10" />
               <View className="min-w-0 flex-1 gap-2">
                 <SkeletonBlock className="h-4 w-2/3" />
@@ -87,7 +87,7 @@ export function PropertyDocumentsField({
               <TouchableOpacity
                 key={document.id}
                 activeOpacity={0.8}
-                className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
+                className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3"
                 onPress={() => openPropertyDocument(document)}
               >
                 <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
@@ -116,7 +116,7 @@ export function PropertyDocumentsField({
               </TouchableOpacity>
             ))
           ) : (
-            <View className="rounded-2xl border border-dashed border-primary/20 bg-white px-3 py-4">
+            <View className="rounded-2xl border border-dashed border-primary/20 bg-panel px-3 py-4">
               <Text className="text-center font-ralewayBold text-xs text-description">
                 No documents attached yet.
               </Text>
@@ -133,7 +133,7 @@ export function PropertyDocumentsField({
           {documents.map((document, index) => (
             <View
               key={`${document.name}-${document.size ?? index}`}
-              className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
+              className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3"
             >
               <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
                 <MaterialCommunityIcons
@@ -157,7 +157,7 @@ export function PropertyDocumentsField({
                 activeOpacity={0.8}
                 accessibilityLabel={`Remove ${document.name}`}
                 accessibilityRole="button"
-                className="h-11 w-11 items-center justify-center rounded-full bg-whitePrimary"
+                className="h-11 w-11 items-center justify-center rounded-full bg-panel"
                 onPress={() => onRemove(index)}
               >
                 <MaterialCommunityIcons

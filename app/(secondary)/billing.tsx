@@ -105,7 +105,7 @@ export default function BillingScreen() {
           entitlement={entitlement}
           onViewPlans={viewPlans}
         />
-        <View className="flex-row items-start gap-3 rounded-2xl border border-primary/15 bg-white p-4">
+        <View className="flex-row items-start gap-3 rounded-2xl border border-primary/15 bg-panel p-4">
           <Feather name="shield" size={18} color={colors.primary} />
           <View className="min-w-0 flex-1">
             <Text className="font-ralewayBold text-xs text-textPrimary">

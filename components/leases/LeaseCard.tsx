@@ -31,7 +31,7 @@ export function LeaseCard({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onOpenTenant}
-      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-sm shadow-primary/10"
+      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-panel shadow-sm shadow-primary/10"
     >
       <View className="p-5">
         {/* --- HEADER: Identity, Status & Actions --- */}

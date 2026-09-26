@@ -46,7 +46,7 @@ export function TenantDocumentsSection({
       ) : error ? (
         <DetailError message="Tenant documents could not be loaded." />
       ) : documents.length ? (
-        <View className="overflow-hidden rounded-2xl border border-primary/20 bg-white">
+        <View className="overflow-hidden rounded-2xl border border-primary/20 bg-panel">
           {documents.slice(0, 4).map((document, index) => (
             <TouchableOpacity
               accessibilityHint="Opens the document"

@@ -31,6 +31,14 @@ export const dashboardNavigationSections = [
     title: "Operations",
     items: [
       {
+        label: "Workspace Settings",
+        supportingText: "Configure identity, region, theme, and map defaults",
+        href: appRoutes.secondary.workspaceSettings,
+        permission: "settings.view",
+        badge: "Admin",
+        icon: { family: "Ionicons", name: "options-outline" },
+      },
+      {
         label: "Inquiries & Leads",
         supportingText: "Review listing leads and engagement",
         href: appRoutes.secondary.inquiries,

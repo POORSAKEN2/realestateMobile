@@ -25,6 +25,7 @@ import {
   openPropertyDocument,
 } from "../../utils/dashboard/dashboardHelpers";
 import { getPropertyImages } from "../../utils/properties/propertyPresentation";
+import { formatCurrency } from "../../utils/formatters";
 import { resolveFloorManagerPolicy } from "../../utils/properties/floorManagerPolicy";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import { ConfirmationModal } from "../ui/ConfirmationModal";
@@ -145,7 +146,7 @@ export function PropertyDetailsModal({
     <>
       {property ? (
         <View
-          className={`overflow-hidden bg-white ${showFullDetails ? "flex-1" : "rounded-t-[30px]"}`}
+          className={`overflow-hidden bg-panel ${showFullDetails ? "flex-1" : "rounded-t-[30px]"}`}
           style={
             showFullDetails
               ? { paddingTop: insets.top }
@@ -167,7 +168,7 @@ export function PropertyDetailsModal({
               >
                 {images.map((image, index) => (
                   <Image
-                    className="h-full bg-white"
+                    className="h-full bg-panel"
                     key={`${image}:${index}`}
                     resizeMode="cover"
                     source={{ uri: image }}
@@ -401,7 +402,7 @@ export function PropertyDetailsModal({
                   ) : null}
                   {property.value > 0 ? (
                     <Text className="mt-1 font-ralewayMedium text-xs text-description">
-                      Listed value: ₱{property.value.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+                      Listed value: {formatCurrency(property.value, 2)}
                     </Text>
                   ) : null}
                 </View>
@@ -409,7 +410,7 @@ export function PropertyDetailsModal({
 
               <DetailsSection title="Current Tenants">
                 {isLoading ? (
-                  <View className="rounded-2xl border border-primary/20 bg-white p-3">
+                  <View className="rounded-2xl border border-primary/20 bg-panel p-3">
                     <View className="flex-row items-center justify-between gap-3">
                       <SkeletonBlock className="h-4 w-1/2" />
                       <SkeletonBlock className="h-5 w-16 rounded-full bg-primary/10" />
@@ -459,7 +460,7 @@ export function PropertyDetailsModal({
 
               <DetailsSection title="Property Documents">
                 {isLoading ? (
-                  <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3">
+                  <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3">
                     <SkeletonBlock className="h-10 w-10 rounded-xl bg-primary/10" />
                     <View className="min-w-0 flex-1 gap-2">
                       <SkeletonBlock className="h-4 w-2/3" />
@@ -471,7 +472,7 @@ export function PropertyDetailsModal({
                   propertyDocuments.map((document) => (
                     <TouchableOpacity
                       activeOpacity={0.8}
-                      className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
+                      className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3"
                       key={document.id}
                       onPress={() => openPropertyDocument(document)}
                     >
@@ -567,7 +568,7 @@ function DetailMetric({
   return (
     <View className="w-1/2 p-1.5">
       <View
-        className={`rounded-2xl border border-primary/20 p-3 ${accent ? "bg-accent/50" : "bg-white"}`}
+        className={`rounded-2xl border border-primary/20 p-3 ${accent ? "bg-accent/50" : "bg-panel"}`}
       >
         <Text
           className={`font-ralewayBold text-[10px] uppercase ${accent ? "text-textPrimary/70" : "text-description"}`}
@@ -598,7 +599,7 @@ function CountMetric({
   value: number;
 }) {
   return (
-    <View className="flex-1 rounded-2xl border border-primary/20 bg-white p-4">
+    <View className="flex-1 rounded-2xl border border-primary/20 bg-panel p-4">
       <View className="flex-row items-center gap-2">
         <Feather name={icon} color="#8A77F4" size={16} />
         <Text className="font-ralewayBold text-[10px] uppercase text-secondary">
@@ -635,7 +636,7 @@ function DetailsSection({
 
 function EmptyDetail({ text }: { text: string }) {
   return (
-    <View className="items-center rounded-2xl border border-dashed border-primary/20 bg-white px-4 py-5">
+    <View className="items-center rounded-2xl border border-dashed border-primary/20 bg-panel px-4 py-5">
       <Text className="font-ralewaySemiBold text-xs text-description">
         {text}
       </Text>
@@ -653,7 +654,7 @@ function Attribute({
   value: string;
 }) {
   return (
-    <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3">
+    <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3">
       <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
         <Feather name={icon} color="#8A77F4" size={15} />
       </View>

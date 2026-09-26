@@ -23,7 +23,7 @@ export function FormSection({
     <View
       className={
         isCard
-          ? "gap-5 rounded-[24px] border border-textPrimary/10 bg-white p-4 shadow-sm shadow-textPrimary/5"
+          ? "gap-5 rounded-[24px] border border-textPrimary/10 bg-panel p-4 shadow-sm shadow-textPrimary/5"
           : "gap-4 border-b border-textPrimary/10 pb-6"
       }
     >

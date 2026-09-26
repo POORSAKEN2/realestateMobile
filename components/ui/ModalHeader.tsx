@@ -29,7 +29,7 @@ export function ModalHeader({
 }: ModalHeaderProps) {
   return (
     <View
-      className={`border-b border-primary/10 bg-white ${
+      className={`border-b border-primary/10 bg-panel ${
         compact ? "px-5 pb-3 pt-3" : "px-6 pb-4 pt-3"
       } ${className}`}
     >

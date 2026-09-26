@@ -217,7 +217,7 @@ export function FloorAreaWorkspace({
             </View>
           </View>
         ) : (
-          <View className="items-center rounded-[24px] border border-dashed border-primary/20 bg-white px-6 py-8">
+          <View className="items-center rounded-[24px] border border-dashed border-primary/20 bg-panel px-6 py-8">
             <MaterialCommunityIcons
               name="vector-polygon"
               color="#8A77F4"

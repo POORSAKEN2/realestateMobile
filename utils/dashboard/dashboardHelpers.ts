@@ -2,6 +2,7 @@ import { Alert, Linking } from "react-native";
 
 import type { AuthUser, Property, PropertyDocument } from "../../types";
 import { getPropertyLifecycleLabel } from "../properties/propertyLifecycle";
+import { formatCompactCurrency } from "../formatters";
 export { getPropertyImages } from "../properties/propertyPresentation";
 
 export type AssetSortBy = "value" | "roi" | "name";
@@ -27,18 +28,7 @@ export function calculateTrend(current: number, previous?: number) {
 }
 
 export function formatPesoValue(value = 0) {
-  const absoluteValue = Math.abs(value);
-  const prefix = value < 0 ? "-₱" : "₱";
-
-  if (absoluteValue >= 1_000_000_000) {
-    return `${prefix}${(absoluteValue / 1_000_000_000).toFixed(1)}B`;
-  }
-  if (absoluteValue >= 1_000_000) {
-    return `${prefix}${(absoluteValue / 1_000_000).toFixed(1)}M`;
-  }
-  return absoluteValue === 0
-    ? "₱0"
-    : `${prefix}${absoluteValue.toLocaleString()}`;
+  return formatCompactCurrency(value);
 }
 
 export function formatPropertyStatus(status: string) {

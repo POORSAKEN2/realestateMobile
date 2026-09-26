@@ -110,7 +110,7 @@ export default function AcceptInvitationScreen() {
             keyboardShouldPersistTaps="handled"
             contentContainerClassName="flex-grow justify-center px-6 py-10"
           >
-            <View className="rounded-3xl bg-white p-6">
+            <View className="rounded-3xl bg-panel p-6">
               <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
                 <Feather name="user-check" size={26} color={colors.primary} />
               </View>

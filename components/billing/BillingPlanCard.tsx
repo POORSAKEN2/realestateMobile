@@ -69,7 +69,7 @@ export function BillingPlanCard({
           ? "border-primary/25 bg-primary/10"
           : isFeatured
             ? "border-primary/25 bg-primary/5"
-            : "border-primary/15 bg-white"
+            : "border-primary/15 bg-panel"
       }`}
     >
       {isFeatured ? (

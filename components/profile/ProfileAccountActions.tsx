@@ -20,7 +20,7 @@ export function ProfileAccountActions({
         accessibilityRole="button"
         activeOpacity={0.7}
         onPress={onOpenAdditionalSettings}
-        className="mt-3 min-h-14 flex-row items-center rounded-2xl border border-primary/20 bg-white px-4"
+        className="mt-3 min-h-14 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-4"
       >
         <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
           <Ionicons name="shield-checkmark-outline" color="#8A77F4" size={19} />
@@ -38,7 +38,7 @@ export function ProfileAccountActions({
         onPress={onSignOut}
         className="mt-3 min-h-14 flex-row items-center rounded-2xl bg-dangerSurface px-4"
       >
-        <View className="h-9 w-9 items-center justify-center rounded-xl bg-white">
+        <View className="h-9 w-9 items-center justify-center rounded-xl bg-panel">
           <Ionicons name="log-out-outline" color="#B42318" size={19} />
         </View>
         <Text className="ml-3 flex-1 font-ralewayBold text-sm text-danger">

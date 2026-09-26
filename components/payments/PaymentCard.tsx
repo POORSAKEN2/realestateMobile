@@ -5,6 +5,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 import { colors } from "../../constants/colors";
 import type { Payment } from "../../types";
+import { formatCurrency } from "../../utils/formatters";
 
 type PaymentCardProps = {
   payment: Payment;
@@ -49,13 +50,10 @@ export function PaymentCard({
     payment.lease?.property?.title ||
     "Property";
 
-  const formattedAmount = `₱${Number(payment.amount || 0).toLocaleString("en-PH", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  const formattedAmount = formatCurrency(Number(payment.amount || 0), 2);
 
   return (
-    <View className="mb-3 rounded-[24px] border border-primary/15 bg-white p-4 shadow-sm shadow-primary/5">
+    <View className="mb-3 rounded-[24px] border border-primary/15 bg-panel p-4 shadow-sm shadow-primary/5">
       {/* Top Header */}
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-2">

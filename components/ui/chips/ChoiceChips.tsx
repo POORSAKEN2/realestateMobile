@@ -34,7 +34,7 @@ export default function ChoiceChips<T extends string | number | boolean>({
   onSelect,
   isMultiSelect = false,
   activeClassName = "border-primary bg-primary",
-  inactiveClassName = "border-textPrimary/10 bg-whitePrimary",
+  inactiveClassName = "border-textPrimary/10 bg-panel",
   activeTextClassName = "text-whitePrimary",
   inactiveTextClassName = "text-textPrimary",
   className = "flex-row flex-wrap gap-2",

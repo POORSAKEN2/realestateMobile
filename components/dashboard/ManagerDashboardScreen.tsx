@@ -149,7 +149,7 @@ export function ManagerDashboardScreen() {
               sections={managerDashboardNavigationSections}
             />
 
-            <View className="mt-2 rounded-[24px] border border-primary/15 bg-white px-4 py-2 shadow-sm shadow-primary/5">
+            <View className="mt-2 rounded-[24px] border border-primary/15 bg-panel px-4 py-2 shadow-sm shadow-primary/5">
               <AccessItem
                 description="Create and update operational records permitted by the Manager role."
                 icon="create-outline"

@@ -239,7 +239,7 @@ export function BottomSheetModal({
 
       <Animated.View
         accessibilityViewIsModal
-        className="overflow-hidden rounded-t-[30px] bg-white pt-5"
+        className="overflow-hidden rounded-t-[30px] bg-panel pt-5"
         pointerEvents={visible ? "auto" : "none"}
         style={{
           maxHeight: "100%",

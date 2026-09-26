@@ -344,7 +344,7 @@ export function UpgradePlanModal({
                 </Text>
               )}
               {isPremium && can("billing.checkout") ? (
-                <View className="gap-3 rounded-2xl bg-white p-4">
+                <View className="gap-3 rounded-2xl bg-panel p-4">
                   <Text className="font-ralewayBold text-textPrimary">
                     {hasLifetimeAccess
                       ? "Lifetime access is active"
@@ -369,7 +369,7 @@ export function UpgradePlanModal({
                 </View>
               ) : null}
               {preview && (
-                <View className="gap-3 rounded-2xl bg-white p-4">
+                <View className="gap-3 rounded-2xl bg-panel p-4">
                   <Text className="font-ralewayBold text-textPrimary">
                     Plan change preview:{" "}
                     {tiers.find((tier) => tier.key === preview.tier)?.label ??
@@ -457,7 +457,7 @@ export function UpgradePlanModal({
                 );
               })}
 
-              <View className="gap-2 rounded-2xl border border-primary/15 bg-white p-4">
+              <View className="gap-2 rounded-2xl border border-primary/15 bg-panel p-4">
                 <Text className="font-ralewayBold text-xs text-textPrimary">
                   Purchase terms
                 </Text>

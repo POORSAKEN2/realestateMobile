@@ -4,6 +4,7 @@ import type {
   PaymentStatus,
   TenantFinancialLedger,
 } from "../../types";
+import { formatLocalizedDate } from "../formatters";
 
 export function normalizeLeasePayment(
   payment: Record<string, any>,
@@ -57,7 +58,7 @@ export function formatTenantDetailDate(value: string) {
   const date = new Date(`${value.slice(0, 10)}T00:00:00`);
   if (Number.isNaN(date.getTime())) return value;
 
-  return date.toLocaleDateString("en-US", {
+  return formatLocalizedDate(date, {
     month: "short",
     day: "numeric",
     year: "numeric",

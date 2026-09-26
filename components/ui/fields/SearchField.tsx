@@ -29,7 +29,7 @@ export function SearchField({
 }: SearchFieldProps) {
   return (
     <View
-      className={`h-12 min-w-0 flex-row items-center rounded-2xl border border-primary/20 bg-white px-3.5 ${wrapperClassName}`}
+      className={`h-12 min-w-0 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 ${wrapperClassName}`}
     >
       <MaterialCommunityIcons name="magnify" color="#6F6D6D" size={20} />
       <TextInput

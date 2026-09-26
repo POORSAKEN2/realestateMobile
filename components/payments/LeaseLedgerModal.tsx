@@ -15,6 +15,7 @@ import { colors } from "../../constants/colors";
 import { useLeaseLedger } from "../../hooks/api/usePayments";
 import type { Payment } from "../../types";
 import { ModalHeader } from "../ui/ModalHeader";
+import { formatCurrency } from "../../utils/formatters";
 
 type LeaseLedgerModalProps = {
   isVisible: boolean;
@@ -74,15 +75,12 @@ export function LeaseLedgerModal({
           >
             {/* KPI Summary Tiles */}
             <View className="flex-row flex-wrap gap-2.5">
-              <View className="min-w-[45%] flex-1 rounded-2xl border border-primary/15 bg-white p-3.5 shadow-sm shadow-primary/5">
+              <View className="min-w-[45%] flex-1 rounded-2xl border border-primary/15 bg-panel p-3.5 shadow-sm shadow-primary/5">
                 <Text className="font-ralewaySemiBold text-[10px] uppercase tracking-wider text-description">
                   Total Due
                 </Text>
                 <Text className="mt-1 font-ralewayBold text-base text-textPrimary">
-                  ₱
-                  {Number(ledger?.total_due || 0).toLocaleString("en-PH", {
-                    minimumFractionDigits: 2,
-                  })}
+                  {formatCurrency(Number(ledger?.total_due || 0), 2)}
                 </Text>
               </View>
 
@@ -91,10 +89,7 @@ export function LeaseLedgerModal({
                   Total Paid
                 </Text>
                 <Text className="mt-1 font-ralewayBold text-base text-success">
-                  ₱
-                  {Number(ledger?.total_paid || 0).toLocaleString("en-PH", {
-                    minimumFractionDigits: 2,
-                  })}
+                  {formatCurrency(Number(ledger?.total_paid || 0), 2)}
                 </Text>
               </View>
 
@@ -103,11 +98,7 @@ export function LeaseLedgerModal({
                   Outstanding
                 </Text>
                 <Text className="mt-1 font-ralewayBold text-base text-warning">
-                  ₱
-                  {Number(ledger?.total_outstanding || 0).toLocaleString(
-                    "en-PH",
-                    { minimumFractionDigits: 2 },
-                  )}
+                  {formatCurrency(Number(ledger?.total_outstanding || 0), 2)}
                 </Text>
               </View>
 
@@ -116,10 +107,7 @@ export function LeaseLedgerModal({
                   Overdue Arrears
                 </Text>
                 <Text className="mt-1 font-ralewayBold text-base text-danger">
-                  ₱
-                  {Number(ledger?.total_overdue || 0).toLocaleString("en-PH", {
-                    minimumFractionDigits: 2,
-                  })}
+                  {formatCurrency(Number(ledger?.total_overdue || 0), 2)}
                 </Text>
               </View>
             </View>
@@ -132,7 +120,7 @@ export function LeaseLedgerModal({
               </Text>
 
               {!ledger?.payments || ledger.payments.length === 0 ? (
-                <View className="items-center justify-center rounded-2xl border border-dashed border-primary/20 bg-white p-6">
+                <View className="items-center justify-center rounded-2xl border border-dashed border-primary/20 bg-panel p-6">
                   <Feather
                     name="calendar"
                     size={28}
@@ -149,7 +137,7 @@ export function LeaseLedgerModal({
                   return (
                     <View
                       key={p.id}
-                      className="mb-2.5 rounded-2xl border border-primary/15 bg-white p-3.5 shadow-sm shadow-primary/5"
+                      className="mb-2.5 rounded-2xl border border-primary/15 bg-panel p-3.5 shadow-sm shadow-primary/5"
                     >
                       <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center gap-2">
@@ -185,10 +173,7 @@ export function LeaseLedgerModal({
                           </Text>
                         </View>
                         <Text className="font-ralewayBold text-sm text-textPrimary">
-                          ₱
-                          {Number(p.amount || 0).toLocaleString("en-PH", {
-                            minimumFractionDigits: 2,
-                          })}
+                          {formatCurrency(Number(p.amount || 0), 2)}
                         </Text>
                       </View>
 

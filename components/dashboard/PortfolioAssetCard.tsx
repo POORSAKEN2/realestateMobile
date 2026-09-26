@@ -28,7 +28,7 @@ export function PortfolioAssetCard({
       accessibilityRole="button"
       accessibilityLabel={`View ${property.title}`}
       onPress={() => onOpen(property)}
-      className="flex-row gap-3 rounded-2xl border border-textPrimary/10 bg-white p-2.5"
+      className="flex-row gap-3 rounded-2xl border border-textPrimary/10 bg-panel p-2.5"
     >
       <TouchableOpacity
         activeOpacity={0.86}

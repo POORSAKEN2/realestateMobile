@@ -22,7 +22,7 @@ export function ProfileSummaryCard({
   onChangePhoto,
 }: ProfileSummaryCardProps) {
   return (
-    <View className="mt-7 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+    <View className="mt-7 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
       <View className="items-center">
         <TouchableOpacity
           accessibilityRole="button"

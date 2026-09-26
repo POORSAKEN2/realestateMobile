@@ -28,7 +28,7 @@ export function InquiryListState({
 
   const error = isError;
   return (
-    <View className="items-center rounded-[28px] border border-dashed border-primary/20 bg-white p-8">
+    <View className="items-center rounded-[28px] border border-dashed border-primary/20 bg-panel p-8">
       <Ionicons
         name={error ? "cloud-offline-outline" : "mail-unread-outline"}
         size={40}

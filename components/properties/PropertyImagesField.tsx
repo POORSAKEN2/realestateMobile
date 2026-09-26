@@ -17,7 +17,7 @@ export function PropertyImagesField({
   storageHint?: string;
 }) {
   return (
-    <View className="gap-4 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+    <View className="gap-4 rounded-[24px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
           <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
@@ -83,7 +83,7 @@ export function PropertyImagesField({
                   activeOpacity={0.8}
                   accessibilityLabel={`Remove ${image.name}`}
                   accessibilityRole="button"
-                  className="h-11 w-11 items-center justify-center rounded-full bg-whitePrimary"
+                  className="h-11 w-11 items-center justify-center rounded-full bg-panel"
                   onPress={() => onRemove(index)}
                 >
                   <MaterialCommunityIcons

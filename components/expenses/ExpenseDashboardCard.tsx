@@ -217,7 +217,7 @@ export function ExpenseDashboardCard({
   return (
     <Pressable
       accessibilityLabel={`${label}: ${value}`}
-      className="h-[164px] w-[128px] rounded-[20px] border border-primary/20 bg-white p-3.5"
+      className="h-[164px] w-[128px] rounded-[20px] border border-primary/20 bg-panel p-3.5"
       style={cardShadow}
     >
       <View className="h-10 w-10 items-center justify-center rounded-[13px] bg-primary/10">

@@ -27,6 +27,7 @@ import { AccessDeniedPrompt } from "../components/auth/AccessDeniedPrompt";
 import { AuthProvider } from "../context/AuthContext";
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
 import { RevenueCatProvider } from "../context/RevenueCatContext";
+import { WorkspacePresentationProvider } from "../context/WorkspacePresentationContext";
 
 type TextWithDefaultProps = typeof Text & {
   defaultProps?: {
@@ -86,6 +87,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <WorkspacePresentationProvider>
           <RevenueCatProvider>
             <MapKitGeocodingProvider>
               <DefaultLocationProvider>
@@ -104,6 +106,7 @@ export default function RootLayout() {
               </DefaultLocationProvider>
             </MapKitGeocodingProvider>
           </RevenueCatProvider>
+          </WorkspacePresentationProvider>
         </AuthProvider>
       </QueryClientProvider>
     </GestureHandlerRootView>

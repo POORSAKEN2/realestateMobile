@@ -26,7 +26,7 @@ export function OnboardingSix() {
       }
       visual={
         <View className="w-full flex-1 items-center justify-center">
-          <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-whitePrimary/95 shadow-2xl">
+          <View className="h-80 w-80 overflow-hidden rounded-[32px] border border-textPrimary/10 bg-panel/95 shadow-2xl">
             <View className="absolute inset-0">
               <View className="absolute left-6 top-0 h-full w-px bg-textPrimary/10" />
               <View className="absolute left-12 top-0 h-full w-px bg-textPrimary/10" />
@@ -60,7 +60,7 @@ export function OnboardingSix() {
               {/* <View className="absolute bottom-[76px] right-[50px] h-5 w-5 rounded-full border border-white/70 bg-success" /> */}
             </View>
 
-            <View className="absolute right-5 top-12 w-44 rounded-[20px] border border-white/80 bg-whitePrimary/95 p-4 shadow-xl">
+            <View className="absolute right-5 top-12 w-44 rounded-[20px] border border-white/80 bg-panel/95 p-4 shadow-xl">
               <View className="flex-row items-center gap-2">
                 <View className="h-8 w-8 items-center justify-center rounded-2xl bg-successSurface">
                   <Feather name="navigation" size={15} color="#8A77F4" />
@@ -77,7 +77,7 @@ export function OnboardingSix() {
               </View>
             </View>
 
-            <View className="absolute bottom-5 left-5 rounded-2xl border border-white/80 bg-whitePrimary/90 px-4 py-3 shadow-sm">
+            <View className="absolute bottom-5 left-5 rounded-2xl border border-white/80 bg-panel/90 px-4 py-3 shadow-sm">
               <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
                 Region
               </Text>

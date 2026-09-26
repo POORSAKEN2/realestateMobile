@@ -42,7 +42,7 @@ type TenantsScreenProps = {
 
 function TenantCardSkeleton() {
   return (
-    <View className="rounded-3xl border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+    <View className="rounded-3xl border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
       <View className="flex-row items-start gap-3.5">
         <SkeletonBlock className="h-12 w-12 rounded-full bg-primary/10" />
         <View className="min-w-0 flex-1 gap-2 pt-1">
@@ -87,7 +87,7 @@ function TenantLoadingState() {
         <View className="flex-1 gap-3">
           {Array.from({ length: 2 }, (_, index) => (
             <View
-              className="min-h-0 flex-1 justify-center rounded-2xl border border-textPrimary/10 bg-white p-3 shadow-sm shadow-textPrimary/10"
+              className="min-h-0 flex-1 justify-center rounded-2xl border border-textPrimary/10 bg-panel p-3 shadow-sm shadow-textPrimary/10"
               key={index}
             >
               <View className="flex-row items-center gap-2">
@@ -101,7 +101,7 @@ function TenantLoadingState() {
         </View>
       </View>
 
-      <View className="mt-6 rounded-3xl border border-primary/20 bg-white p-3 shadow-sm shadow-primary/10">
+      <View className="mt-6 rounded-3xl border border-primary/20 bg-panel p-3 shadow-sm shadow-primary/10">
         <View className="flex-row gap-2">
           <SkeletonBlock className="h-12 flex-1 rounded-2xl" />
           <SkeletonBlock className="h-12 w-12 rounded-2xl bg-primary/10" />

@@ -43,7 +43,7 @@ export function InquiryStatusActions({
               className={`min-h-10 flex-1 flex-row items-center justify-center gap-1 rounded-xl border px-2 ${
                 selected
                   ? "border-primary bg-primary"
-                  : "border-primary/20 bg-white"
+                  : "border-primary/20 bg-panel"
               }`}
               disabled={selected || isUpdating}
               key={option.value}

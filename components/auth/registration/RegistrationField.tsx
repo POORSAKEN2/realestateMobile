@@ -46,7 +46,7 @@ export function RegistrationField({
         {label}
       </Text>
       <View
-        className={`h-14 flex-row items-center rounded-[14px] border-[1.5px] bg-white pl-4 ${
+        className={`h-14 flex-row items-center rounded-[14px] border-[1.5px] bg-panel pl-4 ${
           isFocused ? "border-primary" : "border-accent"
         }`}
       >

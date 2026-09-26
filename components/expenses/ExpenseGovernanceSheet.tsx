@@ -17,6 +17,7 @@ import { useExpenseGovernance } from "../../hooks/expenses/useExpenseGovernance"
 import { validateExpenseTransitionReason } from "../../utils/expenses/expenseGovernance";
 import type { ExpenseLifecycleStatus } from "../../types/domain/expenses";
 import { formatPeso } from "../../utils/expenses/expenseForm";
+import { formatDateTime } from "../../utils/formatters";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import { BaseField } from "../ui/fields/BaseField";
 import { ModalHeader } from "../ui/ModalHeader";
@@ -128,7 +129,7 @@ export function ExpenseGovernanceSheet({
       >
         <SafeAreaView
           edges={["bottom"]}
-          className="max-h-[92%] rounded-t-[28px] bg-white"
+          className="max-h-[92%] rounded-t-[28px] bg-panel"
         >
           <ModalHeader
             title="Expense governance"
@@ -300,7 +301,7 @@ export function ExpenseGovernanceSheet({
                       </Text>
                       <Text className="mt-1 text-xs text-description">
                         {item.actor?.name ?? item.actor?.role ?? "System"} ·{" "}
-                        {new Date(item.occurred_at).toLocaleString()}
+                        {formatDateTime(item.occurred_at)}
                       </Text>
                       {item.reason ? (
                         <Text className="mt-2 text-sm text-textPrimary">
@@ -358,7 +359,7 @@ export function ExpenseGovernanceSheet({
         onRequestClose={closeReason}
       >
         <View className="flex-1 items-center justify-center bg-black/50 px-6">
-          <View className="w-full max-w-[480px] rounded-[24px] bg-white p-5">
+          <View className="w-full max-w-[480px] rounded-[24px] bg-panel p-5">
             <Text className="font-ralewayExtraBold text-lg text-textPrimary">
               Reason required
             </Text>

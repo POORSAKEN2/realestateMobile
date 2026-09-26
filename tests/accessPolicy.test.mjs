@@ -92,6 +92,16 @@ test("audit history and exports require owner permissions", () => {
     );
   }
 });
+test("workspace settings editing is owner-only while effective values are shared", () => {
+  assert.equal(permits(owner, "settings.view"), true);
+  assert.equal(permits(owner, "settings.update"), true);
+  assert.equal(permits(manager, "settings.view"), false);
+  assert.equal(describeRequest("/settings", "GET").permission, "settings.view");
+  assert.equal(describeRequest("/settings", "PATCH").permission, "settings.update");
+  assert.equal(describeRequest("/settings/effective", "GET").permission, undefined);
+  assert.equal(describeRequest("/settings/notifications", "GET").permission, undefined);
+  assert.throws(() => assertRequestAccess(manager, describeRequest("/settings", "GET"), new ResourceScopeIndex()), ApiError);
+});
 test("deletion submission is self-service while review stays owner-only", () => {
   const managerWithoutGrants = normalizeAccess({
     role: "MANAGER",

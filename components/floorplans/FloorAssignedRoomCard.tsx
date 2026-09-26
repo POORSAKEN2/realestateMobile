@@ -35,7 +35,7 @@ export function FloorAssignedRoomCard({
   const statusStyle = STATUS_STYLES[room.status];
 
   return (
-    <View className="rounded-2xl border border-textPrimary/10 bg-white p-4">
+    <View className="rounded-2xl border border-textPrimary/10 bg-panel p-4">
       <View className="flex-row items-center gap-3">
         <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
           <MaterialCommunityIcons name="door" color="#8A77F4" size={20} />

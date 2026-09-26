@@ -36,7 +36,7 @@ export function OnboardingThree() {
       visual={
         <>
           <View
-            className="absolute left-5 right-5 top-28 z-20 overflow-hidden rounded-[24px] border border-white/80 bg-whitePrimary/90 p-3"
+            className="absolute left-5 right-5 top-28 z-20 overflow-hidden rounded-[24px] border border-white/80 bg-panel/90 p-3"
             style={leaseCardShadow}
           >
             <View className="absolute left-4 right-4 top-2 h-6 rounded-full bg-white/60" />

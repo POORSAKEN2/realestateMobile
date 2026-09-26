@@ -28,7 +28,7 @@ export function FloorPlanTabs({
             accessibilityRole="tab"
             accessibilityState={{ selected }}
             className={`h-11 flex-row items-center gap-2 rounded-2xl px-4 ${
-              selected ? "bg-primary" : "border border-primary/20 bg-white"
+              selected ? "bg-primary" : "border border-primary/20 bg-panel"
             }`}
             key={floor.id}
             onPress={() => onSelectFloor(floor.id)}

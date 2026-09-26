@@ -18,6 +18,7 @@ import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 import type { GlobalSearchResults } from "../../types/domain/search";
 import { openModuleRoute } from "../../utils/navigation/moduleNavigation";
+import { formatCurrency } from "../../utils/formatters";
 
 type GlobalSearchModalProps = { onClose: () => void };
 
@@ -91,7 +92,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
     >
       <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
         {/* Search Header */}
-        <View className="border-b border-primary/10 bg-white px-5 py-4">
+        <View className="border-b border-primary/10 bg-panel px-5 py-4">
           <View className="flex-row items-center gap-3">
             <View className="h-12 flex-1 flex-row items-center rounded-2xl border border-primary/20 bg-surface px-3.5">
               <Feather name="search" size={18} color={colors.primary} />
@@ -171,7 +172,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                 />
               </View>
             ) : !hasResults ? (
-              <View className="mt-4 items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-white p-8">
+              <View className="mt-4 items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8">
                 <Ionicons
                   name="alert-circle-outline"
                   size={36}
@@ -196,7 +197,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       <TouchableOpacity
                         key={item.id}
                         activeOpacity={0.7}
-                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-white p-3.5"
+                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-panel p-3.5"
                         onPress={() => navigateTo(appRoutes.primary.properties)}
                       >
                         <View className="flex-row items-center gap-3">
@@ -236,7 +237,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       <TouchableOpacity
                         key={item.id}
                         activeOpacity={0.7}
-                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-white p-3.5"
+                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-panel p-3.5"
                         onPress={() => navigateTo(appRoutes.secondary.leases)}
                       >
                         <View className="flex-row items-center gap-3">
@@ -279,7 +280,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       <TouchableOpacity
                         key={item.id}
                         activeOpacity={0.7}
-                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-white p-3.5"
+                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-panel p-3.5"
                         onPress={() => navigateTo(appRoutes.primary.tenants)}
                       >
                         <View className="flex-row items-center gap-3">
@@ -319,7 +320,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       <TouchableOpacity
                         key={item.id}
                         activeOpacity={0.7}
-                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-white p-3.5"
+                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-panel p-3.5"
                         onPress={() => navigateTo(appRoutes.primary.expenses)}
                       >
                         <View className="flex-row items-center gap-3">
@@ -335,11 +336,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                               {item.description || item.category || "Expense"}
                             </Text>
                             <Text className="font-ralewayBold text-xs text-primary">
-                              ₱
-                              {Number(item.amount || 0).toLocaleString(
-                                "en-PH",
-                                { minimumFractionDigits: 2 },
-                              )}
+                              {formatCurrency(Number(item.amount || 0), 2)}
                             </Text>
                           </View>
                         </View>
@@ -363,7 +360,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       <TouchableOpacity
                         key={item.id}
                         activeOpacity={0.7}
-                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-white p-3.5"
+                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-panel p-3.5"
                         onPress={() =>
                           navigateTo(appRoutes.secondary.documents)
                         }
@@ -405,7 +402,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                       <TouchableOpacity
                         key={item.id}
                         activeOpacity={0.7}
-                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-white p-3.5"
+                        className="flex-row items-center justify-between rounded-2xl border border-primary/15 bg-panel p-3.5"
                         onPress={() => navigateTo(appRoutes.secondary.bookings)}
                       >
                         <View className="flex-row items-center gap-3">

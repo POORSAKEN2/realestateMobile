@@ -16,7 +16,7 @@ export function BookingCalendarLoading({
       accessibilityLabel="Loading booking calendar"
       className="gap-4"
     >
-      <View className="overflow-hidden rounded-[24px] border border-primary/15 bg-white">
+      <View className="overflow-hidden rounded-[24px] border border-primary/15 bg-panel">
         <View className="flex-row items-center gap-2 px-4 py-4">
           <View className="min-w-0 flex-1 gap-2">
             <SkeletonBlock className="h-5 w-36" />
@@ -37,7 +37,7 @@ export function BookingCalendarLoading({
           </View>
         ) : (
           <>
-            <View className="flex-row border-y border-primary/10 bg-white py-3">
+            <View className="flex-row border-y border-primary/10 bg-panel py-3">
               {Array.from({ length: 7 }, (_, index) => (
                 <View className="flex-1 items-center" key={index}>
                   <SkeletonBlock className="h-2.5 w-3 rounded-full bg-primary/20" />
@@ -73,7 +73,7 @@ export function BookingCalendarLoading({
         </View>
       </View>
 
-      <View className="gap-2.5 rounded-[22px] border border-primary/20 bg-white p-3 shadow-sm shadow-primary/10">
+      <View className="gap-2.5 rounded-[22px] border border-primary/20 bg-panel p-3 shadow-sm shadow-primary/10">
         <View className="flex-row items-center justify-between gap-3">
           <View className="min-w-0 flex-1 gap-2">
             <SkeletonBlock className="h-2.5 w-20" />
@@ -96,7 +96,7 @@ export function BookingCalendarLoading({
 
 export function BookingCalendarEmpty() {
   return (
-    <View className="items-center rounded-[24px] border border-dashed border-primary/20 bg-white p-8">
+    <View className="items-center rounded-[24px] border border-dashed border-primary/20 bg-panel p-8">
       <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
         <Ionicons name="calendar-outline" color="#8A77F4" size={28} />
       </View>

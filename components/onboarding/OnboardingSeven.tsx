@@ -33,7 +33,7 @@ export function OnboardingSeven() {
       visual={
         <View className="flex-1 justify-center">
           <View className="items-center">
-            <View className="my-5 h-80 w-80  justify-between overflow-hidden rounded-[32px] border border-whitePrimary bg-whitePrimary/90 p-5 shadow-2xl">
+            <View className="my-5 h-80 w-80  justify-between overflow-hidden rounded-[32px] border border-whitePrimary bg-panel/90 p-5 shadow-2xl">
               <View className="flex-row items-start justify-between gap-3">
                 <View>
                   <Text className="font-ralewayExtraBold text-font10 uppercase tracking-widest text-textPrimary">
@@ -70,7 +70,7 @@ export function OnboardingSeven() {
                 </View>
               </View>
 
-              <View className="rounded-2xl border border-textPrimary/10 bg-whitePrimary/80 p-3 shadow-sm">
+              <View className="rounded-2xl border border-textPrimary/10 bg-panel/80 p-3 shadow-sm">
                 <View className="flex-row items-center gap-2">
                   <Feather name="navigation" size={14} color="#8A77F4" />
                   <Text className="font-ralewaySemiBold text-xs text-textPrimary">

@@ -29,7 +29,7 @@ export function InquiryFilters({
 }) {
   return (
     <View className="gap-3">
-      <View className="h-12 flex-row items-center rounded-2xl border border-primary/20 bg-white px-3.5 shadow-sm shadow-primary/5">
+      <View className="h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 shadow-sm shadow-primary/5">
         <Feather name="search" size={16} color={colors.description} />
         <TextInput
           accessibilityLabel="Search inquiries"
@@ -72,7 +72,7 @@ export function InquiryFilters({
               className={`rounded-full border px-4 py-2 ${
                 selected
                   ? "border-primary bg-primary"
-                  : "border-primary/15 bg-white"
+                  : "border-primary/15 bg-panel"
               }`}
               key={option.value}
               onPress={() => onStatusChange(option.value)}

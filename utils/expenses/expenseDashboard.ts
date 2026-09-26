@@ -1,4 +1,5 @@
 import type { Expense } from "../../types/domain/expenses";
+import { formatLocalizedDate } from "../formatters";
 
 export type ExpenseCategoryTotal = {
   category: string;
@@ -74,10 +75,10 @@ export function getMonthlyExpenseSummary(
           right.total - left.total ||
           left.category.localeCompare(right.category),
       ),
-    monthLabel: new Intl.DateTimeFormat("en-US", {
+    monthLabel: formatLocalizedDate(referenceDate, {
       month: "long",
       year: "numeric",
-    }).format(referenceDate),
+    }),
     total,
   };
 }

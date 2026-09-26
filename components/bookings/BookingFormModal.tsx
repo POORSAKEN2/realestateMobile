@@ -20,6 +20,7 @@ import { FormSection } from "../ui/forms/FormSection";
 import { BookingAvailabilityMessage } from "./BookingAvailabilityMessage";
 import { BookingGuestFields } from "./BookingGuestFields";
 import { BookingStayFields } from "./BookingStayFields";
+import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
 
 type BookingFormModalProps = {
   buildings: Property[];
@@ -74,6 +75,7 @@ export function BookingFormModal({
   onToggleAddingGuest,
   onUpdateForm,
 }: BookingFormModalProps) {
+  const { settings } = useWorkspacePresentation();
   return (
     <AddEditModal permission={mode === "edit" ? "bookings.update" : "bookings.create"} propertyId={form.propertyId || undefined}
       appearance="card"
@@ -151,7 +153,7 @@ export function BookingFormModal({
           <View className="flex-1">
             <BaseField
               keyboardType="decimal-pad"
-              label="Daily rate (PHP)"
+              label={`Daily rate (${settings.currency})`}
               onChangeText={(value) => onUpdateForm("dailyRate", value)}
               placeholder="e.g. 2500"
               required
@@ -253,7 +255,7 @@ export function BookingFormModal({
           <PermissionGate permission="bookings.delete"><TouchableOpacity
             accessibilityRole="button"
             activeOpacity={0.85}
-            className="h-12 items-center justify-center rounded-2xl border border-danger/20 bg-white"
+            className="h-12 items-center justify-center rounded-2xl border border-danger/20 bg-panel"
             disabled={isCancelling}
             onPress={onCancelBooking}
           >

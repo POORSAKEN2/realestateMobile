@@ -19,7 +19,7 @@ export function OnboardingPageLayout({
   visual,
 }: OnboardingPageLayoutProps) {
   return (
-    <Screen className="bg-whitePrimary">
+    <Screen className="bg-panel">
       <View className="flex-1">
         <OnboardingProgress activeIndex={activeIndex} />
         <OnboardingStepTransition copy={copy} footer={footer} visual={visual} />

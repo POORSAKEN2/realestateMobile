@@ -27,7 +27,7 @@ export function TenantCard({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onOpen}
-      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-sm shadow-primary/10"
+      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-panel shadow-sm shadow-primary/10"
     >
       <View className="p-5">
         {/* --- HEADER: Identity & Actions --- */}

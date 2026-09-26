@@ -57,7 +57,7 @@ export default function StaffManagerCreatedScreen() {
           </Text>
         </View>
 
-        <View className="mt-8 overflow-hidden rounded-[24px] border border-primary/15 bg-white shadow-sm shadow-primary/10">
+        <View className="mt-8 overflow-hidden rounded-[24px] border border-primary/15 bg-panel shadow-sm shadow-primary/10">
           <View className="min-h-16 flex-row items-center px-5">
             <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
               <Ionicons name="mail-outline" color={colors.primary} size={20} />

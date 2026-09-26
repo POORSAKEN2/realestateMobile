@@ -3,6 +3,7 @@ import {
   DEFAULT_CHECK_OUT_TIME,
 } from "../../api/bookings";
 import type { TransientBooking } from "../../types";
+import { formatLocalizedDate } from "../formatters";
 
 export type BookingFormMode = "create" | "edit";
 export type BookingCalendarView = "day" | "week" | "month";
@@ -77,19 +78,19 @@ export function getMonthDays(monthDate: Date) {
 }
 
 export function formatDisplayDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", {
+  return formatLocalizedDate(parseDate(value), {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(parseDate(value));
+  });
 }
 
 export function formatDisplayTime(value: string) {
   const [hours, minutes] = value.split(":").map(Number);
-  return new Intl.DateTimeFormat("en-US", {
+  return formatLocalizedDate(new Date(2026, 0, 1, hours, minutes), {
     hour: "numeric",
     minute: "2-digit",
-  }).format(new Date(2026, 0, 1, hours, minutes));
+  });
 }
 
 export function getDateRangeLabel(booking: TransientBooking) {

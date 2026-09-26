@@ -42,11 +42,11 @@ export function OnboardingTwo() {
       }
       visual={
         <View className="w-full flex-1 items-center justify-center">
-          <View className="-mx-6 h-80 justify-center self-stretch overflow-hidden bg-whitePrimary">
+          <View className="-mx-6 h-80 justify-center self-stretch overflow-hidden bg-panel">
             <View className="absolute inset-0 flex-row"></View>
 
             <View
-              className="absolute -left-10 top-4 h-72 w-44 -rotate-6 rounded-[34px] bg-whitePrimary"
+              className="absolute -left-10 top-4 h-72 w-44 -rotate-6 rounded-[34px] bg-panel"
               style={imageCardShadow}
             >
               <View className="h-full w-full overflow-hidden rounded-[34px] bg-blackPrimary">
@@ -60,7 +60,7 @@ export function OnboardingTwo() {
             </View>
 
             <View
-              className="absolute -right-10 top-4 h-72 w-44 rotate-6 rounded-[34px] bg-whitePrimary"
+              className="absolute -right-10 top-4 h-72 w-44 rotate-6 rounded-[34px] bg-panel"
               style={imageCardShadow}
             >
               <View className="h-full w-full overflow-hidden rounded-[34px] bg-blackPrimary">
@@ -74,7 +74,7 @@ export function OnboardingTwo() {
             </View>
 
             <View
-              className="z-10 self-center rounded-[38px] bg-whitePrimary"
+              className="z-10 self-center rounded-[38px] bg-panel"
               style={imageCardShadow}
             >
               <View className="overflow-hidden rounded-[38px]">

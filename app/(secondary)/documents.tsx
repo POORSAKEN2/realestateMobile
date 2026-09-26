@@ -205,7 +205,7 @@ export default function DocumentsScreen() {
       {access.role === "ADMIN" ? (
         <View className="mb-2 flex-row rounded-2xl bg-primary/10 p-1">
           {(["active", "archived"] as const).map((state) => (
-            <TouchableOpacity className={`min-h-10 flex-1 items-center justify-center rounded-xl ${archiveState === state ? "bg-white" : ""}`} key={state} onPress={() => setArchiveState(state)}>
+            <TouchableOpacity className={`min-h-10 flex-1 items-center justify-center rounded-xl ${archiveState === state ? "bg-panel" : ""}`} key={state} onPress={() => setArchiveState(state)}>
               <Text className="font-ralewayBold text-sm capitalize text-textPrimary">{state}</Text>
             </TouchableOpacity>
           ))}

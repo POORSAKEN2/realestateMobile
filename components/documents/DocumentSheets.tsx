@@ -154,7 +154,7 @@ function BottomSheet({
     >
       <SafeAreaView
         accessibilityViewIsModal
-        className="rounded-t-[30px] bg-white"
+        className="rounded-t-[30px] bg-panel"
         edges={["bottom"]}
       >
         <ModalHeader

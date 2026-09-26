@@ -65,7 +65,7 @@ export function PickerField({
         className={`h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
           isFilledVariant
             ? "border-textPrimary/10 bg-surface"
-            : "border-textPrimary/10 bg-whitePrimary shadow-sm"
+            : "border-textPrimary/10 bg-panel shadow-sm"
         } ${disabled ? "opacity-60" : ""}`}
         disabled={disabled}
         onPress={onPress}
@@ -101,7 +101,7 @@ export function PickerModalShell({
       <View
         className={`flex-1 justify-center px-5 ${MODAL_OVERLAY_CLASS_NAME}`}
       >
-        <View className="rounded-3xl border border-primary/20 bg-whitePrimary p-5 shadow-xl shadow-primary/10">
+        <View className="rounded-3xl border border-primary/20 bg-panel p-5 shadow-xl shadow-primary/10">
           <View className="mb-2 flex-row items-center justify-between">
             <Text className="font-ralewayExtraBold text-sm text-textPrimary">
               {title}

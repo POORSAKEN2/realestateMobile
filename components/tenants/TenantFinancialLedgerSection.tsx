@@ -22,7 +22,7 @@ export function TenantFinancialLedgerSection({
     <TenantSection icon="card-outline" title="Financial ledger">
       {isLoading ? (
         <SkeletonGroup accessibilityLabel="Loading financial ledger">
-          <View className="flex-row gap-2 rounded-2xl border border-primary/20 bg-white p-4">
+          <View className="flex-row gap-2 rounded-2xl border border-primary/20 bg-panel p-4">
             {Array.from({ length: 3 }, (_, index) => (
               <View className="flex-1 gap-2" key={index}>
                 <SkeletonBlock className="h-3 w-16" />
@@ -43,7 +43,7 @@ export function TenantFinancialLedgerSection({
           </View>
 
           {ledger.payments.length ? (
-            <View className="mt-3 overflow-hidden rounded-2xl border border-primary/20 bg-white">
+            <View className="mt-3 overflow-hidden rounded-2xl border border-primary/20 bg-panel">
               {ledger.payments.slice(0, 6).map((payment, index) => {
                 const statusStyle = getPaymentStatusStyle(payment.status);
                 return (

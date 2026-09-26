@@ -72,7 +72,7 @@ export function RevenueCatPurchaseSummaryCard({
 }) {
   return (
     <View className="gap-4">
-      <View className="items-center rounded-[28px] bg-white px-5 py-6">
+      <View className="items-center rounded-[28px] bg-panel px-5 py-6">
         <View className="h-14 w-14 items-center justify-center rounded-full bg-successSurface">
           <Feather name="check" color={colors.success} size={28} />
         </View>
@@ -93,7 +93,7 @@ export function RevenueCatPurchaseSummaryCard({
         </Text>
       </View>
 
-      <View className="rounded-2xl border border-primary/15 bg-white px-4">
+      <View className="rounded-2xl border border-primary/15 bg-panel px-4">
         <BillingSummaryRow label="Plan" value={summary.planLabel} />
         <BillingSummaryRow label="Billing" value={summary.billingPeriodLabel} />
         <BillingSummaryRow label="Status" value={summary.lifecycleLabel} />

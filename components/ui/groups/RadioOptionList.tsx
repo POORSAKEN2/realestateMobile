@@ -30,7 +30,7 @@ export function RadioOptionList<T extends string>({
             className={`min-h-14 flex-row items-center justify-between rounded-2xl border px-4 ${
               selected
                 ? "border-primary bg-primary/10"
-                : "border-textPrimary/10 bg-white"
+                : "border-textPrimary/10 bg-panel"
             }`}
             onPress={() => onSelect(option.value)}
           >

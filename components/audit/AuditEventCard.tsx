@@ -22,7 +22,7 @@ export const AuditEventCard = memo(function AuditEventCard({
       accessibilityRole="button"
       accessibilityLabel={`${auditLabel(event.action)}. ${auditLabel(event.result)}. ${auditDate(event.created_at, true)}`}
       activeOpacity={0.8}
-      className="gap-3 rounded-2xl border border-textPrimary/10 bg-white p-4"
+      className="gap-3 rounded-2xl border border-textPrimary/10 bg-panel p-4"
       onPress={() => onOpen(event.id)}
     >
       <View className="flex-row items-start gap-3">

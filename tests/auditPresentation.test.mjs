@@ -53,7 +53,7 @@ test("audit presentation retains date-only calendar day across time zones", () =
   assert.equal(localAuditDate(date), "2026-01-01");
   assert.equal(
     auditDate("2026-01-01"),
-    new Date(2026, 0, 1, 12).toLocaleDateString(),
+    "01/01/2026",
   );
   assert.equal(auditDate("invalid"), "Unavailable");
   assert.equal(auditDate(null), "Unavailable");

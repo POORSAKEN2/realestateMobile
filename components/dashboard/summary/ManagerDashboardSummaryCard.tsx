@@ -107,7 +107,7 @@ export function ManagerDashboardSummaryCard({
 }: RoleDashboardSummaryCardProps) {
   return (
     <View
-      className="flex aspect-video overflow-hidden rounded-2xl border border-primary/15 bg-white p-2"
+      className="flex aspect-video overflow-hidden rounded-2xl border border-primary/15 bg-panel p-2"
       style={[managerShadow]}
     >
       <View className="p-4" style={{ height: "55%" }}>
@@ -117,7 +117,7 @@ export function ManagerDashboardSummaryCard({
               {badge}
             </Text>
           </View>
-          <View className="h-7 w-7 items-center justify-center rounded-lg border border-primary/30 bg-white">
+          <View className="h-7 w-7 items-center justify-center rounded-lg border border-primary/30 bg-panel">
             <MaterialCommunityIcons
               name={icon}
               color={colors.primary}

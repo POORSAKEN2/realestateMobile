@@ -31,7 +31,7 @@ export function SearchFilterSheet({
       visible={visible}
     >
       <SafeAreaView
-        className="max-h-full shrink rounded-t-[30px] bg-white"
+        className="max-h-full shrink rounded-t-[30px] bg-panel"
         edges={footer ? [] : ["bottom"]}
       >
         <ModalHeader

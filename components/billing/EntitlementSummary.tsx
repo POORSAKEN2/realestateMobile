@@ -27,7 +27,7 @@ export function EntitlementSummary({
   const limits = entitlement.limits;
   const subscribedTier = entitlement.subscribed_tier;
   return (
-    <View className="gap-4 rounded-[28px] border border-textPrimary/10 bg-white p-5">
+    <View className="gap-4 rounded-[28px] border border-textPrimary/10 bg-panel p-5">
       <Text className="font-ralewayExtraBold text-base text-textPrimary">
         Plan limits & features
       </Text>

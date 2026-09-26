@@ -59,7 +59,7 @@ export function BookingViewToggle({
         className={`h-11 w-[94px] flex-row items-center justify-center gap-1.5 rounded-2xl border ${
           value === "agenda"
             ? "border-primary bg-primary"
-            : "border-primary/20 bg-white"
+            : "border-primary/20 bg-panel"
         }`}
         onPress={() => onChange("agenda")}
       >

@@ -257,7 +257,7 @@ export default function PropertyImageGallery({
                 <View
                   className={`rounded-full ${
                     index === activeIndex
-                      ? "h-2 w-5 bg-white"
+                      ? "h-2 w-5 bg-panel"
                       : "h-2 w-2 bg-white/40"
                   }`}
                   key={`${image}:gallery-dot:${index}`}

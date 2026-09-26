@@ -45,7 +45,7 @@ export function FloorRoomLinkSection({
       </Text>
 
       {roomOptions.length ? (
-        <View className="mt-3 flex-row items-end gap-3 rounded-2xl border border-textPrimary/10 bg-white p-3">
+        <View className="mt-3 flex-row items-end gap-3 rounded-2xl border border-textPrimary/10 bg-panel p-3">
           <DropdownField
             label="Unassigned room"
             onSelect={onSelect}

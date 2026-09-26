@@ -18,7 +18,7 @@ export function MapPropertyPreview({
 
   return (
     <View
-      className="absolute left-4 right-4 flex-row items-center gap-3 rounded-3xl border border-primary/20 bg-white p-3 shadow-xl shadow-primary/20"
+      className="absolute left-4 right-4 flex-row items-center gap-3 rounded-3xl border border-primary/20 bg-panel p-3 shadow-xl shadow-primary/20"
       style={{ bottom: bottomInset + 24 }}
     >
       <View className="h-[74px] w-[74px] items-center justify-center overflow-hidden rounded-[18px] bg-textPrimary/10">

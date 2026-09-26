@@ -87,7 +87,7 @@ export default function SupportScreen() {
         </Text>
 
         <View className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/10 p-4">
-          <View className="h-10 w-10 items-center justify-center rounded-2xl bg-white">
+          <View className="h-10 w-10 items-center justify-center rounded-2xl bg-panel">
             <Feather name="headphones" size={18} color={colors.primary} />
           </View>
           <View className="min-w-0 flex-1">
@@ -105,7 +105,7 @@ export default function SupportScreen() {
           <TouchableOpacity
             activeOpacity={0.8}
             className={`flex-1 h-10 items-center justify-center rounded-xl ${
-              activeTab === "faqs" ? "bg-white shadow-sm" : ""
+              activeTab === "faqs" ? "bg-panel shadow-sm" : ""
             }`}
             onPress={() => setActiveTab("faqs")}
           >
@@ -121,7 +121,7 @@ export default function SupportScreen() {
           <TouchableOpacity
             activeOpacity={0.8}
             className={`flex-1 h-10 items-center justify-center rounded-xl ${
-              activeTab === "tickets" ? "bg-white shadow-sm" : ""
+              activeTab === "tickets" ? "bg-panel shadow-sm" : ""
             }`}
             onPress={() => setActiveTab("tickets")}
           >
@@ -138,7 +138,7 @@ export default function SupportScreen() {
         {activeTab === "faqs" ? (
           <View className="flex-1 mt-4">
             {/* Search Bar */}
-            <View className="h-12 flex-row items-center rounded-2xl border border-primary/20 bg-white px-3.5 shadow-sm shadow-primary/5 mb-3">
+            <View className="h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 shadow-sm shadow-primary/5 mb-3">
               <Feather name="search" size={16} color={colors.description} />
               <TextInput
                 accessibilityLabel="Search FAQs"
@@ -169,7 +169,7 @@ export default function SupportScreen() {
                 onRefresh={refetchFaqs}
                 renderItem={({ item }) => <FaqAccordion faq={item} />}
                 ListEmptyComponent={
-                  <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-white p-8 mt-4">
+                  <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8 mt-4">
                     <Feather name="help-circle" size={36} color={colors.description} />
                     <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
                       No matching FAQs
@@ -199,7 +199,7 @@ export default function SupportScreen() {
                 renderItem={({ item }) => {
                   const isResolved = item.status === "Resolved" || item.status === "Closed";
                   return (
-                    <View className="mb-3 rounded-2xl border border-primary/15 bg-white p-4 shadow-sm shadow-primary/5">
+                    <View className="mb-3 rounded-2xl border border-primary/15 bg-panel p-4 shadow-sm shadow-primary/5">
                       <View className="flex-row items-center justify-between">
                         <Text className="font-ralewayBold text-base text-textPrimary flex-1 pr-2">
                           {item.subject}
@@ -235,7 +235,7 @@ export default function SupportScreen() {
                   );
                 }}
                 ListEmptyComponent={
-                  <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-white p-8 mt-4">
+                  <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8 mt-4">
                     <Ionicons name="chatbubbles-outline" size={36} color={colors.description} />
                     <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
                       No support tickets yet

@@ -19,6 +19,7 @@ import {
   SkeletonListCard,
 } from "../../components/ui/Skeleton";
 import { colors } from "../../constants/colors";
+import { formatLocalizedDate } from "../../utils/formatters";
 import { resolveModuleRoute } from "../../constants/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import type { AppNotification } from "../../types";
@@ -78,10 +79,10 @@ function formatTimestamp(value?: string | null) {
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffHours < 48) return "Yesterday";
 
-  return new Intl.DateTimeFormat("en-US", {
+  return formatLocalizedDate(date, {
     month: "short",
     day: "numeric",
-  }).format(date);
+  });
 }
 
 function EmptyState({ onRefresh }: { onRefresh: () => void }) {
@@ -126,7 +127,7 @@ function NotificationRow({
       accessibilityRole="button"
       className={`mb-3 rounded-[24px] border p-4 ${
         notification.isRead
-          ? "border-accent bg-white"
+          ? "border-accent bg-panel"
           : "border-infoSurface bg-infoSurface"
       }`}
       onPress={() => onPress(notification)}
@@ -273,7 +274,7 @@ export default function NotificationScreen() {
               className={`h-11 w-11 items-center justify-center rounded-full border ${
                 unreadCount > 0
                   ? "border-primary/25 bg-primary/10"
-                  : "border-accent bg-whitePrimary"
+                  : "border-accent bg-panel"
               }`}
               disabled={unreadCount === 0 || markAllReadMutation.isPending}
               onPress={() => markAllReadMutation.mutate()}

@@ -82,7 +82,7 @@ export default function StaffManagementScreen() {
         leading={<SecondaryBackButton />}
       />
       <ScrollView className="mt-6" contentContainerClassName="gap-4 pb-8">
-        <View className="gap-2 rounded-3xl bg-white p-5">
+        <View className="gap-2 rounded-3xl bg-panel p-5">
           <Text className="font-ralewayExtraBold text-xl">
             Property managers
           </Text>

@@ -67,7 +67,7 @@ export function ChoiceField<T extends string | number | boolean>({
           className={`rounded-2xl border border-dashed p-4 ${
             hasFilledSurface
               ? "border-textPrimary/20 bg-surface"
-              : "border-textPrimary/20 bg-whitePrimary/90"
+              : "border-textPrimary/20 bg-panel/90"
           }`}
         >
           <Text className="font-ralewaySemiBold text-sm text-description">
@@ -101,7 +101,7 @@ export function ChoiceField<T extends string | number | boolean>({
                           ? activeColorClass
                           : hasFilledSurface
                             ? "border-primary/20 bg-surface"
-                            : "border-primary/20 bg-whitePrimary"
+                            : "border-primary/20 bg-panel"
                       }`
                 }
                 onPress={() => handlePress(option.value)}

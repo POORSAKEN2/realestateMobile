@@ -13,6 +13,7 @@ import {
   capitalizeWords,
   getInitials,
 } from "../../utils/dashboard/dashboardHelpers";
+import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
 
 type DashboardHeroProps = {
   email?: string;
@@ -31,6 +32,7 @@ export function DashboardHero({
   profileImageUri,
   subtitle,
 }: DashboardHeroProps) {
+  const { settings } = useWorkspacePresentation();
   const { height } = useWindowDimensions();
   const heroHeight = Math.min(Math.max(height * 0.24, 192), 224);
 
@@ -67,7 +69,7 @@ export function DashboardHero({
               {capitalizeWords(name)}
             </Text>
             <Text className="text-sm text-white/80" numberOfLines={1}>
-              {subtitle}
+              {settings.appName} · {subtitle}
             </Text>
           </View>
         </View>

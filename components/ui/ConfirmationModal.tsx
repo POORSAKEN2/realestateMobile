@@ -46,7 +46,7 @@ export function ConfirmationModal({
       >
         <ScrollView
           accessibilityViewIsModal
-          className="w-full max-w-[480px] rounded-[28px] bg-white"
+          className="w-full max-w-[480px] rounded-[28px] bg-panel"
           contentContainerStyle={{ padding: 24 }}
           style={{
             flexGrow: 0,

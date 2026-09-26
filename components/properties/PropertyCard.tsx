@@ -12,6 +12,7 @@ import {
 
 import type { Property } from "../../types";
 import { formatPeso, formatStatus } from "../../utils/properties/propertyForm";
+import { formatDateTime } from "../../utils/formatters";
 import {
   getPropertyImages,
   getPropertyStatusTone,
@@ -117,7 +118,7 @@ export function PropertyCard({
       accessibilityLabel={`View overview for ${property.title}`}
       accessibilityRole="button"
       activeOpacity={0.9}
-      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-white shadow-sm shadow-primary/10"
+      className="w-full overflow-hidden rounded-3xl border border-primary/20 bg-panel shadow-sm shadow-primary/10"
       onPress={onOpenDetails}
     >
       <TouchableOpacity
@@ -246,7 +247,7 @@ export function PropertyCard({
               Archived
             </Text>
             <Text className="mt-1 text-xs text-description">
-              {new Date(property.archivedAt).toLocaleString()}
+              {formatDateTime(property.archivedAt)}
             </Text>
           </View>
         ) : null}
@@ -255,7 +256,7 @@ export function PropertyCard({
           accessibilityLabel={`Manage bedspaces for ${property.title}`}
           accessibilityRole="button"
           activeOpacity={0.82}
-          className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3.5"
+          className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3.5"
           onPress={(event) => {
             event.stopPropagation();
             onOpenBedspaces();
@@ -300,7 +301,7 @@ export function PropertyCard({
             className={`mt-3 flex-row items-center gap-3 rounded-2xl border p-3.5 ${
               floorManagerPolicy.floorSummaryProminence === "primary"
                 ? "border-primary/25 bg-primary/10"
-                : "border-primary/20 bg-white"
+                : "border-primary/20 bg-panel"
             }`}
             onPress={(event) => {
               event.stopPropagation();

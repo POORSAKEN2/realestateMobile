@@ -37,7 +37,7 @@ export function FormActionRow({
           accessibilityRole="button"
           accessibilityState={{ disabled: isCancelDisabled }}
           activeOpacity={0.85}
-          className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-white px-3 py-3 ${
+          className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-panel px-3 py-3 ${
             isCancelDisabled ? "opacity-60" : ""
           }`}
           disabled={isCancelDisabled}

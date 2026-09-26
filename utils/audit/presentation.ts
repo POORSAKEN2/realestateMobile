@@ -1,4 +1,5 @@
 import type { AuditFilters } from "../../types/domain/audit";
+import { formatDate, formatDateTime } from "../formatters";
 
 export function auditLabel(value: string): string {
   return value
@@ -26,7 +27,7 @@ export function auditDate(
     /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00` : value,
   );
   if (Number.isNaN(date.getTime())) return "Unavailable";
-  return includeTime ? date.toLocaleString() : date.toLocaleDateString();
+  return includeTime ? formatDateTime(date) : formatDate(date);
 }
 
 export function auditStoragePolicyNotice(

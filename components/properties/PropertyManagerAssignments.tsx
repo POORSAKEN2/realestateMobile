@@ -30,7 +30,7 @@ export function PropertyManagerAssignments({ propertyId }: { propertyId: string 
     },
   });
   const unavailable = !staff.roster.data?.complete || !Array.isArray(property.data?.managers);
-  return <View className="gap-3 rounded-2xl border border-primary/15 bg-white p-4">
+  return <View className="gap-3 rounded-2xl border border-primary/15 bg-panel p-4">
     <Text className="font-ralewayBold text-base">Assigned managers</Text>
     {property.isPending || staff.roster.isPending ? <Text>Loading assignments…</Text> : property.isError || staff.roster.isError || unavailable
       ? <StaffActionButton label="Reload assignments" onPress={() => { void property.refetch(); void staff.roster.refetch(); }} />

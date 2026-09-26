@@ -56,7 +56,7 @@ export function RegistrationStepLayout({
           <Pressable
             accessibilityLabel="Go to the previous registration step"
             accessibilityRole="button"
-            className="h-11 w-11 items-center justify-center rounded-full border border-accent bg-white active:bg-surface"
+            className="h-11 w-11 items-center justify-center rounded-full border border-accent bg-panel active:bg-surface"
             hitSlop={8}
             onPress={onBack}
           >

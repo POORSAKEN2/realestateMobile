@@ -22,6 +22,7 @@ import { SkeletonBlock, SkeletonGroup } from "../../components/ui/Skeleton";
 import { useAuth } from "../../hooks/useAuth";
 import type { PortfolioSnapshot, Property } from "../../types";
 import { formatPesoValue } from "../../utils/dashboard/dashboardHelpers";
+import { formatLocalizedDate } from "../../utils/formatters";
 import { colors } from "../../constants/colors";
 import { shareFinancialSummaryCsv, shareFinancialSummaryPdf } from "../../api/reports";
 import {
@@ -61,7 +62,7 @@ const formatSnapshotLabel = (snapshot: PortfolioSnapshot) => {
 
   if (Number.isNaN(date.getTime())) return snapshot.snapshot_date;
 
-  return date.toLocaleDateString("en-US", { month: "short" });
+  return formatLocalizedDate(date, { month: "short" });
 };
 
 function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
@@ -102,7 +103,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
       : "";
 
   return (
-    <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+    <View className="mt-4 rounded-[28px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between">
         <View>
           <Text className="font-ralewayBold text-base text-textPrimary">
@@ -194,7 +195,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
   let cumulativePercent = 0;
 
   return (
-    <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+    <View className="mt-4 rounded-[28px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-start justify-between">
         <View className="min-w-0 flex-1 pr-4">
           <Text className="font-ralewayBold text-base uppercase text-textPrimary">
@@ -316,7 +317,7 @@ function AnalyticsLoadingState() {
       <View className="mt-6 flex-row flex-wrap">
         {Array.from({ length: 4 }, (_, index) => (
           <View className="w-1/2 p-1.5" key={index}>
-            <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+            <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
               <SkeletonBlock className="h-10 w-10 rounded-2xl bg-primary/10" />
               <SkeletonBlock className="mt-4 h-5 w-4/5 bg-primary/15" />
               <View className="mt-2 gap-1.5">
@@ -328,7 +329,7 @@ function AnalyticsLoadingState() {
         ))}
       </View>
 
-      <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+      <View className="mt-4 rounded-[28px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
         <View className="flex-row items-center justify-between">
           <View className="gap-2">
             <SkeletonBlock className="h-5 w-44" />
@@ -358,7 +359,7 @@ function AnalyticsLoadingState() {
         </View>
       </View>
 
-      <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+      <View className="mt-4 rounded-[28px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
         <View className="flex-row items-center justify-between">
           <View className="min-w-0 flex-1 gap-2 pr-4">
             <SkeletonBlock className="h-5 w-44 max-w-full" />
@@ -368,7 +369,7 @@ function AnalyticsLoadingState() {
         </View>
         <View className="mt-5 flex-row items-center gap-5">
           <View className="h-[172px] w-[172px] items-center justify-center rounded-full bg-primary/10">
-            <View className="h-28 w-28 items-center justify-center rounded-full bg-white">
+            <View className="h-28 w-28 items-center justify-center rounded-full bg-panel">
               <SkeletonBlock className="h-5 w-8 bg-primary/15" />
               <SkeletonBlock className="mt-2 h-2.5 w-14" />
             </View>
@@ -514,7 +515,7 @@ export default function AnalyticsScreen() {
             <View className="mt-6 flex-row flex-wrap">
               {metricCards.map((card) => (
                 <View key={card.label} className="w-1/2 p-1.5">
-                  <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+                  <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
                     <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
                       <Feather
                         name={card.icon}
@@ -545,7 +546,7 @@ export default function AnalyticsScreen() {
                 </Text>
               </>
             ) : (
-              <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+              <View className="mt-4 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
                 <View className="flex-row items-center gap-3">
                   <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
                     <Feather name="lock" size={18} color={colors.primary} />
@@ -564,7 +565,7 @@ export default function AnalyticsScreen() {
             {canViewAdvancedAnalytics ? (
               <DistributionChart slices={distributionSlices} />
             ) : (
-              <View className="mt-4 rounded-[28px] border border-primary/20 bg-white p-5 shadow-sm shadow-primary/10">
+              <View className="mt-4 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
                 <View className="flex-row items-center gap-3">
                   <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
                     <Feather name="lock" size={18} color={colors.primary} />
@@ -591,7 +592,7 @@ export default function AnalyticsScreen() {
             )}
 
             {/* Financial Summary Export */}
-            <View className="mt-4 rounded-3xl border border-primary/20 bg-white p-5 shadow-sm shadow-primary/5">
+            <View className="mt-4 rounded-3xl border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/5">
               <View className="flex-row items-center justify-between">
                 <View>
                   <Text className="font-ralewayBold text-base text-textPrimary">

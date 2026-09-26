@@ -67,7 +67,7 @@ export function TenantNotesSection({
       ) : error ? (
         <DetailError message="Internal notes could not be loaded." />
       ) : notes.length ? (
-        <View className="overflow-hidden rounded-2xl border border-primary/20 bg-white">
+        <View className="overflow-hidden rounded-2xl border border-primary/20 bg-panel">
           {notes.map((note, index) => (
             <NoteRow
               key={note.id}

@@ -79,7 +79,7 @@ export default function DefaultLocationScreen() {
                 className={`min-h-20 flex-row items-center justify-between rounded-2xl border px-4 ${
                   selected
                     ? "border-success bg-success/10"
-                    : "border-textPrimary/10 bg-white"
+                    : "border-textPrimary/10 bg-panel"
                 }`}
                 onPress={() => setSelectedId(item.id)}
               >

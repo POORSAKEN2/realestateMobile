@@ -80,7 +80,7 @@ function StateCard({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-[24px] border border-dashed border-primary/30 bg-white p-8">
+    <View className="items-center rounded-[24px] border border-dashed border-primary/30 bg-panel p-8">
       <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
         <MaterialCommunityIcons name={icon} color="#8A77F4" size={28} />
       </View>

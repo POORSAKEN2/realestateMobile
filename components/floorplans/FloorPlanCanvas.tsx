@@ -131,7 +131,7 @@ export function FloorPlanCanvas({
       >
         {!image ? (
           <View className="flex-1 items-center justify-center px-8">
-            <View className="h-14 w-14 items-center justify-center rounded-2xl bg-white">
+            <View className="h-14 w-14 items-center justify-center rounded-2xl bg-panel">
               <Feather name="image" color="#8A77F4" size={24} />
             </View>
             <Text className="mt-3 text-center font-ralewayBold text-sm text-textPrimary">
@@ -240,7 +240,7 @@ export function FloorPlanCanvas({
       </Pressable>
 
       {drawingArea && drawingMode ? (
-        <View className="border-t border-textPrimary/10 bg-white p-4">
+        <View className="border-t border-textPrimary/10 bg-panel p-4">
           <Text className="font-ralewayBold text-sm text-textPrimary">
             {drawingStrategy?.instruction}
           </Text>
@@ -284,7 +284,7 @@ export function FloorPlanCanvas({
           </View>
         </View>
       ) : showShapeCaption ? (
-        <View className="flex-row items-center justify-center gap-2 border-t border-textPrimary/10 bg-white px-4 py-3">
+        <View className="flex-row items-center justify-center gap-2 border-t border-textPrimary/10 bg-panel px-4 py-3">
           <View className="h-2 w-2 rounded-full bg-success" />
           <Text className="text-center text-xs text-description">
             Area shapes use plan-relative coordinates.

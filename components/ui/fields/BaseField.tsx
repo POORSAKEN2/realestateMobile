@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TextInput, TextInputProps } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Or your specific Ionicons path
+import { colors } from "../../../constants/colors";
 
 interface FieldProps extends Omit<TextInputProps, "onChangeText"> {
   label: string;
@@ -40,8 +41,8 @@ export function BaseField({
         multiline ? "min-h-24 py-3" : "h-14"
       }`
     : isIconVariant
-      ? "h-14 flex-row items-center rounded-xl border border-textPrimary/10 bg-white px-4 shadow-sm shadow-textPrimary/5"
-      : `rounded-xl border border-textPrimary/10 bg-whitePrimary px-4 ${
+      ? "h-14 flex-row items-center rounded-xl border border-textPrimary/10 bg-panel px-4 shadow-sm shadow-textPrimary/5"
+      : `rounded-xl border border-textPrimary/10 bg-panel px-4 ${
           multiline ? "min-h-28 py-4" : "h-14"
         }`;
 
@@ -51,7 +52,7 @@ export function BaseField({
       ? "ml-3 flex-1 text-base font-ralewayBold text-textPrimary"
       : "flex-1 text-base text-textPrimary";
 
-  const resolvedPlaceholderColor = isIconVariant ? "#6F6D6D" : "#6F6D6D";
+  const resolvedPlaceholderColor = colors.description;
 
   // 3. Smart fallbacks for specific business logic (e.g., Tenants auto-capitalize)
   const resolvedAutoCapitalize = autoCapitalize
@@ -70,7 +71,7 @@ export function BaseField({
       </Text>
 
       <View className={containerClassName}>
-        {icon && <Ionicons name={icon} color="#6F6D6D" size={19} />}
+        {icon && <Ionicons name={icon} color={colors.description} size={19} />}
 
         <TextInput
           accessibilityLabel={`${label}${required ? ", required" : ""}`}

@@ -10,6 +10,7 @@ import {
   type RevenueCatProductKey,
 } from "../../constants/revenueCat";
 import type { SubscriptionTierKey } from "../../types/domain/billing";
+import { formatLocalizedDate } from "../formatters";
 import {
   getActiveRevenueCatTier,
   getRevenueCatProductKey,
@@ -73,11 +74,11 @@ function activePaidEntitlement(customerInfo: CustomerInfo): {
 
 function formatPurchaseDate(value: string | null) {
   if (!value || !Number.isFinite(Date.parse(value))) return null;
-  return new Intl.DateTimeFormat("en-US", {
+  return formatLocalizedDate(value, {
     day: "numeric",
     month: "long",
     year: "numeric",
-  }).format(new Date(value));
+  });
 }
 
 function lifecycleStatus(

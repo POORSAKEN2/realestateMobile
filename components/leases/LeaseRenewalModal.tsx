@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { colors } from "../../constants/colors";
+import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
+import { formatCurrency } from "../../utils/formatters";
 import { AddEditModal } from "../ui/AddEditModal";
 import type { Lease } from "../../types";
 
@@ -25,6 +27,7 @@ export function LeaseRenewalModal({
   onSubmit,
   isPending,
 }: LeaseRenewalModalProps) {
+  const { settings } = useWorkspacePresentation();
   const [termMonths, setTermMonths] = useState("12");
   const [newRent, setNewRent] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +101,7 @@ export function LeaseRenewalModal({
               Current Monthly Rent:
             </Text>
             <Text className="font-ralewayBold text-sm text-textPrimary">
-              ₱{currentRent.toLocaleString("en-PH", { minimumFractionDigits: 2 })}
+              {formatCurrency(currentRent, 2)}
             </Text>
           </View>
         </View>
@@ -118,7 +121,7 @@ export function LeaseRenewalModal({
                   className={`flex-1 items-center justify-center rounded-xl border py-3 ${
                     isSelected
                       ? "border-primary bg-primary"
-                      : "border-primary/20 bg-white"
+                      : "border-primary/20 bg-panel"
                   }`}
                   onPress={() => setTermMonths(preset)}
                 >
@@ -133,7 +136,7 @@ export function LeaseRenewalModal({
               );
             })}
           </View>
-          <View className="mt-1 h-14 justify-center rounded-2xl border border-primary/20 bg-white px-4">
+          <View className="mt-1 h-14 justify-center rounded-2xl border border-primary/20 bg-panel px-4">
             <TextInput
               accessibilityLabel="Custom term length"
               className="font-ralewayBold text-base text-textPrimary"
@@ -150,7 +153,7 @@ export function LeaseRenewalModal({
         <View className="gap-2">
           <View className="flex-row items-center justify-between">
             <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
-              New Monthly Rent (PHP ₱) *
+              New Monthly Rent ({settings.currency}) *
             </Text>
             {Number(escalationPercent) !== 0 ? (
               <Text
@@ -163,11 +166,10 @@ export function LeaseRenewalModal({
             ) : null}
           </View>
 
-          <View className="h-14 flex-row items-center rounded-2xl border border-primary/20 bg-white px-4">
-            <Text className="font-ralewayBold text-lg text-primary">₱</Text>
+          <View className="h-14 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-4">
             <TextInput
               accessibilityLabel="New monthly rent"
-              className="ml-2 flex-1 font-ralewayBold text-lg text-textPrimary"
+              className="flex-1 font-ralewayBold text-lg text-textPrimary"
               keyboardType="decimal-pad"
               onChangeText={setNewRent}
               placeholder="0.00"

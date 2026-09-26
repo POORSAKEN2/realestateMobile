@@ -12,11 +12,14 @@ import { useProperties } from "../../hooks/api/useProperties";
 import { usePropertyMap } from "../../hooks/properties/usePropertyMap";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { getPropertyCoordinate } from "../../utils/properties/propertyPresentation";
+import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
 
 const primaryTint = "rgba(138, 119, 244, 0.12)";
 const primaryBorder = "rgba(138, 119, 244, 0.22)";
 
 export default function MapCanvasScreen() {
+  useWorkspacePresentation();
+  const styles = createStyles();
   const insets = useSafeAreaInsets();
   const { useList } = useProperties();
   const { data: properties = [], isError, isLoading, refetch } = useList();
@@ -183,7 +186,8 @@ export default function MapCanvasScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles() {
+  return StyleSheet.create({
   container: {
     backgroundColor: colors.surface,
     flex: 1,
@@ -202,7 +206,7 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.panel,
     borderRadius: 999,
     elevation: 5,
     height: 48,
@@ -218,7 +222,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.panel,
     borderColor: primaryBorder,
     borderWidth: 1,
     borderRadius: 22,
@@ -245,7 +249,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   summaryLabel: {
-    color: "#6F6D6D",
+    color: colors.description,
     fontFamily: "Raleway_900Black",
     fontSize: 11,
     textTransform: "uppercase",
@@ -259,7 +263,7 @@ const styles = StyleSheet.create({
   centerPanel: {
     alignItems: "center",
     alignSelf: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.panel,
     borderRadius: 24,
     bottom: "38%",
     elevation: 8,
@@ -280,7 +284,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   centerText: {
-    color: "#6F6D6D",
+    color: colors.description,
     fontSize: 13,
     lineHeight: 20,
     marginTop: 6,
@@ -301,7 +305,7 @@ const styles = StyleSheet.create({
   unmappedNotice: {
     alignItems: "center",
     alignSelf: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.panel,
     borderRadius: 999,
     elevation: 5,
     flexDirection: "row",
@@ -319,4 +323,5 @@ const styles = StyleSheet.create({
     fontFamily: "Raleway_800ExtraBold",
     fontSize: 12,
   },
-});
+  });
+}

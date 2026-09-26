@@ -47,7 +47,7 @@ export function InquiryDetail({
 }) {
   return (
     <View className="gap-4 pb-8">
-      <View className="rounded-[28px] border border-primary/15 bg-white p-5 shadow-sm shadow-primary/5">
+      <View className="rounded-[28px] border border-primary/15 bg-panel p-5 shadow-sm shadow-primary/5">
         <View className="flex-row items-center gap-3">
           <View className="h-14 w-14 items-center justify-center rounded-2xl bg-accent/25">
             <Ionicons name="person-outline" size={26} color={colors.primary} />
@@ -104,7 +104,7 @@ export function InquiryDetail({
         ) : null}
       </View>
 
-      <View className="rounded-[28px] border border-primary/15 bg-white p-5">
+      <View className="rounded-[28px] border border-primary/15 bg-panel p-5">
         <Text className="font-ralewayExtraBold text-base text-textPrimary">
           Message
         </Text>
@@ -113,7 +113,7 @@ export function InquiryDetail({
         </Text>
       </View>
 
-      <View className="rounded-[28px] border border-primary/15 bg-white p-5">
+      <View className="rounded-[28px] border border-primary/15 bg-panel p-5">
         <InquiryStatusActions
           canUpdate={canUpdate}
           isUpdating={isUpdating}

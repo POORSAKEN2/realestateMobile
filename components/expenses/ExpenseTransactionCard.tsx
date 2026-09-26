@@ -49,7 +49,7 @@ export function ExpenseTransactionCard({
       accessibilityLabel={`${expense.category}, ${expense.description ?? "Expense"}, ${formattedAmount}, ${expense.lifecycle_status}`}
       accessibilityRole={onPress ? "button" : undefined}
       onPress={onPress}
-      className="min-h-[84px] flex-row items-center rounded-[20px] border border-primary/20 bg-white px-3.5 py-3"
+      className="min-h-[84px] flex-row items-center rounded-[20px] border border-primary/20 bg-panel px-3.5 py-3"
       style={{
         shadowColor: "#8A77F4",
         shadowOffset: { width: 0, height: 2 },

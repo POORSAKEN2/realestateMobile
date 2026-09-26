@@ -7,12 +7,8 @@ import {
   parseDate,
   type Availability,
 } from "../../utils/bookings/bookingCalendar";
+import { formatLocalizedDate } from "../../utils/formatters";
 
-const dayFormatter = new Intl.DateTimeFormat("en-US", {
-  weekday: "short",
-  month: "short",
-  day: "numeric",
-});
 
 type BookingDayScheduleProps = {
   availability: Availability;
@@ -31,10 +27,10 @@ export function BookingDaySchedule({
   onCreate,
   onOpenBooking,
 }: BookingDayScheduleProps) {
-  const dayLabel = dayFormatter.format(parseDate(date));
+  const dayLabel = formatLocalizedDate(parseDate(date), { weekday: "short", month: "short", day: "numeric" });
 
   return (
-    <View className="gap-2.5 rounded-[22px] border border-primary/20 bg-white p-3 shadow-sm shadow-primary/10">
+    <View className="gap-2.5 rounded-[22px] border border-primary/20 bg-panel p-3 shadow-sm shadow-primary/10">
       <View className="flex-row items-center justify-between gap-3">
         <View className="min-w-0 flex-1">
           <Text className="font-ralewayBold text-base text-textPrimary">

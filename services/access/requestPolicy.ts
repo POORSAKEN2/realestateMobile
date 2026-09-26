@@ -114,6 +114,8 @@ export function describeRequest(
   if (segments[0] === "users") permission = "staff.manage";
   if (segments[0] === "audit-events")
     permission = segments[1] === "export" ? "audit.export" : "audit.view";
+  if (segments[0] === "settings" && segments.length === 1)
+    permission = verb === "GET" ? "settings.view" : "settings.update";
   if (segments[0] === "governance") permission = "deletion.preview";
   if (segments[0] === "properties" && segments[2] === "archive")
     permission = "properties.archive";

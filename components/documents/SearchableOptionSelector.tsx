@@ -73,7 +73,7 @@ export function SearchableOptionSelector({
       className="h-[500px] max-h-full shrink bg-surface"
       edges={["bottom"]}
     >
-      <View className="flex-row items-center gap-3 bg-white px-5 pb-5 pt-2">
+      <View className="flex-row items-center gap-3 bg-panel px-5 pb-5 pt-2">
         <TouchableOpacity
           accessibilityLabel={backAccessibilityLabel}
           accessibilityRole="button"
@@ -146,7 +146,7 @@ function OptionRow({
       className={`min-h-14 flex-row items-center rounded-2xl border px-4 ${
         isSelected
           ? "border-primary bg-primary/10"
-          : "border-textPrimary/10 bg-white"
+          : "border-textPrimary/10 bg-panel"
       }`}
       onPress={onPress}
     >

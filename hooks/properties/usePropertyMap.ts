@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { DEFAULT_PHILIPPINES_REGION } from "../../constants/defaultLocation";
+import { getDefaultLocationRegion } from "../../constants/defaultLocation";
+import { useDefaultLocation } from "../useDefaultLocation";
 import type { Property } from "../../types";
 import type { MapRegion } from "../../types/maps";
 import { hasMapCoordinate } from "../../utils/properties/propertyPresentation";
@@ -10,11 +11,16 @@ import {
 } from "../../utils/properties/propertyMap";
 
 export function usePropertyMap(properties: Property[]) {
+  const { effectiveLocation } = useDefaultLocation();
+  const fallbackRegion = useMemo(
+    () => getDefaultLocationRegion(effectiveLocation),
+    [effectiveLocation],
+  );
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(
     null,
   );
   const [viewport, setViewport] = useState({
-    region: DEFAULT_PHILIPPINES_REGION,
+    region: fallbackRegion,
     revision: 0,
   });
   const mappedProperties = useMemo(
@@ -29,8 +35,8 @@ export function usePropertyMap(properties: Property[]) {
     ? (propertiesById.get(selectedPropertyId) ?? null)
     : null;
   const portfolioRegion = useMemo(
-    () => getPortfolioRegion(mappedProperties),
-    [mappedProperties],
+    () => getPortfolioRegion(mappedProperties, fallbackRegion),
+    [fallbackRegion, mappedProperties],
   );
 
   const moveViewport = useCallback(
@@ -41,6 +47,10 @@ export function usePropertyMap(properties: Property[]) {
       })),
     [],
   );
+
+  useEffect(() => {
+    if (mappedProperties.length === 0) moveViewport(fallbackRegion);
+  }, [fallbackRegion, mappedProperties.length, moveViewport]);
 
   const propertiesKey = useMemo(
     () =>

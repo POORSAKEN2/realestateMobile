@@ -16,6 +16,7 @@ import {
   type TenantNoteCategory,
 } from "../../types";
 import type { TenantNoteFormState } from "../../utils/tenants/tenantNoteForm";
+import { formatNumber } from "../../utils/formatters";
 import {
   formatTenantNoteDate,
   parseTenantNoteDate,
@@ -59,7 +60,7 @@ export function TenantNoteEditor({
   return (
     <View
       accessibilityViewIsModal
-      className="overflow-hidden rounded-t-[30px] bg-white"
+      className="overflow-hidden rounded-t-[30px] bg-panel"
       style={{ height: height * 0.84 }}
     >
       <View className="flex-row items-center border-b border-textPrimary/10 px-5 pb-4 pt-2">
@@ -101,8 +102,8 @@ export function TenantNoteEditor({
               variant="filled"
             />
             <Text className="mt-1 text-right font-ralewayMedium text-[10px] text-description">
-              {form.content.length.toLocaleString()} /{" "}
-              {TENANT_NOTE_CONTENT_LIMIT.toLocaleString()}
+              {formatNumber(form.content.length, 0)} /{" "}
+              {formatNumber(TENANT_NOTE_CONTENT_LIMIT, 0)}
             </Text>
           </View>
 

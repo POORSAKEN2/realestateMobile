@@ -31,7 +31,7 @@ export function StaffManagerCard({
     unknown: "Status unavailable",
   }[manager.status];
   return (
-    <View className="gap-3 rounded-3xl border border-primary/15 bg-white p-5">
+    <View className="gap-3 rounded-3xl border border-primary/15 bg-panel p-5">
       <View>
         <Text className="font-ralewayExtraBold text-lg text-textPrimary">
           {manager.name}

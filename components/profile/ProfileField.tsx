@@ -40,7 +40,7 @@ export function ProfileField({
   const borderClassName = error
     ? "border-danger bg-dangerSurface"
     : isFocused
-      ? "border-primary bg-white"
+      ? "border-primary bg-panel"
       : "border-primary/20 bg-primary/5";
 
   return (

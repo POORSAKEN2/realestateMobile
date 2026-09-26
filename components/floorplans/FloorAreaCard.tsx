@@ -43,7 +43,7 @@ export function FloorAreaCard({
 
   return (
     <>
-      <View className="rounded-[24px] border border-textPrimary/10 bg-white p-4">
+      <View className="rounded-[24px] border border-textPrimary/10 bg-panel p-4">
         <View className="flex-row items-start gap-3">
           <View
             className="mt-1 h-4 w-4 rounded-full border-[3px]"

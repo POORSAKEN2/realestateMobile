@@ -1,4 +1,5 @@
 import { Expense } from "../../types/domain/expenses";
+import { formatCompactCurrency } from "../formatters";
 
 export type FormState = {
   propertyId: string;
@@ -19,10 +20,7 @@ export const emptyForm: FormState = {
 };
 
 export function formatPeso(value = 0) {
-  if (value >= 1_000_000_000)
-    return `PHP ${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `PHP ${(value / 1_000_000).toFixed(1)}M`;
-  return `PHP ${value.toLocaleString()}`;
+  return formatCompactCurrency(value);
 }
 export function parseNumber(value: string) {
   const parsed = Number(value.trim().replace(/,/g, ""));

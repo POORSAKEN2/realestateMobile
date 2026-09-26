@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { colors } from "../../constants/colors";
+import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
 import { AddEditModal } from "../ui/AddEditModal";
 import type { Payment, PaymentType, RecordPaymentPayload } from "../../types";
 
@@ -30,6 +31,7 @@ export function RecordPaymentModal({
   prefillPayment,
   defaultLeaseId,
 }: RecordPaymentModalProps) {
+  const { settings } = useWorkspacePresentation();
   const [amount, setAmount] = useState("");
   const [paymentType, setPaymentType] = useState<PaymentType>("Rent");
   const [paidDate, setPaidDate] = useState("");
@@ -109,13 +111,12 @@ export function RecordPaymentModal({
         {/* Payment Amount */}
         <View className="gap-2">
           <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
-            Payment Amount (PHP ₱) *
+            Payment Amount ({settings.currency}) *
           </Text>
-          <View className="h-14 flex-row items-center rounded-2xl border border-primary/20 bg-white px-4">
-            <Text className="font-ralewayBold text-lg text-primary">₱</Text>
+          <View className="h-14 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-4">
             <TextInput
               accessibilityLabel="Payment amount"
-              className="ml-2 flex-1 font-ralewayBold text-lg text-textPrimary"
+              className="flex-1 font-ralewayBold text-lg text-textPrimary"
               keyboardType="decimal-pad"
               onChangeText={setAmount}
               placeholder="0.00"
@@ -140,7 +141,7 @@ export function RecordPaymentModal({
                   className={`rounded-xl border px-3.5 py-2.5 ${
                     isSelected
                       ? "border-primary bg-primary"
-                      : "border-primary/20 bg-white"
+                      : "border-primary/20 bg-panel"
                   }`}
                   onPress={() => setPaymentType(type)}
                 >
@@ -162,7 +163,7 @@ export function RecordPaymentModal({
           <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
             Payment Date (YYYY-MM-DD)
           </Text>
-          <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-white px-4">
+          <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-panel px-4">
             <TextInput
               accessibilityLabel="Payment Date"
               className="font-ralewayBold text-base text-textPrimary"
@@ -179,7 +180,7 @@ export function RecordPaymentModal({
           <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
             Reference / Transaction No. (Optional)
           </Text>
-          <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-white px-4">
+          <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-panel px-4">
             <TextInput
               accessibilityLabel="Reference Number"
               className="font-ralewayBold text-base text-textPrimary"
@@ -196,7 +197,7 @@ export function RecordPaymentModal({
           <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
             Notes / Remarks (Optional)
           </Text>
-          <View className="h-24 rounded-2xl border border-primary/20 bg-white p-3">
+          <View className="h-24 rounded-2xl border border-primary/20 bg-panel p-3">
             <TextInput
               accessibilityLabel="Notes"
               className="flex-1 font-ralewayMedium text-sm text-textPrimary"

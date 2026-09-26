@@ -13,6 +13,7 @@ import {
   type PropertyType,
 } from "../../types";
 import { getPropertyLifecycleLabel } from "./propertyLifecycle";
+import { formatCompactCurrency } from "../formatters";
 
 export type StatusFilter = Property["status"] | "ALL";
 
@@ -188,10 +189,7 @@ export function formatStatus(status: string) {
     .join(" ");
 }
 export function formatPeso(value = 0) {
-  if (value >= 1_000_000_000)
-    return `PHP ${(value / 1_000_000_000).toFixed(1)}B`;
-  if (value >= 1_000_000) return `PHP ${(value / 1_000_000).toFixed(1)}M`;
-  return `PHP ${value.toLocaleString()}`;
+  return formatCompactCurrency(value);
 }
 export function requiresBedroomAndBathroomCounts(
   classification: PropertyClassification,

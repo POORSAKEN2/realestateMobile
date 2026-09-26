@@ -29,7 +29,7 @@ export function BedspaceCard({ bedspace }: { bedspace: Bedspace }) {
   const statusStyle = STATUS_STYLES[bedspace.status];
 
   return (
-    <View className="rounded-2xl border border-textPrimary/10 bg-white p-4">
+    <View className="rounded-2xl border border-textPrimary/10 bg-panel p-4">
       <View className="flex-row items-start gap-3">
         <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
           <MaterialCommunityIcons

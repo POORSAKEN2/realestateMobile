@@ -154,7 +154,7 @@ export default function PropertiesScreen() {
           <View className="mb-4 flex-row rounded-2xl bg-primary/10 p-1">
             {(["active", "archived"] as const).map((state) => (
               <TouchableOpacity
-                className={`min-h-10 flex-1 items-center justify-center rounded-xl ${archiveState === state ? "bg-white" : ""}`}
+                className={`min-h-10 flex-1 items-center justify-center rounded-xl ${archiveState === state ? "bg-panel" : ""}`}
                 key={state}
                 onPress={() => setArchiveState(state)}
               >

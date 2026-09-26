@@ -8,8 +8,7 @@ import {
   parseDate,
 } from "../../utils/bookings/bookingCalendar";
 import { getBookingStatusPresentation } from "../../utils/bookings/bookingPresentation";
-
-const monthFormatter = new Intl.DateTimeFormat("en-US", { month: "short" });
+import { formatLocalizedDate } from "../../utils/formatters";
 
 type BookingReservationListProps = {
   bookings: TransientBooking[];
@@ -34,7 +33,7 @@ export function BookingReservationList({
     return (
       <SkeletonGroup
         accessibilityLabel="Loading reservations"
-        className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10"
+        className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10"
       >
         <View className="flex-row items-end justify-between gap-3">
           <View className="min-w-0 flex-1 gap-2">
@@ -46,7 +45,7 @@ export function BookingReservationList({
 
         {Array.from({ length: 3 }, (_, index) => (
           <View
-            className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
+            className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3"
             key={index}
           >
             <SkeletonBlock className="h-12 w-12 rounded-xl bg-primary/10" />
@@ -63,7 +62,7 @@ export function BookingReservationList({
   }
 
   return (
-    <View className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-white p-4 shadow-sm shadow-primary/10">
+    <View className="mb-16 gap-3 rounded-[24px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-end justify-between gap-3">
         <View>
           <Text className="font-ralewayBold text-lg text-textPrimary">
@@ -119,12 +118,12 @@ function ReservationCard({
       activeOpacity={0.78}
       accessibilityLabel={`Open ${status.label} booking for ${booking.guestName}`}
       accessibilityRole="button"
-      className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-white p-3"
+      className="min-h-[76px] flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3"
       onPress={() => onPress(booking)}
     >
       <View className="w-12 items-center rounded-xl bg-primary/10 py-2">
         <Text className="font-ralewayExtraBold text-[10px] uppercase text-description">
-          {monthFormatter.format(startDate)}
+          {formatLocalizedDate(startDate, { month: "short" })}
         </Text>
         <Text className="font-ralewayBold text-lg text-textPrimary">
           {startDate.getDate()}

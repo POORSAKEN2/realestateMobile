@@ -13,6 +13,7 @@ import { getStandardModalSheetHeight } from "../../../constants/modal";
 import { BottomSheetModal } from "../BottomSheetModal";
 import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "../ModalActionFooter";
 import { ModalHeader } from "../ModalHeader";
+import { colors } from "../../../constants/colors";
 
 const DROPDOWN_OPTION_GAP = 8;
 
@@ -84,10 +85,10 @@ export function DropdownField<T extends string>({
         accessibilityState={{ disabled }}
         className={
           isCompactVariant
-            ? `h-11 flex-row items-center justify-between rounded-xl border border-textPrimary/10 bg-white px-3 ${disabled ? "opacity-50" : ""}`
+            ? `h-11 flex-row items-center justify-between rounded-xl border border-textPrimary/10 bg-panel px-3 ${disabled ? "opacity-50" : ""}`
             : isFilledVariant
               ? `h-14 flex-row items-center justify-between rounded-2xl border border-textPrimary/10 bg-surface px-4 ${disabled ? "opacity-50" : ""}`
-              : `h-14 flex-row items-center justify-between rounded-xl border border-textPrimary/10 bg-whitePrimary px-4 shadow-sm ${disabled ? "opacity-50" : ""}`
+              : `h-14 flex-row items-center justify-between rounded-xl border border-textPrimary/10 bg-panel px-4 shadow-sm ${disabled ? "opacity-50" : ""}`
         }
         disabled={disabled}
         onPress={() => setIsOpen(true)}
@@ -102,7 +103,7 @@ export function DropdownField<T extends string>({
         </Text>
         <MaterialCommunityIcons
           name={isFilledVariant ? "chevron-right" : "chevron-down"}
-          color="#6F6D6D"
+          color={colors.description}
           size={isCompactVariant ? 19 : 22}
         />
       </TouchableOpacity>
@@ -114,7 +115,7 @@ export function DropdownField<T extends string>({
         visible={isOpen}
       >
         <SafeAreaView
-          className="w-full overflow-hidden rounded-t-[28px] bg-whitePrimary"
+          className="w-full overflow-hidden rounded-t-[28px] bg-panel"
           edges={["bottom", "left", "right"]}
           style={{ height: sheetHeight }}
         >
@@ -147,7 +148,7 @@ export function DropdownField<T extends string>({
                   className={`h-14 flex-row items-center justify-between rounded-lg border px-4 ${
                     isSelected
                       ? "border-primary bg-primary/10"
-                      : "border-textPrimary/10 bg-whitePrimary"
+                      : "border-textPrimary/10 bg-panel"
                   }`}
                   onPress={() => handleSelect(option.value)}
                 >
@@ -162,7 +163,7 @@ export function DropdownField<T extends string>({
                   {isSelected ? (
                     <MaterialCommunityIcons
                       name="check"
-                      color="#8A77F4"
+                      color={colors.primary}
                       size={21}
                     />
                   ) : null}

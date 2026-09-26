@@ -3,6 +3,7 @@ import type {
   PlanChangeBlocker,
   UsageLimit,
 } from "../../types/domain/billing";
+import { formatNumber } from "../formatters";
 
 export function usagePercentage(usage: UsageLimit): number {
   if (usage.limit === null) return 0;
@@ -24,7 +25,7 @@ export const dimensionLabels: Record<string, string> = {
   retention_days: "History",
 };
 export function formatUsage(dimension: string, amount: number): string {
-  if (dimension !== "storage_bytes") return amount.toLocaleString();
+  if (dimension !== "storage_bytes") return formatNumber(amount, 0);
   if (amount === 0) return "0 B";
   const unit = Math.min(
     3,

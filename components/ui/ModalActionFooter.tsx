@@ -7,7 +7,7 @@ export const MODAL_ACTION_FOOTER_CONTENT_HEIGHT = 40;
 export function ModalActionFooter({ children }: { children: ReactNode }) {
   return (
     <SafeAreaView
-      className="border-t border-textPrimary/10 bg-white px-5 pb-4 pt-4"
+      className="border-t border-textPrimary/10 bg-panel px-5 pb-4 pt-4"
       edges={["bottom"]}
     >
       {children}

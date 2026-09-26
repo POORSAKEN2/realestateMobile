@@ -1,5 +1,10 @@
 import { Stack } from "expo-router";
+import { AccessBoundary } from "../../components/auth/AccessBoundary";
 
 export default function SecondaryLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <AccessBoundary>
+      <Stack screenOptions={{ headerShown: false }} />
+    </AccessBoundary>
+  );
 }

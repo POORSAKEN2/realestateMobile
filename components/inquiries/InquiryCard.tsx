@@ -32,7 +32,7 @@ export function InquiryCard({
   onStatusChange: (status: InquiryStatus) => void;
 }) {
   return (
-    <View className="mb-3 rounded-[24px] border border-primary/15 bg-white p-4 shadow-sm shadow-primary/5">
+    <View className="mb-3 rounded-[24px] border border-primary/15 bg-panel p-4 shadow-sm shadow-primary/5">
       <TouchableOpacity
         accessibilityLabel={`Open inquiry from ${inquiry.guest.name}`}
         accessibilityRole="button"

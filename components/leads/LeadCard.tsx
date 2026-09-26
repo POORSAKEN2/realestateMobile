@@ -39,7 +39,7 @@ export function LeadCard({ lead, onUpdateStatus }: LeadCardProps) {
   }
 
   return (
-    <View className="mb-3 rounded-[24px] border border-primary/15 bg-white p-4 shadow-sm shadow-primary/5">
+    <View className="mb-3 rounded-[24px] border border-primary/15 bg-panel p-4 shadow-sm shadow-primary/5">
       {/* Header */}
       <View className="flex-row items-start justify-between">
         <View className="flex-row items-center gap-2.5">

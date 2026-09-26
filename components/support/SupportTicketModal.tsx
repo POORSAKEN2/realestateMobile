@@ -72,7 +72,7 @@ export function SupportTicketModal({
           <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
             Subject *
           </Text>
-          <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-white px-4">
+          <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-panel px-4">
             <TextInput
               accessibilityLabel="Ticket Subject"
               className="font-ralewayBold text-base text-textPrimary"
@@ -99,7 +99,7 @@ export function SupportTicketModal({
                   className={`flex-1 items-center justify-center rounded-xl border py-2.5 ${
                     isSelected
                       ? "border-primary bg-primary"
-                      : "border-primary/20 bg-white"
+                      : "border-primary/20 bg-panel"
                   }`}
                   onPress={() => setPriority(p)}
                 >
@@ -121,7 +121,7 @@ export function SupportTicketModal({
           <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
             Description & Details *
           </Text>
-          <View className="h-32 rounded-2xl border border-primary/20 bg-white p-3.5">
+          <View className="h-32 rounded-2xl border border-primary/20 bg-panel p-3.5">
             <TextInput
               accessibilityLabel="Ticket Description"
               className="flex-1 font-ralewayMedium text-sm text-textPrimary"

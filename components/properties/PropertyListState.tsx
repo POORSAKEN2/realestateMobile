@@ -8,7 +8,7 @@ export function PropertyListSkeleton() {
     <View
       accessibilityLabel="Loading properties"
       accessibilityRole="progressbar"
-      className="overflow-hidden rounded-3xl border border-textPrimary/10 bg-white"
+      className="overflow-hidden rounded-3xl border border-textPrimary/10 bg-panel"
     >
       <SkeletonBlock className="h-36 w-full" />
       <View className="gap-3 p-4">
@@ -38,7 +38,7 @@ export function PropertyListMessage({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-3xl border border-dashed border-primary/20 bg-white p-8">
+    <View className="items-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8">
       <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
         <MaterialCommunityIcons name={icon} color="#8A77F4" size={28} />
       </View>

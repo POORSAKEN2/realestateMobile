@@ -76,7 +76,7 @@ export const EmailVerificationCodeInput = forwardRef<
               ? "border-primary bg-primary/10"
               : digit
                 ? "border-primary bg-primary/10"
-                : "border-accent bg-white"
+                : "border-accent bg-panel"
           }`}
           keyboardType="number-pad"
           maxLength={values.length}
