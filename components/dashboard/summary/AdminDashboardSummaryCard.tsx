@@ -2,6 +2,10 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
 import { colors } from "../../../constants/colors";
+import {
+  useThemeColors,
+  useWorkspacePresentation,
+} from "../../../context/WorkspacePresentationContext";
 import { SkeletonBlock } from "../../ui/Skeleton";
 import type {
   DashboardSummaryMetric,
@@ -23,9 +27,12 @@ function AdminMetric({
   isLoading: boolean;
   metric: DashboardSummaryMetric;
 }) {
+  const { resolvedTheme } = useWorkspacePresentation();
+  const palette = useThemeColors();
+  const isDark = resolvedTheme === "dark";
   return (
     <View
-      className="min-w-0 flex-1 justify-center overflow-hidden rounded-2xl border border-white/15 bg-white/10 p-1.5"
+      className={`min-w-0 flex-1 justify-center overflow-hidden rounded-2xl border p-1.5 ${isDark ? "border-primary/20 bg-primary/5" : "border-white/15 bg-white/10"}`}
       style={{ aspectRatio: 16 / 9 }}
     >
       <View
@@ -38,25 +45,27 @@ function AdminMetric({
         <MaterialCommunityIcons
           accessible={false}
           name={metric.icon}
-          color={colors.whitePrimary}
+          color={isDark ? palette.primary : palette.whitePrimary}
           size={56}
         />
       </View>
       <View className="z-10 min-w-0">
         <Text
           adjustsFontSizeToFit
-          className="font-ralewayBold text-[9px] uppercase leading-[10px] text-accent"
+          className={`font-ralewayBold text-[9px] uppercase leading-[10px] ${isDark ? "text-description" : "text-accent"}`}
           minimumFontScale={0.75}
           numberOfLines={2}
         >
           {metric.label}
         </Text>
         {isLoading ? (
-          <SkeletonBlock className="mt-0.5 h-4 w-2/3 bg-accent/20" />
+          <SkeletonBlock
+            className={`mt-0.5 h-4 w-2/3 ${isDark ? "bg-primary/20" : "bg-accent/20"}`}
+          />
         ) : (
           <Text
             adjustsFontSizeToFit
-            className="mt-0.5 font-ralewayExtraBold text-base leading-[18px] text-white"
+            className={`mt-0.5 font-ralewayExtraBold text-base leading-[18px] ${isDark ? "text-textPrimary" : "text-white"}`}
             numberOfLines={1}
           >
             {metric.value}
@@ -69,40 +78,53 @@ function AdminMetric({
 
 export function AdminDashboardSummaryCard({
   badge,
-  icon,
   isLoading,
   label,
   metrics,
   value,
 }: RoleDashboardSummaryCardProps) {
+  const { resolvedTheme } = useWorkspacePresentation();
+  const palette = useThemeColors();
+  const isDark = resolvedTheme === "dark";
   return (
     <View
-      className="overflow-hidden rounded-2xl border border-primary/25 bg-secondary px-4 py-6"
-      style={adminShadow}
+      className={`overflow-hidden rounded-2xl border border-primary/25 px-4 py-6 ${isDark ? "bg-panel" : "bg-secondary"}`}
+      style={{
+        ...adminShadow,
+        shadowColor: palette.secondary,
+        shadowOpacity: isDark ? 0.08 : 0.24,
+      }}
     >
-      <View className="absolute -right-10 -top-14 h-36 w-36 rounded-full bg-primary/55" />
+      <View
+        className={`absolute -right-10 -top-14 h-36 w-36 rounded-full ${isDark ? "bg-primary/10" : "bg-primary/55"}`}
+      />
       <View className="absolute -bottom-14 -left-10 h-28 w-28 rounded-full bg-accent/10" />
 
       <View className="flex-row items-center justify-between gap-4">
-        {/* <View className="h-10 w-10 items-center justify-center rounded-2xl border border-accent/30 bg-white/10">
-          <MaterialCommunityIcons name={icon} color={colors.accent} size={21} />
-        </View> */}
-        <Text className="font-ralewayBold text-[10px] uppercase tracking-wider text-accent/80">
+        <Text
+          className={`font-ralewayBold text-[10px] uppercase tracking-wider ${isDark ? "text-primary" : "text-accent/80"}`}
+        >
           {label}
         </Text>
-        <View className="rounded-full bg-textPrimary/20 px-3 py-1.5">
-          <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-white">
+        <View
+          className={`rounded-full px-3 py-1.5 ${isDark ? "bg-primary/10" : "bg-textPrimary/20"}`}
+        >
+          <Text
+            className={`font-ralewayExtraBold text-[10px] uppercase tracking-wider ${isDark ? "text-primary" : "text-white"}`}
+          >
             {badge}
           </Text>
         </View>
       </View>
 
       {isLoading ? (
-        <SkeletonBlock className="mt-2 h-9 w-4/5 rounded-xl bg-accent/20" />
+        <SkeletonBlock
+          className={`mt-2 h-9 w-4/5 rounded-xl ${isDark ? "bg-primary/20" : "bg-accent/20"}`}
+        />
       ) : (
         <Text
           adjustsFontSizeToFit
-          className="mt-1 font-ralewayExtraBold text-[32px] text-white"
+          className={`mt-1 font-ralewayExtraBold text-[32px] ${isDark ? "text-textPrimary" : "text-white"}`}
           numberOfLines={1}
         >
           {value}

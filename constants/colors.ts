@@ -21,12 +21,25 @@ export const lightColors = {
 } as const;
 
 export const darkColors: Record<keyof typeof lightColors, string> = {
-  primary: "#A99BFF", secondary: "#B99BFF", accent: "#214A43",
-  surface: "#10111A", text: "#F4F1FF", panel: "#1A1C28", whitePrimary: "#FFFFFF",
-  description: "#B8B5C5", muted: "#8F96A8", black: "#F4F1FF",
-  danger: "#FF8A80", dangerSurface: "#3A1D20", success: "#71D7BC",
-  successSurface: "#173C34", warning: "#FFD078", warningSurface: "#382E16",
-  turnover: "#F0B95F", info: "#8DB8FF", infoSurface: "#172A4A",
+  primary: "#8A77F4",
+  secondary: "#A99BFF",
+  accent: "#214A43",
+  surface: "#10111A",
+  text: "#F4F1FF",
+  panel: "#1A1C28",
+  whitePrimary: "#FFFFFF",
+  description: "#B8B5C5",
+  muted: "#8F96A8",
+  black: "#F4F1FF",
+  danger: "#FF8A80",
+  dangerSurface: "#3A1D20",
+  success: "#71D7BC",
+  successSurface: "#173C34",
+  warning: "#FFD078",
+  warningSurface: "#382E16",
+  turnover: "#F0B95F",
+  info: "#8DB8FF",
+  infoSurface: "#172A4A",
 };
 
 let activeColors: Record<keyof typeof lightColors, string> = lightColors;
@@ -35,7 +48,9 @@ export function setActiveColors(theme: "light" | "dark") {
   activeColors = theme === "dark" ? darkColors : lightColors;
 }
 
-export const colors = (Object.keys(lightColors) as (keyof typeof lightColors)[]).reduce(
+export const colors = (
+  Object.keys(lightColors) as (keyof typeof lightColors)[]
+).reduce(
   (result, key) =>
     Object.defineProperty(result, key, {
       enumerable: true,

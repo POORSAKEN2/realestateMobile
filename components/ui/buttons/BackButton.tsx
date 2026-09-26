@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { colors } from "../../../constants/colors";
+import { useThemeColors } from "../../../context/WorkspacePresentationContext";
 
 export type BackButtonVariant = "neutral" | "primary" | "secondary" | "overlay";
 
@@ -12,19 +12,13 @@ type BackButtonProps = {
   variant?: BackButtonVariant;
 };
 
-const iconColors: Record<BackButtonVariant, string> = {
-  neutral: colors.text,
-  primary: colors.primary,
-  secondary: colors.primary,
-  overlay: colors.primary,
-};
-
 export function BackButton({
   accessibilityLabel = "Go back",
   disabled = false,
   onPress,
   variant = "neutral",
 }: BackButtonProps) {
+  const palette = useThemeColors();
   return (
     <TouchableOpacity
       accessibilityLabel={accessibilityLabel}
@@ -36,7 +30,7 @@ export function BackButton({
       onPress={onPress}
       style={[styles.button, disabled ? styles.disabled : undefined]}
     >
-      <Ionicons name="chevron-back" color={iconColors[variant]} size={24} />
+      <Ionicons name="chevron-back" color={palette.primary} size={24} />
     </TouchableOpacity>
   );
 }

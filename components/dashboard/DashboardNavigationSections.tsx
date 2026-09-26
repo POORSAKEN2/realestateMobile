@@ -96,7 +96,9 @@ export function DashboardNavigationSections({
     <View className="mt-6 gap-6">
       {visibleSections.map((section) => (
         <View key={section.title}>
-          <Text className="mb-3 font-ralewayBold text-xl">{section.title}</Text>
+          <Text className="mb-3 font-ralewayBold text-xl text-textPrimary">
+            {section.title}
+          </Text>
           <View className="-mx-1.5 flex-row flex-wrap">
             {section.items.map((item) => (
               <View key={item.label} className="w-1/4 px-1.5 pb-4">

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
+import { colors } from "../../constants/colors";
 import { SkeletonGroup, SkeletonList, SkeletonListCard } from "./Skeleton";
 
 export function ModuleLoadingState({
@@ -33,8 +34,8 @@ export function ModuleEmptyState({
   title: string;
 }) {
   return (
-    <View className="items-center rounded-[28px] border border-dashed border-textPrimary/20 bg-white/95 p-8 shadow-sm">
-      <Ionicons name={icon} color="#8A77F4" size={38} />
+    <View className="items-center rounded-[28px] border border-dashed border-primary/20 bg-panel p-8 shadow-sm shadow-primary/10">
+      <Ionicons name={icon} color={colors.primary} size={38} />
       <Text className="mt-3 font-ralewayExtraBold text-base text-textPrimary">
         {title}
       </Text>

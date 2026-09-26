@@ -181,7 +181,7 @@ export default function AuditHistoryScreen() {
               </Text>
             ) : null}
             {notice ? (
-              <Text accessibilityRole="alert" className="text-sm text-red-700">
+              <Text accessibilityRole="alert" className="text-sm text-danger">
                 {notice}
               </Text>
             ) : null}

@@ -52,7 +52,7 @@ export function ProfileIdentityCard({
             </Text>
           </View>
           {planLabel ? (
-            <View className="flex-row items-center gap-1.5 rounded-full border border-primary/25 bg-white/70 px-3 py-1.5">
+            <View className="flex-row items-center gap-1.5 rounded-full border border-primary/25 bg-panel/80 px-3 py-1.5">
               <Ionicons name="star-outline" color={colors.primary} size={13} />
               <Text
                 className="font-ralewayExtraBold text-xs text-primary"

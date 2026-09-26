@@ -83,7 +83,7 @@ export default function StaffManagementScreen() {
       />
       <ScrollView className="mt-6" contentContainerClassName="gap-4 pb-8">
         <View className="gap-2 rounded-3xl bg-panel p-5">
-          <Text className="font-ralewayExtraBold text-xl">
+          <Text className="font-ralewayExtraBold text-xl text-textPrimary">
             Property managers
           </Text>
           <Text className="text-description">
@@ -133,7 +133,7 @@ export default function StaffManagementScreen() {
               }}
             />
             {staff.roster.isPending ? (
-              <Text>Loading managers…</Text>
+              <Text className="text-description">Loading managers…</Text>
             ) : (
               staff.roster.data?.records.map((manager) => (
                 <StaffManagerCard

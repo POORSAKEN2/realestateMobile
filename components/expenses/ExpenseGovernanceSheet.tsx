@@ -383,7 +383,9 @@ export function ExpenseGovernanceSheet({
                 onPress={closeReason}
                 className="flex-1 items-center rounded-xl border border-textPrimary/10 p-3"
               >
-                <Text className="font-ralewayBold">Cancel</Text>
+                <Text className="font-ralewayBold text-textPrimary">
+                  Cancel
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 disabled={isPending}

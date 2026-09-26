@@ -162,7 +162,7 @@ export function StaffManagerEditor({
         </FormSection>
         {gateway.supportsAssignments ? (
           properties.isPending ? (
-            <Text>Loading properties…</Text>
+            <Text className="text-description">Loading properties…</Text>
           ) : properties.isError ? (
             <View className="gap-3 rounded-2xl bg-dangerSurface p-4">
               <Text accessibilityRole="alert" className="text-danger">

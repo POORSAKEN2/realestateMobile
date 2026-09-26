@@ -2,9 +2,9 @@ import { Text } from "react-native";
 import { auditLabel } from "../../utils/audit/presentation";
 
 const results: Record<string, { label: string; className: string }> = {
-  success: { label: "Success", className: "bg-emerald-50 text-emerald-700" },
-  failure: { label: "Failed", className: "bg-red-50 text-red-700" },
-  denied: { label: "Denied", className: "bg-amber-50 text-amber-800" },
+  success: { label: "Success", className: "bg-successSurface text-success" },
+  failure: { label: "Failed", className: "bg-dangerSurface text-danger" },
+  denied: { label: "Denied", className: "bg-warningSurface text-warning" },
 };
 
 export function AuditResultBadge({ result }: { result: string }) {

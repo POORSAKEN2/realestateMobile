@@ -147,7 +147,7 @@ export function AuditFilterSheet({
               </TouchableOpacity>
             ) : null}
             {errors[key] ? (
-              <Text accessibilityRole="alert" className="text-xs text-red-700">
+              <Text accessibilityRole="alert" className="text-xs text-danger">
                 {errors[key]}
               </Text>
             ) : null}
@@ -172,7 +172,7 @@ export function AuditFilterSheet({
               onChangeText={(value) => onChange({ ...draft, [key]: value })}
             />
             {errors[key] ? (
-              <Text accessibilityRole="alert" className="text-xs text-red-700">
+              <Text accessibilityRole="alert" className="text-xs text-danger">
                 {errors[key]}
               </Text>
             ) : null}

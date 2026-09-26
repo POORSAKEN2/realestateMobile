@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
+import { colors } from "../../constants/colors";
 import { SearchField } from "./fields/SearchField";
 
 type SearchToolbarProps = {
@@ -57,7 +58,11 @@ function FilterButton({
       className="relative h-12 min-w-12 items-center justify-center rounded-2xl"
       onPress={onPress}
     >
-      <MaterialCommunityIcons name="tune-variant" color="#8A77F4" size={21} />
+      <MaterialCommunityIcons
+        name="tune-variant"
+        color={colors.primary}
+        size={21}
+      />
 
       {activeFilterCount > 0 ? (
         <View className="absolute right-0 top-0 h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1">
