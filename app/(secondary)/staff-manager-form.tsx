@@ -80,7 +80,7 @@ export default function StaffManagerFormScreen() {
             />
           </View>
         ) : unavailable ? (
-          <Text>
+          <Text className="text-description">
             This manager is unavailable. Return to staff management and refresh.
           </Text>
         ) : (

@@ -37,7 +37,9 @@ export function ManagerPermissionFields({
   const selectedPermissions = new Set(permissions);
   return (
     <View className="gap-4">
-      <Text className="font-ralewayExtraBold text-lg">Allowed actions</Text>
+      <Text className="font-ralewayExtraBold text-lg text-textPrimary">
+        Allowed actions
+      </Text>
       <Text className="text-description">
         Review allowed actions. Property access also requires assignments; no
         selected actions means no access to those modules.

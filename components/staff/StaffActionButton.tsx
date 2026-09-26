@@ -1,4 +1,5 @@
 import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
+import { colors } from "../../constants/colors";
 export function StaffActionButton({
   label,
   onPress,
@@ -22,7 +23,7 @@ export function StaffActionButton({
       className={`min-h-12 items-center justify-center rounded-2xl border border-primary/20 px-4 py-3 ${disabled || pending ? "opacity-40" : ""}`}
     >
       {pending ? (
-        <ActivityIndicator />
+        <ActivityIndicator color={colors.primary} />
       ) : (
         <Text
           className={`font-ralewayBold ${destructive ? "text-danger" : "text-primary"}`}

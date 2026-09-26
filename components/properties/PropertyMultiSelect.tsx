@@ -20,7 +20,9 @@ export function PropertyMultiSelect({
   const selected = new Set(selectedIds);
   return (
     <View className="gap-3">
-      <Text className="font-ralewayExtraBold text-lg">{title}</Text>
+      <Text className="font-ralewayExtraBold text-lg text-textPrimary">
+        {title}
+      </Text>
       <Text className="text-description">{description}</Text>
       {!properties.length && !selectedIds.length ? (
         <Text className="rounded-2xl bg-primary/5 p-4 text-sm text-description">

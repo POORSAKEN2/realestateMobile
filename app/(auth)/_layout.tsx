@@ -1,15 +1,17 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
-import { colors } from '../../constants/colors';
+import { useThemeColors } from "../../context/WorkspacePresentationContext";
 
 export default function AuthLayout() {
+  const palette = useThemeColors();
+
   return (
     <Stack
       screenOptions={{
-        contentStyle: { backgroundColor: colors.whitePrimary },
+        contentStyle: { backgroundColor: palette.surface },
         headerShadowVisible: false,
-        headerStyle: { backgroundColor: colors.whitePrimary },
-        headerTintColor: colors.black,
+        headerStyle: { backgroundColor: palette.panel },
+        headerTintColor: palette.text,
       }}
     />
   );

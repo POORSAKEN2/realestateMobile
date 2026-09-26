@@ -26,7 +26,9 @@ type WorkspacePresentation = {
   workspaceLocation: (typeof DEFAULT_LOCATION_OPTIONS)[number];
 };
 
-const WorkspacePresentationContext = createContext<WorkspacePresentation | undefined>(undefined);
+const WorkspacePresentationContext = createContext<
+  WorkspacePresentation | undefined
+>(undefined);
 
 function rgb(hex: string) {
   const value = hex.replace("#", "");
@@ -49,19 +51,32 @@ export function WorkspacePresentationProvider({ children }: PropsWithChildren) {
   setPresentationSettings(settings);
   const workspaceLocation = effective
     ? toDefaultLocation(effective.defaultDashboardLocation)
-    : DEFAULT_LOCATION_OPTIONS.find(location => location.id === "philippines")!;
+    : DEFAULT_LOCATION_OPTIONS.find(
+        (location) => location.id === "philippines",
+      )!;
   const style = vars({
-    "--color-primary": rgb(palette.primary), "--color-secondary": rgb(palette.secondary),
-    "--color-accent": rgb(palette.accent), "--color-surface": rgb(palette.surface),
-    "--color-text": rgb(palette.text), "--color-panel": rgb(palette.panel),
-    "--color-description": rgb(palette.description), "--color-muted": rgb(palette.muted),
-    "--color-danger": rgb(palette.danger), "--color-danger-surface": rgb(palette.dangerSurface),
-    "--color-success": rgb(palette.success), "--color-success-surface": rgb(palette.successSurface),
-    "--color-warning": rgb(palette.warning), "--color-warning-surface": rgb(palette.warningSurface),
-    "--color-turnover": rgb(palette.turnover), "--color-info": rgb(palette.info),
+    "--color-primary": rgb(palette.primary),
+    "--color-secondary": rgb(palette.secondary),
+    "--color-accent": rgb(palette.accent),
+    "--color-surface": rgb(palette.surface),
+    "--color-text": rgb(palette.text),
+    "--color-panel": rgb(palette.panel),
+    "--color-description": rgb(palette.description),
+    "--color-muted": rgb(palette.muted),
+    "--color-danger": rgb(palette.danger),
+    "--color-danger-surface": rgb(palette.dangerSurface),
+    "--color-success": rgb(palette.success),
+    "--color-success-surface": rgb(palette.successSurface),
+    "--color-warning": rgb(palette.warning),
+    "--color-warning-surface": rgb(palette.warningSurface),
+    "--color-turnover": rgb(palette.turnover),
+    "--color-info": rgb(palette.info),
     "--color-info-surface": rgb(palette.infoSurface),
   });
-  const value = useMemo(() => ({ settings, resolvedTheme, workspaceLocation }), [resolvedTheme, settings, workspaceLocation]);
+  const value = useMemo(
+    () => ({ settings, resolvedTheme, workspaceLocation }),
+    [resolvedTheme, settings, workspaceLocation],
+  );
   return (
     <WorkspacePresentationContext.Provider value={value}>
       <View className="flex-1 bg-surface" style={style}>
@@ -85,6 +100,15 @@ function toDefaultLocation(location: WorkspaceLocationOption) {
 
 export function useWorkspacePresentation() {
   const value = useContext(WorkspacePresentationContext);
-  if (!value) throw new Error("useWorkspacePresentation must be used inside WorkspacePresentationProvider");
+  if (!value)
+    throw new Error(
+      "useWorkspacePresentation must be used inside WorkspacePresentationProvider",
+    );
   return value;
+}
+
+export function useThemeColors() {
+  const { resolvedTheme } = useWorkspacePresentation();
+
+  return resolvedTheme === "dark" ? darkColors : lightColors;
 }

@@ -170,7 +170,7 @@ function AdminDashboardScreen() {
               />
 
               <View className="mb-4 mt-6">
-                <Text className="font-ralewayBold text-xl">
+                <Text className="font-ralewayBold text-xl text-textPrimary">
                   Portfolio Assets
                 </Text>
 

@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import { colors } from "../../constants/colors";
+import { lightColors } from "../../constants/colors";
 import {
   capitalizeWords,
   getInitials,
@@ -43,7 +44,10 @@ export function DashboardHero({
       className="-mx-6 -mt-6 overflow-hidden px-6 pt-6"
       style={{ height: heroHeight }}
     >
-      <View className="absolute inset-0 bg-textPrimary/60" />
+      <View
+        className="absolute inset-0"
+        style={{ backgroundColor: lightColors.text, opacity: 0.6 }}
+      />
 
       <View className="flex-row items-center justify-between pt-4">
         <View className="min-w-0 flex-1 flex-row items-center gap-3 pr-3">
@@ -79,7 +83,7 @@ export function DashboardHero({
             accessibilityLabel="Open global search"
             accessibilityRole="button"
             activeOpacity={0.82}
-            className="h-11 w-11 items-center justify-center rounded-2xl border-white/60 bg-white/90 shadow-lg shadow-textPrimary/20"
+            className="h-11 w-11 items-center justify-center rounded-2xl border border-primary/20 bg-panel/90 shadow-lg shadow-primary/20"
             hitSlop={10}
             onPress={onSearchPress}
           >

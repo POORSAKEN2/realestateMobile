@@ -11,8 +11,8 @@ export function AuditErrorState({
   retrying?: boolean;
 }) {
   return (
-    <View className="gap-3 rounded-2xl border border-red-100 bg-red-50 p-4">
-      <Text accessibilityRole="alert" className="text-sm text-red-700">
+    <View className="gap-3 rounded-2xl border border-danger/20 bg-dangerSurface p-4">
+      <Text accessibilityRole="alert" className="text-sm text-danger">
         {error.message}
       </Text>
       <Button

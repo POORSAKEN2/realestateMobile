@@ -15,6 +15,7 @@ import Svg, { Path } from "react-native-svg";
 import BrandLogomarkWhite from "../../assets/branding/svg/brand-logomark-white.svg";
 import { colors } from "../../constants/colors";
 import { tabBarLayout } from "../../constants/tabBar";
+import { useThemeColors } from "../../context/WorkspacePresentationContext";
 
 const ADD_BUTTON_SIZE = tabBarLayout.addButtonSize;
 const ADD_BUTTON_GAP = 24;
@@ -36,6 +37,7 @@ type PrimaryTab = (typeof LEFT_TABS)[number] | (typeof RIGHT_TABS)[number];
 
 function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
   const { can } = useAccess();
+  const palette = useThemeColors();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const barHeight = TAB_BAR_CONTENT_HEIGHT + insets.bottom;
@@ -120,7 +122,7 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
         accessibilityLabel="Add, unavailable"
         accessibilityRole="button"
         accessibilityState={{ disabled: true }}
-        className="absolute items-center justify-center rounded-full bg-primary shadow-lg shadow-slate-300"
+        className="absolute items-center justify-center rounded-full bg-primary shadow-lg"
         pointerEvents="none"
         style={{
           height: ADD_BUTTON_SIZE,
@@ -128,6 +130,7 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
           top: TAB_BAR_TOP - ADD_BUTTON_SIZE / 2 + tabBarLayout.addButtonOffset,
           width: ADD_BUTTON_SIZE,
           zIndex: 0,
+          shadowColor: palette.primary,
         }}
       >
         <BrandLogomarkWhite width={40} height={40} />
@@ -147,8 +150,9 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
       >
         <Path
           d={barPath}
-          fill={colors.whitePrimary}
-          stroke={colors.accent}
+          fill={palette.panel}
+          stroke={palette.primary}
+          strokeOpacity={0.32}
           strokeLinejoin="round"
           strokeWidth={2}
         />
@@ -179,13 +183,15 @@ function AppTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
 }
 
 export default function TabsLayout() {
+  const palette = useThemeColors();
+
   return (
     <Tabs
       tabBar={(props) => <AppTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        headerStyle: { backgroundColor: colors.whitePrimary },
-        headerTintColor: colors.black,
+        headerStyle: { backgroundColor: palette.panel },
+        headerTintColor: palette.text,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.muted,
         tabBarLabelStyle: {
