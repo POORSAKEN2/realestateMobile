@@ -44,7 +44,7 @@ export function MapPropertyPreview({
           />
         )}
         {images.length > 1 ? (
-          <View className="absolute bottom-1.5 right-1.5 min-w-5 rounded-full bg-textPrimary/75 px-1.5 py-0.5">
+          <View className="absolute bottom-1.5 right-1.5 min-w-5 rounded-full bg-overlay/80 px-1.5 py-0.5">
             <Text className="text-center font-ralewayBlack text-[10px] text-white">
               {images.length}
             </Text>

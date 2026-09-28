@@ -13,6 +13,7 @@ export const appRoutes = {
     profile: "/(tabs)/profile",
   },
   secondary: {
+    propertyOwners: "/(secondary)/property-owners" as Href,
     analytics: "/(secondary)/analytics",
     bookings: "/(secondary)/bookings",
     bedspaces: "/(secondary)/bedspaces",
@@ -41,6 +42,7 @@ export const appRoutes = {
 } as const;
 
 const moduleRoutes: Record<string, Href> = {
+  "property-owners": appRoutes.secondary.propertyOwners,
   analytics: appRoutes.secondary.analytics,
   bookings: appRoutes.secondary.bookings,
   bedspaces: appRoutes.secondary.bedspaces,

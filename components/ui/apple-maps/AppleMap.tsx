@@ -16,6 +16,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
+import { useThemeColors } from "../../../context/WorkspacePresentationContext";
 
 import { useAppleMapsAuthorization } from "../../../hooks/maps/useAppleMapsAuthorization";
 import { SkeletonBlock, SkeletonGroup } from "../Skeleton";
@@ -108,6 +109,7 @@ export function AppleMap({
   showsScale = false,
   viewportRevision = 0,
 }: AppleMapProps) {
+  const colors = useThemeColors();
   const ref = useRef<WebViewHandle | null>(null);
   const sourceRef = useRef<AppleMapSource | null>(null);
   const getAuthorizationToken = useAppleMapsAuthorization();
@@ -222,7 +224,7 @@ export function AppleMap({
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.surface }]}>
       <MapWebView
         allowFileAccess={false}
         androidLayerType="hardware"
@@ -241,10 +243,13 @@ export function AppleMap({
         scrollEnabled={false}
         setSupportMultipleWindows={false}
         source={sourceRef.current as AppleMapSource}
-        style={styles.webView}
+        style={[styles.webView, { backgroundColor: colors.surface }]}
       />
       {!ready && !error ? (
-        <View pointerEvents="none" style={styles.loading}>
+        <View
+          pointerEvents="none"
+          style={[styles.loading, { backgroundColor: colors.surface }]}
+        >
           <SkeletonGroup
             accessibilityLabel="Loading map"
             className="w-full items-center px-8"
@@ -259,8 +264,10 @@ export function AppleMap({
         </View>
       ) : null}
       {error ? (
-        <View style={styles.fallback}>
-          <Text style={styles.errorText}>{error}</Text>
+        <View style={[styles.fallback, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.errorText, { color: colors.danger }]}>
+            {error}
+          </Text>
           <Pressable
             accessibilityRole="button"
             onPress={() => void retryMap()}
@@ -275,24 +282,21 @@ export function AppleMap({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FAF9F9" },
-  webView: { flex: 1, backgroundColor: "#FAF9F9" },
+  container: { flex: 1 },
+  webView: { flex: 1 },
   loading: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    backgroundColor: "#FAF9F9",
   },
   fallback: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
-    backgroundColor: "#FAF9F9",
   },
   errorText: {
-    color: "#B42318",
     fontSize: 13,
     fontWeight: "600",
     textAlign: "center",

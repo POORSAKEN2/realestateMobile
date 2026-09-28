@@ -1,4 +1,4 @@
-export const MODAL_OVERLAY_CLASS_NAME = "bg-textPrimary/40";
+export const MODAL_OVERLAY_CLASS_NAME = "bg-overlay/40";
 
 const MODAL_SHEET_HEIGHT_RATIO = 0.64;
 const MODAL_SHEET_MIN_HEIGHT = 360;

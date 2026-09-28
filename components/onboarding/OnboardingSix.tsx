@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { Image, Text, View } from "react-native";
 
 import { onboardingScreens } from "../../constants/onboarding";
+import { colors } from "../../constants/colors";
 import { OnboardingControls } from "./OnboardingControls";
 import { OnboardingPageLayout } from "./OnboardingPageLayout";
 import philippinesMap from "../../assets/images/philippines-map.png";
@@ -55,7 +56,7 @@ export function OnboardingSix() {
                 tintColor="#805000"
               />
               <View className="right-50 absolute bottom-20 h-10 w-10 items-center justify-center rounded-full bg-success shadow-xl">
-                <Feather name="map-pin" size={18} color="#FFFFFF" />
+                <Feather name="map-pin" size={18} color={colors.onSuccess} />
               </View>
               {/* <View className="absolute bottom-[76px] right-[50px] h-5 w-5 rounded-full border border-white/70 bg-success" /> */}
             </View>

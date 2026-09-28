@@ -365,7 +365,7 @@ function CalendarDay({
           <View className="h-2 w-2 rounded-[2px] bg-danger" />
         ) : isInVisiblePeriod && activeBookingCount > 1 ? (
           <View className="h-4 min-w-5 items-center justify-center rounded-full bg-textPrimary px-1">
-            <Text className="font-ralewayExtraBold text-[9px] leading-[11px] text-white">
+            <Text className="font-ralewayExtraBold text-[9px] leading-[11px] text-onInverse">
               {activeBookingCount > 9 ? "9+" : activeBookingCount}
             </Text>
           </View>

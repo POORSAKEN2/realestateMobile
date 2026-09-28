@@ -107,7 +107,7 @@ export function ActionSheet({
           style={{ flexGrow: 0, flexShrink: 1 }}
         >
           {visibleActions.map((action) => {
-            const color = action.destructive ? "#B42318" : colors.primary;
+            const color = action.destructive ? colors.danger : colors.primary;
 
             return (
               <TouchableOpacity
@@ -154,7 +154,7 @@ export function ActionSheet({
                 {action.selected === undefined ? (
                   <MaterialCommunityIcons
                     name="chevron-right"
-                    color={action.destructive ? "#B42318" : "#6F6D6D"}
+                    color={action.destructive ? colors.danger : colors.description}
                     size={20}
                   />
                 ) : action.selected ? (

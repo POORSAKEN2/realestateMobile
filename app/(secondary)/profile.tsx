@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import {
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -29,15 +30,6 @@ export function ProfileScreen({
   const profile = useProfileController();
   const profileSnackbar = useSnackbar();
   const isPrimary = navigationLevel === "primary";
-
-  function handleBack() {
-    if (router.canGoBack()) {
-      router.back();
-      return;
-    }
-
-    router.replace(appRoutes.primary.dashboard);
-  }
 
   async function handleChangePhoto() {
     const status = await profile.chooseProfileImage();
@@ -90,7 +82,10 @@ export function ProfileScreen({
   }
 
   return (
-    <Screen bottomInset={isPrimary ? "tab-bar" : "safe-area"} className="bg-surface">
+    <Screen
+      bottomInset={isPrimary ? "tab-bar" : "safe-area"}
+      className="bg-surface"
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
@@ -100,17 +95,19 @@ export function ProfileScreen({
           title="Account Details"
           leading={
             <SecondaryBackButton
-              accessibilityLabel="Back from analytics"
+              accessibilityLabel="Back from account details"
               variant="secondary"
             />
           }
         />
 
+        <View className="h-3" />
         <ScrollView
           className="-mx-6 flex-1"
           contentContainerClassName="px-6 pb-8"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         >
           <ProfileSummaryCard
             completion={profile.completion}
@@ -119,25 +116,61 @@ export function ProfileScreen({
             jobTitle={profile.form.jobTitle}
             name={profile.form.fullName}
             onChangePhoto={handleChangePhoto}
+            disabled={profile.isSaving}
           />
           <ProfileDetailsForm
             errors={profile.validationErrors}
             onChange={profile.updateField}
             values={profile.form}
+            disabled={profile.isSaving}
           />
-          <ProfileSaveButton
-            disabled={profile.saveDisabled}
-            hasChanges={profile.hasChanges}
-            isSaving={profile.isSaving}
-            onPress={handleSave}
-          />
+          {!profile.hasChanges ? (
+            <ProfileSaveButton
+              disabled={profile.saveDisabled}
+              hasChanges={profile.hasChanges}
+              isSaving={profile.isSaving}
+              onPress={handleSave}
+              onDiscard={profile.discardChanges}
+            />
+          ) : null}
           <ProfileAccountActions
             onOpenAdditionalSettings={() =>
               router.push(appRoutes.secondary.settings)
             }
             onSignOut={handleSignOut}
+            disabled={profile.isSaving}
           />
         </ScrollView>
+        {profile.hasChanges ? (
+          <View className="border-t border-primary/15 bg-surface pt-3">
+            <ProfileSaveButton
+              disabled={profile.saveDisabled}
+              hasChanges={profile.hasChanges}
+              isSaving={profile.isSaving}
+              onPress={() => {
+                Keyboard.dismiss();
+                void handleSave();
+              }}
+              onDiscard={() =>
+                Alert.alert(
+                  "Discard changes?",
+                  "Your unsaved profile edits and photo selection will be removed.",
+                  [
+                    { text: "Keep editing", style: "cancel" },
+                    {
+                      text: "Discard",
+                      style: "destructive",
+                      onPress: () => {
+                        Keyboard.dismiss();
+                        profile.discardChanges();
+                      },
+                    },
+                  ],
+                )
+              }
+            />
+          </View>
+        ) : null}
       </KeyboardAvoidingView>
 
       <ScreenSnackbar

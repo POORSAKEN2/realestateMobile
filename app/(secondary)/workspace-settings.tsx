@@ -67,12 +67,12 @@ export default function WorkspaceSettingsScreen() {
   return (
     <Screen className="bg-surface">
       <ModuleHeader eyebrow="Administration" leading={<SecondaryBackButton />} title="Workspace Settings" supportingText="Account-wide identity and presentation defaults" />
-      <View className="mt-4 flex-row items-center justify-between">
-        <Text className={`text-xs font-ralewayExtraBold ${form.isDirty ? "text-warning" : "text-success"}`}>
-          {form.isDirty ? `${changedKeys.length} unsaved change${changedKeys.length === 1 ? "" : "s"}` : "All changes saved"}
+      {form.isDirty ? <View className="mt-4 flex-row items-center justify-between">
+        <Text className="text-xs font-ralewayExtraBold text-warning">
+          {`${changedKeys.length} unsaved change${changedKeys.length === 1 ? "" : "s"}`}
         </Text>
-        {form.isDirty ? <TouchableOpacity onPress={form.discard}><Text className="text-xs font-ralewayExtraBold text-primary">Discard</Text></TouchableOpacity> : null}
-      </View>
+        <TouchableOpacity accessibilityRole="button" onPress={form.discard}><Text className="text-xs font-ralewayExtraBold text-primary">Discard</Text></TouchableOpacity>
+      </View> : null}
       <ScrollView className="-mx-6 mt-3 flex-1" contentContainerClassName="gap-5 px-6 pb-28" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View className="rounded-[24px] border border-primary/20 bg-panel p-5">
           <Text className="mb-4 font-ralewayExtraBold text-lg text-textPrimary">Identity</Text>
@@ -106,7 +106,7 @@ export default function WorkspaceSettingsScreen() {
         </TouchableOpacity>
       </View>
       <ConfirmationModal visible={confirming} title="Save workspace settings?" description={`Update ${changedKeys.map(key => WORKSPACE_SETTING_LABELS[key]).join(", ")}. Changes apply across this account.`} confirmLabel="Save" isPending={form.mutation.isPending} onCancel={() => setConfirming(false)} onConfirm={confirmSave} />
-      <ScreenSnackbar message={snackbar.message} onDismiss={snackbar.dismiss} />
+      <ScreenSnackbar bottomClearance={76} message={snackbar.message} onDismiss={snackbar.dismiss} />
     </Screen>
   );
 }

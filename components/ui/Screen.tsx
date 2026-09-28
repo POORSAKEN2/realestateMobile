@@ -8,6 +8,7 @@ import {
 
 import { getTabBarContentInset } from "../../constants/tabBar";
 import { ScreenScrollInsetContext } from "../../context/ScreenScrollInsetContext";
+import { ScreenOverlayInsetContext } from "../../context/ScreenOverlayInsetContext";
 
 export type ScreenBottomInset = "none" | "safe-area" | "tab-bar";
 export type ScreenHorizontalInset = "none" | "safe-area";
@@ -46,7 +47,16 @@ export function Screen({
         <ScreenScrollInsetContext.Provider
           value={usesTabBarInset ? getTabBarContentInset(insets.bottom) : 0}
         >
-          {children}
+          <ScreenOverlayInsetContext.Provider
+            value={{
+              navigation: usesTabBarInset
+                ? getTabBarContentInset(insets.bottom)
+                : 0,
+              safeArea: bottomInset === "safe-area" ? 0 : insets.bottom,
+            }}
+          >
+            {children}
+          </ScreenOverlayInsetContext.Provider>
         </ScreenScrollInsetContext.Provider>
       </View>
     </SafeAreaView>

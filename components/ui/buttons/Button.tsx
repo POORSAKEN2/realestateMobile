@@ -7,6 +7,7 @@ type ButtonProps = {
   onPress: () => void;
   variant?: "primary" | "secondary";
   isLoading?: boolean;
+  disabled?: boolean;
 };
 
 export function Button({
@@ -14,6 +15,7 @@ export function Button({
   onPress,
   variant = "primary",
   isLoading = false,
+  disabled = false,
 }: ButtonProps) {
   const buttonClassName =
     variant === "primary"
@@ -26,8 +28,9 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
-      className={`h-12 items-center justify-center rounded-lg px-5 ${buttonClassName}`}
-      disabled={isLoading}
+      accessibilityState={{ disabled: disabled || isLoading, busy: isLoading }}
+      className={`h-12 items-center justify-center rounded-lg px-5 ${buttonClassName} ${disabled ? 'opacity-50' : ''}`}
+      disabled={disabled || isLoading}
       onPress={onPress}
     >
       {isLoading ? (

@@ -1,6 +1,7 @@
 import type { AppPermission } from "../../types/auth/access";
 
 export const ROUTE_PERMISSIONS: Readonly<Record<string, AppPermission>> = {
+  "property-owners": "staff.manage",
   "audit-history": "audit.view",
   "workspace-settings": "settings.view",
   properties: "properties.viewAny",

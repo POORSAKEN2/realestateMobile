@@ -86,7 +86,7 @@ export function TenantCard({
               }}
               className="rounded-full p-1.5 hover:bg-dangerSurface"
             >
-              <Ionicons name="trash" size={16} color="#B42318" />
+              <Ionicons name="trash" size={16} color={colors.danger} />
             </TouchableOpacity></PermissionGate>
           </View>
         </View>

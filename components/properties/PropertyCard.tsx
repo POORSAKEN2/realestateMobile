@@ -172,14 +172,14 @@ export function PropertyCard({
           </View>
         )}
 
-        <View className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1.5 shadow-sm">
+        <View className="absolute left-3 top-3 rounded-full bg-panel/95 px-3 py-1.5 shadow-sm">
           <Text className="font-ralewayBold text-xs text-textPrimary">
             {property.type ?? "Property"}
           </Text>
         </View>
 
         {propertyImages.length > 1 ? (
-          <View className="absolute bottom-3 right-3 rounded-full bg-blackPrimary/60 px-2.5 py-1.5">
+          <View className="absolute bottom-3 right-3 rounded-full bg-overlay/80 px-2.5 py-1.5">
             <Text className="font-ralewayBold text-xs text-white">
               {activeImageIndex + 1} of {propertyImages.length}
             </Text>

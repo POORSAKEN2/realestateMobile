@@ -180,9 +180,9 @@ export default function PropertyImageGallery({
       transparent
       visible={visible}
     >
-      <View className="flex-1 bg-textPrimary">
+      <View className="flex-1 bg-overlay">
         <View className="absolute left-5 right-5 top-14 z-10 flex-row items-center justify-between gap-3">
-          <View className="min-w-0 flex-1 rounded-2xl bg-textPrimary/70 px-4 py-3">
+          <View className="min-w-0 flex-1 rounded-2xl bg-overlay/90 px-4 py-3">
             <Text
               className="font-ralewayExtraBold text-base text-white"
               numberOfLines={1}
@@ -199,7 +199,7 @@ export default function PropertyImageGallery({
             activeOpacity={0.85}
             accessibilityLabel="Close image gallery"
             accessibilityRole="button"
-            className="h-12 w-12 items-center justify-center rounded-2xl "
+            className="h-12 w-12 items-center justify-center rounded-2xl bg-overlay/90"
             onPress={handleClose}
           >
             <MaterialCommunityIcons name="close" color="#FFFFFF" size={24} />
@@ -252,7 +252,7 @@ export default function PropertyImageGallery({
             </Text>
           </View>
           {images.length > 1 ? (
-            <View className="flex-row items-center gap-1.5 rounded-full bg-blackPrimary/45 px-3 py-2.5">
+            <View className="flex-row items-center gap-1.5 rounded-full bg-overlay/90 px-3 py-2.5">
               {images.map((image, index) => (
                 <View
                   className={`rounded-full ${

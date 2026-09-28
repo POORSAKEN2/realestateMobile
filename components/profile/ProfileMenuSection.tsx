@@ -11,6 +11,7 @@ export type ProfileMenuItem = {
   supportingText?: string;
   badge?: string;
   trailingIcon?: keyof typeof Ionicons.glyphMap;
+  disabled?: boolean;
 };
 
 type ProfileMenuSectionProps = {
@@ -30,10 +31,12 @@ function ProfileMenuRow({
       accessibilityHint={item.accessibilityHint}
       accessibilityLabel={item.label}
       accessibilityRole="button"
+      accessibilityState={{ disabled: item.disabled ?? false }}
+      disabled={item.disabled}
       activeOpacity={0.72}
       className={`min-h-20 flex-row items-center px-5 py-3.5 ${
         isLast ? "" : "border-b border-primary/10"
-      }`}
+      } ${item.disabled ? "opacity-50" : ""}`}
       onPress={item.onPress}
     >
       <View className="h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">

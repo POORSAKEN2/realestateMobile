@@ -46,7 +46,7 @@ export function PortfolioAssetCard({
           resizeMode="cover"
         />
         {images.length > 1 ? (
-          <View className="absolute bottom-1.5 right-1.5 rounded-full bg-blackPrimary/55 px-1.5 py-0.5">
+          <View className="absolute bottom-1.5 right-1.5 rounded-full bg-overlay/80 px-1.5 py-0.5">
             <Text className="font-ralewayBold text-[9px] text-white">
               {images.length}
             </Text>

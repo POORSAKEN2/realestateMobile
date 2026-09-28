@@ -49,13 +49,13 @@ export function OnboardingTwo() {
               className="absolute -left-10 top-4 h-72 w-44 -rotate-6 rounded-[34px] bg-panel"
               style={imageCardShadow}
             >
-              <View className="h-full w-full overflow-hidden rounded-[34px] bg-blackPrimary">
+              <View className="h-full w-full overflow-hidden rounded-[34px] bg-overlay">
                 <Image
                   className="h-full w-full opacity-70"
                   resizeMode="cover"
                   source={propertyImages.left}
                 />
-                <View className="absolute inset-0 bg-blackPrimary/35" />
+                <View className="absolute inset-0 bg-overlay/35" />
               </View>
             </View>
 
@@ -63,13 +63,13 @@ export function OnboardingTwo() {
               className="absolute -right-10 top-4 h-72 w-44 rotate-6 rounded-[34px] bg-panel"
               style={imageCardShadow}
             >
-              <View className="h-full w-full overflow-hidden rounded-[34px] bg-blackPrimary">
+              <View className="h-full w-full overflow-hidden rounded-[34px] bg-overlay">
                 <Image
                   className="h-full w-full opacity-70"
                   resizeMode="cover"
                   source={propertyImages.right}
                 />
-                <View className="absolute inset-0 bg-blackPrimary/25" />
+                <View className="absolute inset-0 bg-overlay/25" />
               </View>
             </View>
 

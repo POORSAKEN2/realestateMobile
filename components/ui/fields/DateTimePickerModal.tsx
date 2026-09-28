@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 
 import { colors } from "../../../constants/colors";
+import { useWorkspacePresentation } from "../../../context/WorkspacePresentationContext";
 import { PickerModalShell } from "./PickerField";
 
 type DateTimePickerModalProps = {
@@ -27,6 +28,7 @@ export function DateTimePickerModal({
   title,
   value,
 }: DateTimePickerModalProps) {
+  const { resolvedTheme } = useWorkspacePresentation();
   const [draftValue, setDraftValue] = useState(value);
   const initialAndroidPicker = useRef({
     maximumDate,
@@ -86,7 +88,7 @@ export function DateTimePickerModal({
           }
         }}
         textColor={colors.text}
-        themeVariant="light"
+        themeVariant={resolvedTheme}
         value={draftValue}
       />
     </PickerModalShell>

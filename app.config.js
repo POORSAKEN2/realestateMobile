@@ -1,6 +1,7 @@
 const { validateBillingEnvironment } = require("./config/billingEnvironment");
 
 module.exports = ({ config }) => {
+  require('./config/supportPreview').supportPreviewTarget();
   validateBillingEnvironment(process.env);
   const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 

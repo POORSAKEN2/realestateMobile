@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { colors } from "../../constants/colors";
 import { TouchableOpacity } from "react-native";
 
 export function FloorPlanIconButton({
@@ -16,7 +17,7 @@ export function FloorPlanIconButton({
   onPress: () => void;
   selected?: boolean;
 }) {
-  const color = danger ? "#B42318" : selected ? "#8A77F4" : "#6F6D6D";
+  const color = danger ? colors.danger : selected ? colors.primary : colors.description;
 
   return (
     <TouchableOpacity

@@ -1,47 +1,42 @@
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../../constants/colors";
 import { Text, TouchableOpacity, View } from "react-native";
+import { ProfileMenuSection } from "./ProfileMenuSection";
 
 type ProfileAccountActionsProps = {
   onOpenAdditionalSettings: () => void;
   onSignOut: () => void;
+  disabled?: boolean;
 };
 
 export function ProfileAccountActions({
   onOpenAdditionalSettings,
   onSignOut,
+  disabled = false,
 }: ProfileAccountActionsProps) {
   return (
-    <View className="mt-8 border-t border-primary/20 pt-6">
-      <Text className="font-ralewayBold text-base text-textPrimary">
-        Account
-      </Text>
-      <TouchableOpacity
-        accessibilityLabel="Open additional settings"
-        accessibilityRole="button"
-        activeOpacity={0.7}
-        onPress={onOpenAdditionalSettings}
-        className="mt-3 min-h-14 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-4"
-      >
-        <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-          <Ionicons name="shield-checkmark-outline" color="#8A77F4" size={19} />
-        </View>
-        <Text className="ml-3 flex-1 font-ralewaySemiBold text-sm text-textPrimary">
-          Additional settings
-        </Text>
-        <Ionicons name="chevron-forward" color="#8A77F4" size={20} />
-      </TouchableOpacity>
-
+    <View>
+      <ProfileMenuSection
+        title="Account"
+        items={[
+          {
+            icon: "settings-outline",
+            label: "Settings",
+            supportingText: "Workspace, security, and privacy",
+            disabled,
+            onPress: onOpenAdditionalSettings,
+          },
+        ]}
+      />
       <TouchableOpacity
         accessibilityRole="button"
         accessibilityLabel="Sign out"
-        activeOpacity={0.7}
+        disabled={disabled}
         onPress={onSignOut}
-        className="mt-3 min-h-14 flex-row items-center rounded-2xl bg-dangerSurface px-4"
+        className="mt-4 min-h-14 flex-row items-center justify-center gap-2 rounded-xl border border-danger/25"
       >
-        <View className="h-9 w-9 items-center justify-center rounded-xl bg-panel">
-          <Ionicons name="log-out-outline" color="#B42318" size={19} />
-        </View>
-        <Text className="ml-3 flex-1 font-ralewayBold text-sm text-danger">
+        <Ionicons name="log-out-outline" color={colors.danger} size={20} />
+        <Text className="font-ralewaySemiBold text-sm text-danger">
           Sign out
         </Text>
       </TouchableOpacity>

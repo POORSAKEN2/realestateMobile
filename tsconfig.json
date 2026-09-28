@@ -1,7 +1,10 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@raze-support-preview": ["./components/support-preview/disabled.tsx"]
+    }
   },
   "include": [
     "**/*.ts",
@@ -9,5 +12,6 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts"
-  ]
+  ],
+  "exclude": ["local-modules", "node_modules"]
 }

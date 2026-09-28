@@ -106,7 +106,7 @@ function EmptyState({ onRefresh }: { onRefresh: () => void }) {
         className="mt-6 rounded-full bg-info px-5 py-3"
         onPress={onRefresh}
       >
-        <Text className="font-ralewayBold text-sm text-white">Refresh</Text>
+        <Text className="font-ralewayBold text-sm text-onInfo">Refresh</Text>
       </TouchableOpacity>
     </View>
   );

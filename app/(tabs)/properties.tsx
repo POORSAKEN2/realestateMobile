@@ -7,6 +7,8 @@ import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList
 import { PropertyCard } from "../../components/properties/PropertyCard";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
+import { OwnerForm } from "../../components/owners/OwnerForm";
+import { Button } from "../../components/ui/buttons/Button";
 import { PropertyDocumentsField } from "../../components/properties/PropertyDocumentsField";
 import { PropertyImagesField } from "../../components/properties/PropertyImagesField";
 import {
@@ -46,6 +48,8 @@ export default function PropertiesScreen() {
   const accessToken = session?.accessToken;
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAddingOwner, setIsAddingOwner] = useState(false);
+  const [isSavingOwner, setIsSavingOwner] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [archiveState, setArchiveState] = useState<"active" | "archived">("active");
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
@@ -149,6 +153,10 @@ export default function PropertiesScreen() {
             title="Properties"
           />
         </View>
+
+        {access.role === "ADMIN" ? (
+          <View className="mb-4"><Button title="Property Owners" variant="secondary" onPress={() => router.push(appRoutes.secondary.propertyOwners)} /></View>
+        ) : null}
 
         {access.role === "ADMIN" ? (
           <View className="mb-4 flex-row rounded-2xl bg-primary/10 p-1">
@@ -308,7 +316,7 @@ export default function PropertiesScreen() {
       <AddEditModal permission={editingProperty ? "properties.update" : "properties.create"} propertyId={editingProperty?.id}
         appearance="card"
         isVisible={isFormVisible}
-        onClose={closeForm}
+        onClose={() => { if (!isSavingOwner) { setIsAddingOwner(false); closeForm(); } }}
         title={editingProperty ? "Edit property" : "Add a property"}
         subtitle={
           editingProperty
@@ -320,6 +328,7 @@ export default function PropertiesScreen() {
         onSubmit={handleSubmit}
         formError={formError}
         showCancelAction
+        showSubmitAction={!isAddingOwner}
       >
         <PropertyCoreFields
           form={form}
@@ -335,6 +344,12 @@ export default function PropertiesScreen() {
           publishingQuotaLabel={publishingQuotaLabel}
           propertyTypeChoices={propertyTypeChoices}
           statusEditable={!editingProperty}
+          onAddOwner={isAddingOwner ? undefined : () => setIsAddingOwner(true)}
+          ownerForm={isAddingOwner && access.role === 'ADMIN' ? <OwnerForm
+            onBusyChange={setIsSavingOwner}
+            onCancel={() => setIsAddingOwner(false)}
+            onSaved={owner => { updateForm('ownerId', owner.id); setIsAddingOwner(false); }}
+          /> : undefined}
         />
 
         <PropertyImagesField

@@ -405,7 +405,7 @@ export default function DeletionRequestsScreen() {
                           }
                         >
                           <Text
-                            className={`font-ralewayExtraBold ${action === "approve" ? "text-white" : "text-primary"}`}
+                            className={`font-ralewayExtraBold ${action === "approve" ? "text-onDanger" : "text-primary"}`}
                           >
                             {words(action)}
                           </Text>

@@ -1,4 +1,5 @@
 import { useAccess } from "../../hooks/auth/useAccess";
+import { colors } from "../../constants/colors";
 import type { AppPermission } from "../../types/auth/access";
 import React, { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
@@ -181,7 +182,7 @@ export const AddEditModal: React.FC<AddEditModalProps> = ({
                 >
                   <Ionicons
                     name="alert-circle-outline"
-                    color="#B42318"
+                    color={colors.danger}
                     size={20}
                   />
                   <View className="min-w-0 flex-1">

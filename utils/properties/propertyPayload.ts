@@ -66,7 +66,7 @@ export function buildPropertyPayload(
   }
   if (form.isPublished) {
     if (!form.ownerId) {
-      return { error: "Choose a verified property owner before publishing." };
+      return { error: "Choose a property owner before publishing." };
     }
     if (!form.listingMode) {
       return { error: "Choose a listing mode before publishing." };

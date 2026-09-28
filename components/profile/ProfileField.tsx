@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
+import { colors } from "../../constants/colors";
 import {
   Text,
   TextInput,
@@ -15,6 +16,7 @@ export type ProfileFieldProps = Pick<
   | "keyboardType"
   | "maxLength"
   | "textContentType"
+  | "editable"
 > & {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
@@ -61,7 +63,13 @@ export function ProfileField({
       >
         <Ionicons
           name={icon}
-          color={error ? "#B42318" : isFocused ? "#8A77F4" : "#6F6D6D"}
+          color={
+            error
+              ? colors.danger
+              : isFocused
+                ? colors.primary
+                : colors.description
+          }
           size={20}
         />
         <TextInput
@@ -72,10 +80,10 @@ export function ProfileField({
           onBlur={() => setIsFocused(false)}
           onFocus={() => setIsFocused(true)}
           placeholder={placeholder}
-          placeholderTextColor="#6F6D6D"
+          placeholderTextColor={colors.description}
           {...inputProps}
         />
-        {value ? (
+        {value && inputProps.editable !== false ? (
           <TouchableOpacity
             accessibilityRole="button"
             accessibilityLabel={`Clear ${label.toLowerCase()}`}
@@ -83,7 +91,11 @@ export function ProfileField({
             onPress={() => onChangeText("")}
             className="h-8 w-8 items-center justify-center"
           >
-            <Ionicons name="close-circle" color="#BEE3DB" size={19} />
+            <Ionicons
+              name="close-circle"
+              color={colors.description}
+              size={19}
+            />
           </TouchableOpacity>
         ) : null}
       </View>

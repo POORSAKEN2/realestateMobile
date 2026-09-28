@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Alert,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -18,6 +17,7 @@ import {
 import { colors } from "../../constants/colors";
 import { deletionStatusLabel } from "../../utils/accountDeletion/accountDeletion";
 import { formatDateTime } from "../../utils/formatters";
+import { BaseField } from "../ui/fields/BaseField";
 
 const key = ["account-deletion-request"] as const;
 const label = (value: string) =>
@@ -99,7 +99,7 @@ export function AccountDeletionCard() {
           </Text>
         </TouchableOpacity>
       ) : current ? (
-        <View className="mt-4 gap-3">
+        <View className="mt-4 gap-4">
           <View className="rounded-2xl bg-primary/10 p-4">
             <Text className="font-ralewayExtraBold text-xs uppercase text-primary">
               {deletionStatusLabel(current.status)} · {label(current.scope)}
@@ -109,8 +109,7 @@ export function AccountDeletionCard() {
             </Text>
             {current.scheduled_for ? (
               <Text className="mt-2 font-ralewayBold text-sm text-danger">
-                Final deletion:{" "}
-                {formatDateTime(current.scheduled_for)}
+                Final deletion: {formatDateTime(current.scheduled_for)}
               </Text>
             ) : null}
             {current.decision_reason ? (
@@ -151,19 +150,24 @@ export function AccountDeletionCard() {
               <Text className="text-sm text-description">
                 Administrator asks: {current.information_requested}
               </Text>
-              <TextInput
-                className="min-h-24 rounded-2xl border border-primary/20 px-4 py-3 text-textPrimary"
+              <BaseField
+                label="Your response"
+                required
                 multiline
                 placeholder="Your response"
-                placeholderTextColor={colors.description}
+                editable={!busy}
                 value={response}
                 onChangeText={setResponse}
               />
-              <TextInput
-                className="h-13 rounded-2xl border border-primary/20 px-4 text-textPrimary"
+              <BaseField
+                label="Current password"
+                required
                 secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                textContentType="password"
+                editable={!busy}
                 placeholder="Current password"
-                placeholderTextColor={colors.description}
                 value={password}
                 onChangeText={setPassword}
               />
@@ -201,23 +205,27 @@ export function AccountDeletionCard() {
           ) : null}
 
           {canSubmit ? (
-            <View className="mt-2 gap-3 border-t border-primary/10 pt-4">
+            <View className="mt-2 gap-4 border-t border-primary/10 pt-4">
               <Text className="font-ralewayExtraBold text-sm text-textPrimary">
                 Submit another request
               </Text>
-              <TextInput
-                className="min-h-24 rounded-2xl border border-primary/20 px-4 py-3 text-textPrimary"
+              <BaseField
+                label="Reason (optional)"
                 multiline
-                placeholder="Reason (optional)"
-                placeholderTextColor={colors.description}
+                placeholder="Tell us why you're leaving"
+                editable={!busy}
                 value={reason}
                 onChangeText={setReason}
               />
-              <TextInput
-                className="h-13 rounded-2xl border border-primary/20 px-4 text-textPrimary"
+              <BaseField
+                label="Current password"
+                required
                 secureTextEntry
+                autoCapitalize="none"
+                autoCorrect={false}
+                textContentType="password"
+                editable={!busy}
                 placeholder="Current password"
-                placeholderTextColor={colors.description}
                 value={password}
                 onChangeText={setPassword}
               />
@@ -227,9 +235,9 @@ export function AccountDeletionCard() {
                 onPress={confirmSubmit}
               >
                 {submit.isPending ? (
-                  <ActivityIndicator color={colors.whitePrimary} />
+                  <ActivityIndicator color={colors.onDanger} />
                 ) : (
-                  <Text className="font-ralewayExtraBold text-white">
+                  <Text className="font-ralewayExtraBold text-onDanger">
                     Request account deletion
                   </Text>
                 )}
@@ -238,20 +246,24 @@ export function AccountDeletionCard() {
           ) : null}
         </View>
       ) : (
-        <View className="mt-4 gap-3">
-          <TextInput
-            className="min-h-24 rounded-2xl border border-primary/20 px-4 py-3 text-textPrimary"
+        <View className="mt-4 gap-4">
+          <BaseField
+            label="Reason (optional)"
             multiline
-            placeholder="Reason (optional)"
-            placeholderTextColor={colors.description}
+            placeholder="Tell us why you're leaving"
+            editable={!busy}
             value={reason}
             onChangeText={setReason}
           />
-          <TextInput
-            className="h-13 rounded-2xl border border-primary/20 px-4 text-textPrimary"
+          <BaseField
+            label="Current password"
+            required
             secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="password"
+            editable={!busy}
             placeholder="Current password"
-            placeholderTextColor={colors.description}
             value={password}
             onChangeText={setPassword}
           />
@@ -261,9 +273,9 @@ export function AccountDeletionCard() {
             onPress={confirmSubmit}
           >
             {busy ? (
-              <ActivityIndicator color={colors.whitePrimary} />
+              <ActivityIndicator color={colors.onDanger} />
             ) : (
-              <Text className="font-ralewayExtraBold text-white">
+              <Text className="font-ralewayExtraBold text-onDanger">
                 Request account deletion
               </Text>
             )}

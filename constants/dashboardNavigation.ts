@@ -31,14 +31,6 @@ export const dashboardNavigationSections = [
     title: "Operations",
     items: [
       {
-        label: "Workspace Settings",
-        supportingText: "Configure identity, region, theme, and map defaults",
-        href: appRoutes.secondary.workspaceSettings,
-        permission: "settings.view",
-        badge: "Admin",
-        icon: { family: "Ionicons", name: "options-outline" },
-      },
-      {
         label: "Inquiries & Leads",
         supportingText: "Review listing leads and engagement",
         href: appRoutes.secondary.inquiries,
@@ -113,40 +105,6 @@ export const dashboardNavigationSections = [
         supportingText: "Ask questions and create reports",
         badge: "Planned",
         icon: { family: "MaterialCommunityIcons", name: "robot-outline" },
-      },
-    ],
-  },
-  {
-    title: "Account & Organization",
-    items: [
-      {
-        label: "Team & Access",
-        supportingText: "Create property manager accounts",
-        href: appRoutes.secondary.staffManagement,
-        permission: "staff.manage",
-        badge: "Admin",
-        icon: { family: "Ionicons", name: "people-circle-outline" },
-      },
-      {
-        label: "Plan & Billing",
-        supportingText: "View subscription and property limits",
-        href: appRoutes.secondary.billing,
-        permission: "billing.viewEntitlement",
-        icon: { family: "Ionicons", name: "card-outline" },
-      },
-      {
-        label: "Notifications & Reminders",
-        supportingText: "Review alerts and rent reminders",
-        href: appRoutes.secondary.notifications,
-        permission: "notifications.viewAny",
-        icon: { family: "Ionicons", name: "notifications-outline" },
-      },
-      {
-        label: "Support Center",
-        supportingText: "Get product help & FAQs",
-        href: appRoutes.secondary.support,
-        permission: "support-tickets.viewAny",
-        icon: { family: "Ionicons", name: "help-buoy-outline" },
       },
     ],
   },

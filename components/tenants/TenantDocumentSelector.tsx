@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../../constants/colors";
 import {
   ActivityIndicator,
   FlatList,
@@ -141,7 +142,7 @@ function DocumentOption({
   return (
     <View className="flex-row items-center gap-3 rounded-2xl border border-textPrimary/10 bg-panel p-4">
       <View className="h-11 w-11 items-center justify-center rounded-xl bg-dangerSurface">
-        <Ionicons color="#B42318" name="document-outline" size={21} />
+        <Ionicons color={colors.danger} name="document-outline" size={21} />
       </View>
       <View className="min-w-0 flex-1">
         <Text

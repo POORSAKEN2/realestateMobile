@@ -1,7 +1,10 @@
 import { createElement, useState } from "react";
 import type { ChangeEvent, CSSProperties } from "react";
 
-import { colors } from "../../../constants/colors";
+import {
+  useThemeColors,
+  useWorkspacePresentation,
+} from "../../../context/WorkspacePresentationContext";
 import { PickerModalShell } from "./PickerField";
 
 type DateTimePickerModalProps = {
@@ -15,10 +18,7 @@ type DateTimePickerModalProps = {
 };
 
 const inputStyle: CSSProperties = {
-  backgroundColor: "#FAF9F9",
-  border: "1px solid #BEE3DB",
   borderRadius: 16,
-  color: colors.text,
   fontSize: 16,
   minHeight: 56,
   padding: "12px 16px",
@@ -69,6 +69,8 @@ export function DateTimePickerModal({
   title,
   value,
 }: DateTimePickerModalProps) {
+  const colors = useThemeColors();
+  const { resolvedTheme } = useWorkspacePresentation();
   const [draftValue, setDraftValue] = useState(value);
 
   return (
@@ -95,7 +97,13 @@ export function DateTimePickerModal({
             parseInputValue(event.target.value, mode, currentValue),
           ),
         step: mode === "time" ? 60 : undefined,
-        style: inputStyle,
+        style: {
+          ...inputStyle,
+          backgroundColor: colors.surface,
+          border: `1px solid ${colors.description}`,
+          color: colors.text,
+          colorScheme: resolvedTheme,
+        },
         type: mode,
         value: formatInputValue(draftValue, mode),
       })}
