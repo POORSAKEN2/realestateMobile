@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCallback, useMemo } from "react";
+import { colors } from "../../constants/colors";
 import {
   ActivityIndicator,
   Modal,
@@ -203,7 +204,7 @@ export function LocationPinPicker({
                   onFocus={() => setIsSearchFocused(true)}
                   onSubmitEditing={search}
                   placeholder="Search address or place"
-                  placeholderTextColor="#6F6D6D"
+                  placeholderTextColor={colors.description}
                   ref={searchInputRef}
                   returnKeyType="search"
                   value={searchQuery}

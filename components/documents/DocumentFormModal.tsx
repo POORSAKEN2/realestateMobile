@@ -1,5 +1,6 @@
 import { useAccess } from "../../hooks/auth/useAccess";
 import { useEffect, useMemo, useState } from "react";
+import { colors } from "../../constants/colors";
 import {
   ScrollView,
   Text,
@@ -209,7 +210,7 @@ export function DocumentFormModal({
                     }`}
                     onChangeText={(name) => onChangeForm({ ...form, name })}
                     placeholder="Document name"
-                    placeholderTextColor="#6F6D6D"
+                    placeholderTextColor={colors.description}
                     value={form.name}
                   />
                   {errors.name ? (
@@ -275,7 +276,7 @@ export function DocumentFormModal({
                         onChangeForm({ ...form, revisionComment })
                       }
                       placeholder="For example: Signed copy uploaded"
-                      placeholderTextColor="#6F6D6D"
+                      placeholderTextColor={colors.description}
                       textAlignVertical="top"
                       value={form.revisionComment}
                     />

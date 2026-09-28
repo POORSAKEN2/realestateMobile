@@ -1,4 +1,5 @@
 import { PermissionGate } from "../auth/PermissionGate";
+import { colors } from "../../constants/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
@@ -260,7 +261,7 @@ export function BookingFormModal({
             onPress={onCancelBooking}
           >
             {isCancelling ? (
-              <ActivityIndicator color="#B42318" />
+              <ActivityIndicator color={colors.danger} />
             ) : (
               <Text className="font-ralewayExtraBold text-danger">
                 Cancel Booking

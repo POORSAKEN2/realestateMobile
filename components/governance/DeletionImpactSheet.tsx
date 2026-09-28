@@ -7,6 +7,7 @@ import type { DeletionImpact } from "../../types";
 import { BottomSheetModal } from "../ui/BottomSheetModal";
 import { ModalHeader } from "../ui/ModalHeader";
 import { appRoutes } from "../../constants/navigation";
+import { colors } from "../../constants/colors";
 
 const ACTION_LABELS = {
   archive: "Archive",
@@ -121,12 +122,12 @@ export function DeletionImpactSheet({
             </>
           ) : null}
         </ScrollView>
-        <View className="flex-row gap-3 border-t border-black/5 p-5">
+        <View className="flex-row gap-3 border-t border-textPrimary/10 p-5">
           <TouchableOpacity className="min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary" disabled={isPending} onPress={onClose}>
             <Text className="font-ralewayBold text-primary">Close</Text>
           </TouchableOpacity>
-          <TouchableOpacity className={`min-h-14 flex-1 items-center justify-center rounded-2xl ${disabled ? "bg-gray-300" : "bg-danger"}`} disabled={disabled} onPress={onConfirm}>
-            {isPending ? <ActivityIndicator color="#fff" /> : <Text className="font-ralewayBold text-white">{impact ? ACTION_LABELS[impact.action] : "Continue"}</Text>}
+          <TouchableOpacity className={`min-h-14 flex-1 items-center justify-center rounded-2xl ${disabled ? "bg-textPrimary/10" : "bg-danger"}`} disabled={disabled} onPress={onConfirm}>
+            {isPending ? <ActivityIndicator color={disabled ? colors.description : colors.onDanger} /> : <Text className={`font-ralewayBold ${disabled ? "text-description" : "text-onDanger"}`}>{impact ? ACTION_LABELS[impact.action] : "Continue"}</Text>}
           </TouchableOpacity>
         </View>
       </SafeAreaView>

@@ -34,7 +34,10 @@ import {
   restoreRevenueCatPurchases,
   toRevenueCatClientError,
 } from "../services/billing/revenueCatClient";
-import { presentRevenueCatCustomerCenter } from "../services/billing/revenueCatUi";
+import {
+  presentRevenueCatCustomerCenter,
+  prepareRevenueCatCustomerCenter,
+} from "../services/billing/revenueCatUi";
 import {
   getRevenueCatEntitlementFingerprint,
   hasRevenueCatPremium,
@@ -57,6 +60,8 @@ type RevenueCatContextValue = {
   isReady: boolean;
   packages: Record<RevenueCatProductKey, PurchasesPackage | null>;
   presentCustomerCenter: () => Promise<void>;
+  prepareCustomerCenter: () => Promise<void>;
+  receiveCustomerCenterInfo: (info: CustomerInfo) => void;
   purchasePackage: (pkg: PurchasesPackage) => Promise<CustomerInfo | null>;
   refresh: () => Promise<CustomerInfo | null>;
   restorePurchases: () => Promise<CustomerInfo>;
@@ -273,6 +278,11 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
     [currentOffering],
   );
 
+  const prepareCustomerCenter = useCallback(async () => {
+    authorizeBillingPurchase(purchaseUser.current);
+    await prepareRevenueCatCustomerCenter();
+  }, []);
+
   const value = useMemo<RevenueCatContextValue>(
     () => ({
       activeTier: getActiveRevenueCatTier(customerInfo),
@@ -283,6 +293,8 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       isPremium: hasRevenueCatPremium(customerInfo),
       isReady,
       packages,
+      prepareCustomerCenter,
+      receiveCustomerCenterInfo: updateCustomerInfo,
       presentCustomerCenter: async () => {
         authorizeBillingPurchase(purchaseUser.current);
         await presentRevenueCatCustomerCenter({
@@ -323,6 +335,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       isReady,
       packages,
       refresh,
+      prepareCustomerCenter,
       serverSyncStatus,
       updateCustomerInfo,
     ],

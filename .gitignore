@@ -43,3 +43,6 @@ yarn-error.*
 /android
 .env
 realestateMobile.code-workspace
+
+# Optional, machine-local Support review UI. Core app never requires these files.
+/local-modules/

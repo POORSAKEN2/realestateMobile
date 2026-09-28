@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { colors } from "../../../constants/colors";
 import { Stack } from "expo-router";
 import type { PropsWithChildren } from "react";
 import {
@@ -110,7 +111,7 @@ export function RegistrationStepLayout({
                   feedback.tone === "error" ? "alert-circle" : "check-circle"
                 }
                 size={18}
-                color={feedback.tone === "error" ? "#B42318" : "#8A77F4"}
+                color={feedback.tone === "error" ? colors.danger : colors.primary}
               />
               <Text
                 className={`ml-3 flex-1 text-sm leading-5 ${

@@ -1,4 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
+import { colors } from "../../constants/colors";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useMemo, useRef } from "react";
@@ -31,8 +32,8 @@ import { BottomSheetModal } from "../ui/BottomSheetModal";
 import { ConfirmationModal } from "../ui/ConfirmationModal";
 import { SkeletonBlock } from "../ui/Skeleton";
 import { PropertyFloorSummary } from "./PropertyFloorSummary";
-import { PropertyManagerAssignments } from "./PropertyManagerAssignments";
 import { PropertyLifecyclePanel } from "./PropertyLifecyclePanel";
+import { PropertyAdministration } from "./PropertyAdministration";
 import { useAccess } from "../../hooks/auth/useAccess";
 import { getPropertyLifecycleLabel } from "../../utils/properties/propertyLifecycle";
 
@@ -176,7 +177,7 @@ export function PropertyDetailsModal({
                   />
                 ))}
               </ScrollView>
-              <View className="absolute inset-0 bg-textPrimary/35" />
+              <View className="absolute inset-0 bg-overlay/60" />
               <TouchableOpacity
                 accessibilityLabel={
                   showFullDetails
@@ -185,7 +186,7 @@ export function PropertyDetailsModal({
                 }
                 accessibilityRole="button"
                 activeOpacity={0.78}
-                className={`absolute h-10 w-10 items-center justify-center rounded-full bg-textPrimary/45 ${showFullDetails ? "left-4" : "right-4"}`}
+                className={`absolute h-10 w-10 items-center justify-center rounded-full bg-overlay/80 ${showFullDetails ? "left-4" : "right-4"}`}
                 onPress={onClose}
                 style={{ top: showFullDetails ? 8 : 16 }}
               >
@@ -379,13 +380,13 @@ export function PropertyDetailsModal({
                 <View className="mt-4 rounded-2xl border border-success/30 bg-success/10 p-4">
                   <View className="flex-row items-center justify-between">
                     <View className="flex-row items-center gap-2">
-                      <Feather name="globe" size={16} color="#027A48" />
+                      <Feather name="globe" size={16} color={colors.success} />
                       <Text className="font-ralewayBold text-xs text-success">
                         Published on Terrane Marketplace
                       </Text>
                     </View>
                     <View className="rounded-full bg-success px-2 py-0.5">
-                      <Text className="font-ralewayBold text-[9px] uppercase text-white">
+                      <Text className="font-ralewayBold text-[9px] uppercase text-onSuccess">
                         Public
                       </Text>
                     </View>
@@ -520,7 +521,7 @@ export function PropertyDetailsModal({
                 </>
               ) : null}
             </View>
-            {showFullDetails && can("staff.manage") && <PropertyManagerAssignments key={property.id} propertyId={property.id} />}
+            {showFullDetails && <PropertyAdministration key={property.id} property={property} />}
           </ScrollView>
         </View>
       ) : null}

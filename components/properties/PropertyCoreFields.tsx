@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import type { ReactNode } from 'react';
 import { Switch, Text, TouchableOpacity, View } from "react-native";
 
 import type { PropertyClassification, PropertyType } from "../../types";
@@ -19,6 +20,8 @@ import { DropdownField } from "../ui/fields/DropdownField";
 import { LocationPinPicker } from "./LocationPinPicker";
 import { PropertyFormSection } from "./PropertyFormSection";
 import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
+import { useAccess } from '../../hooks/auth/useAccess';
+import { Button } from '../ui/buttons/Button';
 
 type UpdateForm = <K extends keyof FormState>(
   key: K,
@@ -39,6 +42,8 @@ export function PropertyCoreFields({
   publishingQuotaLabel,
   propertyTypeChoices,
   statusEditable = true,
+  onAddOwner,
+  ownerForm,
 }: {
   form: FormState;
   locationSuggestions: string[];
@@ -53,8 +58,11 @@ export function PropertyCoreFields({
   publishingQuotaLabel?: string;
   propertyTypeChoices: Choice<PropertyType>[];
   statusEditable?: boolean;
+  onAddOwner?: () => void;
+  ownerForm?: ReactNode;
 }) {
   const { settings } = useWorkspacePresentation();
+  const { access } = useAccess();
   const filteredLocationSuggestions = locationSuggestions;
   const selectLocation = onSelectSuggestedLocation;
   const updateClassification = onClassificationChange;
@@ -343,7 +351,7 @@ export function PropertyCoreFields({
                   Publish property
                 </Text>
                 <Text className="mt-1 text-xs leading-4 text-description">
-                  Requires a verified owner, listing mode, map pin, photo, and price.
+                  Requires independent property verification, availability, area, map pin, photo, and price. Save a draft first, then request review in property details.
                 </Text>
                 {publishingQuotaLabel ? (
                   <Text className="mt-1 font-ralewaySemiBold text-[11px] text-primary">
@@ -354,7 +362,7 @@ export function PropertyCoreFields({
             </View>
             <Switch
               accessibilityLabel="Publish property"
-              disabled={publishingBlocked}
+              disabled={publishingBlocked || access.role !== 'ADMIN'}
               onValueChange={(value) => updateForm("isPublished", value)}
               thumbColor="#FFFFFF"
               trackColor={{ false: "#6F6D6D", true: "#8A77F4" }}
@@ -369,11 +377,10 @@ export function PropertyCoreFields({
           </Text>
         ) : null}
 
-        {form.isPublished ? (
           <>
             <DropdownField
               disabled={propertyOwnersLoading || propertyOwnerChoices.length === 0}
-              label="Verified property owner"
+              label="Property owner"
               options={propertyOwnerChoices}
               onSelect={(value) => updateForm("ownerId", value)}
               placeholder={propertyOwnersLoading ? "Loading owners..." : "Select owner"}
@@ -383,9 +390,11 @@ export function PropertyCoreFields({
             />
             {!propertyOwnersLoading && propertyOwnerChoices.length === 0 ? (
               <Text className="text-xs leading-4 text-warning">
-                {propertyOwnersError ?? "No verified property owner is available. Verify an owner before publishing."}
+                {propertyOwnersError ?? "Add a property owner before requesting verification."}
               </Text>
             ) : null}
+            {access.role === 'ADMIN' && onAddOwner ? <Button title="Add owner" variant="secondary" onPress={onAddOwner} /> : null}
+            {ownerForm}
             <DropdownField
               label="Listing mode"
               options={propertyListingModeChoices}
@@ -411,7 +420,6 @@ export function PropertyCoreFields({
               variant="filled"
             />
           </>
-        ) : null}
       </PropertyFormSection>
     </>
   );

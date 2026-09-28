@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import type {
   EditableProfileField,
@@ -6,6 +6,7 @@ import type {
   ProfileValidationErrors,
 } from "../../types";
 import { ProfileField, type ProfileFieldProps } from "./ProfileField";
+import { FormSection } from "../ui/forms/FormSection";
 
 type ProfileFieldDefinition = Omit<
   ProfileFieldProps,
@@ -51,33 +52,36 @@ type ProfileDetailsFormProps = {
   errors: ProfileValidationErrors;
   onChange: (field: EditableProfileField, value: string) => void;
   values: Pick<ProfileForm, EditableProfileField>;
+  disabled?: boolean;
 };
 
 export function ProfileDetailsForm({
   errors,
   onChange,
   values,
+  disabled = false,
 }: ProfileDetailsFormProps) {
   return (
-    <View className="mt-5 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
-      <Text className="font-ralewayBold text-lg text-textPrimary">
-        Professional details
-      </Text>
-      <Text className="mt-1 text-sm leading-5 text-description">
-        Information shown across your account and documents.
-      </Text>
-
-      <View className="mt-6 gap-5">
-        {PROFILE_FIELDS.map(({ field, ...fieldProps }) => (
-          <ProfileField
-            key={field}
-            {...fieldProps}
-            value={values[field]}
-            error={errors[field]}
-            onChangeText={(value) => onChange(field, value)}
-          />
-        ))}
-      </View>
+    <View className="mt-5">
+      <FormSection
+        icon="account-edit-outline"
+        title="Professional details"
+        description="Used across your account and documents. Only your name is required."
+        variant="card"
+      >
+        <View className="gap-4">
+          {PROFILE_FIELDS.map(({ field, ...fieldProps }) => (
+            <ProfileField
+              key={field}
+              {...fieldProps}
+              value={values[field]}
+              error={errors[field]}
+              editable={!disabled}
+              onChangeText={(value) => onChange(field, value)}
+            />
+          ))}
+        </View>
+      </FormSection>
     </View>
   );
 }

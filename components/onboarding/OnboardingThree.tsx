@@ -43,7 +43,7 @@ export function OnboardingThree() {
 
             <View className="flex-row items-center gap-2.5">
               <View className="h-9 w-9 items-center justify-center rounded-2xl border border-white/70 bg-success">
-                <Text className="font-ralewayExtraBold text-xs text-whitePrimary">
+                <Text className="font-ralewayExtraBold text-xs text-onSuccess">
                   JD
                 </Text>
               </View>
@@ -63,7 +63,7 @@ export function OnboardingThree() {
             </View>
 
             <View className="mt-3 gap-2">
-              <View className="rounded-2xl border border-white/80 bg-white/55 px-2.5 py-2">
+              <View className="rounded-2xl border border-textPrimary/10 bg-panel/95 px-2.5 py-2">
                 <Text className="font-ralewayBold text-[9px] uppercase tracking-widest text-textPrimary">
                   Property
                 </Text>
@@ -73,7 +73,7 @@ export function OnboardingThree() {
               </View>
 
               <View className="flex-row gap-2">
-                <View className="flex-1 rounded-2xl border border-white/80 bg-white/55 px-2.5 py-2">
+                <View className="flex-1 rounded-2xl border border-textPrimary/10 bg-panel/95 px-2.5 py-2">
                   <Text className="font-ralewayBold text-[9px] uppercase tracking-widest text-textPrimary">
                     Room
                   </Text>

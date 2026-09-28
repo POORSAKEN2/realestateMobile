@@ -42,6 +42,7 @@ import { BillingPlanCard } from "./BillingPlanCard";
 import { BillingActionButton } from "./BillingActionButton";
 import { RevenueCatPackagePicker } from "./RevenueCatPackagePicker";
 import { RevenueCatPurchaseSummaryCard } from "./RevenueCatPurchaseSummaryCard";
+import { RevenueCatCustomerCenter } from "./RevenueCatCustomerCenter";
 
 type UpgradePlanModalProps = {
   isVisible: boolean;
@@ -73,7 +74,6 @@ export function UpgradePlanModal({
     isLoading: isRevenueCatLoading,
     isPremium,
     packages,
-    presentCustomerCenter,
     purchasePackage,
     refresh: refreshRevenueCat,
     serverSyncStatus,
@@ -94,6 +94,7 @@ export function UpgradePlanModal({
       setPreview(null);
       setSelectedProductKey(null);
       setCompletedPurchase(null);
+      setIsManagingPurchase(false);
     }
   }, [isVisible]);
   const tiers = entitlement?.tiers?.length
@@ -247,31 +248,28 @@ export function UpgradePlanModal({
     }
   }
 
-  async function managePurchase() {
-    if (busy.current) return;
-    busy.current = true;
+  function managePurchase() {
+    if (busy.current || !can("billing.checkout")) return;
     setIsManagingPurchase(true);
-    try {
-      await presentCustomerCenter();
-      await refetch();
-    } catch (err) {
-      Alert.alert(
-        "Subscription unavailable",
-        err instanceof Error ? err.message : "Please try again.",
-      );
-    } finally {
-      busy.current = false;
-      setIsManagingPurchase(false);
-    }
   }
 
-  const actionPending = pendingTierKey !== null || isManagingPurchase;
+  function closeCustomerCenter() {
+    setIsManagingPurchase(false);
+    // Recheck store state and authoritative access without holding the UI open.
+    void Promise.allSettled([refreshRevenueCat(), refetch()]);
+  }
+
+  const actionPending = pendingTierKey !== null;
   const handleClose = () => {
+    if (isManagingPurchase) {
+      closeCustomerCenter();
+      return;
+    }
     if (!actionPending && !busy.current) onClose();
   };
   return (
     <Modal
-      allowSwipeDismissal={!actionPending}
+      allowSwipeDismissal={!actionPending && !isManagingPurchase}
       animationType="slide"
       onRequestClose={handleClose}
       presentationStyle="pageSheet"
@@ -279,214 +277,230 @@ export function UpgradePlanModal({
     >
       <SafeAreaView className="flex-1 bg-surface" edges={["top", "bottom"]}>
         <ModalHeader
-          closeAccessibilityLabel="Close upgrade subscription"
+          closeAccessibilityLabel={
+            isManagingPurchase
+              ? "Back to subscription plans"
+              : "Close upgrade subscription"
+          }
           onClose={handleClose}
           disabled={actionPending}
           subtitle={
-            completedPurchase
-              ? "Your transaction was successful."
-              : "Choose the property capacity that fits your portfolio."
+            isManagingPurchase
+              ? "Review your store subscription and support options."
+              : completedPurchase
+                ? "Your transaction was successful."
+                : "Choose the property capacity that fits your portfolio."
           }
           title={
-            completedPurchase ? "Purchase complete" : "Choose subscription"
+            isManagingPurchase
+              ? "Subscription management"
+              : completedPurchase
+                ? "Purchase complete"
+                : "Choose subscription"
           }
         />
 
-        <ScrollView
-          className="flex-1"
-          contentContainerClassName="gap-4 px-6 pb-10 pt-5"
-          showsVerticalScrollIndicator={false}
-        >
-          {completedPurchase && completedSummary && completedBillingState ? (
-            <RevenueCatPurchaseSummaryCard
-              isManaging={isManagingPurchase}
-              onDone={onClose}
-              onManage={() => void managePurchase()}
-              serverSyncStatus={serverSyncStatus}
-              summary={completedSummary}
-              syncRequired={completedBillingState.syncRequired}
-            />
-          ) : (
-            <>
-              {message && (
-                <Text
-                  accessibilityRole="alert"
-                  className="rounded-2xl bg-warningSurface p-4 text-textPrimary"
-                >
-                  {message}
-                </Text>
-              )}
-              {requiredTier && (
-                <Text className="text-description">
-                  Suggested plan:{" "}
-                  {tiers.find((tier) => tier.key === requiredTier)?.label ??
-                    requiredTier}
-                </Text>
-              )}
-              {isFetching && (
-                <Text className="text-description">
-                  Refreshing available plans…
-                </Text>
-              )}
-              {isError && (
-                <TouchableOpacity
-                  accessibilityRole="button"
-                  onPress={() => void refetch()}
-                >
-                  <Text className="text-danger">
-                    Plans could not be loaded. Tap to retry.
+        {isManagingPurchase ? (
+          <RevenueCatCustomerCenter onClose={closeCustomerCenter} />
+        ) : (
+          <ScrollView
+            className="flex-1"
+            contentContainerClassName="gap-4 px-6 pb-10 pt-5"
+            showsVerticalScrollIndicator={false}
+          >
+            {completedPurchase && completedSummary && completedBillingState ? (
+              <RevenueCatPurchaseSummaryCard
+                isManaging={isManagingPurchase}
+                onDone={onClose}
+                onManage={() => void managePurchase()}
+                serverSyncStatus={serverSyncStatus}
+                summary={completedSummary}
+                syncRequired={completedBillingState.syncRequired}
+              />
+            ) : (
+              <>
+                {message && (
+                  <Text
+                    accessibilityRole="alert"
+                    className="rounded-2xl bg-warningSurface p-4 text-textPrimary"
+                  >
+                    {message}
                   </Text>
-                </TouchableOpacity>
-              )}
-              {!can("billing.checkout") && (
-                <Text className="text-description">
-                  Ask your account owner to change the organization plan.
-                </Text>
-              )}
-              {isPremium && can("billing.checkout") ? (
-                <View className="gap-3 rounded-2xl bg-panel p-4">
-                  <Text className="font-ralewayBold text-textPrimary">
-                    {hasLifetimeAccess
-                      ? "Lifetime access is active"
-                      : "Manage your active subscription"}
-                  </Text>
+                )}
+                {requiredTier && (
                   <Text className="text-description">
-                    {hasLifetimeAccess
-                      ? "This organization owns grandfathered lifetime access. Review any new plan limits before changing plans."
-                      : "Use RevenueCat Customer Center to change billing periods, switch tiers, cancel, or get billing support."}
+                    Suggested plan:{" "}
+                    {tiers.find((tier) => tier.key === requiredTier)?.label ??
+                      requiredTier}
                   </Text>
-                  <BillingActionButton
-                    label={
-                      hasActiveSubscription
-                        ? "Open subscription management"
-                        : "Open purchase support"
-                    }
-                    disabled={pendingTierKey !== null}
-                    isLoading={isManagingPurchase}
-                    onPress={() => void managePurchase()}
-                    primary
-                  />
-                </View>
-              ) : null}
-              {preview && (
-                <View className="gap-3 rounded-2xl bg-panel p-4">
-                  <Text className="font-ralewayBold text-textPrimary">
-                    Plan change preview:{" "}
-                    {tiers.find((tier) => tier.key === preview.tier)?.label ??
-                      preview.tier}
+                )}
+                {isFetching && (
+                  <Text className="text-description">
+                    Refreshing available plans…
                   </Text>
-                  {entitlement?.entitlement_source === "legacy" && (
+                )}
+                {isError && (
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    onPress={() => void refetch()}
+                  >
+                    <Text className="text-danger">
+                      Plans could not be loaded. Tap to retry.
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                {!can("billing.checkout") && (
+                  <Text className="text-description">
+                    Ask your account owner to change the organization plan.
+                  </Text>
+                )}
+                {isPremium && can("billing.checkout") ? (
+                  <View className="gap-3 rounded-2xl bg-panel p-4">
+                    <Text className="font-ralewayBold text-textPrimary">
+                      {hasLifetimeAccess
+                        ? "Lifetime access is active"
+                        : "Manage your active subscription"}
+                    </Text>
                     <Text className="text-description">
-                      A new purchase uses this plan's quotas. Your grandfathered
-                      ownership remains preserved.
+                      {hasLifetimeAccess
+                        ? "This organization owns grandfathered lifetime access. Review any new plan limits before changing plans."
+                        : "Use RevenueCat Customer Center to change billing periods, switch tiers, cancel, or get billing support."}
                     </Text>
-                  )}
-                  {preview.result.blockers.map((blocker) => (
-                    <Text
-                      key={blocker.dimension}
-                      accessibilityRole="alert"
-                      className="text-danger"
-                    >
-                      {blockerMessage(blocker)}
-                    </Text>
-                  ))}
-                  {preview.result.allowed && (
-                    <Text className="text-description">
-                      Your current usage fits this plan.
-                    </Text>
-                  )}
-                  {selectedPaidTier && (
-                    <RevenueCatPackagePicker
-                      disabled={pendingTierKey !== null || isManagingPurchase}
-                      isLoading={isRevenueCatLoading}
-                      missingPeriodLabels={missingPeriodLabels}
-                      onSelect={setSelectedProductKey}
-                      onRetry={() => void reloadPurchaseOptions()}
-                      options={packageOptions}
-                      selectedKey={selectedProductKey}
+                    <BillingActionButton
+                      label={
+                        hasActiveSubscription
+                          ? "Open subscription management"
+                          : "Open purchase support"
+                      }
+                      disabled={pendingTierKey !== null}
+                      isLoading={isManagingPurchase}
+                      onPress={() => void managePurchase()}
+                      primary
                     />
-                  )}
-                  {selectedPaidTier &&
-                    can("billing.checkout") &&
-                    selectedOption && (
-                      <BillingActionButton
-                        label={
-                          pendingTierKey
-                            ? "Processing purchase…"
-                            : `Purchase ${formatRevenueCatPackagePrice(selectedOption.key, selectedOption.pkg)}`
-                        }
-                        isLoading={pendingTierKey !== null}
-                        disabled={isManagingPurchase || isRevenueCatLoading}
-                        onPress={() => void continuePurchase()}
-                        primary
+                  </View>
+                ) : null}
+                {preview && (
+                  <View className="gap-3 rounded-2xl bg-panel p-4">
+                    <Text className="font-ralewayBold text-textPrimary">
+                      Plan change preview:{" "}
+                      {tiers.find((tier) => tier.key === preview.tier)?.label ??
+                        preview.tier}
+                    </Text>
+                    {entitlement?.entitlement_source === "legacy" && (
+                      <Text className="text-description">
+                        A new purchase uses this plan's quotas. Your
+                        grandfathered ownership remains preserved.
+                      </Text>
+                    )}
+                    {preview.result.blockers.map((blocker) => (
+                      <Text
+                        key={blocker.dimension}
+                        accessibilityRole="alert"
+                        className="text-danger"
+                      >
+                        {blockerMessage(blocker)}
+                      </Text>
+                    ))}
+                    {preview.result.allowed && (
+                      <Text className="text-description">
+                        Your current usage fits this plan.
+                      </Text>
+                    )}
+                    {selectedPaidTier && (
+                      <RevenueCatPackagePicker
+                        disabled={pendingTierKey !== null || isManagingPurchase}
+                        isLoading={isRevenueCatLoading}
+                        missingPeriodLabels={missingPeriodLabels}
+                        onSelect={setSelectedProductKey}
+                        onRetry={() => void reloadPurchaseOptions()}
+                        options={packageOptions}
+                        selectedKey={selectedProductKey}
                       />
                     )}
+                    {selectedPaidTier &&
+                      can("billing.checkout") &&
+                      selectedOption && (
+                        <BillingActionButton
+                          label={
+                            pendingTierKey
+                              ? "Processing purchase…"
+                              : `Purchase ${formatRevenueCatPackagePrice(selectedOption.key, selectedOption.pkg)}`
+                          }
+                          isLoading={pendingTierKey !== null}
+                          disabled={isManagingPurchase || isRevenueCatLoading}
+                          onPress={() => void continuePurchase()}
+                          primary
+                        />
+                      )}
+                  </View>
+                )}
+                {tiers.map((tier) => {
+                  const isCurrent =
+                    currentTierKey === tier.key &&
+                    entitlement?.entitlement_source !== "trial" &&
+                    entitlement?.access_mode !== "read_only";
+                  const isFeatured = tier.key === "professional";
+                  const canUpgrade =
+                    can("billing.checkout") &&
+                    ["starter", "professional", "portfolio"].includes(
+                      tier.key,
+                    ) &&
+                    (!isCurrent ||
+                      entitlement?.entitlement_source === "trial" ||
+                      entitlement?.access_mode === "read_only");
+
+                  return (
+                    <BillingPlanCard
+                      canUpgrade={canUpgrade}
+                      isCurrent={isCurrent}
+                      isFeatured={isFeatured}
+                      isPending={pendingTierKey === tier.key}
+                      disabled={
+                        !entitlement ||
+                        isFetching ||
+                        isError ||
+                        pendingTierKey !== null ||
+                        isManagingPurchase
+                      }
+                      key={tier.key}
+                      onUpgrade={() => handleUpgrade(tier.key)}
+                      priceLabel={getTierStorePriceLabel(packages, tier)}
+                      tier={tier}
+                    />
+                  );
+                })}
+
+                <View className="gap-2 rounded-2xl border border-primary/15 bg-panel p-4">
+                  <Text className="font-ralewayBold text-xs text-textPrimary">
+                    Purchase terms
+                  </Text>
+                  <Text className="font-ralewayMedium text-xs leading-5 text-description">
+                    Monthly and yearly purchases renew automatically until
+                    canceled. Charges use the price shown by the App Store or
+                    Google Play and grant organization-wide access. Manage or
+                    cancel through Customer Center. Existing lifetime ownership
+                    is preserved; new lifetime purchases are unavailable.
+                  </Text>
+                  <Text className="font-ralewayMedium text-xs text-description">
+                    <LegalLink
+                      className="font-ralewayBold text-primary underline"
+                      document="terms"
+                    >
+                      Terms of Service
+                    </LegalLink>{" "}
+                    ·{" "}
+                    <LegalLink
+                      className="font-ralewayBold text-primary underline"
+                      document="privacy"
+                    >
+                      Privacy Policy
+                    </LegalLink>
+                  </Text>
                 </View>
-              )}
-              {tiers.map((tier) => {
-                const isCurrent =
-                  currentTierKey === tier.key &&
-                  entitlement?.entitlement_source !== "trial" &&
-                  entitlement?.access_mode !== "read_only";
-                const isFeatured = tier.key === "professional";
-                const canUpgrade =
-                  can("billing.checkout") &&
-                  ["starter", "professional", "portfolio"].includes(tier.key) &&
-                  (!isCurrent ||
-                    entitlement?.entitlement_source === "trial" ||
-                    entitlement?.access_mode === "read_only");
-
-                return (
-                  <BillingPlanCard
-                    canUpgrade={canUpgrade}
-                    isCurrent={isCurrent}
-                    isFeatured={isFeatured}
-                    isPending={pendingTierKey === tier.key}
-                    disabled={
-                      !entitlement ||
-                      isFetching ||
-                      isError ||
-                      pendingTierKey !== null ||
-                      isManagingPurchase
-                    }
-                    key={tier.key}
-                    onUpgrade={() => handleUpgrade(tier.key)}
-                    priceLabel={getTierStorePriceLabel(packages, tier)}
-                    tier={tier}
-                  />
-                );
-              })}
-
-              <View className="gap-2 rounded-2xl border border-primary/15 bg-panel p-4">
-                <Text className="font-ralewayBold text-xs text-textPrimary">
-                  Purchase terms
-                </Text>
-                <Text className="font-ralewayMedium text-xs leading-5 text-description">
-                  Monthly and yearly purchases renew automatically until
-                  canceled. Charges use the price shown by the App Store or
-                  Google Play and grant organization-wide access. Manage or
-                  cancel through Customer Center. Existing lifetime ownership is
-                  preserved; new lifetime purchases are unavailable.
-                </Text>
-                <Text className="font-ralewayMedium text-xs text-description">
-                  <LegalLink
-                    className="font-ralewayBold text-primary underline"
-                    document="terms"
-                  >
-                    Terms of Service
-                  </LegalLink>{" "}
-                  ·{" "}
-                  <LegalLink
-                    className="font-ralewayBold text-primary underline"
-                    document="privacy"
-                  >
-                    Privacy Policy
-                  </LegalLink>
-                </Text>
-              </View>
-            </>
-          )}
-        </ScrollView>
+              </>
+            )}
+          </ScrollView>
+        )}
       </SafeAreaView>
     </Modal>
   );

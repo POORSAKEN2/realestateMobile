@@ -5,6 +5,13 @@ import { colors } from "../../constants/colors";
 import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
 import { AddEditModal } from "../ui/AddEditModal";
 import type { Payment, PaymentType, RecordPaymentPayload } from "../../types";
+import { PickerField } from "../ui/fields/PickerField";
+import { DateTimePickerModal } from "../ui/fields/DateTimePickerModal";
+import {
+  formatDateValue,
+  parseDateValue,
+} from "../../utils/expenses/expenseForm";
+import { formatDate } from "../../utils/formatters";
 
 const PAYMENT_TYPES: PaymentType[] = [
   "Rent",
@@ -35,22 +42,26 @@ export function RecordPaymentModal({
   const [amount, setAmount] = useState("");
   const [paymentType, setPaymentType] = useState<PaymentType>("Rent");
   const [paidDate, setPaidDate] = useState("");
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [referenceNo, setReferenceNo] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setDatePickerOpen(false);
     if (isVisible) {
       if (prefillPayment) {
         setAmount(String(prefillPayment.amount || ""));
         setPaymentType(prefillPayment.type || "Rent");
-        setReferenceNo(prefillPayment.reference_no || prefillPayment.referenceNo || "");
-        setPaidDate(new Date().toISOString().split("T")[0]);
+        setReferenceNo(
+          prefillPayment.reference_no || prefillPayment.referenceNo || "",
+        );
+        setPaidDate(formatDateValue(new Date()));
       } else {
         setAmount("");
         setPaymentType("Rent");
         setReferenceNo("");
-        setPaidDate(new Date().toISOString().split("T")[0]);
+        setPaidDate(formatDateValue(new Date()));
         setNotes("");
       }
       setError(null);
@@ -65,9 +76,7 @@ export function RecordPaymentModal({
     }
 
     const leaseId =
-      prefillPayment?.lease_id ||
-      prefillPayment?.leaseId ||
-      defaultLeaseId;
+      prefillPayment?.lease_id || prefillPayment?.leaseId || defaultLeaseId;
 
     if (!leaseId) {
       setError("Please specify the lease associated with this payment.");
@@ -80,19 +89,22 @@ export function RecordPaymentModal({
         lease_id: leaseId,
         amount: numericAmount,
         type: paymentType,
-        paid_date: paidDate || new Date().toISOString().split("T")[0],
+        paid_date: paidDate || formatDateValue(new Date()),
         status: "Paid",
         reference_no: referenceNo.trim() || undefined,
         notes: notes.trim() || undefined,
       });
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to record payment.");
+      setError(
+        err instanceof Error ? err.message : "Failed to record payment.",
+      );
     }
   }
 
   return (
-    <AddEditModal permission="payments.create"
+    <AddEditModal
+      permission="payments.create"
       formError={error}
       isPending={isPending}
       isVisible={isVisible}
@@ -159,21 +171,26 @@ export function RecordPaymentModal({
         </View>
 
         {/* Paid Date */}
-        <View className="gap-2">
-          <Text className="font-ralewayExtraBold text-[11px] uppercase tracking-wide text-description">
-            Payment Date (YYYY-MM-DD)
-          </Text>
-          <View className="h-14 justify-center rounded-2xl border border-primary/20 bg-panel px-4">
-            <TextInput
-              accessibilityLabel="Payment Date"
-              className="font-ralewayBold text-base text-textPrimary"
-              onChangeText={setPaidDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.description}
-              value={paidDate}
-            />
-          </View>
-        </View>
+        <PickerField
+          label="Payment date"
+          placeholder="Select payment date"
+          required
+          disabled={isPending}
+          value={paidDate ? formatDate(parseDateValue(paidDate)) : undefined}
+          onPress={() => setDatePickerOpen(true)}
+        />
+        {isVisible && datePickerOpen ? (
+          <DateTimePickerModal
+            mode="date"
+            title="Select payment date"
+            value={parseDateValue(paidDate)}
+            onClose={() => setDatePickerOpen(false)}
+            onConfirm={(date) => {
+              setPaidDate(formatDateValue(date));
+              setDatePickerOpen(false);
+            }}
+          />
+        ) : null}
 
         {/* Reference Number */}
         <View className="gap-2">

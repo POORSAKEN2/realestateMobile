@@ -18,7 +18,7 @@ const primaryTint = "rgba(138, 119, 244, 0.12)";
 const primaryBorder = "rgba(138, 119, 244, 0.22)";
 
 export default function MapCanvasScreen() {
-  useWorkspacePresentation();
+  const { resolvedTheme } = useWorkspacePresentation();
   const styles = createStyles();
   const insets = useSafeAreaInsets();
   const { useList } = useProperties();
@@ -50,7 +50,7 @@ export default function MapCanvasScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="transparent" style="dark" translucent />
+      <StatusBar backgroundColor="transparent" style={resolvedTheme === "dark" ? "light" : "dark"} translucent />
       <AdaptiveMap
         onMapPress={clearSelection}
         onPinPress={selectPropertyById}
@@ -120,7 +120,7 @@ export default function MapCanvasScreen() {
         <View style={styles.centerPanel}>
           <MaterialCommunityIcons
             name="map-marker-alert-outline"
-            color="#B42318"
+            color={colors.danger}
             size={34}
           />
           <Text style={styles.centerTitle}>Map data unavailable</Text>

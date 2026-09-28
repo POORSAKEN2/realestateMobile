@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
+import { colors } from "../../../constants/colors";
 import {
   Pressable,
   Text,
@@ -53,7 +54,7 @@ export function RegistrationField({
         <Feather
           name={icon}
           size={19}
-          color={isFocused ? "#8A77F4" : "#6F6D6D"}
+          color={isFocused ? colors.primary : colors.description}
         />
         <TextInput
           autoCapitalize={autoCapitalize}
@@ -64,7 +65,7 @@ export function RegistrationField({
           onChangeText={onChangeText}
           onFocus={() => setIsFocused(true)}
           placeholder={placeholder}
-          placeholderTextColor="#6F6D6D"
+          placeholderTextColor={colors.description}
           returnKeyType={returnKeyType}
           secureTextEntry={secure && !isValueVisible}
           textContentType={textContentType}
@@ -83,7 +84,7 @@ export function RegistrationField({
             <Feather
               name={isValueVisible ? "eye" : "eye-off"}
               size={19}
-              color="#6F6D6D"
+              color={colors.description}
             />
           </Pressable>
         ) : null}

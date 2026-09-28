@@ -55,7 +55,7 @@ export function usePropertyFormController(
   const entitlementQuery = useBillingEntitlement();
   const propertyOwnersQuery = usePropertyOwners(
     accessToken,
-    isFormVisible && form.isPublished,
+    isFormVisible,
   );
   const publishedListings = entitlementQuery.data?.limits?.published_listings;
   const publishingBlocked = Boolean(
@@ -264,7 +264,6 @@ export function usePropertyFormController(
     pickDocuments,
     pickImages,
     propertyOwnerChoices: (propertyOwnersQuery.data ?? [])
-      .filter((owner) => owner.verificationStatus?.toLowerCase() === "verified")
       .map((owner) => ({ label: owner.name, value: owner.id })),
     propertyOwnersError: propertyOwnersQuery.isError
       ? propertyOwnersQuery.error?.message ?? "Property owners could not be loaded."

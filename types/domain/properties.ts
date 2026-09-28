@@ -54,6 +54,8 @@ export type PropertyOwner = {
   contactEmail: string;
   phone: string;
   verificationStatus?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type Property = {

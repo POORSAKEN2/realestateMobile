@@ -61,6 +61,13 @@ export function useProfileController(
     }
   }
 
+  function discardChanges() {
+    if (isSaving) return;
+    setForm(savedForm);
+    setSelectedImage(null);
+    setValidationErrors({});
+  }
+
   async function chooseProfileImage() {
     const result = await dependencies.selectImage();
 
@@ -121,6 +128,7 @@ export function useProfileController(
 
   return {
     chooseProfileImage,
+    discardChanges,
     completion,
     email: user?.email?.trim(),
     form,

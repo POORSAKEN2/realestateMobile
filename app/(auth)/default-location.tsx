@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import { DEFAULT_LOCATION_OPTIONS } from "../../constants/defaultLocation";
+import { colors } from "../../constants/colors";
 import { Screen } from "../../components/ui/Screen";
 import { useAuth } from "../../hooks/useAuth";
 import { useDefaultLocation } from "../../hooks/useDefaultLocation";
@@ -49,7 +50,7 @@ export default function DefaultLocationScreen() {
           <View className="h-14 w-14 items-center justify-center rounded-2xl bg-success">
             <MaterialCommunityIcons
               name="map-marker-radius"
-              color="#FFFFFF"
+              color={colors.onSuccess}
               size={28}
             />
           </View>
@@ -102,7 +103,7 @@ export default function DefaultLocationScreen() {
                 >
                   <MaterialCommunityIcons
                     name={selected ? "check" : "map-marker-outline"}
-                    color={selected ? "#FFFFFF" : "#6F6D6D"}
+                    color={selected ? colors.onSuccess : colors.description}
                     size={20}
                   />
                 </View>
@@ -115,22 +116,20 @@ export default function DefaultLocationScreen() {
         <View className="absolute bottom-4 left-0 right-0">
           <TouchableOpacity
             activeOpacity={0.85}
-            className={`h-14 flex-row items-center justify-center rounded-2xl ${
-              isSaving ? "bg-accent" : "bg-success"
-            }`}
+            className="h-14 flex-row items-center justify-center rounded-2xl bg-success"
             disabled={isSaving}
             onPress={handleContinue}
           >
             {isSaving ? (
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={colors.onSuccess} />
             ) : (
               <>
                 <MaterialCommunityIcons
                   name="arrow-right"
-                  color="#FFFFFF"
+                  color={colors.onSuccess}
                   size={20}
                 />
-                <Text className="ml-2 font-ralewayExtraBold text-base text-white">
+                <Text className="ml-2 font-ralewayExtraBold text-base text-onSuccess">
                   Continue
                 </Text>
               </>

@@ -87,9 +87,9 @@ export function ConfirmationModal({
               }}
             >
               {isPending ? (
-                <ActivityIndicator color={colors.whitePrimary} />
+                <ActivityIndicator color={colors.onInverse} />
               ) : (
-                <Text className="text-center font-ralewayExtraBold text-white">
+                <Text className="text-center font-ralewayExtraBold text-onInverse">
                   {confirmLabel}
                 </Text>
               )}

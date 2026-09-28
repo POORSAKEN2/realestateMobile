@@ -1,11 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
-import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
+import { Button } from "../ui/buttons/Button";
 
 type ProfileSaveButtonProps = {
   disabled: boolean;
   hasChanges: boolean;
   isSaving: boolean;
   onPress: () => void;
+  onDiscard: () => void;
 };
 
 export function ProfileSaveButton({
@@ -13,35 +16,52 @@ export function ProfileSaveButton({
   hasChanges,
   isSaving,
   onPress,
+  onDiscard,
 }: ProfileSaveButtonProps) {
-  return (
-    <TouchableOpacity
-      accessibilityRole="button"
-      accessibilityLabel="Save profile changes"
-      accessibilityState={{ disabled, busy: isSaving }}
-      activeOpacity={0.82}
-      className={`mt-5 h-14 flex-row items-center justify-center rounded-2xl ${
-        disabled ? "bg-description/20" : "bg-primary"
-      }`}
-      disabled={disabled}
-      onPress={onPress}
-    >
-      {isSaving ? (
-        <ActivityIndicator color="#FFFFFF" size="small" />
-      ) : (
+  if (!hasChanges)
+    return (
+      <View className="mt-4 flex-row items-center gap-2">
         <Ionicons
-          name={hasChanges ? "checkmark" : "checkmark-circle"}
-          color="#FFFFFF"
-          size={20}
+          name="checkmark-circle-outline"
+          color={colors.success}
+          size={18}
         />
-      )}
-      <Text className="ml-2 font-ralewayBold text-base text-white">
-        {isSaving
-          ? "Saving changes…"
-          : hasChanges
-            ? "Save changes"
-            : "Profile up to date"}
+        <Text
+          accessibilityLiveRegion="polite"
+          className="text-sm text-description"
+        >
+          Profile up to date
+        </Text>
+      </View>
+    );
+  return (
+    <View className="gap-2">
+      <Text
+        accessibilityLiveRegion="polite"
+        className="text-xs text-description"
+      >
+        Unsaved profile changes
       </Text>
-    </TouchableOpacity>
+      <View className="flex-row items-center gap-3">
+        <TouchableOpacity
+          accessibilityRole="button"
+          disabled={isSaving}
+          onPress={onDiscard}
+          className="min-h-12 justify-center px-2"
+        >
+          <Text className="font-ralewaySemiBold text-sm text-description">
+            Discard
+          </Text>
+        </TouchableOpacity>
+        <View className="flex-1">
+          <Button
+            title="Save changes"
+            disabled={disabled}
+            isLoading={isSaving}
+            onPress={onPress}
+          />
+        </View>
+      </View>
+    </View>
   );
 }

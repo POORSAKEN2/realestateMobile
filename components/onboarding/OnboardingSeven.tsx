@@ -65,7 +65,7 @@ export function OnboardingSeven() {
                 </View>
                 <View className="absolute left-7 top-5 h-8 w-16 rounded-full border border-success/25 bg-success/10" />
                 <View className="absolute bottom-5 right-7 h-7 w-20 rounded-full border border-info/20 bg-info/10" />
-                <View className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-5 -translate-y-5 items-center justify-center rounded-full bg-blackPrimary shadow-xl">
+                <View className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-5 -translate-y-5 items-center justify-center rounded-full bg-overlay shadow-xl">
                   <Feather name="map-pin" size={20} color="#FFFFFF" />
                 </View>
               </View>

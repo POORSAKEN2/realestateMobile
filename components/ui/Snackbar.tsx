@@ -1,7 +1,21 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Text, TouchableOpacity, View } from "react-native";
+import { useContext } from "react";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 
 import { colors } from "../../constants/colors";
+import { ScreenOverlayInsetContext } from "../../context/ScreenOverlayInsetContext";
+import {
+  getSnackbarBottomOffset,
+  type ScreenSnackbarPlacement,
+} from "../../utils/snackbarPlacement";
+
+export type { ScreenSnackbarPlacement } from "../../utils/snackbarPlacement";
 
 export type SnackbarAction = {
   label: string;
@@ -15,13 +29,7 @@ export type SnackbarProps = {
   icon?: keyof typeof MaterialCommunityIcons.glyphMap;
   message: string;
   onDismiss?: () => void;
-};
-
-export type ScreenSnackbarPlacement = "above-navigation" | "screen-bottom";
-
-const SCREEN_PLACEMENT_CLASSES: Record<ScreenSnackbarPlacement, string> = {
-  "above-navigation": "bottom-40",
-  "screen-bottom": "bottom-6",
+  style?: StyleProp<ViewStyle>;
 };
 
 export function Snackbar({
@@ -31,6 +39,7 @@ export function Snackbar({
   icon = "check-circle-outline",
   message,
   onDismiss,
+  style,
 }: SnackbarProps) {
   if (!message) return null;
 
@@ -38,9 +47,14 @@ export function Snackbar({
     <View
       accessibilityLiveRegion="polite"
       accessibilityRole="alert"
-      className={`flex-row items-center gap-3 rounded-2xl bg-textPrimary px-4 py-3 shadow-lg shadow-primary/20 ${className}`}
+      className={`flex-row items-center gap-3 rounded-2xl bg-overlay px-4 py-3 shadow-lg shadow-primary/20 ${className}`}
+      style={style}
     >
-      <MaterialCommunityIcons name={icon} color={colors.accent} size={20} />
+      <MaterialCommunityIcons
+        name={icon}
+        color={colors.overlayAccent}
+        size={20}
+      />
       <Text className="min-w-0 flex-1 font-ralewayBold text-sm text-whitePrimary">
         {message}
       </Text>
@@ -51,7 +65,7 @@ export function Snackbar({
           hitSlop={8}
           onPress={action.onPress}
         >
-          <Text className="font-ralewayExtraBold text-xs text-accent">
+          <Text className="font-ralewayExtraBold text-xs text-overlayAccent">
             {action.label}
           </Text>
         </TouchableOpacity>
@@ -66,7 +80,7 @@ export function Snackbar({
         >
           <MaterialCommunityIcons
             name="close"
-            color={colors.accent}
+            color={colors.overlayAccent}
             size={18}
           />
         </TouchableOpacity>
@@ -78,12 +92,30 @@ export function Snackbar({
 export function ScreenSnackbar({
   className = "",
   placement = "above-navigation",
+  bottomClearance = 0,
+  style,
   ...props
-}: SnackbarProps & { placement?: ScreenSnackbarPlacement }) {
+}: SnackbarProps & {
+  placement?: ScreenSnackbarPlacement;
+  /** Height occupied by a sticky footer, measured from screen bottom. */
+  bottomClearance?: number;
+}) {
+  const insets = useContext(ScreenOverlayInsetContext);
   return (
     <Snackbar
       {...props}
-      className={`absolute left-4 right-4 z-50 ${SCREEN_PLACEMENT_CLASSES[placement]} ${className}`}
+      className={`absolute left-4 right-4 z-50 ${className}`}
+      style={[
+        {
+          bottom: getSnackbarBottomOffset({
+            navigationInset: insets.navigation,
+            safeAreaInset: insets.safeArea,
+            bottomClearance,
+            placement,
+          }),
+        },
+        style,
+      ]}
     />
   );
 }
