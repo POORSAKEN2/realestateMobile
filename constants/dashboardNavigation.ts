@@ -26,6 +26,14 @@ export type DashboardNavigationSection = {
   items: readonly DashboardNavigationItem[];
 };
 
+export const supportNavigationItem = {
+  label: "Support Center",
+  supportingText: "Browse help or submit a ticket",
+  href: appRoutes.secondary.support,
+  permission: "support-tickets.viewAny",
+  icon: { family: "Ionicons", name: "help-buoy-outline" },
+} as const satisfies DashboardNavigationItem;
+
 export const dashboardNavigationSections = [
   {
     title: "Operations",
@@ -202,13 +210,7 @@ export const managerDashboardNavigationSections = [
         permission: "notifications.viewAny",
         icon: { family: "Ionicons", name: "notifications-outline" },
       },
-      {
-        label: "Support Center",
-        supportingText: "Browse help or submit a ticket",
-        href: appRoutes.secondary.support,
-        permission: "support-tickets.viewAny",
-        icon: { family: "Ionicons", name: "help-buoy-outline" },
-      },
+      supportNavigationItem,
     ],
   },
 ] as const satisfies readonly DashboardNavigationSection[];

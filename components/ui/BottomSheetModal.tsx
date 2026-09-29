@@ -86,6 +86,9 @@ export type BottomSheetModalProps = PropsWithChildren<{
   bottomInsetMode?: "edge" | "safe-area";
   closeOnBackdropPress?: boolean;
   dismissDisabled?: boolean;
+  /** Fixed controls below the sliding sheet, inside the same modal. */
+  footer?: ReactNode;
+  reducedMotion?: boolean;
   keyboardAvoiding?: boolean;
   onClose: () => void;
   onDismiss?: () => void;
@@ -100,6 +103,8 @@ export function BottomSheetModal({
   children,
   closeOnBackdropPress = true,
   dismissDisabled = false,
+  footer,
+  reducedMotion = false,
   keyboardAvoiding = false,
   onClose,
   onDismiss,
@@ -184,13 +189,13 @@ export function BottomSheetModal({
 
     const animation = Animated.parallel([
       Animated.timing(backdropOpacity, {
-        duration: visible ? 220 : 180,
+        duration: reducedMotion ? 0 : visible ? 220 : 180,
         easing: visible ? Easing.out(Easing.quad) : Easing.in(Easing.quad),
         toValue: visible ? 1 : 0,
         useNativeDriver: true,
       }),
       Animated.timing(sheetTranslateY, {
-        duration: visible ? 280 : 220,
+        duration: reducedMotion ? 0 : visible ? 280 : 220,
         easing: visible ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
         toValue: visible ? 0 : animationHeight.current,
         useNativeDriver: true,
@@ -209,59 +214,64 @@ export function BottomSheetModal({
     });
 
     return () => animation.stop();
-  }, [backdropOpacity, host, sheetTranslateY, visible]);
+  }, [backdropOpacity, host, sheetTranslateY, visible, reducedMotion]);
 
   const sheet = (
-    <KeyboardAvoidingView
-      behavior={
-        keyboardAvoiding && Platform.OS === "ios" ? "padding" : undefined
-      }
-      className="flex-1 justify-end"
-      style={{ paddingTop: topInsetMode === "safe-area" ? insets.top + 8 : 0 }}
-      enabled={keyboardAvoiding}
-    >
-      <Animated.View
-        className={`absolute inset-0 ${MODAL_OVERLAY_CLASS_NAME}`}
-        pointerEvents={visible ? "auto" : "none"}
-        style={{ opacity: backdropOpacity }}
-      >
-        {closeOnBackdropPress ? (
-          <Pressable
-            accessibilityLabel={backdropAccessibilityLabel}
-            accessibilityRole="button"
-            className="absolute inset-0"
-            onPress={() => {
-              if (!dismissDisabledRef.current) onCloseRef.current();
-            }}
-          />
-        ) : null}
-      </Animated.View>
-
-      <Animated.View
-        accessibilityViewIsModal
-        className="overflow-hidden rounded-t-[30px] bg-panel pt-5"
-        pointerEvents={visible ? "auto" : "none"}
+    <View style={{ flex: 1 }} accessibilityViewIsModal>
+      <KeyboardAvoidingView
+        behavior={
+          keyboardAvoiding && Platform.OS === "ios" ? "padding" : undefined
+        }
+        className="flex-1 justify-end"
         style={{
-          maxHeight: "100%",
-          flexShrink: 1,
-          marginBottom:
-            Platform.OS === "ios" && bottomInsetMode === "edge"
-              ? -Math.max(insets.bottom - BOTTOM_SHEET_EDGE_INSET, 0)
-              : 0,
-          transform: [{ translateY: sheetTranslateY }],
+          paddingTop: topInsetMode === "safe-area" ? insets.top + 8 : 0,
         }}
+        enabled={keyboardAvoiding}
       >
-        <View
-          {...pullDownResponder.panHandlers}
-          accessible={false}
-          className="absolute top-0 z-10 h-5 w-24 items-center self-center pt-1.5"
-          hitSlop={{ bottom: 8 }}
+        <Animated.View
+          className={`absolute inset-0 ${MODAL_OVERLAY_CLASS_NAME}`}
+          pointerEvents={visible ? "auto" : "none"}
+          style={{ opacity: backdropOpacity }}
         >
-          <View className="h-1 w-10 rounded-full bg-description/25" />
-        </View>
-        {renderedChildren.current}
-      </Animated.View>
-    </KeyboardAvoidingView>
+          {closeOnBackdropPress ? (
+            <Pressable
+              accessibilityLabel={backdropAccessibilityLabel}
+              accessibilityRole="button"
+              className="absolute inset-0"
+              onPress={() => {
+                if (!dismissDisabledRef.current) onCloseRef.current();
+              }}
+            />
+          ) : null}
+        </Animated.View>
+
+        <Animated.View
+          accessibilityViewIsModal={!footer}
+          className="overflow-hidden rounded-t-[30px] bg-panel pt-5"
+          pointerEvents={visible ? "auto" : "none"}
+          style={{
+            maxHeight: "100%",
+            flexShrink: 1,
+            marginBottom:
+              !footer && Platform.OS === "ios" && bottomInsetMode === "edge"
+                ? -Math.max(insets.bottom - BOTTOM_SHEET_EDGE_INSET, 0)
+                : 0,
+            transform: [{ translateY: sheetTranslateY }],
+          }}
+        >
+          <View
+            {...pullDownResponder.panHandlers}
+            accessible={false}
+            className="absolute top-0 z-10 h-5 w-24 items-center self-center pt-1.5"
+            hitSlop={{ bottom: 8 }}
+          >
+            <View className="h-1 w-10 rounded-full bg-description/25" />
+          </View>
+          {renderedChildren.current}
+        </Animated.View>
+      </KeyboardAvoidingView>
+      {footer ? <View className="bg-panel">{footer}</View> : null}
+    </View>
   );
 
   useLayoutEffect(() => {
