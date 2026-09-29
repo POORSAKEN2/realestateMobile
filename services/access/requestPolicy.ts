@@ -18,6 +18,7 @@ export type RequestAccess = {
   propertyIds: string[];
   collection: boolean;
   aggregate: boolean;
+  scopedPaymentOverview?: boolean;
   inheritProperty: boolean;
   references: Array<{ resource: Resource; id: string }>;
 };
@@ -54,7 +55,7 @@ export function describeRequest(
   }
   let inheritProperty = false;
   let resource = segments[0] as Resource;
-  let id = segments[1];
+  let id: string | undefined = segments[1];
   let propertyId =
     String(
       bodyField(body, "property_id") ??
@@ -77,19 +78,22 @@ export function describeRequest(
     inheritProperty = true;
   }
   if (resource === "rooms" && segments[2] === "bedspaces") {
-    references.push({ resource: "rooms", id });
+    references.push({ resource: "rooms", id: id! });
     resource = "bedspaces";
     id = segments[3];
     inheritProperty = true;
   }
   if (resource === "floorplans" && segments[2] === "areas") {
-    references.push({ resource: "floorplans", id });
+    references.push({ resource: "floorplans", id: id! });
     resource = "areas";
     id = segments[3];
     inheritProperty = true;
   }
-  if (resource === "leads" && ["viewings", "inquiries"].includes(id))
+  if (resource === "leads" && id && ["viewings", "inquiries"].includes(id))
     id = segments[2];
+  const scopedPaymentOverview =
+    pathname === "/payments/overview" && verb === "GET";
+  if (scopedPaymentOverview) id = undefined;
   const collection = !id;
   let permission: AppPermission | undefined;
   if (OPERATIONAL_RESOURCES.includes(resource)) {
@@ -112,8 +116,8 @@ export function describeRequest(
       permission = "expenses.approve";
   }
   if (segments[0] === "users") permission = "staff.manage";
-  if (segments[0] === 'lessors' && segments[2] === 'properties')
-    permission = 'staff.manage';
+  if (segments[0] === "lessors" && segments[2] === "properties")
+    permission = "staff.manage";
   if (segments[0] === "audit-events")
     permission = segments[1] === "export" ? "audit.export" : "audit.view";
   if (segments[0] === "settings" && segments.length === 1)
@@ -130,7 +134,10 @@ export function describeRequest(
   if (segments[0] === "staff") permission = "staff.manage";
   if (segments[0] === "properties" && segments[2] === "managers")
     permission = "staff.manage";
-  if (segments[0] === "properties" && ['verification', 'availability'].includes(segments[2]))
+  if (
+    segments[0] === "properties" &&
+    ["verification", "availability"].includes(segments[2])
+  )
     permission = "staff.manage";
   if (segments[0] === "billing")
     permission =
@@ -163,6 +170,7 @@ export function describeRequest(
     propertyIds,
     collection,
     aggregate,
+    scopedPaymentOverview,
   };
 }
 
@@ -262,7 +270,10 @@ function propertyFor(
         row.propertyId ??
         row.property?.id ??
         row.room?.property_id ??
-        row.lease?.property_id);
+        row.lease?.property_id ??
+        row.lease?.propertyId ??
+        row.lease?.property?.id ??
+        row.buyout?.propertyId);
   if (value !== undefined && value !== null) return String(value);
   for (const [field, related] of [
     ["room_id", "rooms"],
@@ -305,6 +316,25 @@ export function scopeResponse<T>(
     (!request.permission || permits(access, request.permission, request.id))
   )
     return payload;
+  if (request.scopedPaymentOverview) {
+    const response = payload as {
+      data?: { scope?: { kind?: string; propertyIds?: unknown } };
+      scope?: { kind?: string; propertyIds?: unknown };
+    };
+    const scope = (response.data ?? response).scope;
+    if (
+      scope?.kind !== "accessible_properties" ||
+      !Array.isArray(scope.propertyIds) ||
+      scope.propertyIds.some(
+        (id) =>
+          typeof id !== "string" ||
+          !canAccessProperty(access, id) ||
+          !permits(access, "payments.viewAny", id),
+      )
+    )
+      denyAccess();
+    return payload;
+  }
   const resource = request.resource;
   function allowed(row: unknown): boolean {
     if (!row || typeof row !== "object") return false;
@@ -336,6 +366,22 @@ export function scopeResponse<T>(
     )
       return false;
     index.remember(resource, item.id, propertyId);
+    // Ledger charges inherit only the verified lease's property and read grant.
+    if (resource === "leases" && Array.isArray(item.payments)) {
+      for (const payment of item.payments) {
+        if (
+          payment &&
+          String(payment.leaseId ?? payment.lease_id) ===
+            String(item.id ?? request.id) &&
+          String(payment.propertyId ?? payment.property_id ?? propertyId) ===
+            propertyId &&
+          (permits(access, "payments.viewAny", propertyId) ||
+            permits(access, "payments.view", propertyId))
+        ) {
+          index.remember("payments", payment.id, propertyId);
+        }
+      }
+    }
     return true;
   }
   function visit(value: unknown): unknown {

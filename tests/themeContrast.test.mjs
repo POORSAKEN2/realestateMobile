@@ -43,6 +43,7 @@ for (const [theme, palette] of Object.entries({
       ["onSuccess", "success"],
       ["onInfo", "info"],
       ["whitePrimary", "overlay"],
+      ["whitePrimary", "primaryStrong"],
       ["overlayAccent", "overlay"],
     ]) {
       assert.ok(

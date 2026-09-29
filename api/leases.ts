@@ -40,6 +40,13 @@ export async function fetchLeases(accessToken?: string) {
   return unwrapCollection(response).map(normalizeLease);
 }
 
+export async function fetchLeaseOptionsPage(page: number) {
+  const response = await apiClient.get<
+    ApiEnvelope<Record<string, any>[]> | Record<string, any>[]
+  >(`/leases?page=${page}`);
+  return unwrapCollection(response).map(normalizeLease);
+}
+
 export async function fetchLeaseLedger(
   leaseId: string,
   accessToken?: string,
@@ -111,7 +118,11 @@ export async function deleteLease(id: string, accessToken?: string) {
 
 export async function renewLease(
   id: string,
-  payload: { end_date?: string; term_length_months?: number; monthly_rent?: number },
+  payload: {
+    end_date?: string;
+    term_length_months?: number;
+    monthly_rent?: number;
+  },
   accessToken?: string,
 ) {
   const response = await apiClient.post<
@@ -122,4 +133,3 @@ export async function renewLease(
 
   return normalizeLease(unwrapData(response));
 }
-

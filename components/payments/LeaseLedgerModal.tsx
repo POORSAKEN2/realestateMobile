@@ -11,11 +11,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { getPaymentStatusPresentation } from "../../constants/paymentStatusPresentation";
+import { useThemeColors } from "../../context/WorkspacePresentationContext";
 import { colors } from "../../constants/colors";
 import { useLeaseLedger } from "../../hooks/api/usePayments";
 import type { Payment } from "../../types";
 import { ModalHeader } from "../ui/ModalHeader";
-import { formatCurrency } from "../../utils/formatters";
+import { formatCurrency, formatDate } from "../../utils/formatters";
+import { parseDateValue } from "../../utils/expenses/expenseForm";
 
 type LeaseLedgerModalProps = {
   isVisible: boolean;
@@ -32,6 +35,7 @@ export function LeaseLedgerModal({
   leaseTitle,
   onRecordPayment,
 }: LeaseLedgerModalProps) {
+  const palette = useThemeColors();
   const { data: ledger, isLoading, error } = useLeaseLedger(leaseId, isVisible);
 
   return (
@@ -84,29 +88,47 @@ export function LeaseLedgerModal({
                 </Text>
               </View>
 
-              <View className="min-w-[45%] flex-1 rounded-2xl border border-success/20 bg-successSurface p-3.5 shadow-sm shadow-success/5">
-                <Text className="font-ralewaySemiBold text-[10px] uppercase tracking-wider text-success">
+              <View
+                className={`min-w-[45%] flex-1 rounded-2xl border p-3.5 shadow-sm shadow-primary/5 ${getPaymentStatusPresentation("Paid").containerClass}`}
+              >
+                <Text
+                  className={`font-ralewaySemiBold text-[10px] uppercase tracking-wider ${getPaymentStatusPresentation("Paid").textClass}`}
+                >
                   Total Paid
                 </Text>
-                <Text className="mt-1 font-ralewayBold text-base text-success">
+                <Text
+                  className={`mt-1 font-ralewayBold text-base ${getPaymentStatusPresentation("Paid").textClass}`}
+                >
                   {formatCurrency(Number(ledger?.total_paid || 0), 2)}
                 </Text>
               </View>
 
-              <View className="min-w-[45%] flex-1 rounded-2xl border border-warning/20 bg-warningSurface p-3.5 shadow-sm shadow-warning/5">
-                <Text className="font-ralewaySemiBold text-[10px] uppercase tracking-wider text-warning">
+              <View
+                className={`min-w-[45%] flex-1 rounded-2xl border p-3.5 shadow-sm shadow-primary/5 ${getPaymentStatusPresentation("Pending").containerClass}`}
+              >
+                <Text
+                  className={`font-ralewaySemiBold text-[10px] uppercase tracking-wider ${getPaymentStatusPresentation("Pending").textClass}`}
+                >
                   Outstanding
                 </Text>
-                <Text className="mt-1 font-ralewayBold text-base text-warning">
+                <Text
+                  className={`mt-1 font-ralewayBold text-base ${getPaymentStatusPresentation("Pending").textClass}`}
+                >
                   {formatCurrency(Number(ledger?.total_outstanding || 0), 2)}
                 </Text>
               </View>
 
-              <View className="min-w-[45%] flex-1 rounded-2xl border border-danger/20 bg-dangerSurface p-3.5 shadow-sm shadow-danger/5">
-                <Text className="font-ralewaySemiBold text-[10px] uppercase tracking-wider text-danger">
+              <View
+                className={`min-w-[45%] flex-1 rounded-2xl border p-3.5 shadow-sm shadow-primary/5 ${getPaymentStatusPresentation("Overdue").containerClass}`}
+              >
+                <Text
+                  className={`font-ralewaySemiBold text-[10px] uppercase tracking-wider ${getPaymentStatusPresentation("Overdue").textClass}`}
+                >
                   Overdue Arrears
                 </Text>
-                <Text className="mt-1 font-ralewayBold text-base text-danger">
+                <Text
+                  className={`mt-1 font-ralewayBold text-base ${getPaymentStatusPresentation("Overdue").textClass}`}
+                >
                   {formatCurrency(Number(ledger?.total_overdue || 0), 2)}
                 </Text>
               </View>
@@ -132,8 +154,10 @@ export function LeaseLedgerModal({
                 </View>
               ) : (
                 ledger.payments.map((p) => {
-                  const isPaid = p.status === "Paid";
-                  const isOverdue = p.status === "Overdue";
+                  const status = p.effectiveStatus ?? p.status;
+                  const statusStyle = getPaymentStatusPresentation(status);
+                  const isPaid = status === "Paid";
+                  const isOverdue = status === "Overdue";
                   return (
                     <View
                       key={p.id}
@@ -142,13 +166,7 @@ export function LeaseLedgerModal({
                       <View className="flex-row items-center justify-between">
                         <View className="flex-row items-center gap-2">
                           <View
-                            className={`h-7 w-7 items-center justify-center rounded-lg ${
-                              isPaid
-                                ? "bg-success/15"
-                                : isOverdue
-                                  ? "bg-danger/15"
-                                  : "bg-warning/15"
-                            }`}
+                            className={`h-7 w-7 items-center justify-center rounded-lg border ${statusStyle.containerClass}`}
                           >
                             <Ionicons
                               name={
@@ -159,13 +177,7 @@ export function LeaseLedgerModal({
                                     : "time-outline"
                               }
                               size={14}
-                              color={
-                                isPaid
-                                  ? colors.success
-                                  : isOverdue
-                                    ? colors.danger
-                                    : colors.warning
-                              }
+                              color={palette[statusStyle.iconColor]}
                             />
                           </View>
                           <Text className="font-ralewayBold text-sm text-textPrimary">
@@ -179,34 +191,41 @@ export function LeaseLedgerModal({
 
                       <View className="mt-2 flex-row items-center justify-between border-t border-primary/5 pt-2 text-xs">
                         <Text className="font-ralewayMedium text-xs text-description">
-                          Due: {p.due_date || p.dueDate}
+                          Due:{" "}
+                          {p.due_date || p.dueDate
+                            ? formatDate(
+                                parseDateValue(
+                                  String(p.due_date || p.dueDate).slice(0, 10),
+                                ),
+                              )
+                            : "Not scheduled"}
                         </Text>
                         <Text
-                          className={`font-ralewayBold text-xs uppercase ${
-                            isPaid
-                              ? "text-success"
-                              : isOverdue
-                                ? "text-danger"
-                                : "text-warning"
-                          }`}
+                          className={`font-ralewayBold text-xs uppercase ${statusStyle.textClass}`}
                         >
-                          {p.status}
+                          {status}
                         </Text>
                       </View>
 
                       {!isPaid && onRecordPayment ? (
-                        <PermissionGate permission="payments.create"><TouchableOpacity
-                          activeOpacity={0.8}
-                          className="mt-2 h-9 items-center justify-center rounded-xl bg-primary/10"
-                          onPress={() => {
-                            onClose();
-                            onRecordPayment(p);
-                          }}
+                        <PermissionGate
+                          permission="payments.update"
+                          propertyId={p.propertyId}
                         >
-                          <Text className="font-ralewayBold text-xs text-primary">
-                            Record Payment
-                          </Text>
-                        </TouchableOpacity></PermissionGate>
+                          <TouchableOpacity
+                            activeOpacity={0.8}
+                            accessibilityRole="button"
+                            className="mt-2 h-11 items-center justify-center rounded-xl bg-primary/10"
+                            onPress={() => {
+                              onClose();
+                              onRecordPayment(p);
+                            }}
+                          >
+                            <Text className="font-ralewayBold text-xs text-primary">
+                              Record Collection
+                            </Text>
+                          </TouchableOpacity>
+                        </PermissionGate>
                       ) : null}
                     </View>
                   );

@@ -1,5 +1,11 @@
 import { apiClient, authHeaders, unwrapData } from "./client";
 import type {
+  PaymentBucket,
+  PaymentOverview,
+  PaymentPage,
+  CollectPaymentPayload,
+} from "../types/domain/payments";
+import type {
   ApiEnvelope,
   LeaseLedgerData,
   Payment,
@@ -12,36 +18,72 @@ export interface FetchPaymentsParams {
   property_id?: string;
   lease_id?: string;
   page?: number;
+  bucket?: PaymentBucket;
+  search?: string;
+}
+
+export async function fetchPaymentsPage(
+  params: FetchPaymentsParams = {},
+  accessToken?: string,
+): Promise<PaymentPage> {
+  const query = Object.entries(params)
+    .filter(([, value]) => value !== undefined && value !== "")
+    .map(([key, value]) => `${key}=${encodeURIComponent(String(value))}`)
+    .join("&");
+  const response = await apiClient.get<{
+    data: Payment[];
+    meta: { current_page: number; last_page: number };
+  }>(`/payments${query ? `?${query}` : ""}`, {
+    headers: authHeaders(accessToken),
+  });
+  if (
+    !Array.isArray(response.data) ||
+    !response.meta?.current_page ||
+    !response.meta?.last_page
+  ) {
+    throw new Error(
+      "Payment list is temporarily unavailable. Please try again later.",
+    );
+  }
+  return {
+    items: response.data,
+    currentPage: response.meta.current_page,
+    lastPage: response.meta.last_page,
+  };
 }
 
 export async function fetchPayments(
   params?: FetchPaymentsParams,
   accessToken?: string,
 ): Promise<Payment[]> {
-  const queryParts: string[] = [];
-  if (params?.status) queryParts.push(`status=${encodeURIComponent(params.status)}`);
-  if (params?.property_id) queryParts.push(`property_id=${encodeURIComponent(params.property_id)}`);
-  if (params?.lease_id) queryParts.push(`lease_id=${encodeURIComponent(params.lease_id)}`);
-  if (params?.page) queryParts.push(`page=${params.page}`);
+  return (await fetchPaymentsPage(params, accessToken)).items;
+}
 
-  const queryString = queryParts.length > 0 ? `?${queryParts.join("&")}` : "";
-  const response = await apiClient.get<ApiEnvelope<Payment[]> | Payment[]>(
-    `/payments${queryString}`,
-    { headers: authHeaders(accessToken) },
+export async function fetchPaymentOverview(): Promise<PaymentOverview> {
+  return unwrapData(
+    await apiClient.get<ApiEnvelope<PaymentOverview>>("/payments/overview"),
   );
+}
 
-  const raw = unwrapData<Payment[]>(response);
-  return Array.isArray(raw) ? raw : [];
+export async function collectPayment(
+  id: string,
+  payload: CollectPaymentPayload,
+): Promise<Payment> {
+  return unwrapData(
+    await apiClient.post<ApiEnvelope<Payment>>(
+      `/payments/${encodeURIComponent(id)}/collect`,
+      payload,
+    ),
+  );
 }
 
 export async function fetchLeaseLedger(
   leaseId: string,
   accessToken?: string,
 ): Promise<LeaseLedgerData> {
-  const response = await apiClient.get<ApiEnvelope<LeaseLedgerData> | LeaseLedgerData>(
-    `/leases/${leaseId}/ledger`,
-    { headers: authHeaders(accessToken) },
-  );
+  const response = await apiClient.get<
+    ApiEnvelope<LeaseLedgerData> | LeaseLedgerData
+  >(`/leases/${leaseId}/ledger`, { headers: authHeaders(accessToken) });
 
   return unwrapData<LeaseLedgerData>(response);
 }
