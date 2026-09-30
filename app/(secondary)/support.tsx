@@ -64,13 +64,10 @@ export default function SupportScreen() {
               accessibilityLabel="Create support ticket"
               accessibilityRole="button"
               activeOpacity={0.8}
-              className="h-10 px-3.5 flex-row items-center justify-center rounded-2xl bg-primary"
+              className="h-11 w-11 items-center justify-center rounded-2xl bg-primary"
               onPress={() => setIsTicketModalOpen(true)}
             >
               <Ionicons name="add" size={18} color="#FFFFFF" />
-              <Text className="ml-1 font-ralewayBold text-xs text-white">
-                Ticket
-              </Text>
             </TouchableOpacity>
           }
           eyebrow="Account"

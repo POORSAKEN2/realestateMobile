@@ -15,6 +15,7 @@ interface AddButtonProps {
   propertyId?: string;
   onPress: (event: GestureResponderEvent) => void;
   title?: string;
+  iconOnly?: boolean;
   iconName?: keyof typeof MaterialCommunityIcons.glyphMap;
   iconSize?: number;
   loading?: boolean;
@@ -29,11 +30,14 @@ export default function AddButton({
   permission,
   propertyId,
   title = "New",
+  iconOnly = false,
   iconName = "plus",
   iconSize = 20,
   loading = false,
   disabled = false,
-  className = "min-h-11 flex-row items-center gap-2 rounded-2xl bg-primary px-4 py-3 shadow-md shadow-primary/20",
+  className = iconOnly
+    ? "h-11 w-11 items-center justify-center rounded-2xl bg-primary shadow-md shadow-primary/20"
+    : "min-h-11 flex-row items-center gap-2 rounded-2xl bg-primary px-4 py-3 shadow-md shadow-primary/20",
   textClassName = "font-ralewayBold text-sm text-white",
   style,
 }: AddButtonProps) {
@@ -63,7 +67,7 @@ export default function AddButton({
               size={iconSize}
             />
           )}
-          <Text className={textClassName}>{title}</Text>
+          {!iconOnly && <Text className={textClassName}>{title}</Text>}
         </>
       )}
     </TouchableOpacity>

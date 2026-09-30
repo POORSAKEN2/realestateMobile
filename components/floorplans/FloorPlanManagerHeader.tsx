@@ -36,7 +36,7 @@ export function FloorPlanManagerHeader({
             <TouchableOpacity
               accessibilityLabel="Add floor"
               accessibilityRole="button"
-              className={`h-11 flex-row items-center gap-1.5 rounded-2xl px-3.5 ${
+              className={`h-11 w-11 items-center justify-center rounded-2xl ${
                 canAddFloor ? "bg-primary" : "bg-textPrimary/10"
               }`}
               disabled={!canAddFloor}
@@ -47,13 +47,6 @@ export function FloorPlanManagerHeader({
                 color={canAddFloor ? palette.whitePrimary : palette.description}
                 size={17}
               />
-              <Text
-                className={`font-ralewayBold text-xs ${
-                  canAddFloor ? "text-white" : "text-description"
-                }`}
-              >
-                Floor
-              </Text>
             </TouchableOpacity>
           </PermissionGate>
         }

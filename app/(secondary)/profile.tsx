@@ -17,7 +17,6 @@ import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProfileController } from "../../hooks/profile/useProfileController";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { appRoutes } from "../../constants/navigation";
-import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 
 type ProfileScreenProps = {
@@ -90,15 +89,9 @@ export function ProfileScreen({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        <ModuleHeader
-          eyebrow="Account"
-          title="Account Details"
-          leading={
-            <SecondaryBackButton
-              accessibilityLabel="Back from account details"
-              variant="secondary"
-            />
-          }
+        <SecondaryBackButton
+          accessibilityLabel="Back from account details"
+          variant="secondary"
         />
 
         <View className="h-3" />

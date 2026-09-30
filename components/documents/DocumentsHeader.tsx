@@ -1,6 +1,6 @@
 import { PermissionGate } from "../auth/PermissionGate";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Text, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 
 import { SecondaryBackButton } from "../navigation/SecondaryBackButton";
 import { ModuleHeader } from "../ui/ModuleHeader";
@@ -23,13 +23,10 @@ export function DocumentsHeader({
           accessibilityLabel="Upload document"
           accessibilityRole="button"
           activeOpacity={0.85}
-          className="min-h-11 flex-row items-center justify-center gap-1.5 rounded-2xl bg-primary px-3.5"
+          className="h-11 w-11 items-center justify-center rounded-2xl bg-primary"
           onPress={onUpload}
         >
           <MaterialCommunityIcons name="plus" color="#FFFFFF" size={20} />
-          <Text className="font-ralewayExtraBold text-xs text-white">
-            Upload
-          </Text>
         </TouchableOpacity></PermissionGate>
       ) : undefined}
       eyebrow="Operations"

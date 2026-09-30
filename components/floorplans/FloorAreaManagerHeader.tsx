@@ -19,11 +19,11 @@ export function FloorAreaManagerHeader({
     <ModuleHeader
       action={
         <AddButton permission="areas.create"
-          className="h-11 flex-row items-center gap-1.5 rounded-2xl bg-primary px-3.5"
           disabled={!canAddArea}
+          iconOnly
           iconSize={17}
           onPress={onAddArea}
-          title="Area"
+          title="Add area"
         />
       }
       eyebrow="Portfolio Intelligence"

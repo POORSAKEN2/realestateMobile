@@ -8,7 +8,6 @@ import { PropertyCard } from "../../components/properties/PropertyCard";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import { OwnerForm } from "../../components/owners/OwnerForm";
-import { Button } from "../../components/ui/buttons/Button";
 import { PropertyDocumentsField } from "../../components/properties/PropertyDocumentsField";
 import { PropertyImagesField } from "../../components/properties/PropertyImagesField";
 import {
@@ -148,27 +147,36 @@ export default function PropertiesScreen() {
       <View className="flex-1">
         <View className="px-1 pb-5">
           <ModuleHeader
-            action={archiveState === "active" ? <AddButton permission="properties.create" title="Add" onPress={openForm} /> : undefined}
+            action={archiveState === "active" ? <AddButton permission="properties.create" iconOnly title="Add property" onPress={openForm} /> : undefined}
             eyebrow="Portfolio Intelligence"
             title="Properties"
           />
         </View>
 
         {access.role === "ADMIN" ? (
-          <View className="mb-4"><Button title="Property Owners" variant="secondary" onPress={() => router.push(appRoutes.secondary.propertyOwners)} /></View>
-        ) : null}
-
-        {access.role === "ADMIN" ? (
-          <View className="mb-4 flex-row rounded-2xl bg-primary/10 p-1">
-            {(["active", "archived"] as const).map((state) => (
-              <TouchableOpacity
-                className={`min-h-10 flex-1 items-center justify-center rounded-xl ${archiveState === state ? "bg-panel" : ""}`}
-                key={state}
-                onPress={() => setArchiveState(state)}
-              >
-                <Text className="font-ralewayBold text-sm capitalize text-textPrimary">{state}</Text>
-              </TouchableOpacity>
-            ))}
+          <View className="mb-4 flex-row items-center gap-2">
+            <View className="min-w-0 flex-1 flex-row rounded-2xl bg-primary/10 p-1">
+              {(["active", "archived"] as const).map((state) => (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: archiveState === state }}
+                  className={`min-h-11 flex-1 items-center justify-center rounded-xl ${archiveState === state ? "bg-panel" : ""}`}
+                  key={state}
+                  onPress={() => setArchiveState(state)}
+                >
+                  <Text className="font-ralewayBold text-sm capitalize text-textPrimary">{state}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <TouchableOpacity
+              accessibilityLabel="Manage property owners"
+              accessibilityRole="button"
+              activeOpacity={0.8}
+              className="h-12 items-center justify-center rounded-2xl border border-primary/25 bg-panel px-3"
+              onPress={() => router.push(appRoutes.secondary.propertyOwners)}
+            >
+              <Text className="font-ralewayBold text-sm text-primary">Owners</Text>
+            </TouchableOpacity>
           </View>
         ) : null}
 

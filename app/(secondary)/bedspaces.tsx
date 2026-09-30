@@ -155,8 +155,9 @@ export default function BedspacesScreen() {
           action={
             <AddButton permission="bedspaces.create"
               disabled={!selectedRoomId || isLoading || isError}
+              iconOnly
               onPress={management.openCreateForm}
-              title="Add"
+              title="Add bedspace"
             />
           }
           eyebrow="Portfolio Intelligence"

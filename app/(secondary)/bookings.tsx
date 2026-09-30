@@ -177,12 +177,14 @@ export default function BookingsScreen() {
             action={
               <AddButton permission="bookings.create"
                 disabled={!selectedBuilding}
+                iconOnly
                 onPress={() =>
                   bookingForm.openCreate(
                     selectedPropertyId,
                     calendar.selectedDate,
                   )
                 }
+                title="Add booking"
               />
             }
             eyebrow="Operations"

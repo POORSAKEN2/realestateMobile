@@ -163,7 +163,7 @@ export default function LeasesScreen() {
         {/* --- TOP HEADER: Title & Primary Action --- */}
         <View className="px-1">
           <ModuleHeader
-            action={<AddButton permission="leases.create" onPress={() => openCreateForm()} />}
+            action={<AddButton permission="leases.create" iconOnly onPress={() => openCreateForm()} title="Add lease" />}
             eyebrow="Operations"
             leading={
               <SecondaryBackButton

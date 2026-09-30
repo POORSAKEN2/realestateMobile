@@ -195,7 +195,7 @@ export function TenantsScreen({
       <View className="px-1">
         <ModuleHeader
           action={
-            <AddButton permission="clients.create" onPress={openCreateForm} />
+            <AddButton permission="clients.create" iconOnly onPress={openCreateForm} title="Add tenant" />
           }
           eyebrow="Operations"
           leading={

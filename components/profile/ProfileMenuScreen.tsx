@@ -17,11 +17,8 @@ import {
   isAuthUser,
 } from "../../utils/profile/profileForm";
 import { Screen } from "../ui/Screen";
-import { ProfileAvatar } from "./ProfileAvatar";
 import { ProfileIdentityCard } from "./ProfileIdentityCard";
 import { ProfileMenuSection, type ProfileMenuItem } from "./ProfileMenuSection";
-import { ModuleHeader } from "../ui/ModuleHeader";
-import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
 
 function getRoleLabel(role?: string) {
   const normalizedRole = role?.toUpperCase();
@@ -38,7 +35,6 @@ function getRoleLabel(role?: string) {
 }
 
 export function ProfileMenuScreen() {
-  const { settings } = useWorkspacePresentation();
   const { session, signOut } = useAuth();
   const user = isAuthUser(session?.user) ? session.user : null;
   const name = user?.name?.trim() || "Your profile";
@@ -140,13 +136,6 @@ export function ProfileMenuScreen() {
   return (
     <Screen bottomInset="none" className="bg-surface">
       <View className="-mx-6 flex-1 px-6 pb-36">
-        <ModuleHeader
-          action={<ProfileAvatar imageUri={imageUri} name={name} />}
-          eyebrow="Account"
-          supportingText={`${settings.appName} · Manage your profile, security, and support.`}
-          title="Profile"
-        />
-
         <ProfileIdentityCard
           imageUri={imageUri}
           name={name}

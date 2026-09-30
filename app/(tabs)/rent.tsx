@@ -185,13 +185,10 @@ export function RentScreen({
               }
               disabled={!can("leases.viewAny")}
               accessibilityState={{ disabled: !can("leases.viewAny") }}
-              className={`h-10 flex-row items-center justify-center rounded-2xl bg-primary px-3.5 ${!can("leases.viewAny") ? "opacity-50" : ""}`}
+              className={`h-11 w-11 items-center justify-center rounded-2xl bg-primary ${!can("leases.viewAny") ? "opacity-50" : ""}`}
               onPress={() => openRecord()}
             >
               <Ionicons name="add" size={18} color={palette.whitePrimary} />
-              <Text className="ml-1 font-ralewayBold text-xs text-white">
-                Record
-              </Text>
             </TouchableOpacity>
           </PermissionGate>
         }
