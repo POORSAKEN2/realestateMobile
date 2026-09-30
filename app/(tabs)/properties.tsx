@@ -5,6 +5,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { PropertyCard } from "../../components/properties/PropertyCard";
+import { getPropertyManageActions } from "../../components/properties/getPropertyManageActions";
 import { PropertyCoreFields } from "../../components/properties/PropertyCoreFields";
 import { PropertyDetailsModal } from "../../components/properties/PropertyDetailsModal";
 import { OwnerForm } from "../../components/owners/OwnerForm";
@@ -16,6 +17,10 @@ import {
 } from "../../components/properties/PropertyListState";
 import { PropertyListToolbar } from "../../components/properties/PropertyListToolbar";
 import { AddEditModal } from "../../components/ui/AddEditModal";
+import {
+  ActionSheet,
+  type ActionSheetItem,
+} from "../../components/ui/ActionSheet";
 import { Screen } from "../../components/ui/Screen";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
@@ -33,7 +38,10 @@ import {
 import AddButton from "../../components/ui/buttons/AddButton";
 import { appRoutes } from "../../constants/navigation";
 import { DeletionImpactSheet } from "../../components/governance/DeletionImpactSheet";
-import { useDeletionGovernance, useRestoreGovernedRecord } from "../../hooks/useDeletionGovernance";
+import {
+  useDeletionGovernance,
+  useRestoreGovernedRecord,
+} from "../../hooks/useDeletionGovernance";
 
 type PropertyListItem =
   | { kind: "property"; property: Property }
@@ -50,16 +58,32 @@ export default function PropertiesScreen() {
   const [isAddingOwner, setIsAddingOwner] = useState(false);
   const [isSavingOwner, setIsSavingOwner] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
-  const [archiveState, setArchiveState] = useState<"active" | "archived">("active");
+  const [archiveState, setArchiveState] = useState<"active" | "archived">(
+    "active",
+  );
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(
     null,
   );
+  const [managedProperty, setManagedProperty] = useState<{
+    property: Property;
+    actions: ActionSheetItem[];
+  } | null>(null);
 
   const { useList } = useProperties(accessToken);
-  const { data: properties = [], isError, isLoading, refetch, error } = useList({ archiveState });
+  const {
+    data: properties = [],
+    isError,
+    isLoading,
+    refetch,
+    error,
+  } = useList({ archiveState });
   const propertySnackbar = useSnackbar();
-  const governance = useDeletionGovernance(() => propertySnackbar.show("Property archived."));
-  const restoreMutation = useRestoreGovernedRecord(() => propertySnackbar.show("Property restored."));
+  const governance = useDeletionGovernance(() =>
+    propertySnackbar.show("Property archived."),
+  );
+  const restoreMutation = useRestoreGovernedRecord(() =>
+    propertySnackbar.show("Property restored."),
+  );
   const propertyForm = usePropertyFormController(accessToken, {
     onSaved: (_property, operation) =>
       propertySnackbar.show(
@@ -147,7 +171,16 @@ export default function PropertiesScreen() {
       <View className="flex-1">
         <View className="px-1 pb-5">
           <ModuleHeader
-            action={archiveState === "active" ? <AddButton permission="properties.create" iconOnly title="Add property" onPress={openForm} /> : undefined}
+            action={
+              archiveState === "active" ? (
+                <AddButton
+                  permission="properties.create"
+                  iconOnly
+                  title="Add property"
+                  onPress={openForm}
+                />
+              ) : undefined
+            }
             eyebrow="Portfolio Intelligence"
             title="Properties"
           />
@@ -164,7 +197,9 @@ export default function PropertiesScreen() {
                   key={state}
                   onPress={() => setArchiveState(state)}
                 >
-                  <Text className="font-ralewayBold text-sm capitalize text-textPrimary">{state}</Text>
+                  <Text className="font-ralewayBold text-sm capitalize text-textPrimary">
+                    {state}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -175,7 +210,9 @@ export default function PropertiesScreen() {
               className="h-12 items-center justify-center rounded-2xl border border-primary/25 bg-panel px-3"
               onPress={() => router.push(appRoutes.secondary.propertyOwners)}
             >
-              <Text className="font-ralewayBold text-sm text-primary">Owners</Text>
+              <Text className="font-ralewayBold text-sm text-primary">
+                Owners
+              </Text>
             </TouchableOpacity>
           </View>
         ) : null}
@@ -221,7 +258,10 @@ export default function PropertiesScreen() {
               return (
                 <PropertyListMessage
                   actionLabel="Try again"
-                  description={error?.message ?? "Properties could not be loaded. Check your connection and retry."}
+                  description={
+                    error?.message ??
+                    "Properties could not be loaded. Check your connection and retry."
+                  }
                   icon="cloud-alert-outline"
                   onAction={refetch}
                   title="Unable to load properties"
@@ -235,11 +275,21 @@ export default function PropertiesScreen() {
 
               return (
                 <PropertyListMessage
-                  actionLabel={isFiltered ? "Clear filters" : can("properties.create") ? "Add property" : undefined}
+                  actionLabel={
+                    isFiltered
+                      ? "Clear filters"
+                      : can("properties.create")
+                        ? "Add property"
+                        : undefined
+                  }
                   description={
                     isFiltered
                       ? "Change your search or reset filters to see more results."
-                      : archiveState === "archived" ? "Archived properties appear here and can be restored by an administrator." : access.role === "MANAGER" ? "No assigned properties are available. Ask your account owner to review your access." : "Add your first property to start tracking portfolio performance."
+                      : archiveState === "archived"
+                        ? "Archived properties appear here and can be restored by an administrator."
+                        : access.role === "MANAGER"
+                          ? "No assigned properties are available. Ask your account owner to review your access."
+                          : "Add your first property to start tracking portfolio performance."
                   }
                   icon={
                     isFiltered ? "home-search-outline" : "home-plus-outline"
@@ -250,7 +300,9 @@ export default function PropertiesScreen() {
                           setSearchQuery("");
                           setStatusFilter("ALL");
                         }
-                      : archiveState === "active" && can("properties.create") ? openForm : undefined
+                      : archiveState === "active" && can("properties.create")
+                        ? openForm
+                        : undefined
                   }
                   title={
                     isFiltered ? "No matching properties" : "No properties yet"
@@ -259,39 +311,50 @@ export default function PropertiesScreen() {
               );
             }
 
+            const property = item.property;
+            const actions = getPropertyManageActions(property, can, {
+              onBedspaces: () =>
+                router.push({
+                  pathname: appRoutes.secondary.bedspaces,
+                  params: {
+                    propertyId: property.id,
+                    propertyTitle: property.title,
+                  },
+                }),
+              onFloorPlans: () =>
+                router.push({
+                  pathname: appRoutes.secondary.floorPlans,
+                  params: {
+                    propertyId: property.id,
+                    propertyTitle: property.title,
+                    propertyType: property.type,
+                  },
+                }),
+              onBookings: () =>
+                router.push({
+                  pathname: appRoutes.secondary.bookings,
+                  params: { propertyId: property.id },
+                }),
+              onEdit: () => openEditForm(property),
+              onArchive: () =>
+                governance.open({
+                  resource: "properties",
+                  id: property.id,
+                  label: property.title,
+                }),
+              onRestore: () =>
+                restoreMutation.mutate({
+                  resource: "properties",
+                  id: property.id,
+                }),
+            });
             return (
               <PropertyCard
-                property={item.property}
-                onEdit={() => openEditForm(item.property)}
-                onOpenDetails={() => setSelectedProperty(item.property)}
-                onArchive={() => governance.open({ resource: "properties", id: item.property.id, label: item.property.title })}
-                onRestore={() => restoreMutation.mutate({ resource: "properties", id: item.property.id })}
-                onOpenBedspaces={() =>
-                  router.push({
-                    pathname: appRoutes.secondary.bedspaces,
-                    params: {
-                      propertyId: item.property.id,
-                      propertyTitle: item.property.title,
-                    },
-                  })
-                }
-                onOpenFloorPlans={() =>
-                  router.push({
-                    pathname: appRoutes.secondary.floorPlans,
-                    params: {
-                      propertyId: item.property.id,
-                      propertyTitle: item.property.title,
-                      propertyType: item.property.type,
-                    },
-                  })
-                }
-                onOpenBookings={
-                  item.property.isTransientBookable
-                    ? () =>
-                        router.push({
-                          pathname: appRoutes.secondary.bookings,
-                          params: { propertyId: item.property.id },
-                        })
+                property={property}
+                onOpenDetails={() => setSelectedProperty(property)}
+                onManage={
+                  actions.length
+                    ? () => setManagedProperty({ property, actions })
                     : undefined
                 }
               />
@@ -309,6 +372,15 @@ export default function PropertiesScreen() {
         property={selectedProperty}
       />
 
+      <ActionSheet
+        actions={managedProperty?.actions ?? []}
+        grouped
+        onClose={() => setManagedProperty(null)}
+        subtitle={managedProperty?.property.title}
+        title="Manage property"
+        visible={Boolean(managedProperty)}
+      />
+
       <DeletionImpactSheet
         error={governance.error}
         impact={governance.impact}
@@ -321,10 +393,17 @@ export default function PropertiesScreen() {
         visible={Boolean(governance.target)}
       />
 
-      <AddEditModal permission={editingProperty ? "properties.update" : "properties.create"} propertyId={editingProperty?.id}
+      <AddEditModal
+        permission={editingProperty ? "properties.update" : "properties.create"}
+        propertyId={editingProperty?.id}
         appearance="card"
         isVisible={isFormVisible}
-        onClose={() => { if (!isSavingOwner) { setIsAddingOwner(false); closeForm(); } }}
+        onClose={() => {
+          if (!isSavingOwner) {
+            setIsAddingOwner(false);
+            closeForm();
+          }
+        }}
         title={editingProperty ? "Edit property" : "Add a property"}
         subtitle={
           editingProperty
@@ -353,11 +432,18 @@ export default function PropertiesScreen() {
           propertyTypeChoices={propertyTypeChoices}
           statusEditable={!editingProperty}
           onAddOwner={isAddingOwner ? undefined : () => setIsAddingOwner(true)}
-          ownerForm={isAddingOwner && access.role === 'ADMIN' ? <OwnerForm
-            onBusyChange={setIsSavingOwner}
-            onCancel={() => setIsAddingOwner(false)}
-            onSaved={owner => { updateForm('ownerId', owner.id); setIsAddingOwner(false); }}
-          /> : undefined}
+          ownerForm={
+            isAddingOwner && access.role === "ADMIN" ? (
+              <OwnerForm
+                onBusyChange={setIsSavingOwner}
+                onCancel={() => setIsAddingOwner(false)}
+                onSaved={(owner) => {
+                  updateForm("ownerId", owner.id);
+                  setIsAddingOwner(false);
+                }}
+              />
+            ) : undefined
+          }
         />
 
         <PropertyImagesField

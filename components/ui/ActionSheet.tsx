@@ -11,8 +11,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { colors } from "../../constants/colors";
 import { getStandardModalSheetHeight } from "../../constants/modal";
+import {
+  useThemeColors,
+  useWorkspacePresentation,
+} from "../../context/WorkspacePresentationContext";
 import { BottomSheetModal } from "./BottomSheetModal";
 import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "./ModalActionFooter";
 import { ModalHeader } from "./ModalHeader";
@@ -28,16 +31,102 @@ export type ActionSheetItem = {
   label: string;
   onPress: () => void;
   selected?: boolean;
+  section?: string;
 };
+
+function ActionRow({
+  action,
+  grouped,
+  isLast,
+  onPress,
+}: {
+  action: ActionSheetItem;
+  grouped: boolean;
+  isLast: boolean;
+  onPress: () => void;
+}) {
+  const palette = useThemeColors();
+  const { resolvedTheme } = useWorkspacePresentation();
+  const iconColor = action.destructive
+    ? palette.danger
+    : grouped && resolvedTheme === "light"
+      ? palette.primaryStrong
+      : grouped
+        ? palette.secondary
+        : palette.primary;
+
+  return (
+    <TouchableOpacity
+      accessibilityHint={action.description}
+      accessibilityLabel={action.label}
+      accessibilityRole={action.selected === undefined ? "button" : "radio"}
+      accessibilityState={{
+        checked: action.selected,
+        disabled: action.disabled,
+      }}
+      activeOpacity={0.8}
+      className={`min-h-16 flex-row items-center gap-3 px-4 py-3 ${
+        grouped
+          ? isLast
+            ? ""
+            : "border-b border-primary/10"
+          : `rounded-2xl ${action.destructive ? "bg-dangerSurface" : "bg-primary/10"}`
+      } ${action.disabled ? "opacity-50" : ""}`}
+      disabled={action.disabled}
+      onPress={onPress}
+    >
+      <View
+        className={`h-11 w-11 items-center justify-center rounded-xl ${
+          action.destructive ? "bg-dangerSurface" : "bg-primary/10"
+        }`}
+      >
+        <MaterialCommunityIcons
+          name={action.icon}
+          color={iconColor}
+          size={20}
+        />
+      </View>
+      <View className="min-w-0 flex-1">
+        <Text
+          className={`font-ralewayBold text-sm ${
+            action.destructive ? "text-danger" : "text-textPrimary"
+          }`}
+        >
+          {action.label}
+        </Text>
+        {action.description ? (
+          <Text className="mt-0.5 text-xs leading-4 text-description">
+            {action.description}
+          </Text>
+        ) : null}
+      </View>
+      {action.selected === undefined ? (
+        <MaterialCommunityIcons
+          name="chevron-right"
+          color={action.destructive ? palette.danger : palette.description}
+          size={20}
+        />
+      ) : action.selected ? (
+        <MaterialCommunityIcons
+          name="check-circle"
+          color={palette.primary}
+          size={21}
+        />
+      ) : null}
+    </TouchableOpacity>
+  );
+}
 
 export function ActionSheet({
   actions,
+  grouped = false,
   onClose,
   subtitle,
   title,
   visible,
 }: {
   actions: ActionSheetItem[];
+  grouped?: boolean;
   onClose: () => void;
   subtitle?: string;
   title: string;
@@ -47,6 +136,15 @@ export function ActionSheet({
   const visibleActions = actions.filter(
     (action) => !action.permission || can(action.permission, action.propertyId),
   );
+  const groups: { title: string; actions: ActionSheetItem[] }[] = [];
+  if (grouped) {
+    for (const action of visibleActions) {
+      const title = action.section ?? "Actions";
+      const lastGroup = groups.at(-1);
+      if (lastGroup?.title === title) lastGroup.actions.push(action);
+      else groups.push({ title, actions: [action] });
+    }
+  }
   const pendingAction = useRef<(() => void) | null>(null);
   const { height } = useWindowDimensions();
   const maxSheetHeight = getStandardModalSheetHeight(height);
@@ -97,7 +195,7 @@ export function ActionSheet({
         <ScrollView
           bounces={false}
           contentContainerStyle={{
-            gap: 8,
+            gap: grouped ? 16 : 8,
             paddingBottom: MODAL_ACTION_FOOTER_CONTENT_HEIGHT,
             paddingHorizontal: 20,
             paddingTop: 16,
@@ -106,67 +204,37 @@ export function ActionSheet({
           showsVerticalScrollIndicator={false}
           style={{ flexGrow: 0, flexShrink: 1 }}
         >
-          {visibleActions.map((action) => {
-            const color = action.destructive ? colors.danger : colors.primary;
-
-            return (
-              <TouchableOpacity
-                accessibilityRole={
-                  action.selected === undefined ? "button" : "radio"
-                }
-                accessibilityState={{
-                  checked: action.selected,
-                  disabled: action.disabled,
-                }}
-                activeOpacity={0.8}
-                className={`min-h-16 flex-row items-center gap-3 rounded-2xl px-4 py-3 ${
-                  action.destructive ? "bg-dangerSurface" : "bg-primary/10"
-                } ${action.disabled ? "opacity-50" : ""}`}
-                disabled={action.disabled}
-                key={action.label}
-                onPress={() => handleAction(action)}
-              >
-                <View
-                  className={`h-10 w-10 items-center justify-center rounded-xl ${
-                    action.destructive ? "bg-dangerSurface" : "bg-primary/10"
-                  }`}
-                >
-                  <MaterialCommunityIcons
-                    name={action.icon}
-                    color={color}
-                    size={19}
-                  />
-                </View>
-                <View className="min-w-0 flex-1">
+          {grouped
+            ? groups.map((group, index) => (
+                <View key={`${group.title}:${index}`}>
                   <Text
-                    className={`font-ralewayBold text-sm ${
-                      action.destructive ? "text-danger" : "text-textPrimary"
-                    }`}
+                    accessibilityRole="header"
+                    className="mb-2 ml-1 font-ralewayBold text-xs uppercase tracking-wider text-description"
                   >
-                    {action.label}
+                    {group.title}
                   </Text>
-                  {action.description ? (
-                    <Text className="mt-0.5 text-xs leading-4 text-description">
-                      {action.description}
-                    </Text>
-                  ) : null}
+                  <View className="overflow-hidden rounded-2xl border border-primary/15 bg-surface">
+                    {group.actions.map((action, index) => (
+                      <ActionRow
+                        action={action}
+                        grouped
+                        isLast={index === group.actions.length - 1}
+                        key={action.label}
+                        onPress={() => handleAction(action)}
+                      />
+                    ))}
+                  </View>
                 </View>
-                {action.selected === undefined ? (
-                  <MaterialCommunityIcons
-                    name="chevron-right"
-                    color={action.destructive ? colors.danger : colors.description}
-                    size={20}
-                  />
-                ) : action.selected ? (
-                  <MaterialCommunityIcons
-                    name="check-circle"
-                    color={colors.primary}
-                    size={21}
-                  />
-                ) : null}
-              </TouchableOpacity>
-            );
-          })}
+              ))
+            : visibleActions.map((action) => (
+                <ActionRow
+                  action={action}
+                  grouped={false}
+                  isLast
+                  key={action.label}
+                  onPress={() => handleAction(action)}
+                />
+              ))}
         </ScrollView>
       </SafeAreaView>
     </BottomSheetModal>

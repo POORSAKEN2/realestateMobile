@@ -10,15 +10,16 @@ export function PropertyListSkeleton() {
       accessibilityRole="progressbar"
       className="overflow-hidden rounded-3xl border border-textPrimary/10 bg-panel"
     >
-      <SkeletonBlock className="h-36 w-full" />
+      <SkeletonBlock className="h-28 w-full" />
       <View className="gap-3 p-4">
         <SkeletonBlock className="h-5 w-2/3 rounded-lg" />
         <SkeletonBlock className="h-4 w-1/2 rounded-lg" />
-        <View className="mt-2 flex-row gap-3">
-          <SkeletonBlock className="h-14 flex-1 rounded-2xl" />
-          <SkeletonBlock className="h-14 flex-1 rounded-2xl" />
-          <SkeletonBlock className="h-14 flex-1 rounded-2xl" />
+        <SkeletonBlock className="mt-2 h-7 w-1/2 rounded-lg" />
+        <View className="flex-row gap-2">
+          <SkeletonBlock className="h-8 w-20 rounded-xl" />
+          <SkeletonBlock className="h-8 w-32 rounded-xl" />
         </View>
+        <SkeletonBlock className="mt-2 h-12 w-full rounded-xl" />
       </View>
     </View>
   );
