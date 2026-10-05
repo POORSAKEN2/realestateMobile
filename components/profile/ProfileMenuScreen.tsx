@@ -1,9 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useMemo } from "react";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView } from "react-native";
 
-import { colors } from "../../constants/colors";
 import { appRoutes } from "../../constants/navigation";
 import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { useAuth } from "../../hooks/useAuth";
@@ -35,7 +33,7 @@ function getRoleLabel(role?: string) {
 }
 
 export function ProfileMenuScreen() {
-  const { session, signOut } = useAuth();
+  const { session } = useAuth();
   const user = isAuthUser(session?.user) ? session.user : null;
   const name = user?.name?.trim() || "Your profile";
   const imageUri = getProfileImageUri(user);
@@ -54,7 +52,7 @@ export function ProfileMenuScreen() {
   const showTeamAccess = canManageStaff(user);
   const canManageBilling = hasAppPermission(user, "billing.checkout");
 
-  const accountOrganizationItems = useMemo<ProfileMenuItem[]>(() => {
+  const organizationItems = useMemo<ProfileMenuItem[]>(() => {
     const items: ProfileMenuItem[] = [
       {
         accessibilityHint: "Opens subscription and billing information",
@@ -97,6 +95,18 @@ export function ProfileMenuScreen() {
 
     return items;
   }, [billingState, canManageBilling, serverSyncStatus, showTeamAccess]);
+  const accountItems = useMemo<ProfileMenuItem[]>(
+    () => [
+      {
+        accessibilityHint: "Opens workspace, security, and privacy settings",
+        icon: "settings-outline",
+        label: "Settings",
+        onPress: () => router.push(appRoutes.secondary.settings),
+        supportingText: "Workspace, security, and privacy",
+      },
+    ],
+    [],
+  );
   const supportItems = useMemo<ProfileMenuItem[]>(
     () => [
       {
@@ -115,27 +125,13 @@ export function ProfileMenuScreen() {
     router.push(appRoutes.secondary.profile);
   }
 
-  function confirmSignOut() {
-    Alert.alert(
-      "Sign out?",
-      "You’ll need to sign in again to manage your properties.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Sign Out",
-          style: "destructive",
-          onPress: () => {
-            signOut();
-            router.replace(appRoutes.auth.login);
-          },
-        },
-      ],
-    );
-  }
-
   return (
     <Screen bottomInset="none" className="bg-surface">
-      <View className="-mx-6 flex-1 px-6 pb-36">
+      <ScrollView
+        className="-mx-6 flex-1"
+        contentContainerClassName="px-6 pb-36"
+        showsVerticalScrollIndicator={false}
+      >
         <ProfileIdentityCard
           imageUri={imageUri}
           name={name}
@@ -144,12 +140,10 @@ export function ProfileMenuScreen() {
           roleLabel={roleLabel}
         />
 
-        <ProfileMenuSection
-          items={accountOrganizationItems}
-          title="Account & Organization"
-        />
+        <ProfileMenuSection items={organizationItems} title="Organization" />
+        <ProfileMenuSection items={accountItems} title="Account" />
         <ProfileMenuSection items={supportItems} title="Support" />
-      </View>
+      </ScrollView>
     </Screen>
   );
 }

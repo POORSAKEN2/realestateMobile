@@ -44,6 +44,7 @@ for (const [theme, palette] of Object.entries({
       ["onInfo", "info"],
       ["whitePrimary", "overlay"],
       ["whitePrimary", "primaryStrong"],
+      ["onPrimary", "primary"],
       ["overlayAccent", "overlay"],
     ]) {
       assert.ok(
@@ -59,6 +60,13 @@ for (const [theme, palette] of Object.entries({
       (value) => value * 0.8 + 0.2,
     );
     assert.ok(contrast(channels(palette.whitePrimary), photoOverlay) >= 4.5);
+    const primaryBadge = channels(palette.primary).map(
+      (value, index) => value * 0.1 + channels(palette.panel)[index] * 0.9,
+    );
+    assert.ok(
+      contrast(channels(palette.primaryContent), primaryBadge) >= 4.5,
+      `${theme}: primary badge text must meet 4.5:1`,
+    );
   });
 }
 
@@ -67,9 +75,13 @@ test("theme changes update inline foreground tokens without reloading", () => {
     setActiveColors("dark");
     assert.equal(colors.onInverse, darkColors.onInverse);
     assert.equal(colors.onDanger, darkColors.onDanger);
+    assert.equal(colors.onPrimary, darkColors.onPrimary);
+    assert.equal(colors.primaryContent, darkColors.primaryContent);
     setActiveColors("light");
     assert.equal(colors.onInverse, lightColors.onInverse);
     assert.equal(colors.onDanger, lightColors.onDanger);
+    assert.equal(colors.onPrimary, lightColors.onPrimary);
+    assert.equal(colors.primaryContent, lightColors.primaryContent);
   } finally {
     setActiveColors("light");
   }

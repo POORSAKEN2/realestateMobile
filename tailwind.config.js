@@ -14,6 +14,8 @@ module.exports = {
     extend: {
       colors: {
         primary: "rgb(var(--color-primary) / <alpha-value>)",
+        primaryContent: "rgb(var(--color-primary-content) / <alpha-value>)",
+        onPrimary: "rgb(var(--color-on-primary) / <alpha-value>)",
         secondary: "rgb(var(--color-secondary) / <alpha-value>)",
         accent: "rgb(var(--color-accent) / <alpha-value>)",
         surface: "rgb(var(--color-surface) / <alpha-value>)",

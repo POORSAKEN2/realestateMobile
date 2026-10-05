@@ -56,6 +56,8 @@ export function WorkspacePresentationProvider({ children }: PropsWithChildren) {
       )!;
   const style = vars({
     "--color-primary": rgb(palette.primary),
+    "--color-primary-content": rgb(palette.primaryContent),
+    "--color-on-primary": rgb(palette.onPrimary),
     "--color-secondary": rgb(palette.secondary),
     "--color-accent": rgb(palette.accent),
     "--color-surface": rgb(palette.surface),

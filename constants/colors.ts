@@ -1,6 +1,8 @@
 export const lightColors = {
   primary: "#8A77F4",
   primaryStrong: "#5436A3",
+  primaryContent: "#5436A3",
+  onPrimary: "#1E1F45",
   secondary: "#8b62f3",
   accent: "#BEE3DB",
   surface: "#FAF9F9",
@@ -30,6 +32,8 @@ export const lightColors = {
 export const darkColors: Record<keyof typeof lightColors, string> = {
   primary: "#8A77F4",
   primaryStrong: "#39255B",
+  primaryContent: "#A99BFF",
+  onPrimary: "#10111A",
   secondary: "#A99BFF",
   accent: "#214A43",
   surface: "#10111A",

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { colors } from "../../constants/colors";
+import { useThemeColors } from "../../context/WorkspacePresentationContext";
 import { ProfileAvatar } from "./ProfileAvatar";
 
 type ProfileIdentityCardProps = {
@@ -19,6 +19,7 @@ export function ProfileIdentityCard({
   planLabel,
   roleLabel,
 }: ProfileIdentityCardProps) {
+  const palette = useThemeColors();
   const accessibilityLabel = [name, roleLabel, planLabel]
     .filter(Boolean)
     .join(", ");
@@ -53,9 +54,13 @@ export function ProfileIdentityCard({
           </View>
           {planLabel ? (
             <View className="flex-row items-center gap-1.5 rounded-full border border-primary/25 bg-panel/80 px-3 py-1.5">
-              <Ionicons name="star-outline" color={colors.primary} size={13} />
+              <Ionicons
+                name="star-outline"
+                color={palette.primaryContent}
+                size={13}
+              />
               <Text
-                className="font-ralewayExtraBold text-xs text-primary"
+                className="font-ralewayExtraBold text-xs text-primaryContent"
                 numberOfLines={1}
               >
                 {planLabel}
@@ -65,7 +70,7 @@ export function ProfileIdentityCard({
         </View>
       </View>
       <View className="h-10 w-10 items-center justify-center rounded-2xl bg-panel">
-        <Ionicons name="chevron-forward" color={colors.primary} size={21} />
+        <Ionicons name="chevron-forward" color={palette.primary} size={21} />
       </View>
     </TouchableOpacity>
   );

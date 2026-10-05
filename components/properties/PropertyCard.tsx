@@ -12,10 +12,7 @@ import {
 import type { Property } from "../../types";
 import { formatPeso, formatStatus } from "../../utils/properties/propertyForm";
 import { formatDateTime } from "../../utils/formatters";
-import {
-  useThemeColors,
-  useWorkspacePresentation,
-} from "../../context/WorkspacePresentationContext";
+import { useThemeColors } from "../../context/WorkspacePresentationContext";
 import {
   getPropertyImages,
   getPropertyStatusTone,
@@ -48,7 +45,6 @@ export function PropertyCard({
   const propertyImages = getPropertyImages(property);
   const statusTone = getPropertyStatusTone(property.status);
   const palette = useThemeColors();
-  const { resolvedTheme } = useWorkspacePresentation();
   const [imageWidth, setImageWidth] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
@@ -242,7 +238,7 @@ export function PropertyCard({
             accessibilityLabel={`Manage ${property.title}`}
             accessibilityRole="button"
             activeOpacity={0.82}
-            className="mt-4 min-h-12 flex-row items-center justify-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3"
+            className="mt-4 min-h-11 max-w-full flex-row items-center justify-center gap-1.5 self-end rounded-2xl bg-primary px-3 py-2"
             onPress={(event) => {
               event.stopPropagation();
               onManage();
@@ -250,23 +246,11 @@ export function PropertyCard({
           >
             <MaterialCommunityIcons
               name="dots-horizontal"
-              color={
-                resolvedTheme === "dark"
-                  ? palette.secondary
-                  : palette.primaryStrong
-              }
-              size={20}
+              color={palette.whitePrimary}
+              size={17}
             />
-            <Text
-              className="text-center font-ralewayBold text-sm"
-              style={{
-                color:
-                  resolvedTheme === "dark"
-                    ? palette.secondary
-                    : palette.primaryStrong,
-              }}
-            >
-              Manage property
+            <Text className="shrink text-center font-ralewayExtraBold text-xs text-whitePrimary">
+              Manage
             </Text>
           </TouchableOpacity>
         ) : null}

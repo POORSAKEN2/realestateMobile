@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { colors } from "../../constants/colors";
+import { useThemeColors } from "../../context/WorkspacePresentationContext";
 
 export type ProfileMenuItem = {
   accessibilityHint?: string;
@@ -26,6 +26,7 @@ function ProfileMenuRow({
   isLast: boolean;
   item: ProfileMenuItem;
 }) {
+  const palette = useThemeColors();
   return (
     <TouchableOpacity
       accessibilityHint={item.accessibilityHint}
@@ -40,7 +41,7 @@ function ProfileMenuRow({
       onPress={item.onPress}
     >
       <View className="h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
-        <Ionicons name={item.icon} color={colors.primary} size={22} />
+        <Ionicons name={item.icon} color={palette.primary} size={22} />
       </View>
       <View className="ml-3 min-w-0 flex-1">
         <View className="flex-row items-center gap-2">
@@ -49,7 +50,7 @@ function ProfileMenuRow({
           </Text>
           {item.badge ? (
             <View className="rounded-full bg-primary/10 px-2.5 py-1">
-              <Text className="font-ralewayBold text-[9px] uppercase text-primary">
+              <Text className="font-ralewayBold text-[9px] uppercase text-primaryContent">
                 {item.badge}
               </Text>
             </View>
@@ -63,7 +64,7 @@ function ProfileMenuRow({
       </View>
       <Ionicons
         name={item.trailingIcon ?? "chevron-forward"}
-        color={colors.primary}
+        color={palette.primary}
         size={20}
       />
     </TouchableOpacity>
