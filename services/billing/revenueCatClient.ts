@@ -32,6 +32,7 @@ function getRevenueCatApiKey() {
 }
 
 let configurationPromise: Promise<void> | null = null;
+let identityPromise: Promise<unknown> = Promise.resolve();
 
 export class RevenueCatClientError extends Error {
   constructor(
@@ -122,9 +123,22 @@ export function configureRevenueCat(appUserId?: string | null) {
   return configurationPromise;
 }
 
-export async function identifyRevenueCatCustomer(
+export function identifyRevenueCatCustomer(
   appUserId: string | null,
   email?: string | null,
+  options: { fresh?: boolean } = {},
+) {
+  const request = identityPromise.then(() =>
+    identifyCustomer(appUserId, email, options),
+  );
+  identityPromise = request.catch(() => {});
+  return request;
+}
+
+async function identifyCustomer(
+  appUserId: string | null,
+  email?: string | null,
+  options: { fresh?: boolean } = {},
 ) {
   await configureRevenueCat();
 
@@ -134,12 +148,20 @@ export async function identifyRevenueCatCustomer(
   }
 
   const currentAppUserId = await Purchases.getAppUserID();
-  const customerInfo =
-    currentAppUserId === appUserId
-      ? await Purchases.getCustomerInfo()
-      : (await Purchases.logIn(appUserId)).customerInfo;
+  if (currentAppUserId !== appUserId) await Purchases.logIn(appUserId);
+  if (options.fresh) await Purchases.invalidateCustomerInfoCache();
+  const customerInfo = await Purchases.getCustomerInfo();
 
-  if (email) await Purchases.setEmail(email);
+  if (email) {
+    try {
+      await Purchases.setEmail(email);
+    } catch (error) {
+      console.warn(
+        "revenuecat_email_update_failed",
+        toRevenueCatClientError(error).message,
+      );
+    }
+  }
   return customerInfo;
 }
 
@@ -184,7 +206,13 @@ export async function getRevenueCatSnapshot(): Promise<RevenueCatSnapshot> {
   try {
     const [customerInfo, currentOffering] = await Promise.all([
       Purchases.getCustomerInfo(),
-      getCurrentRevenueCatOffering(),
+      getCurrentRevenueCatOffering().catch((error) => {
+        console.warn(
+          "revenuecat_offering_unavailable",
+          toRevenueCatClientError(error).message,
+        );
+        return null;
+      }),
     ]);
     return { customerInfo, currentOffering };
   } catch (error) {

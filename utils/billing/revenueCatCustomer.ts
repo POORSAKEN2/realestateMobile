@@ -8,6 +8,21 @@ import {
 } from "../../constants/revenueCat";
 import type { SubscriptionTierKey } from "../../types/domain/billing";
 
+export function getRevenueCatIdentity(user: unknown) {
+  if (typeof user !== "object" || user === null) return null;
+  const record = user as Record<string, unknown>;
+  const rawTenantId = record.tenant_id ?? record.tenantId;
+  if (typeof rawTenantId !== "string" && typeof rawTenantId !== "number")
+    return null;
+  const appUserId = String(rawTenantId).trim();
+  if (!appUserId) return null;
+  return {
+    appUserId,
+    email:
+      typeof record.email === "string" ? record.email.trim() || null : null,
+  };
+}
+
 export function hasRevenueCatPremium(customerInfo: CustomerInfo | null) {
   return getActiveRevenueCatTier(customerInfo) !== "free";
 }
@@ -15,8 +30,15 @@ export function hasRevenueCatPremium(customerInfo: CustomerInfo | null) {
 export function getActiveRevenueCatTier(
   customerInfo: CustomerInfo | null,
 ): SubscriptionTierKey {
-  for (const tier of ["portfolio", "professional", "starter", "all_in", "tier1"] as const) {
-    if (customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS[tier]]) return tier;
+  for (const tier of [
+    "portfolio",
+    "professional",
+    "starter",
+    "all_in",
+    "tier1",
+  ] as const) {
+    if (customerInfo?.entitlements.active[REVENUECAT_ENTITLEMENT_IDS[tier]])
+      return tier;
   }
   return "free";
 }

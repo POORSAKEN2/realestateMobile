@@ -49,3 +49,23 @@ test("automatic reconciliation reports delayed without trusting client access", 
   assert.equal(result.entitlement, null);
   assert.match(result.error.message, /backend unavailable/);
 });
+
+test("account change during backoff stops further authenticated requests", async () => {
+  let current = true;
+  let attempts = 0;
+  await reconcileBillingWithBackoff(
+    async () => {
+      attempts++;
+      return entitlement("free");
+    },
+    "professional",
+    {
+      delaysMs: [0, 1, 1],
+      sleep: async () => {
+        current = false;
+      },
+      shouldContinue: () => current,
+    },
+  );
+  assert.equal(attempts, 1);
+});

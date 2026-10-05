@@ -20,11 +20,13 @@ export async function fetchPlanChangePreview(
 
 export async function fetchBillingEntitlement(
   accessToken?: string,
+  signal?: AbortSignal,
 ): Promise<BillingEntitlement> {
   const response = await apiClient.get<
     ApiEnvelope<BillingEntitlement> | BillingEntitlement
   >("/billing/entitlement", {
     headers: authHeaders(accessToken),
+    signal,
   });
 
   return unwrapData<BillingEntitlement>(response);

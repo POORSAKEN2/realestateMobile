@@ -13,21 +13,24 @@ import Purchases, {
   type PurchasesOffering,
   type PurchasesPackage,
 } from "react-native-purchases";
+import { AppState } from "react-native";
 
 import { reconcileBillingEntitlement } from "../api/billing";
-import { BILLING_ENTITLEMENT_QUERY_KEY } from "../hooks/api/useBillingEntitlement";
+import {
+  BILLING_ENTITLEMENT_QUERY_KEY,
+  billingEntitlementQueryKey,
+  useBillingEntitlement,
+} from "../hooks/api/useBillingEntitlement";
 import { type RevenueCatProductKey } from "../constants/revenueCat";
 import { hasAppPermission } from "../utils/auth/accessPolicy";
 import { authorizeBillingPurchase } from "../utils/billing/billingPurchasePolicy";
 import { useAuth } from "../hooks/useAuth";
 import type { SubscriptionTierKey } from "../types/domain/billing";
-import {
-  type BillingSyncStatus,
-  reconcileBillingWithBackoff,
-} from "../utils/billing/billingSync";
+import { type BillingSyncStatus } from "../utils/billing/billingSync";
+import { createBillingEntitlementSynchronizer } from "../services/billing/billingEntitlementSync";
 import {
   configureRevenueCat,
-  getRevenueCatSnapshot,
+  getCurrentRevenueCatOffering,
   identifyRevenueCatCustomer,
   isRevenueCatCancellation,
   purchaseRevenueCatPackage,
@@ -43,12 +46,8 @@ import {
   hasRevenueCatPremium,
   getActiveRevenueCatTier,
   indexRevenueCatPackages,
+  getRevenueCatIdentity,
 } from "../utils/billing/revenueCatCustomer";
-
-type RevenueCatIdentity = {
-  appUserId: string;
-  email: string | null;
-};
 
 type RevenueCatContextValue = {
   activeTier: SubscriptionTierKey;
@@ -65,30 +64,13 @@ type RevenueCatContextValue = {
   purchasePackage: (pkg: PurchasesPackage) => Promise<CustomerInfo | null>;
   refresh: () => Promise<CustomerInfo | null>;
   restorePurchases: () => Promise<CustomerInfo>;
+  waitForSubscriptionValidation: () => Promise<void>;
   serverSyncStatus: BillingSyncStatus;
 };
 
 export const RevenueCatContext = createContext<
   RevenueCatContextValue | undefined
 >(undefined);
-
-function getRevenueCatIdentity(user: unknown): RevenueCatIdentity | null {
-  if (typeof user !== "object" || user === null) return null;
-  const record = user as Record<string, unknown>;
-  const rawTenantId = record.tenant_id ?? record.tenantId;
-  if (typeof rawTenantId !== "string" && typeof rawTenantId !== "number") {
-    return null;
-  }
-
-  const appUserId = String(rawTenantId).trim();
-  if (!appUserId) return null;
-
-  return {
-    appUserId,
-    email:
-      typeof record.email === "string" ? record.email.trim() || null : null,
-  };
-}
 
 export function RevenueCatProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
@@ -101,177 +83,177 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
   const [isReady, setIsReady] = useState(false);
   const [serverSyncStatus, setServerSyncStatus] =
     useState<BillingSyncStatus>("idle");
-  const pendingServerTier = useRef<SubscriptionTierKey>("free");
-  const lastServerSyncFingerprint = useRef<string | null>(null);
-  const serverSyncRequestVersion = useRef(0);
-  const serverSyncWorker = useRef<Promise<void> | null>(null);
   const purchaseUser = useRef(session?.user);
   purchaseUser.current = session?.user;
-  const currentTenant = useRef<string | null>(null);
   const identity = useMemo(
     () => getRevenueCatIdentity(session?.user),
     [session?.user],
   );
 
-  currentTenant.current = identity?.appUserId ?? null;
+  const canReconcile = hasAppPermission(session?.user, "billing.checkout");
+  const scope = useMemo(
+    () => ({
+      appUserId: identity?.appUserId ?? null,
+      accessToken: session?.accessToken,
+      canReconcile,
+    }),
+    [identity?.appUserId, session?.accessToken, canReconcile],
+  );
+  const currentScope = useRef(scope);
+  currentScope.current = scope;
+  const identifiedScope = useRef<typeof scope | null>(null);
+  const validationRequest = useRef<{
+    scope: typeof scope;
+    promise: Promise<CustomerInfo | null>;
+  } | null>(null);
+  const waitForSubscriptionValidation = useCallback(async () => {
+    if (validationRequest.current?.scope === currentScope.current)
+      await validationRequest.current.promise;
+  }, []);
+  useBillingEntitlement({
+    enabled:
+      !isAuthLoading &&
+      Boolean(scope.accessToken) &&
+      hasAppPermission(session?.user, "billing.viewEntitlement"),
+  });
 
-  const synchronizeServerEntitlement = useCallback(
-    (nextCustomerInfo: CustomerInfo) => {
-      if (
-        !identity?.appUserId ||
-        !hasAppPermission(purchaseUser.current, "billing.checkout")
-      )
-        return;
-      const fingerprint = JSON.stringify([
-        identity.appUserId,
-        getRevenueCatEntitlementFingerprint(nextCustomerInfo),
-      ]);
-      if (lastServerSyncFingerprint.current === fingerprint) return;
-      lastServerSyncFingerprint.current = fingerprint;
-      pendingServerTier.current = getActiveRevenueCatTier(nextCustomerInfo);
-      serverSyncRequestVersion.current += 1;
-      if (serverSyncWorker.current) return;
-
-      const worker = async () => {
-        let handledVersion = 0;
-
-        while (handledVersion < serverSyncRequestVersion.current) {
-          handledVersion = serverSyncRequestVersion.current;
-          if (!hasAppPermission(purchaseUser.current, "billing.checkout"))
-            return;
-          const tenantAtRequest = currentTenant.current;
-          const targetTier = pendingServerTier.current;
-          setServerSyncStatus("syncing");
-          const result = await reconcileBillingWithBackoff(
-            reconcileBillingEntitlement,
-            targetTier,
-          );
-
-          if (
-            tenantAtRequest !== currentTenant.current ||
-            !hasAppPermission(purchaseUser.current, "billing.checkout")
-          )
-            continue;
-          if (result.entitlement) {
-            queryClient.setQueryData(
-              BILLING_ENTITLEMENT_QUERY_KEY,
-              result.entitlement,
-            );
-          }
-
-          if (result.synchronized) {
-            setServerSyncStatus("synchronized");
-            continue;
-          }
-
-          setServerSyncStatus("delayed");
+  const serverSynchronizer = useMemo(
+    () =>
+      createBillingEntitlementSynchronizer({
+        reconcile: () => reconcileBillingEntitlement(scope.accessToken),
+        isCurrent: () =>
+          currentScope.current === scope &&
+          Boolean(scope.appUserId) &&
+          Boolean(scope.accessToken) &&
+          scope.canReconcile,
+        onEntitlement: async (entitlement) => {
+          const queryKey = billingEntitlementQueryKey(scope.appUserId);
+          await queryClient.cancelQueries({ queryKey });
+          if (currentScope.current === scope)
+            queryClient.setQueryData(queryKey, entitlement);
+        },
+        onStatus: setServerSyncStatus,
+        onDelayed: (cause) => {
           console.warn("billing_entitlement_auto_sync_delayed", {
-            appUserId: identity.appUserId,
+            appUserId: scope.appUserId,
             message:
-              result.error instanceof Error
-                ? result.error.message
+              cause instanceof Error
+                ? cause.message
                 : "RevenueCat has not confirmed the server entitlement yet",
-            targetTier,
           });
           void queryClient.invalidateQueries({
             queryKey: BILLING_ENTITLEMENT_QUERY_KEY,
           });
-        }
-      };
+        },
+      }),
+    [scope, queryClient],
+  );
 
-      serverSyncWorker.current = worker().finally(() => {
-        serverSyncWorker.current = null;
-      });
+  const synchronizeServerEntitlement = useCallback(
+    (nextCustomerInfo?: CustomerInfo, force = false) => {
+      const fingerprint = nextCustomerInfo
+        ? getRevenueCatEntitlementFingerprint(nextCustomerInfo)
+        : null;
+      return serverSynchronizer.synchronize(
+        getActiveRevenueCatTier(nextCustomerInfo ?? null),
+        fingerprint,
+        force,
+      );
     },
-    [identity?.appUserId, queryClient],
+    [serverSynchronizer],
   );
 
   const updateCustomerInfo = useCallback(
-    (nextCustomerInfo: CustomerInfo) => {
+    (nextCustomerInfo: CustomerInfo, force = false) => {
+      if (currentScope.current !== scope) return Promise.resolve();
       setCustomerInfo(nextCustomerInfo);
       setError(null);
-      synchronizeServerEntitlement(nextCustomerInfo);
+      return synchronizeServerEntitlement(nextCustomerInfo, force);
     },
-    [synchronizeServerEntitlement],
+    [scope, synchronizeServerEntitlement],
   );
 
   const refresh = useCallback(async () => {
+    if (!scope.accessToken || !scope.appUserId) return null;
     setIsLoading(true);
     try {
-      const snapshot = await getRevenueCatSnapshot();
-      setCurrentOffering(snapshot.currentOffering);
-      updateCustomerInfo(snapshot.customerInfo);
-      return snapshot.customerInfo;
+      await configureRevenueCat(scope.appUserId);
+      const nextCustomerInfo = await identifyRevenueCatCustomer(
+        scope.appUserId,
+        identity?.email,
+        { fresh: true },
+      );
+      if (currentScope.current !== scope) return null;
+      identifiedScope.current = scope;
+      setIsReady(true);
+      void getCurrentRevenueCatOffering()
+        .then((offering) => {
+          if (currentScope.current === scope) setCurrentOffering(offering);
+        })
+        .catch((cause) => {
+          console.warn(
+            "revenuecat_offering_unavailable",
+            toRevenueCatClientError(cause).message,
+          );
+        });
+      await updateCustomerInfo(nextCustomerInfo, true);
+      return nextCustomerInfo;
     } catch (cause) {
       const nextError = toRevenueCatClientError(cause);
-      setError(nextError.message);
+      if (currentScope.current === scope) {
+        setError(nextError.message);
+        await synchronizeServerEntitlement(undefined, true);
+      }
       throw nextError;
     } finally {
-      setIsLoading(false);
+      if (currentScope.current === scope) setIsLoading(false);
     }
-  }, [updateCustomerInfo]);
+  }, [
+    scope,
+    identity?.email,
+    updateCustomerInfo,
+    synchronizeServerEntitlement,
+  ]);
 
   useEffect(() => {
     if (isAuthLoading) return;
     let disposed = false;
+    let pendingRefresh: Promise<CustomerInfo | null> | null = null;
+    identifiedScope.current = null;
+    setCustomerInfo(null);
+    setCurrentOffering(null);
+    setError(null);
+    setIsReady(false);
+    setServerSyncStatus("idle");
     const listener = (nextCustomerInfo: CustomerInfo) => {
-      if (!disposed) updateCustomerInfo(nextCustomerInfo);
+      if (!disposed && identifiedScope.current === scope)
+        void updateCustomerInfo(nextCustomerInfo);
     };
-
-    async function initialize() {
-      try {
-        await configureRevenueCat(identity?.appUserId);
-        if (disposed) return;
-        Purchases.addCustomerInfoUpdateListener(listener);
-        setIsReady(true);
-        const snapshot = await getRevenueCatSnapshot();
-        if (disposed) return;
-        setCurrentOffering(snapshot.currentOffering);
-        updateCustomerInfo(snapshot.customerInfo);
-      } catch (cause) {
-        if (!disposed) setError(toRevenueCatClientError(cause).message);
-      } finally {
-        if (!disposed) setIsLoading(false);
-      }
+    function refreshOnce() {
+      if (pendingRefresh) return;
+      pendingRefresh = refresh()
+        .catch(() => null)
+        .finally(() => {
+          pendingRefresh = null;
+        });
+      validationRequest.current = { scope, promise: pendingRefresh };
     }
-
-    void initialize();
+    Purchases.addCustomerInfoUpdateListener(listener);
+    if (scope.accessToken && scope.appUserId) refreshOnce();
+    else {
+      setIsLoading(false);
+      void identifyRevenueCatCustomer(null).catch(() => {});
+    }
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active" && scope.accessToken && scope.appUserId)
+        refreshOnce();
+    });
     return () => {
       disposed = true;
+      subscription.remove();
       Purchases.removeCustomerInfoUpdateListener(listener);
     };
-  }, [isAuthLoading, updateCustomerInfo]);
-
-  useEffect(() => {
-    if (isAuthLoading || !isReady) return;
-    let disposed = false;
-
-    async function synchronizeIdentity() {
-      setIsLoading(true);
-      try {
-        const nextCustomerInfo = await identifyRevenueCatCustomer(
-          identity?.appUserId ?? null,
-          identity?.email,
-        );
-        if (!disposed) updateCustomerInfo(nextCustomerInfo);
-      } catch (cause) {
-        if (!disposed) setError(toRevenueCatClientError(cause).message);
-      } finally {
-        if (!disposed) setIsLoading(false);
-      }
-    }
-
-    void synchronizeIdentity();
-    return () => {
-      disposed = true;
-    };
-  }, [
-    identity?.appUserId,
-    identity?.email,
-    isAuthLoading,
-    isReady,
-    updateCustomerInfo,
-  ]);
+  }, [isAuthLoading, scope, refresh, updateCustomerInfo]);
 
   const packages = useMemo(
     () => indexRevenueCatPackages(currentOffering?.availablePackages ?? []),
@@ -325,6 +307,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
         updateCustomerInfo(restored);
         return restored;
       },
+      waitForSubscriptionValidation,
       serverSyncStatus,
     }),
     [
@@ -338,6 +321,7 @@ export function RevenueCatProvider({ children }: PropsWithChildren) {
       prepareCustomerCenter,
       serverSyncStatus,
       updateCustomerInfo,
+      waitForSubscriptionValidation,
     ],
   );
 

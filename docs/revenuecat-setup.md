@@ -49,6 +49,8 @@ Expo Go can preview UI/Test Store state; real store purchase testing needs a nat
 
 Missing offerings show unavailable purchase options rather than invented prices. Store purchase success does not guarantee server activation: the app displays store state and server access separately, and ADMIN reconciliation retries. Trial access is never presented as confirmed purchased access. Scheduled reports and automated support SLAs remain deferred.
 
+At startup and on foreground resume, the app identifies the active tenant, refreshes cached RevenueCat customer information, and reconciles ADMIN access with the backend. Entitlement reads also run independently of store availability. Missing products or email metadata failures do not block subscription validation. Workspace saves wait for this validation; the backend still enforces inactive subscriptions. Purchase restore remains a user action. Tenant/session changes discard old synchronization results and stop pending retries.
+
 ## Checks
 
 ```bash

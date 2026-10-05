@@ -8,6 +8,9 @@ import {
 import type { UpdateWorkspaceSettings } from "../../types/domain/workspaceSettings";
 import { useAccess } from "../auth/useAccess";
 import { useAuth } from "../useAuth";
+import { useRevenueCat } from "../useRevenueCat";
+import { getSessionAccess } from "../../services/access/sessionAccess";
+import { ApiError } from "../../api/errors";
 
 function useWorkspaceIdentity() {
   const { session } = useAuth();
@@ -21,7 +24,9 @@ export function workspaceSettingsQueryKey(identity: readonly string[]) {
   return ["workspace-settings", ...identity] as const;
 }
 
-export function effectiveWorkspaceSettingsQueryKey(identity: readonly string[]) {
+export function effectiveWorkspaceSettingsQueryKey(
+  identity: readonly string[],
+) {
   return ["workspace-settings-effective", ...identity] as const;
 }
 
@@ -39,6 +44,7 @@ export function useWorkspaceSettings() {
   const identity = useWorkspaceIdentity();
   const { can } = useAccess();
   const queryClient = useQueryClient();
+  const { waitForSubscriptionValidation } = useRevenueCat();
   const query = useQuery({
     queryKey: workspaceSettingsQueryKey(identity),
     queryFn: ({ signal }) => fetchWorkspaceSettings(signal),
@@ -46,8 +52,18 @@ export function useWorkspaceSettings() {
     staleTime: 0,
   });
   const mutation = useMutation({
-    mutationFn: (changes: UpdateWorkspaceSettings) =>
-      updateWorkspaceSettings(changes),
+    mutationFn: async (changes: UpdateWorkspaceSettings) => {
+      const revision = getSessionAccess().revision;
+      await waitForSubscriptionValidation();
+      if (getSessionAccess().revision !== revision) {
+        throw new ApiError(
+          "Your account changed. Please try again.",
+          409,
+          "ACCESS_CHANGED",
+        );
+      }
+      return updateWorkspaceSettings(changes);
+    },
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
