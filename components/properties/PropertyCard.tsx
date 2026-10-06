@@ -238,7 +238,7 @@ export function PropertyCard({
             accessibilityLabel={`Manage ${property.title}`}
             accessibilityRole="button"
             activeOpacity={0.82}
-            className="mt-4 min-h-11 max-w-full flex-row items-center justify-center gap-1.5 self-end rounded-2xl bg-primary px-3 py-2"
+            className="mt-4 min-h-11 max-w-full flex-row items-center justify-center gap-1.5 self-end rounded-2xl bg-primary/10 px-3 py-2"
             onPress={(event) => {
               event.stopPropagation();
               onManage();
@@ -246,10 +246,10 @@ export function PropertyCard({
           >
             <MaterialCommunityIcons
               name="dots-horizontal"
-              color={palette.whitePrimary}
+              color={palette.secondary}
               size={17}
             />
-            <Text className="shrink text-center font-ralewayExtraBold text-xs text-whitePrimary">
+            <Text className="shrink text-center font-ralewayExtraBold text-xs text-secondary">
               Manage
             </Text>
           </TouchableOpacity>
