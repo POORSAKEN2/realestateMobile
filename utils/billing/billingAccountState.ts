@@ -39,11 +39,18 @@ export function getBillingAccountState(
   const syncRequired =
     storeTier !== "free" &&
     !isBillingTierActivated(entitlement ?? null, storeTier);
+  const serverPlanLabel = entitlement
+    ? entitlement.tier_label?.trim() || TIER_LABELS[serverTier] || serverTier
+    : "Unavailable";
+  const serverLabel =
+    entitlement?.access_mode === "read_only"
+      ? `${serverPlanLabel} (read-only)`
+      : entitlement?.entitlement_source === "trial"
+        ? `${serverPlanLabel} trial`
+        : serverPlanLabel;
 
   return {
-    serverLabel: entitlement
-      ? entitlement.tier_label?.trim() || TIER_LABELS[serverTier] || serverTier
-      : "Unavailable",
+    serverLabel,
     serverTier,
     storeLabel,
     storeTier,
@@ -61,7 +68,7 @@ export function getBillingStoreStatus(
       tone: "neutral" as const,
     };
   if (options.error)
-    return { label: "Refresh needed", tone: "warning" as const };
+    return { label: "Store check delayed", tone: "warning" as const };
   if (hasRevenueCatPremium(customerInfo))
     return { label: "Active purchase", tone: "success" as const };
   return { label: "No store purchase", tone: "neutral" as const };

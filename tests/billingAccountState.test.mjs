@@ -62,6 +62,45 @@ test("store refresh failures retain purchase data with a stale-state warning", (
       isLoading: false,
       error: "Offline",
     }).label,
-    "Refresh needed",
+    "Store check delayed",
   );
+});
+
+test("same-tier purchase distinguishes trial access until server confirms payment", () => {
+  const info = customerInfo({
+    professional_access: { productIdentifier: "professional_monthly" },
+  });
+  const trial = {
+    tier: "professional",
+    effective_tier: "professional",
+    tier_label: "Professional",
+    entitlement_source: "trial",
+    access_mode: "active",
+  };
+  const pending = getBillingAccountState(trial, info);
+  assert.equal(pending.serverLabel, "Professional trial");
+  assert.equal(pending.storeLabel, "Professional Monthly");
+  assert.equal(pending.syncRequired, true);
+  const confirmed = getBillingAccountState(
+    { ...trial, entitlement_source: "purchase" },
+    info,
+  );
+  assert.equal(confirmed.serverLabel, "Professional");
+  assert.equal(confirmed.syncRequired, false);
+});
+
+test("expired trial labels read-only access without claiming an active trial", () => {
+  const state = getBillingAccountState(
+    {
+      tier: "professional",
+      tier_label: "Professional",
+      entitlement_source: "trial",
+      access_mode: "read_only",
+    },
+    customerInfo({
+      professional_access: { productIdentifier: "professional_monthly" },
+    }),
+  );
+  assert.equal(state.serverLabel, "Professional (read-only)");
+  assert.equal(state.syncRequired, true);
 });

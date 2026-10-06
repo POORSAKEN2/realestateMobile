@@ -51,6 +51,8 @@ Missing offerings show unavailable purchase options rather than invented prices.
 
 At startup and on foreground resume, the app identifies the active tenant, refreshes cached RevenueCat customer information, and reconciles ADMIN access with the backend. Entitlement reads also run independently of store availability. Missing products or email metadata failures do not block subscription validation. Workspace saves wait for this validation; the backend still enforces inactive subscriptions. Purchase restore remains a user action. Tenant/session changes discard old synchronization results and stop pending retries.
 
+While active, the app automatically reads server entitlement every 5 seconds when purchase confirmation is pending or access is unknown, and every 30 seconds otherwise. Failed reads use the slower interval. Store customer information refreshes every minute without reloading offerings; delayed or mismatched ADMIN access triggers another reconciliation attempt. Backgrounding stops periodic checks. These near-realtime checks share the tenant-scoped cache across screens, so a late webhook updates access without a manual refresh. The server remains authoritative, including when trial or read-only access has the same plan name as the store purchase.
+
 ## Checks
 
 ```bash

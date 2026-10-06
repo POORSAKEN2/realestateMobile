@@ -21,11 +21,15 @@ Deploy the accompanying backend changes and run `php artisan migrate` before rel
 - Plan selection loads `/billing/plan-change-preview?tier=...` and displays usage blockers. Paid checkout requires a successful preview and explicit continuation. Free-plan preview directs users to support because the existing checkout endpoint supports only paid tiers.
 - Structured 403 `entitlement_limit_reached` responses open a plan modal for owners and direct managers to their account owner. Form input is retained. Ordinary permission failures do not open billing prompts.
 - Checkout is disabled while plan data is loading, failed, or another plan operation is pending. Billing refreshes on app foregrounding after returning from checkout.
+- Billing access updates automatically through the tenant-scoped entitlement query shared across screens. While the app is active, it reads `/billing/entitlement` every 5 seconds when access is unknown or a purchase awaits confirmation, and every 30 seconds otherwise. Failed reads retry at the slower interval. Managers only read access when they have `billing.viewEntitlement`; reconciliation still requires `billing.checkout`.
+- RevenueCat purchase/restore/listener events trigger immediate server reconciliation with bounded backoff. Fresh store status is also checked every minute while active, retrying reconciliation for delayed or mismatched access without reloading offerings or showing a loading spinner. App return triggers a fresh check; backgrounding stops periodic checks. Manual refresh remains an optional recovery action.
+- This is near-realtime polling, not a WebSocket connection. The existing backend `POST /api/webhooks/revenuecat` updates server access and the hourly reconciliation command remains a backstop. RevenueCat webhook authentication, tenant UUID mapping, server API credentials, deployed tier mappings, and scheduler execution must be configured separately. Client store state never grants server access.
 - Displayed report/support levels describe entitlement only; they do not implement scheduled exports, PDF generation, or a support routing engine.
 
 ## Verification
 
 - `node --test tests/accessPolicy.test.mjs tests/staffManagement.test.mjs tests/billingEntitlement.test.mjs`
+- `node --test tests/billingAutoRefresh.test.mjs tests/billingAccountState.test.mjs tests/billingRefreshPolicy.test.mjs tests/billingSync.test.mjs tests/billingEntitlementSync.test.mjs tests/revenueCat.test.mjs tests/revenueCatClient.test.mjs`
 - `npx tsc --noEmit`
 - Backend: `php vendor/bin/pest tests/Feature/Api/StaffManagementTest.php tests/Feature/Api/Billing tests/Unit/Billing tests/Unit/Services/Authorization tests/Feature/Authorization --compact`
 - Before release, run the PostgreSQL RLS suite against a dedicated test database, and smoke-test owner/manager flows on a device and real billing sandbox.

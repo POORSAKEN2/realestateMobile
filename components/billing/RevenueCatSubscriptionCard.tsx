@@ -65,7 +65,7 @@ export function RevenueCatSubscriptionCard({
     ? isPremium
       ? `Your store account owns ${productKey ? REVENUECAT_PRODUCT_LABELS[productKey] : billingState.storeLabel}${hasLifetimeAccess ? ", a lifetime purchase" : ""}. App access is confirmed separately by the server.`
       : "Choose Starter, Professional or Portfolio with secure in-app purchase."
-    : "Store status has not been confirmed. Refresh to check purchases and prices.";
+    : "Checking your store purchases. Status updates automatically while the app is open.";
 
   async function runAction(
     action: RevenueCatAction,
@@ -163,13 +163,11 @@ export function RevenueCatSubscriptionCard({
             className="min-w-0 flex-1 text-xs leading-5 text-textPrimary"
           >
             {entitlement
-              ? `Your store purchase is active, but protected app access still uses the ${billingState.serverLabel} plan.`
-              : "Your store purchase is active. Server access could not be confirmed; retry the plan refresh."}{" "}
+              ? `Your store purchase is active. Current server access: ${billingState.serverLabel}.`
+              : "Your store purchase is active. Server access has not been confirmed."}{" "}
             {serverSyncStatus === "delayed"
-              ? "Immediate verification is delayed; webhook and scheduled retries remain active."
-              : serverSyncStatus === "syncing"
-                ? "Server verification is running; upgraded features unlock after confirmation."
-                : "Refresh to check server access. Upgraded features require server confirmation."}
+              ? "Confirmation is taking longer than expected. We'll keep checking automatically while the app is open."
+              : "Checking server access automatically. Paid access updates after confirmation."}
           </Text>
         </View>
       ) : null}
