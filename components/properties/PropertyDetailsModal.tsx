@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { appRoutes } from "../../constants/navigation";
+import { useThemeColors } from "../../context/WorkspacePresentationContext";
 
 import { fetchDocuments, fetchLeases } from "../../api/propertyDetails";
 import { useFloorPlanQueries } from "../../hooks/api/useFloorPlans";
@@ -262,25 +263,35 @@ export function PropertyDetailsModal({
                 />
               </View>
 
-              <View className="mt-4 flex-row gap-3">
-                <CountMetric
-                  icon="users"
-                  label="Tenants"
-                  loading={isLoading}
-                  value={tenantCount}
-                />
-                <CountMetric
-                  icon="file-text"
-                  label="Documents"
-                  loading={isLoading}
-                  value={propertyDocuments.length}
-                />
-                <CountMetric
-                  icon="grid"
-                  label="Bedspaces"
-                  loading={floorPlanQueries.rooms.isLoading}
-                  value={property.bedspaceCount}
-                />
+              <View className="mt-4 gap-3">
+                <View className="flex-row gap-3">
+                  <CountMetric
+                    icon="users"
+                    label="Tenants"
+                    loading={isLoading}
+                    value={tenantCount}
+                  />
+                  <CountMetric
+                    icon="file-text"
+                    label="Documents"
+                    loading={isLoading}
+                    value={propertyDocuments.length}
+                  />
+                </View>
+                <View className="flex-row gap-3">
+                  <CountMetric
+                    icon="home"
+                    label="Rooms"
+                    loading={floorPlanQueries.rooms.isLoading}
+                    value={property.roomCount}
+                  />
+                  <CountMetric
+                    icon="grid"
+                    label="Bedspaces"
+                    loading={floorPlanQueries.rooms.isLoading}
+                    value={property.bedspaceCount}
+                  />
+                </View>
               </View>
 
               {!showFullDetails ? (
@@ -599,11 +610,13 @@ function CountMetric({
   loading: boolean;
   value: number;
 }) {
+  const palette = useThemeColors();
+
   return (
-    <View className="flex-1 rounded-2xl border border-primary/20 bg-panel p-4">
+    <View className="min-w-0 flex-1 rounded-2xl border border-primary/20 bg-panel p-4">
       <View className="flex-row items-center gap-2">
-        <Feather name={icon} color="#8A77F4" size={16} />
-        <Text className="font-ralewayBold text-[10px] uppercase text-secondary">
+        <Feather name={icon} color={palette.primaryContent} size={16} />
+        <Text className="min-w-0 flex-1 font-ralewayBold text-[10px] uppercase text-primaryContent">
           {label}
         </Text>
       </View>
