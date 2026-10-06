@@ -18,6 +18,7 @@ import { useProfileController } from "../../hooks/profile/useProfileController";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { appRoutes } from "../../constants/navigation";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
+import { ModuleHeader } from "../../components/ui/ModuleHeader";
 
 type ProfileScreenProps = {
   navigationLevel?: "primary" | "secondary";
@@ -89,12 +90,17 @@ export function ProfileScreen({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
       >
-        <SecondaryBackButton
-          accessibilityLabel="Back from account details"
-          variant="secondary"
-        />
-
         <View className="h-3" />
+        <ModuleHeader
+          title="Your Profile"
+          eyebrow="Account"
+          leading={
+            <SecondaryBackButton
+              accessibilityLabel="Back from account details"
+              variant="secondary"
+            />
+          }
+        />
         <ScrollView
           className="-mx-6 flex-1"
           contentContainerClassName="px-6 pb-8"
