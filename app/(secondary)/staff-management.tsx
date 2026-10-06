@@ -77,8 +77,8 @@ export default function StaffManagementScreen() {
   return (
     <Screen className="bg-surface">
       <ModuleHeader
-        title="Staff management"
-        eyebrow="Account owner"
+        title="Team & Access"
+        eyebrow="Organization"
         leading={<SecondaryBackButton />}
       />
       <ScrollView className="mt-6" contentContainerClassName="gap-4 pb-8">

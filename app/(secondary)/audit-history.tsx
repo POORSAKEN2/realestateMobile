@@ -109,7 +109,6 @@ export default function AuditHistoryScreen() {
 
   return (
     <Screen className="bg-surface">
-      <SecondaryBackButton />
       <FlatList
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
@@ -118,6 +117,7 @@ export default function AuditHistoryScreen() {
             <ModuleHeader
               title="Audit History"
               supportingText="Investigate account changes and security events."
+              leading={<SecondaryBackButton />}
             />
             <SearchToolbar
               accessibilityLabel="Search audit history"

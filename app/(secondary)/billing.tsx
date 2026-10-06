@@ -44,7 +44,7 @@ export default function BillingScreen() {
   return (
     <Screen className="bg-surface">
       <ModuleHeader
-        eyebrow="Account"
+        eyebrow="Organization"
         leading={
           <SecondaryBackButton
             accessibilityLabel="Back from billing"
@@ -52,11 +52,6 @@ export default function BillingScreen() {
           />
         }
         title="Plan & Billing"
-        supportingText={
-          accountEmail
-            ? `Signed in as ${accountEmail}`
-            : "View organization access and store purchases."
-        }
       />
       <PullToRefreshScrollView
         className="-mx-6 mt-6 flex-1"

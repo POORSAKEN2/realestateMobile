@@ -133,7 +133,6 @@ export default function DeletionRequestsScreen() {
 
   return (
     <Screen className="bg-surface">
-      <SecondaryBackButton />
       <FlatList
         data={queue.data?.data ?? []}
         keyExtractor={(item) => item.id}
@@ -143,8 +142,9 @@ export default function DeletionRequestsScreen() {
         ListHeaderComponent={
           <View className="gap-4 pb-4">
             <ModuleHeader
-              title="Deletion requests"
-              supportingText="Review verified personal-data and tenant-closure requests."
+              title="Deletion Requests"
+              supportingText="Review verified tenant-closure requests."
+              leading={<SecondaryBackButton />}
             />
             <View className="gap-2">
               <Text className="font-ralewayExtraBold text-xs uppercase text-description">

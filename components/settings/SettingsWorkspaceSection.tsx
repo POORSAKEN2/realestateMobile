@@ -15,7 +15,7 @@ export function SettingsWorkspaceSection() {
   if (can("settings.view"))
     items.push({
       icon: "options-outline",
-      label: "Workspace settings",
+      label: "Workspace",
       supportingText: "Identity, region, appearance, and maps",
       onPress: () => router.push(appRoutes.secondary.workspaceSettings),
     });
@@ -29,18 +29,18 @@ export function SettingsWorkspaceSection() {
   if (can("audit.view"))
     items.push({
       icon: "time-outline",
-      label: "Audit history",
+      label: "Audit History",
       supportingText: "Account changes and security events",
       onPress: () => router.push(appRoutes.secondary.auditHistory),
     });
   if (can("account.reviewDeletionRequests"))
     items.push({
       icon: "documents-outline",
-      label: "Deletion requests",
+      label: "Deletion Requests",
       supportingText: "Review data removal and tenant closure",
       onPress: () => router.push(appRoutes.secondary.deletionRequests),
     });
   return items.length ? (
-    <ProfileMenuSection title="Workspace management" items={items} />
+    <ProfileMenuSection title="Administration" items={items} />
   ) : null;
 }
