@@ -5,7 +5,7 @@
     "scheme": "terrane",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/branding/png/brand-logomark-white.png",
+    "icon": "./assets/branding/png/app-icon-purple.png",
     "newArchEnabled": true,
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -14,7 +14,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "icon": "./assets/branding/png/brand-logomark-white.png",
+      "icon": "./assets/branding/png/app-icon-purple.png",
       "splash": {
         "image": "./assets/branding/png/brand-combination-vertical.png",
         "resizeMode": "contain",
@@ -28,7 +28,7 @@
       }
     },
     "android": {
-      "icon": "./assets/branding/png/brand-logomark-white.png",
+      "icon": "./assets/branding/png/app-icon-purple.png",
       "splash": {
         "image": "./assets/branding/png/brand-combination-vertical.png",
         "resizeMode": "contain",
@@ -46,7 +46,7 @@
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/branding/png/app-icon-purple.png"
     },
     "plugins": ["expo-router", "expo-font"],
     "experiments": {
