@@ -1,7 +1,7 @@
 import { useAccess } from "../../hooks/auth/useAccess";
 import { useRouter } from "expo-router";
 import { useMemo, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 
 import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { PropertyCard } from "../../components/properties/PropertyCard";
@@ -49,7 +49,17 @@ type PropertyListItem =
   | { kind: "error" }
   | { kind: "empty" };
 
+const PROPERTY_GRID_GAP = 16;
+const MIN_PROPERTY_CARD_WIDTH = 320;
+
 export default function PropertiesScreen() {
+  const { fontScale } = useWindowDimensions();
+  const [galleryWidth, setGalleryWidth] = useState(0);
+  const galleryColumns =
+    galleryWidth >=
+    2 * MIN_PROPERTY_CARD_WIDTH * Math.max(1, fontScale) + PROPERTY_GRID_GAP
+      ? 2
+      : 1;
   const { session } = useAuth();
   const { can, access } = useAccess();
   const accessToken = session?.accessToken;
@@ -147,6 +157,10 @@ export default function PropertiesScreen() {
       ? propertyItems
       : [{ kind: "empty" as const }];
   }, [filteredProperties, isError, isLoading]);
+  const listColumns =
+    propertyListItems[0]?.kind === "property" ? galleryColumns : 1;
+  const cardWidth =
+    listColumns === 2 ? (galleryWidth - PROPERTY_GRID_GAP) / 2 : undefined;
 
   const filteredLocationSuggestions = useMemo(() => {
     const query = form.location.trim().toLowerCase();
@@ -168,7 +182,10 @@ export default function PropertiesScreen() {
 
   return (
     <Screen bottomInset="tab-bar" className="bg-surface">
-      <View className="flex-1">
+      <View
+        className="flex-1"
+        onLayout={({ nativeEvent }) => setGalleryWidth(nativeEvent.layout.width)}
+      >
         <View className="px-1 pb-5">
           <ModuleHeader
             action={
@@ -238,6 +255,11 @@ export default function PropertiesScreen() {
         </View>
 
         <PullToRefreshFlatList
+          key={`property-gallery-${listColumns}`}
+          numColumns={listColumns}
+          columnWrapperStyle={
+            listColumns === 2 ? { gap: PROPERTY_GRID_GAP } : undefined
+          }
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
           data={propertyListItems}
           ItemSeparatorComponent={() => <View className="h-4" />}
@@ -247,9 +269,18 @@ export default function PropertiesScreen() {
           renderItem={({ item }) => {
             if (item.kind === "loading") {
               return (
-                <View className="gap-4">
-                  <PropertyListSkeleton />
-                  <PropertyListSkeleton />
+                <View
+                  className="gap-4"
+                  style={
+                    galleryColumns === 2 ? { flexDirection: "row" } : undefined
+                  }
+                >
+                  <View className={galleryColumns === 2 ? "flex-1" : undefined}>
+                    <PropertyListSkeleton />
+                  </View>
+                  <View className={galleryColumns === 2 ? "flex-1" : undefined}>
+                    <PropertyListSkeleton />
+                  </View>
                 </View>
               );
             }
@@ -349,15 +380,17 @@ export default function PropertiesScreen() {
                 }),
             });
             return (
-              <PropertyCard
-                property={property}
-                onOpenDetails={() => setSelectedProperty(property)}
-                onManage={
-                  actions.length
-                    ? () => setManagedProperty({ property, actions })
-                    : undefined
-                }
-              />
+              <View style={{ width: cardWidth }}>
+                <PropertyCard
+                  property={property}
+                  onOpenDetails={() => setSelectedProperty(property)}
+                  onManage={
+                    actions.length
+                      ? () => setManagedProperty({ property, actions })
+                      : undefined
+                  }
+                />
+              </View>
             );
           }}
           onRefresh={refreshProperties}
