@@ -35,7 +35,7 @@
         "backgroundColor": "#ffffff"
       },
       "adaptiveIcon": {
-        "foregroundImage": "./assets/branding/png/brand-logomark-white.png",
+        "foregroundImage": "./assets/branding/png/android-adaptive-foreground.png",
         "backgroundColor": "#8A77F4"
       },
       "edgeToEdgeEnabled": true,
