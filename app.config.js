@@ -58,6 +58,7 @@ module.exports = ({ config }) => {
       "expo-notifications",
       "expo-secure-store",
       "./plugins/withInAppPurchaseCapability",
+      "./plugins/withFoldableConfiguration",
     ],
     extra: {
       ...config.extra,
