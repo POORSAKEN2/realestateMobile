@@ -1,17 +1,11 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Linking,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Linking, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { FaqAccordion } from "../../components/support/FaqAccordion";
 import { SupportTicketModal } from "../../components/support/SupportTicketModal";
+import { SupportListFeedback } from "../../components/support/SupportListFeedback";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
 import { Screen } from "../../components/ui/Screen";
@@ -22,9 +16,14 @@ import {
   useFaqs,
   useSupportTickets,
 } from "../../hooks/api/useSupport";
-import type { CreateSupportTicketPayload } from "../../types/domain/support";
+import type {
+  CreateSupportTicketPayload,
+  FAQItem,
+} from "../../types/domain/support";
 import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { supportLevelLabel } from "../../utils/billing/entitlementCapabilities";
+
+const EMPTY_FAQS: FAQItem[] = [];
 
 export default function SupportScreen() {
   const [activeTab, setActiveTab] = useState<"faqs" | "tickets">("faqs");
@@ -32,8 +31,10 @@ export default function SupportScreen() {
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
 
-  const { data: faqs = [], isLoading: isFaqsLoading, refetch: refetchFaqs } = useFaqs();
-  const { data: tickets = [], isLoading: isTicketsLoading, refetch: refetchTickets } = useSupportTickets();
+  const faqQuery = useFaqs();
+  const ticketQuery = useSupportTickets();
+  const faqs = faqQuery.data ?? EMPTY_FAQS;
+  const tickets = ticketQuery.data ?? [];
   const createTicketMutation = useCreateSupportTicket();
   const entitlementQuery = useBillingEntitlement();
   const currentSupportLevel =
@@ -51,7 +52,9 @@ export default function SupportScreen() {
 
   async function handleCreateTicket(payload: CreateSupportTicketPayload) {
     await createTicketMutation.mutateAsync(payload);
-    setSnackbarMessage("Support ticket submitted. Our team will reach out soon.");
+    setSnackbarMessage(
+      "Support ticket submitted. Our team will reach out soon.",
+    );
     setActiveTab("tickets");
   }
 
@@ -80,7 +83,8 @@ export default function SupportScreen() {
           title="Support Center"
         />
         <Text className="mt-2 text-base leading-6 text-description">
-          Find instant answers to common questions or submit a ticket to our support team.
+          Find instant answers to common questions or submit a ticket to our
+          support team.
         </Text>
 
         <View className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/10 p-4">
@@ -100,42 +104,52 @@ export default function SupportScreen() {
         {/* Tab Switcher */}
         <View className="mt-4 flex-row rounded-2xl bg-primary/10 p-1">
           <TouchableOpacity
+            accessibilityRole="tab"
+            accessibilityState={{ selected: activeTab === "faqs" }}
             activeOpacity={0.8}
-            className={`flex-1 h-10 items-center justify-center rounded-xl ${
+            className={`min-h-11 flex-1 items-center justify-center rounded-xl px-2 py-2 shadow-none ${
               activeTab === "faqs" ? "bg-panel shadow-sm" : ""
             }`}
             onPress={() => setActiveTab("faqs")}
           >
             <Text
               className={`font-ralewayBold text-xs ${
-                activeTab === "faqs" ? "text-primary" : "text-description"
+                activeTab === "faqs"
+                  ? "text-primaryContent"
+                  : "text-description"
               }`}
             >
-              Knowledge Base FAQs ({faqs.length})
+              Knowledge Base FAQs
+              {faqQuery.data !== undefined ? ` (${faqs.length})` : ""}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
+            accessibilityRole="tab"
+            accessibilityState={{ selected: activeTab === "tickets" }}
             activeOpacity={0.8}
-            className={`flex-1 h-10 items-center justify-center rounded-xl ${
+            className={`min-h-11 flex-1 items-center justify-center rounded-xl px-2 py-2 shadow-none ${
               activeTab === "tickets" ? "bg-panel shadow-sm" : ""
             }`}
             onPress={() => setActiveTab("tickets")}
           >
             <Text
               className={`font-ralewayBold text-xs ${
-                activeTab === "tickets" ? "text-primary" : "text-description"
+                activeTab === "tickets"
+                  ? "text-primaryContent"
+                  : "text-description"
               }`}
             >
-              My Tickets ({tickets.length})
+              My Tickets
+              {ticketQuery.data !== undefined ? ` (${tickets.length})` : ""}
             </Text>
           </TouchableOpacity>
         </View>
 
         {activeTab === "faqs" ? (
-          <View className="flex-1 mt-4">
+          <View key="faqs" className="mt-4 flex-1">
             {/* Search Bar */}
-            <View className="h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 shadow-sm shadow-primary/5 mb-3">
+            <View className="mb-3 h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 shadow-sm shadow-primary/5">
               <Feather name="search" size={16} color={colors.description} />
               <TextInput
                 accessibilityLabel="Search FAQs"
@@ -147,58 +161,85 @@ export default function SupportScreen() {
               />
               {searchQuery ? (
                 <TouchableOpacity onPress={() => setSearchQuery("")}>
-                  <Ionicons name="close-circle" size={16} color={colors.description} />
+                  <Ionicons
+                    name="close-circle"
+                    size={16}
+                    color={colors.description}
+                  />
                 </TouchableOpacity>
               ) : null}
             </View>
 
             {/* FAQs List */}
-            {isFaqsLoading ? (
-              <View className="flex-1 items-center justify-center">
-                <ActivityIndicator size="large" color={colors.primary} />
-              </View>
-            ) : (
+            <SupportListFeedback
+              label="FAQs"
+              hasData={faqQuery.data !== undefined}
+              isPending={faqQuery.isPending}
+              isError={faqQuery.isError}
+              isFetching={faqQuery.isFetching}
+              onRetry={() => {
+                void faqQuery.refetch();
+              }}
+            />
+            {faqQuery.data !== undefined ? (
               <PullToRefreshFlatList
-                className="flex-1 -mx-1 px-1"
+                className="-mx-1 flex-1 px-1"
                 contentContainerClassName="pb-12 pt-1"
                 data={filteredFaqs}
                 keyExtractor={(item) => String(item.id)}
-                onRefresh={refetchFaqs}
+                onRefresh={faqQuery.refetch}
                 renderItem={({ item }) => <FaqAccordion faq={item} />}
                 ListEmptyComponent={
-                  <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8 mt-4">
-                    <Feather name="help-circle" size={36} color={colors.description} />
-                    <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
-                      No matching FAQs
-                    </Text>
-                    <Text className="mt-1 text-center text-xs text-description">
-                      Can't find what you need? Tap "Ticket" above to contact support.
-                    </Text>
-                  </View>
+                  faqQuery.isError ? null : (
+                    <View className="mt-4 items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8">
+                      <Feather
+                        name="help-circle"
+                        size={36}
+                        color={colors.description}
+                      />
+                      <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
+                        {faqs.length > 0
+                          ? "No matching FAQs"
+                          : "No FAQs available"}
+                      </Text>
+                      <Text className="mt-1 text-center text-xs text-description">
+                        {faqs.length > 0
+                          ? "Try another search or use the + button to create a support ticket."
+                          : "Use the + button to create a support ticket."}
+                      </Text>
+                    </View>
+                  )
                 }
                 showsVerticalScrollIndicator={false}
               />
-            )}
+            ) : null}
           </View>
         ) : (
-          <View className="flex-1 mt-4">
-            {isTicketsLoading ? (
-              <View className="flex-1 items-center justify-center">
-                <ActivityIndicator size="large" color={colors.primary} />
-              </View>
-            ) : (
+          <View key="tickets" className="mt-4 flex-1">
+            <SupportListFeedback
+              label="tickets"
+              hasData={ticketQuery.data !== undefined}
+              isPending={ticketQuery.isPending}
+              isError={ticketQuery.isError}
+              isFetching={ticketQuery.isFetching}
+              onRetry={() => {
+                void ticketQuery.refetch();
+              }}
+            />
+            {ticketQuery.data !== undefined ? (
               <PullToRefreshFlatList
-                className="flex-1 -mx-1 px-1"
+                className="-mx-1 flex-1 px-1"
                 contentContainerClassName="pb-12 pt-1"
                 data={tickets}
                 keyExtractor={(item) => String(item.id)}
-                onRefresh={refetchTickets}
+                onRefresh={ticketQuery.refetch}
                 renderItem={({ item }) => {
-                  const isResolved = item.status === "Resolved" || item.status === "Closed";
+                  const isResolved =
+                    item.status === "Resolved" || item.status === "Closed";
                   return (
                     <View className="mb-3 rounded-2xl border border-primary/15 bg-panel p-4 shadow-sm shadow-primary/5">
                       <View className="flex-row items-center justify-between">
-                        <Text className="font-ralewayBold text-base text-textPrimary flex-1 pr-2">
+                        <Text className="flex-1 pr-2 font-ralewayBold text-base text-textPrimary">
                           {item.subject}
                         </Text>
                         <View
@@ -232,27 +273,33 @@ export default function SupportScreen() {
                   );
                 }}
                 ListEmptyComponent={
-                  <View className="items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8 mt-4">
-                    <Ionicons name="chatbubbles-outline" size={36} color={colors.description} />
-                    <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
-                      No support tickets yet
-                    </Text>
-                    <Text className="mt-1 text-center text-xs text-description">
-                      Need help? Tap the "Ticket" button at the top right.
-                    </Text>
-                  </View>
+                  ticketQuery.isError ? null : (
+                    <View className="mt-4 items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8">
+                      <Ionicons
+                        name="chatbubbles-outline"
+                        size={36}
+                        color={colors.description}
+                      />
+                      <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
+                        No support tickets yet
+                      </Text>
+                      <Text className="mt-1 text-center text-xs text-description">
+                        Need help? Use the + button to create a support ticket.
+                      </Text>
+                    </View>
+                  )
                 }
                 showsVerticalScrollIndicator={false}
               />
-            )}
+            ) : null}
           </View>
         )}
 
         {/* Contact shortcuts banner */}
-        <View className="mt-auto mb-2 flex-row gap-2 border-t border-primary/10 pt-3">
+        <View className="mb-2 mt-auto flex-row gap-2 border-t border-primary/10 pt-3">
           <TouchableOpacity
             activeOpacity={0.8}
-            className="flex-1 h-11 flex-row items-center justify-center rounded-xl bg-primary/10"
+            className="h-11 flex-1 flex-row items-center justify-center rounded-xl bg-primary/10"
             onPress={() => Linking.openURL("mailto:support@terrane.app")}
           >
             <Feather name="mail" size={15} color={colors.primary} />
@@ -263,7 +310,7 @@ export default function SupportScreen() {
 
           <TouchableOpacity
             activeOpacity={0.8}
-            className="flex-1 h-11 flex-row items-center justify-center rounded-xl bg-primary/10"
+            className="h-11 flex-1 flex-row items-center justify-center rounded-xl bg-primary/10"
             onPress={() => Linking.openURL("tel:+639171234567")}
           >
             <Feather name="phone" size={15} color={colors.primary} />

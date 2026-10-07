@@ -23,7 +23,7 @@ export function Button({
       : "border border-primary bg-panel active:bg-primary/10";
 
   const textClassName =
-    variant === "primary" ? "text-whitePrimary" : "text-primary";
+    variant === "primary" ? "text-whitePrimary" : "text-primaryContent";
 
   return (
     <Pressable

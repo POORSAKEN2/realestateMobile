@@ -1,5 +1,5 @@
-import { apiClient, authHeaders, unwrapData } from "./client";
-import type { ApiEnvelope } from "../types";
+import { apiClient, authHeaders, unwrapCollection, unwrapData } from "./client";
+import type { ApiEnvelope, PaginatedApiData } from "../types";
 import type {
   CreateSupportTicketPayload,
   FAQItem,
@@ -7,28 +7,23 @@ import type {
 } from "../types/domain/support";
 
 export async function fetchFaqs(accessToken?: string): Promise<FAQItem[]> {
-  const response = await apiClient.get<ApiEnvelope<FAQItem[]> | FAQItem[]>(
-    "/faqs",
-    { headers: authHeaders(accessToken) },
-  );
+  const response = await apiClient.get<
+    ApiEnvelope<FAQItem[]> | ApiEnvelope<PaginatedApiData<FAQItem>> | FAQItem[]
+  >("/faqs", { headers: authHeaders(accessToken) });
 
-  const raw = unwrapData<FAQItem[]>(response);
-  return Array.isArray(raw) ? raw : [];
+  return unwrapCollection<FAQItem>(response);
 }
 
 export async function fetchSupportTickets(
   accessToken?: string,
 ): Promise<SupportTicket[]> {
   const response = await apiClient.get<
-    ApiEnvelope<SupportTicket[]> | { data?: SupportTicket[] } | SupportTicket[]
+    | ApiEnvelope<SupportTicket[]>
+    | ApiEnvelope<PaginatedApiData<SupportTicket>>
+    | SupportTicket[]
   >("/support-tickets", { headers: authHeaders(accessToken) });
 
-  const raw = unwrapData<SupportTicket[]>(response);
-  if (Array.isArray(raw)) return raw;
-  if (raw && typeof raw === "object" && "data" in raw && Array.isArray((raw as any).data)) {
-    return (raw as any).data;
-  }
-  return [];
+  return unwrapCollection<SupportTicket>(response);
 }
 
 export async function createSupportTicket(
