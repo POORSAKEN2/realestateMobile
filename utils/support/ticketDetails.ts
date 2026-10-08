@@ -26,3 +26,18 @@ export function ticketStatusClass(status: string) {
       return "bg-surface text-textPrimary";
   }
 }
+
+export function ticketPriorityClass(priority?: string) {
+  switch (priority?.trim()) {
+    case "Low":
+      return "bg-successSurface text-success";
+    case "Medium":
+      return "bg-infoSurface text-info";
+    case "High":
+      return "bg-warningSurface text-warning";
+    case "Urgent":
+      return "bg-dangerSurface text-danger";
+    default:
+      return "bg-surface text-textPrimary";
+  }
+}

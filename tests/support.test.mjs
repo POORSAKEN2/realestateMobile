@@ -128,6 +128,8 @@ function screen({
   tickets,
   tab = "faqs",
   search = "",
+  filters,
+  createTicket = async () => {},
   refetch = async () => {},
 }) {
   const query = (overrides) => ({
@@ -138,7 +140,15 @@ function screen({
     refetch,
     ...overrides,
   });
-  let values = [tab, search, false, null, null];
+  let values = [
+    tab,
+    search,
+    false,
+    null,
+    null,
+    filters ?? ticketList.DEFAULT_TICKET_FILTERS,
+    false,
+  ];
   let index = 0;
   const mocks = {
     "react/jsx-runtime": jsx,
@@ -149,7 +159,8 @@ function screen({
         return [
           values[slot],
           (next) => {
-            values[slot] = next;
+            values[slot] =
+              typeof next === "function" ? next(values[slot]) : next;
           },
         ];
       },
@@ -160,7 +171,7 @@ function screen({
     "../../hooks/api/useSupport": {
       useFaqs: () => query(faqs),
       useSupportTickets: () => query(tickets),
-      useCreateSupportTicket: () => ({}),
+      useCreateSupportTicket: () => ({ mutateAsync: createTicket }),
     },
     "../../hooks/api/useBillingEntitlement": {
       useBillingEntitlement: () => ({}),
@@ -169,12 +180,15 @@ function screen({
       "../../utils/billing/entitlementCapabilities.ts",
     ),
     "../../components/support/SupportListFeedback": { SupportListFeedback },
+    "../../utils/support/ticketDetails": ticketDetailsHelpers,
+    "../../utils/support/ticketList": ticketList,
   };
   for (const [path, name] of [
     ["ui/PullToRefreshFlatList", "PullToRefreshFlatList"],
     ["support/FaqAccordion", "FaqAccordion"],
     ["support/SupportTicketModal", "SupportTicketModal"],
     ["support/SupportTicketDetailsModal", "SupportTicketDetailsModal"],
+    ["support/SupportTicketFilterSheet", "SupportTicketFilterSheet"],
     ["navigation/SecondaryBackButton", "SecondaryBackButton"],
     ["ui/ModuleHeader", "ModuleHeader"],
     ["ui/Screen", "Screen"],
@@ -199,9 +213,10 @@ test("ticket card opens selected details and dismissal retains list state", () =
     status: "Open",
   };
   const render = screen({ tab: "tickets", tickets: { data: [ticket] } });
-  const card = nodes(render()).find(
-    (node) =>
-      node.props?.accessibilityLabel === "View ticket details: Billing issue",
+  const card = nodes(render()).find((node) =>
+    node.props?.accessibilityLabel?.startsWith(
+      "View ticket details: Billing issue",
+    ),
   );
   card.props.onPress();
   const details = nodes(render()).find(
@@ -219,6 +234,377 @@ test("ticket card opens selected details and dismissal retains list state", () =
       .data[0],
     ticket,
   );
+});
+
+test("ticket cards hide descriptions and show only urgent priority before status", () => {
+  for (const priority of [
+    "Low",
+    "Medium",
+    "High",
+    "Urgent",
+    "Escalated",
+    undefined,
+  ]) {
+    for (const status of ["Open", "In Progress", "Resolved", "Closed"]) {
+      const ticket = {
+        id: "one",
+        subject: "Ticket",
+        priority,
+        status,
+        description: "Full description belongs in the sheet",
+      };
+      const render = screen({ tab: "tickets", tickets: { data: [ticket] } });
+      const tree = render();
+      assert.ok(!text(tree).includes(ticket.description));
+      const card = nodes(tree).find((node) =>
+        node.props?.accessibilityLabel?.startsWith("View ticket details:"),
+      );
+      const labels = nodes(card)
+        .filter((node) => node.type === "Text")
+        .map((node) => node.props.children);
+      if (priority === "Urgent") {
+        assert.equal(labels.indexOf("Urgent") + 1, labels.indexOf(status));
+        assert.match(card.props.accessibilityLabel, /Urgent priority/);
+      } else {
+        assert.equal(labels.includes(priority || "Not provided"), false);
+        assert.equal(labels.includes("Urgent"), false);
+        assert.equal(card.props.accessibilityLabel.includes("priority"), false);
+      }
+      card.props.onPress();
+      const selected = nodes(render()).find(
+        (node) => node.type === "SupportTicketDetailsModal",
+      ).props.ticket;
+      assert.equal(selected.description, ticket.description);
+    }
+  }
+});
+
+const ticketList = load("../../utils/support/ticketList.ts");
+const listRecords = [
+  {
+    id: "new",
+    subject: "New",
+    priority: "Low",
+    status: "Closed",
+    created_at: "2026-10-08T10:00:00Z",
+  },
+  {
+    id: "urgent",
+    subject: "Urgent ticket",
+    priority: "Urgent",
+    status: "Open",
+    created_at: "2026-10-07T10:00:00Z",
+  },
+  {
+    id: "high",
+    subject: "High ticket",
+    priority: "High",
+    status: "In Progress",
+    created_at: "2026-10-06T10:00:00Z",
+  },
+  {
+    id: "medium",
+    subject: "Medium ticket",
+    priority: "Medium",
+    status: "Resolved",
+    created_at: "2026-10-05T10:00:00Z",
+  },
+  {
+    id: "unknown",
+    subject: "Unknown",
+    priority: "Escalated",
+    status: "Deferred",
+    created_at: "invalid",
+  },
+  { id: "missing", subject: "Missing" },
+];
+
+test("ticket filters combine exactly and sort without mutating cached rows", () => {
+  const original = [...listRecords];
+  const ids = (filters) =>
+    ticketList
+      .filterAndSortTickets(listRecords, {
+        ...ticketList.DEFAULT_TICKET_FILTERS,
+        ...filters,
+      })
+      .map((ticket) => ticket.id);
+  assert.deepEqual(ids({ sort: "newest" }), [
+    "new",
+    "urgent",
+    "high",
+    "medium",
+    "missing",
+    "unknown",
+  ]);
+  assert.deepEqual(ids({ sort: "oldest" }), [
+    "medium",
+    "high",
+    "urgent",
+    "new",
+    "missing",
+    "unknown",
+  ]);
+  assert.deepEqual(ids({ sort: "priority" }), [
+    "urgent",
+    "high",
+    "medium",
+    "new",
+    "missing",
+    "unknown",
+  ]);
+  assert.deepEqual(ids({ sort: "status" }), [
+    "urgent",
+    "high",
+    "medium",
+    "new",
+    "missing",
+    "unknown",
+  ]);
+  assert.deepEqual(ids({ status: "Open", priority: "Urgent" }), ["urgent"]);
+  assert.deepEqual(ids({ status: "Closed", priority: "Urgent" }), []);
+  assert.deepEqual(ids({ status: "Deferred", priority: "Escalated" }), [
+    "unknown",
+  ]);
+  assert.deepEqual(ids({ status: "", priority: "" }), ["missing"]);
+  assert.deepEqual(listRecords, original);
+  assert.deepEqual(ids({ sort: "newest" }), ids({ sort: "newest" }));
+  const options = ticketList.ticketFilterOptions(listRecords);
+  assert.deepEqual(
+    options.statuses.map((option) => option.value),
+    ["ALL", "Open", "In Progress", "Resolved", "Closed", "Deferred", ""],
+  );
+  assert.deepEqual(
+    options.priorities.map((option) => option.value),
+    ["ALL", "Urgent", "High", "Medium", "Low", "Escalated", ""],
+  );
+});
+
+test("ticket sort/filter controls apply, cancel, clear and survive detail dismissal and tab switches", () => {
+  const render = screen({ tab: "tickets", tickets: { data: listRecords } });
+  const getSheet = () =>
+    nodes(render()).find(
+      (node) => node.type === "SupportTicketFilterSheet" && node.props.visible,
+    );
+  const open = () =>
+    nodes(render())
+      .find((node) =>
+        node.props?.accessibilityLabel?.startsWith("Sort and filter tickets."),
+      )
+      .props.onPress();
+  const data = () =>
+    nodes(render()).find((node) => node.type === "PullToRefreshFlatList").props
+      .data;
+  open();
+  getSheet().props.onClose();
+  assert.equal(getSheet(), undefined);
+  assert.equal(data().length, listRecords.length);
+  open();
+  const filters = { status: "Open", priority: "Urgent", sort: "priority" };
+  getSheet().props.onApply(filters);
+  assert.equal(getSheet(), undefined);
+  assert.deepEqual(
+    data().map((ticket) => ticket.id),
+    ["urgent"],
+  );
+  assert.match(text(render()), /Showing\s+1\s+of\s+6\s+tickets/);
+  nodes(render())
+    .find((node) =>
+      node.props?.accessibilityLabel?.startsWith("View ticket details:"),
+    )
+    .props.onPress();
+  nodes(render())
+    .find((node) => node.type === "SupportTicketDetailsModal")
+    .props.onClose();
+  open();
+  assert.deepEqual(getSheet().props.filters, filters);
+  getSheet().props.onClose();
+  nodes(render())
+    .find(
+      (node) =>
+        node.props?.accessibilityRole === "tab" &&
+        text(node).includes("Knowledge Base"),
+    )
+    .props.onPress();
+  nodes(render())
+    .find(
+      (node) =>
+        node.props?.accessibilityRole === "tab" &&
+        text(node).includes("My Tickets"),
+    )
+    .props.onPress();
+  assert.deepEqual(
+    data().map((ticket) => ticket.id),
+    ["urgent"],
+  );
+  open();
+  getSheet().props.onApply({ ...filters, status: "Closed" });
+  assert.deepEqual(data(), []);
+  const empty = nodes(render()).find(
+    (node) => node.type === "PullToRefreshFlatList",
+  ).props.ListEmptyComponent;
+  assert.match(text(empty), /No matching tickets/);
+  nodes(empty)
+    .find((node) => node.props?.accessibilityLabel === "Clear ticket filters")
+    .props.onPress();
+  assert.equal(data().length, listRecords.length);
+});
+
+test("successful ticket submission clears list filters so the new ticket is not hidden", async () => {
+  let submitted;
+  const render = screen({
+    tab: "tickets",
+    tickets: { data: listRecords },
+    filters: { status: "Closed", priority: "Low", sort: "oldest" },
+    createTicket: async (payload) => {
+      submitted = payload;
+    },
+  });
+  const payload = {
+    subject: "New ticket",
+    description: "Details",
+    category: "Billing",
+    priority: "Urgent",
+  };
+  await nodes(render())
+    .find((node) => node.type === "SupportTicketModal")
+    .props.onSubmit(payload);
+  assert.equal(submitted, payload);
+  assert.deepEqual(
+    nodes(render()).find((node) => node.type === "SupportTicketFilterSheet")
+      .props.filters,
+    ticketList.DEFAULT_TICKET_FILTERS,
+  );
+  assert.equal(
+    nodes(render()).find((node) => node.type === "ScreenSnackbar").props
+      .message,
+    "Support ticket submitted.",
+  );
+});
+
+test("shared radio choices announce selection and use readable theme tokens", () => {
+  const { RadioOptionList } = compile(
+    "../components/ui/groups/RadioOptionList.tsx",
+    {
+      "react/jsx-runtime": jsx,
+      "react-native": native,
+      "@expo/vector-icons": {
+        MaterialCommunityIcons: "MaterialCommunityIcons",
+      },
+      "../../../constants/colors": palette,
+    },
+  );
+  let selected;
+  const tree = RadioOptionList({
+    options: [
+      { value: "Open", label: "Open" },
+      { value: "Closed", label: "Closed" },
+    ],
+    value: "Open",
+    onSelect: (value) => {
+      selected = value;
+    },
+  });
+  const radios = nodes(tree).filter(
+    (node) => node.props?.accessibilityRole === "radio",
+  );
+  assert.deepEqual(
+    radios.map((node) => node.props.accessibilityState.checked),
+    [true, false],
+  );
+  radios[1].props.onPress();
+  assert.equal(selected, "Closed");
+  assert.match(
+    nodes(radios[0]).find((node) => node.type === "Text").props.className,
+    /text-primaryContent/,
+  );
+  assert.equal(
+    nodes(tree).find((node) => node.type === "MaterialCommunityIcons").props
+      .color,
+    palette.colors.primaryContent,
+  );
+});
+
+test("ticket filter sheet keeps edits local until apply and reset restores all defaults", () => {
+  let buttonPalette = palette.lightColors;
+  let draft = { status: "Closed", priority: "Low", sort: "oldest" };
+  const initial = draft;
+  let applied;
+  const { SupportTicketFilterSheet } = compile(
+    "../components/support/SupportTicketFilterSheet.tsx",
+    {
+      "react/jsx-runtime": jsx,
+      react: {
+        useEffect: () => {},
+        useRef: (current) => ({ current }),
+        useState: () => [
+          draft,
+          (next) => {
+            draft = typeof next === "function" ? next(draft) : next;
+          },
+        ],
+      },
+      "react-native": { ...native, Platform: { OS: "ios" } },
+      "../ui/SearchFilterSheet": {
+        SearchFilterSheet: "SearchFilterSheet",
+        SearchFilterSection: "SearchFilterSection",
+      },
+      "../ui/groups/RadioOptionList": { RadioOptionList: "RadioOptionList" },
+      "../ui/ModalActionFooter": { ModalActionFooter: "ModalActionFooter" },
+      "../../context/WorkspacePresentationContext": {
+        useThemeColors: () => buttonPalette,
+      },
+      "../../utils/support/ticketList": ticketList,
+    },
+  );
+  const options = ticketList.ticketFilterOptions(listRecords);
+  const render = () =>
+    SupportTicketFilterSheet({
+      filters: initial,
+      visible: true,
+      ...options,
+      onApply: (filters) => {
+        applied = filters;
+      },
+      onClose: () => {},
+    });
+  for (const [index, value] of [
+    [0, "Open"],
+    [1, "Urgent"],
+    [2, "priority"],
+  ]) {
+    nodes(render())
+      .filter((node) => node.type === "RadioOptionList")
+      [index].props.onSelect(value);
+  }
+  assert.deepEqual(initial, {
+    status: "Closed",
+    priority: "Low",
+    sort: "oldest",
+  });
+  assert.equal(applied, undefined);
+  for (const theme of [palette.lightColors, palette.darkColors]) {
+    buttonPalette = theme;
+    const applyButton = nodes(render().props.footer).find(
+      (node) => node.props?.accessibilityLabel === "Apply ticket filters",
+    );
+    assert.equal(applyButton.props.style.backgroundColor, theme.primaryStrong);
+    assert.match(
+      nodes(applyButton).find((node) => node.type === "Text").props.className,
+      /text-whitePrimary/,
+    );
+  }
+  nodes(render().props.footer)
+    .find((node) => node.props?.accessibilityLabel === "Apply ticket filters")
+    .props.onPress();
+  assert.deepEqual(applied, {
+    status: "Open",
+    priority: "Urgent",
+    sort: "priority",
+  });
+  nodes(render().props.footer)
+    .find((node) => node.props?.accessibilityLabel === "Reset ticket filters")
+    .props.onPress();
+  assert.deepEqual(draft, ticketList.DEFAULT_TICKET_FILTERS);
 });
 
 test("ticket detail endpoint encodes ID and unwraps response", async () => {
@@ -359,6 +745,43 @@ test("ticket details shows fresh response, complete description and missing-fiel
     nodes(tree).filter((node) => node.type === "TextInput").length,
     0,
   );
+});
+
+test("ticket detail priorities share status badge styling with semantic colors and neutral fallbacks", () => {
+  const badgeShape =
+    "self-start rounded-xl px-3 py-1.5 font-ralewayBold text-sm";
+  for (const [priority, colorClass] of [
+    ["Low", "bg-successSurface text-success"],
+    ["Medium", "bg-infoSurface text-info"],
+    ["High", "bg-warningSurface text-warning"],
+    ["Urgent", "bg-dangerSurface text-danger"],
+    ["Escalated", "bg-surface text-textPrimary"],
+    [undefined, "bg-surface text-textPrimary"],
+    ["", "bg-surface text-textPrimary"],
+    [" Urgent ", "bg-dangerSurface text-danger"],
+  ]) {
+    assert.equal(
+      ticketDetailsHelpers.ticketPriorityClass(priority),
+      colorClass,
+    );
+    const ticket = { id: "one", subject: "Help", status: "Open", priority };
+    const tree = detailsModal(ticket, { data: ticket });
+    const priorityBadge = nodes(tree).find(
+      (node) =>
+        node.type === "Text" &&
+        node.props.children === (priority?.trim() || "Not provided") &&
+        node.props.className?.startsWith(badgeShape),
+    );
+    assert.ok(priorityBadge);
+    assert.equal(priorityBadge.props.className, `${badgeShape} ${colorClass}`);
+    const statusBadge = nodes(tree).find(
+      (node) => node.type === "Text" && node.props.children === "Open",
+    );
+    assert.equal(
+      statusBadge.props.className,
+      `${badgeShape} bg-warningSurface text-warning`,
+    );
+  }
 });
 
 test("ticket details uses title case, smaller subject and a responsive 2x2 metadata grid", () => {

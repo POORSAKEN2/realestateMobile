@@ -15,6 +15,7 @@ import { colors } from "../../constants/colors";
 import { supportLevelLabel } from "../../utils/billing/entitlementCapabilities";
 import {
   isTicketUnavailable,
+  ticketPriorityClass,
   ticketStatusClass,
   ticketTimestamp,
 } from "../../utils/support/ticketDetails";
@@ -23,26 +24,51 @@ import { ModalHeader } from "../ui/ModalHeader";
 import { FormSection } from "../ui/forms/FormSection";
 import { Button } from "../ui/buttons/Button";
 
+function TicketBadge({
+  value,
+  colorClass,
+}: {
+  value: string;
+  colorClass: string;
+}) {
+  return (
+    <Text
+      className={`self-start rounded-xl px-3 py-1.5 font-ralewayBold text-sm ${colorClass}`}
+    >
+      {value}
+    </Text>
+  );
+}
+
 function DetailRow({
   label,
   value,
   column = false,
+  badgeClass,
 }: {
   label: string;
   value?: string;
   column?: boolean;
+  badgeClass?: string;
 }) {
   return (
     <View className={`min-w-0 gap-1 ${column ? "flex-1" : ""}`}>
       <Text className="font-ralewayMedium text-sm text-description">
         {label}
       </Text>
-      <Text
-        selectable
-        className="font-ralewaySemiBold text-base leading-6 text-textPrimary"
-      >
-        {value?.trim() || "Not provided"}
-      </Text>
+      {badgeClass ? (
+        <TicketBadge
+          value={value?.trim() || "Not provided"}
+          colorClass={badgeClass}
+        />
+      ) : (
+        <Text
+          selectable
+          className="font-ralewaySemiBold text-base leading-6 text-textPrimary"
+        >
+          {value?.trim() || "Not provided"}
+        </Text>
+      )}
     </View>
   );
 }
@@ -160,11 +186,10 @@ export function SupportTicketDetailsModal({
                     >
                       {detail.subject}
                     </Text>
-                    <Text
-                      className={`self-start rounded-xl px-3 py-1.5 font-ralewayBold text-sm ${ticketStatusClass(detail.status)}`}
-                    >
-                      {detail.status || "Status unavailable"}
-                    </Text>
+                    <TicketBadge
+                      value={detail.status || "Status unavailable"}
+                      colorClass={ticketStatusClass(detail.status)}
+                    />
                   </View>
                   <FormSection
                     title="Issue Description"
@@ -195,6 +220,7 @@ export function SupportTicketDetailsModal({
                         column={twoColumns}
                         label="Priority"
                         value={detail.priority}
+                        badgeClass={ticketPriorityClass(detail.priority)}
                       />
                     </View>
                     <View
