@@ -208,6 +208,159 @@ const text = (tree) =>
     .filter((node) => typeof node === "string" || typeof node === "number")
     .join(" ");
 
+function ticketModal(onSubmit) {
+  let index = 0;
+  const states = [];
+  const refs = [];
+  let refIndex = 0;
+  let closes = 0;
+  const { SupportTicketModal } = compile(
+    "../components/support/SupportTicketModal.tsx",
+    {
+      "react/jsx-runtime": jsx,
+      react: {
+        useState: (initial) => {
+          const slot = index++;
+          if (!(slot in states)) states[slot] = initial;
+          return [
+            states[slot],
+            (value) => {
+              states[slot] =
+                typeof value === "function" ? value(states[slot]) : value;
+            },
+          ];
+        },
+        useRef: (initial) =>
+          refs[refIndex++] ?? (refs[refIndex - 1] = { current: initial }),
+      },
+      "react-native": native,
+      "../ui/AddEditModal": { AddEditModal: "AddEditModal" },
+      "../ui/fields/BaseField": { BaseField: "BaseField" },
+    "../ui/fields/DropdownField": { DropdownField: "DropdownField" },
+    "../ui/forms/FormSection": { FormSection: "FormSection" },
+      "../../utils/support/ticketForm": load(
+        "../../utils/support/ticketForm.ts",
+      ),
+    },
+  );
+  const render = () => {
+    index = 0;
+    refIndex = 0;
+    return SupportTicketModal({
+      isVisible: true,
+      isPending: false,
+      onSubmit,
+      onClose: () => closes++,
+    });
+  };
+  const fill = () => {
+    for (const [label, value] of [
+      ["Subject", "  Billing issue  "],
+      ["Description & details", "  Restore failed  "],
+    ]) {
+      nodes(render())
+        .find((node) => node.type === "BaseField" && node.props.label === label)
+        .props.onChangeText(value);
+    }
+    nodes(render())
+      .find((node) => node.type === "DropdownField")
+      .props.onSelect("Billing");
+  };
+  return { render, fill, closes: () => closes };
+}
+
+test("ticket validates blank and oversized fields before transport", async () => {
+  const modal = ticketModal(() => {
+    throw new Error("Unexpected request");
+  });
+  await modal.render().props.onSubmit();
+  assert.match(text(modal.render()), /Enter a subject.*Describe your issue/);
+  const { validateTicket } = load("../../utils/support/ticketForm.ts");
+  assert.ok(
+    validateTicket({
+      subject: "x".repeat(256),
+      description: "Issue",
+      priority: "Medium",
+      category: "Technical",
+    }).subject,
+  );
+});
+
+test("ticket submits trimmed selected category once, disables fields, then resets on success", async () => {
+  let release;
+  const sent = [];
+  const modal = ticketModal((payload) => {
+    sent.push(payload);
+    return new Promise((resolve) => {
+      release = resolve;
+    });
+  });
+  modal.fill();
+  const submit = modal.render().props.onSubmit;
+  const pending = submit();
+  await submit();
+  assert.equal(sent.length, 1);
+  assert.deepEqual(sent[0], {
+    subject: "Billing issue",
+    description: "Restore failed",
+    priority: "Medium",
+    category: "Billing",
+  });
+  assert.equal(modal.render().props.isPending, true);
+  for (const node of nodes(modal.render()).filter(
+    (node) => node.type === "BaseField",
+  ))
+    assert.equal(node.props.editable, false);
+  release();
+  await pending;
+  assert.equal(modal.closes(), 1);
+  assert.equal(
+    nodes(modal.render()).find((node) => node.type === "BaseField").props.value,
+    "",
+  );
+  assert.equal(
+    nodes(modal.render()).find((node) => node.type === "DropdownField").props
+      .value,
+    "Technical",
+  );
+});
+
+test("ticket maps validation errors, preserves draft, and supports retry", async () => {
+  const { ApiError } = load("../../api/errors.ts");
+  let fail = true;
+  const modal = ticketModal(async () => {
+    if (fail)
+      throw new ApiError("Validation failed", 422, undefined, {
+        subject: ["Subject rejected"],
+      });
+  });
+  modal.fill();
+  await modal.render().props.onSubmit();
+  assert.match(text(modal.render()), /Subject rejected/);
+  assert.equal(
+    nodes(modal.render()).find((node) => node.type === "BaseField").props.value,
+    "  Billing issue  ",
+  );
+  assert.equal(modal.closes(), 0);
+  fail = false;
+  await modal.render().props.onSubmit();
+  assert.equal(modal.closes(), 1);
+});
+
+test("ticket network failure appears in general banner and retains draft", async () => {
+  const modal = ticketModal(async () => {
+    throw new Error("Network unavailable");
+  });
+  modal.fill();
+  await modal.render().props.onSubmit();
+  assert.equal(modal.render().props.formError, "Network unavailable");
+  assert.equal(
+    nodes(modal.render()).find((node) => node.type === "DropdownField").props
+      .value,
+    "Billing",
+  );
+});
+
 for (const tab of ["faqs", "tickets"]) {
   test(`${tab}: pending and failed reads never show empty results or zero counts`, () => {
     for (const state of [{ isPending: true }, { isError: true }]) {

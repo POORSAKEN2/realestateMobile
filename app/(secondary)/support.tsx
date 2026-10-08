@@ -52,9 +52,7 @@ export default function SupportScreen() {
 
   async function handleCreateTicket(payload: CreateSupportTicketPayload) {
     await createTicketMutation.mutateAsync(payload);
-    setSnackbarMessage(
-      "Support ticket submitted. Our team will reach out soon.",
-    );
+    setSnackbarMessage("Support ticket submitted.");
     setActiveTab("tickets");
   }
 
@@ -80,7 +78,7 @@ export default function SupportScreen() {
               variant="secondary"
             />
           }
-          title="Support Center"
+          title="Help Center"
         />
         <Text className="mt-2 text-base leading-6 text-description">
           Find instant answers to common questions or submit a ticket to our

@@ -4,7 +4,10 @@ import {
   fetchFaqs,
   fetchSupportTickets,
 } from "../../api/support";
-import type { CreateSupportTicketPayload } from "../../types/domain/support";
+import type {
+  CreateSupportTicketPayload,
+  SupportTicket,
+} from "../../types/domain/support";
 
 export const FAQS_QUERY_KEY = ["faqs"] as const;
 export const SUPPORT_TICKETS_QUERY_KEY = ["supportTickets"] as const;
@@ -27,8 +30,16 @@ export function useCreateSupportTicket() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateSupportTicketPayload) => createSupportTicket(payload),
-    onSuccess: () => {
+    mutationFn: (payload: CreateSupportTicketPayload) =>
+      createSupportTicket(payload),
+    onSuccess: (ticket) => {
+      queryClient.setQueryData<SupportTicket[]>(
+        SUPPORT_TICKETS_QUERY_KEY,
+        (current) => [
+          ticket,
+          ...(current ?? []).filter((item) => item.id !== ticket.id),
+        ],
+      );
       queryClient.invalidateQueries({ queryKey: SUPPORT_TICKETS_QUERY_KEY });
     },
   });
