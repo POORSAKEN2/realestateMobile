@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { Lessee, Property, PropertyDocument } from "../../types";
 import {
@@ -52,17 +53,15 @@ export function DocumentCard({
           onPress={onOpen}
         >
           <View
-            className="h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
-            style={{ backgroundColor: documentType.backgroundColor }}
+            className="h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-iconSurface"
           >
             <MaterialCommunityIcons
               name={documentType.icon}
-              color={documentType.color}
+              color={colors.primary}
               size={25}
             />
             <Text
-              className="mt-0.5 font-ralewayExtraBold text-[9px]"
-              style={{ color: documentType.color }}
+              className="mt-0.5 font-ralewayExtraBold text-[9px] text-primaryContent"
             >
               {document.type}
             </Text>

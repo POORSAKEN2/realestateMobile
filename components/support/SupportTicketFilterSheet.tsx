@@ -77,7 +77,7 @@ export function SupportTicketFilterSheet({
               accessibilityRole="button"
               accessibilityLabel="Apply ticket filters"
               className="min-h-14 flex-1 items-center justify-center rounded-2xl px-3 py-3"
-              style={{ backgroundColor: palette.primaryStrong }}
+              style={{ backgroundColor: palette.primary }}
               onPress={() => onApply(draft)}
             >
               <Text className="text-center font-ralewayBold text-base text-whitePrimary">

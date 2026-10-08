@@ -19,7 +19,7 @@ export function StaffManagementEntryCard({
       className="mt-8 min-h-24 flex-row items-center rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10"
       onPress={onPress}
     >
-      <View className="h-12 w-12 items-center justify-center rounded-2xl bg-accent/60">
+      <View className="h-12 w-12 items-center justify-center rounded-2xl bg-iconSurface">
         <Ionicons name="people-outline" color={colors.primary} size={24} />
       </View>
       <View className="ml-4 min-w-0 flex-1">

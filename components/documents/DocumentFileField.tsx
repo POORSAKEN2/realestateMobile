@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { DocumentUpload, PropertyDocument } from "../../types";
 
@@ -35,12 +36,12 @@ export function DocumentFileField({
           className="min-h-14 min-w-0 flex-1 flex-row items-center gap-3 px-2"
           onPress={onPick}
         >
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-panel">
+      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-iconSurface">
             <MaterialCommunityIcons
               name={
                 selectedFile ? "file-check-outline" : "cloud-upload-outline"
               }
-              color="#8A77F4"
+          color={colors.primary}
               size={23}
             />
           </View>

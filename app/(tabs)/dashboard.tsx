@@ -191,10 +191,10 @@ function AdminDashboardScreen() {
                     activeOpacity={0.8}
                     accessibilityLabel="Open property map"
                     accessibilityRole="button"
-                    className="h-12 w-12 items-center justify-center rounded-2xl bg-primary"
+                    className="h-12 w-12 items-center justify-center rounded-2xl bg-iconSurface"
                     onPress={() => openModuleRoute(appRoutes.secondary.map)}
                   >
-                    <Feather name="map" color={colors.whitePrimary} size={18} />
+                    <Feather name="map" color={colors.primary} size={18} />
                   </TouchableOpacity>
                 </View>
               </View>

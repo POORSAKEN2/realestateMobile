@@ -108,7 +108,7 @@ export function RevenueCatSubscriptionCard({
   return (
     <View className="gap-4 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/5">
       <View className="flex-row items-start gap-3">
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-accent/30">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
           <Feather name="star" color={colors.primary} size={19} />
         </View>
         <View className="min-w-0 flex-1">

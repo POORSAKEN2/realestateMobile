@@ -12,10 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { getStandardModalSheetHeight } from "../../constants/modal";
-import {
-  useThemeColors,
-  useWorkspacePresentation,
-} from "../../context/WorkspacePresentationContext";
+import { useThemeColors } from "../../context/WorkspacePresentationContext";
 import { BottomSheetModal } from "./BottomSheetModal";
 import { MODAL_ACTION_FOOTER_CONTENT_HEIGHT } from "./ModalActionFooter";
 import { ModalHeader } from "./ModalHeader";
@@ -46,14 +43,9 @@ function ActionRow({
   onPress: () => void;
 }) {
   const palette = useThemeColors();
-  const { resolvedTheme } = useWorkspacePresentation();
   const iconColor = action.destructive
     ? palette.danger
-    : grouped && resolvedTheme === "light"
-      ? palette.primaryStrong
-      : grouped
-        ? palette.secondary
-        : palette.primary;
+    : palette.primary;
 
   return (
     <TouchableOpacity
@@ -77,7 +69,7 @@ function ActionRow({
     >
       <View
         className={`h-11 w-11 items-center justify-center rounded-xl ${
-          action.destructive ? "bg-dangerSurface" : "bg-primary/10"
+          action.destructive ? "bg-dangerSurface" : "bg-iconSurface"
         }`}
       >
         <MaterialCommunityIcons

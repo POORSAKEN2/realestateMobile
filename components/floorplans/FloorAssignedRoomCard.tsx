@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { PropertyRoom, PropertyRoomStatus } from "../../types";
 import { getRoomStatusLabel } from "../../utils/floorplans/floorPlanPresentation";
@@ -37,8 +38,8 @@ export function FloorAssignedRoomCard({
   return (
     <View className="rounded-2xl border border-textPrimary/10 bg-panel p-4">
       <View className="flex-row items-center gap-3">
-        <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
-          <MaterialCommunityIcons name="door" color="#8A77F4" size={20} />
+        <View className="h-11 w-11 items-center justify-center rounded-xl bg-iconSurface">
+          <MaterialCommunityIcons name="door" color={colors.primary} size={20} />
         </View>
         <View className="min-w-0 flex-1">
           <Text

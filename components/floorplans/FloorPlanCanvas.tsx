@@ -1,4 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
+import { colors } from "../../constants/colors";
 import { useEffect, useMemo, useState } from "react";
 import {
   GestureResponderEvent,
@@ -131,8 +132,8 @@ export function FloorPlanCanvas({
       >
         {!image ? (
           <View className="flex-1 items-center justify-center px-8">
-            <View className="h-14 w-14 items-center justify-center rounded-2xl bg-panel">
-              <Feather name="image" color="#8A77F4" size={24} />
+          <View className="h-14 w-14 items-center justify-center rounded-2xl bg-iconSurface">
+              <Feather name="image" color={colors.primary} size={24} />
             </View>
             <Text className="mt-3 text-center font-ralewayBold text-sm text-textPrimary">
               Add floor plan image

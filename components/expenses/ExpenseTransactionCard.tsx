@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Pressable, Text, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { Expense } from "../../types/domain/expenses";
 
@@ -58,10 +59,10 @@ export function ExpenseTransactionCard({
         elevation: 2,
       }}
     >
-      <View className="mr-3 h-11 w-11 items-center justify-center rounded-[14px] bg-primary/10 ">
+        <View className="mr-3 h-11 w-11 items-center justify-center rounded-[14px] bg-iconSurface">
         <MaterialCommunityIcons
           name={getExpenseIcon(expense.category)}
-          color="#8A77F4"
+          color={colors.primary}
           size={21}
         />
       </View>

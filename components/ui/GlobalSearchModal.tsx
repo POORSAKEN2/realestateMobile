@@ -201,7 +201,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                         onPress={() => navigateTo(appRoutes.primary.properties)}
                       >
                         <View className="flex-row items-center gap-3">
-                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
                             <Ionicons
                               name="business-outline"
                               size={18}
@@ -241,7 +241,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                         onPress={() => navigateTo(appRoutes.secondary.leases)}
                       >
                         <View className="flex-row items-center gap-3">
-                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
                             <Ionicons
                               name="document-text-outline"
                               size={18}
@@ -284,7 +284,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                         onPress={() => navigateTo(appRoutes.primary.tenants)}
                       >
                         <View className="flex-row items-center gap-3">
-                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
                             <Ionicons
                               name="person-outline"
                               size={18}
@@ -324,7 +324,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                         onPress={() => navigateTo(appRoutes.primary.expenses)}
                       >
                         <View className="flex-row items-center gap-3">
-                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
                             <Ionicons
                               name="receipt-outline"
                               size={18}
@@ -366,7 +366,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                         }
                       >
                         <View className="flex-row items-center gap-3">
-                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
                             <MaterialCommunityIcons
                               name="file-document-outline"
                               size={18}
@@ -406,7 +406,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                         onPress={() => navigateTo(appRoutes.secondary.bookings)}
                       >
                         <View className="flex-row items-center gap-3">
-                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                          <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
                             <Ionicons
                               name="calendar-outline"
                               size={18}

@@ -55,7 +55,7 @@ function FilterButton({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       activeOpacity={0.8}
-      className="relative h-12 min-w-12 items-center justify-center rounded-2xl"
+      className="relative h-12 min-w-12 items-center justify-center rounded-2xl bg-iconSurface"
       onPress={onPress}
     >
       <MaterialCommunityIcons

@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
+import { colors } from "../../../constants/colors";
 
 type FormSectionProps = {
   children: ReactNode;
@@ -33,13 +34,13 @@ export function FormSection({
         <View
           className={
             isCard
-              ? "h-12 w-12 items-center justify-center rounded-2xl bg-primary/10"
-              : "h-9 w-9 items-center justify-center rounded-xl bg-primary/10"
+              ? "h-12 w-12 items-center justify-center rounded-2xl bg-iconSurface"
+              : "h-9 w-9 items-center justify-center rounded-xl bg-iconSurface"
           }
         >
           <MaterialCommunityIcons
             name={icon}
-            color="#8A77F4"
+            color={colors.primary}
             size={isCard ? 22 : 19}
           />
         </View>

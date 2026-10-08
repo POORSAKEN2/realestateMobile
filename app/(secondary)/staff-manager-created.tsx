@@ -59,7 +59,7 @@ export default function StaffManagerCreatedScreen() {
 
         <View className="mt-8 overflow-hidden rounded-[24px] border border-primary/15 bg-panel shadow-sm shadow-primary/10">
           <View className="min-h-16 flex-row items-center px-5">
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
               <Ionicons name="mail-outline" color={colors.primary} size={20} />
             </View>
             <View className="ml-3 flex-1">
@@ -72,7 +72,7 @@ export default function StaffManagerCreatedScreen() {
             </View>
           </View>
           <View className="min-h-16 flex-row items-center border-t border-primary/10 px-5">
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
               <Ionicons
                 name="shield-checkmark-outline"
                 color={colors.primary}

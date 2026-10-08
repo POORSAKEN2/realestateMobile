@@ -1,5 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import { SkeletonBlock } from "../ui/Skeleton";
 import type { FloorPlan, PropertyRoom } from "../../types";
@@ -96,8 +97,8 @@ export function PropertyFloorSummary({
                 key={floor.id}
               >
                 <View className="flex-row items-center gap-3">
-                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                    <Feather name="layers" color="#8A77F4" size={17} />
+                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
+                    <Feather name="layers" color={colors.primary} size={17} />
                   </View>
                   <View className="min-w-0 flex-1">
                     <Text

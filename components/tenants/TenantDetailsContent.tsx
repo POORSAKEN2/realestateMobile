@@ -87,7 +87,7 @@ export function TenantDetailsContent({
       >
         <View className="px-6 pb-2">
           <View className="flex-row items-start gap-4">
-            <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+            <View className="h-14 w-14 items-center justify-center rounded-2xl bg-iconSurface">
               <Text className="font-ralewayExtraBold text-xl text-secondary">
                 {getTenantInitials(tenant.name)}
               </Text>
@@ -220,7 +220,7 @@ function ContactRow({
 }) {
   return (
     <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4">
-      <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+      <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
         <Ionicons color="#8A77F4" name={icon} size={19} />
       </View>
       <View className="min-w-0 flex-1">

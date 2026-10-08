@@ -91,12 +91,12 @@ export function LocationPinPicker({
           accessibilityLabel="Open property pin map"
           accessibilityRole="button"
           activeOpacity={0.85}
-          className="h-11 w-11 items-center justify-center rounded-2xl bg-primary"
+          className="h-11 w-11 items-center justify-center rounded-2xl bg-iconSurface"
           onPress={() => setIsMapVisible(true)}
         >
           <MaterialCommunityIcons
             name="map-marker-radius-outline"
-            color="#FFFFFF"
+            color={colors.primary}
             size={22}
           />
         </TouchableOpacity>

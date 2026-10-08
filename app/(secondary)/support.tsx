@@ -113,7 +113,7 @@ export default function SupportScreen() {
         </Text>
 
         <View className="mt-4 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/10 p-4">
-          <View className="h-10 w-10 items-center justify-center rounded-2xl bg-panel">
+          <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
             <Feather name="headphones" size={18} color={colors.primary} />
           </View>
           <View className="min-w-0 flex-1">
