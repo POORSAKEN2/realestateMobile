@@ -7,6 +7,7 @@ import ts from "typescript";
 import load from "./helpers/loadTs.cjs";
 import postcss from "postcss";
 import tailwind from "tailwindcss";
+import { QueryClient, QueryObserver } from "@tanstack/react-query";
 const { cssToReactNativeRuntime } = load("react-native-css-interop/css-to-rn");
 
 function compile(path, mocks) {
@@ -137,7 +138,7 @@ function screen({
     refetch,
     ...overrides,
   });
-  let values = [tab, search, false, null];
+  let values = [tab, search, false, null, null];
   let index = 0;
   const mocks = {
     "react/jsx-runtime": jsx,
@@ -173,6 +174,7 @@ function screen({
     ["ui/PullToRefreshFlatList", "PullToRefreshFlatList"],
     ["support/FaqAccordion", "FaqAccordion"],
     ["support/SupportTicketModal", "SupportTicketModal"],
+    ["support/SupportTicketDetailsModal", "SupportTicketDetailsModal"],
     ["navigation/SecondaryBackButton", "SecondaryBackButton"],
     ["ui/ModuleHeader", "ModuleHeader"],
     ["ui/Screen", "Screen"],
@@ -188,6 +190,333 @@ function screen({
     return SupportScreen();
   };
 }
+
+test("ticket card opens selected details and dismissal retains list state", () => {
+  const ticket = {
+    id: "one",
+    subject: "Billing issue",
+    description: "Details",
+    status: "Open",
+  };
+  const render = screen({ tab: "tickets", tickets: { data: [ticket] } });
+  const card = nodes(render()).find(
+    (node) =>
+      node.props?.accessibilityLabel === "View ticket details: Billing issue",
+  );
+  card.props.onPress();
+  const details = nodes(render()).find(
+    (node) => node.type === "SupportTicketDetailsModal",
+  );
+  assert.equal(details.props.ticket, ticket);
+  details.props.onClose();
+  assert.equal(
+    nodes(render()).find((node) => node.type === "SupportTicketDetailsModal")
+      .props.ticket,
+    null,
+  );
+  assert.equal(
+    nodes(render()).find((node) => node.type === "PullToRefreshFlatList").props
+      .data[0],
+    ticket,
+  );
+});
+
+test("ticket detail endpoint encodes ID and unwraps response", async () => {
+  const ticket = { id: "one/two", status: "In Progress" };
+  for (const response of [ticket, { data: ticket }]) {
+    const api = compile("../api/support.ts", {
+      "./client": {
+        ...clientHelpers,
+        apiClient: {
+          get: async (url, options) => {
+            assert.equal(url, "/support-tickets/one%2Ftwo");
+            assert.equal(options.headers.Authorization, "Bearer token");
+            return response;
+          },
+        },
+      },
+    });
+    assert.deepEqual(await api.fetchSupportTicket(ticket.id, "token"), ticket);
+  }
+});
+
+const ticketDetailsHelpers = load("../../utils/support/ticketDetails.ts");
+const { ApiError: TicketApiError } = load("../../api/errors.ts");
+
+test("clearing denied detail data retains the error without refetching", async () => {
+  const client = new QueryClient();
+  const key = ["supportTickets", "detail", "denied"];
+  client.setQueryData(key, { id: "denied", subject: "Cached private details" });
+  let requests = 0;
+  const observer = new QueryObserver(client, {
+    queryKey: key,
+    retry: false,
+    enabled: false,
+    queryFn: async () => {
+      requests++;
+      throw new TicketApiError("Denied", 403);
+    },
+  });
+  const unsubscribe = observer.subscribe(() => {});
+  try {
+    await observer.refetch();
+    client
+      .getQueryCache()
+      .find({ queryKey: key, exact: true })
+      .setState({ data: undefined });
+    assert.equal(observer.getCurrentResult().data, undefined);
+    assert.equal(observer.getCurrentResult().isError, true);
+    assert.equal(requests, 1);
+  } finally {
+    unsubscribe();
+    client.clear();
+  }
+});
+
+test("ticket details handles timestamps, unknown statuses and unavailable errors", () => {
+  assert.equal(ticketDetailsHelpers.ticketTimestamp(), "Unavailable");
+  assert.equal(ticketDetailsHelpers.ticketTimestamp("invalid"), "Unavailable");
+  assert.notEqual(
+    ticketDetailsHelpers.ticketTimestamp("2026-10-08T01:00:00Z"),
+    "Unavailable",
+  );
+  assert.equal(
+    ticketDetailsHelpers.ticketStatusClass("Escalated"),
+    "bg-surface text-textPrimary",
+  );
+  for (const status of [403, 404])
+    assert.equal(
+      ticketDetailsHelpers.isTicketUnavailable(
+        new TicketApiError("Denied", status),
+      ),
+      true,
+    );
+  assert.equal(
+    ticketDetailsHelpers.isTicketUnavailable(new TicketApiError("Failed", 500)),
+    false,
+  );
+});
+
+function detailsModal(
+  ticket,
+  query,
+  onClose = () => {},
+  dimensions = { height: 800, width: 393, fontScale: 1 },
+) {
+  const { SupportTicketDetailsModal } = compile(
+    "../components/support/SupportTicketDetailsModal.tsx",
+    {
+      "react/jsx-runtime": jsx,
+      react: { useEffect: () => {}, useRef: (current) => ({ current }) },
+      "react-native": {
+        ...native,
+        Platform: { OS: "ios" },
+        ScrollView: "ScrollView",
+        useWindowDimensions: () => dimensions,
+      },
+      "react-native-safe-area-context": {
+        useSafeAreaInsets: () => ({ bottom: 24 }),
+      },
+      "../../hooks/api/useSupport": { useSupportTicket: () => query },
+      "../../hooks/ui/useReducedMotionPreference": {
+        useReducedMotionPreference: () => true,
+      },
+      "../../constants/colors": palette,
+      "../../utils/billing/entitlementCapabilities": load(
+        "../../utils/billing/entitlementCapabilities.ts",
+      ),
+      "../../utils/support/ticketDetails": ticketDetailsHelpers,
+      "../ui/BottomSheetModal": { BottomSheetModal: "BottomSheetModal" },
+      "../ui/ModalHeader": { ModalHeader: "ModalHeader" },
+      "../ui/forms/FormSection": { FormSection: "FormSection" },
+      "../ui/buttons/Button": { Button },
+    },
+  );
+  return SupportTicketDetailsModal({ ticket, onClose });
+}
+
+test("ticket details shows fresh response, complete description and missing-field fallbacks", () => {
+  const old = {
+    id: "one",
+    subject: "Old",
+    status: "Open",
+    description: "Old description",
+  };
+  const fresh = {
+    ...old,
+    subject: "Fresh",
+    status: "Escalated",
+    description: "x".repeat(1000),
+  };
+  const tree = detailsModal(old, { data: fresh });
+  assert.match(text(tree), /Fresh/);
+  assert.match(text(tree), /Escalated/);
+  assert.ok(text(tree).includes(fresh.description));
+  assert.match(text(tree), /Not provided/);
+  assert.match(text(tree), /Unavailable/);
+  assert.equal(tree.props.reducedMotion, true);
+  assert.equal(
+    nodes(tree).filter((node) => node.type === "TextInput").length,
+    0,
+  );
+});
+
+test("ticket details uses title case, smaller subject and a responsive 2x2 metadata grid", () => {
+  const ticket = {
+    id: "one",
+    subject: "Support submission",
+    status: "Open",
+    description: "Test ticket",
+  };
+  for (const [width, fontScale, direction] of [
+    [393, 1, "flex-row"],
+    [320, 1, "flex-col"],
+    [393, 2, "flex-col"],
+  ]) {
+    const tree = detailsModal(ticket, { data: ticket }, undefined, {
+      height: 800,
+      width,
+      fontScale,
+    });
+    assert.equal(
+      nodes(tree).find((node) => node.type === "ModalHeader").props.title,
+      "Ticket Details",
+    );
+    const subject = nodes(tree).find(
+      (node) => node.type === "Text" && node.props.children === ticket.subject,
+    );
+    assert.match(subject.props.className, /text-lg/);
+    const grids = nodes(tree).filter(
+      (node) =>
+        node.type === "View" && node.props.className === `gap-4 ${direction}`,
+    );
+    assert.equal(grids.length, 2);
+    assert.deepEqual(
+      grids.map((grid) => grid.props.children.map((cell) => cell.props.label)),
+      [
+        ["Category", "Priority"],
+        ["Submitted", "Last updated"],
+      ],
+    );
+  }
+});
+
+test("ticket details retains cached data on failure and retry invokes refresh", () => {
+  let retries = 0;
+  const ticket = {
+    id: "one",
+    subject: "Cached issue",
+    status: "Open",
+    description: "Details",
+  };
+  const tree = detailsModal(ticket, {
+    isError: true,
+    error: new TicketApiError("Failed", 500),
+    refetch: () => {
+      retries++;
+    },
+  });
+  assert.match(text(tree), /Cached issue/);
+  assert.match(text(tree), /Couldn’t refresh ticket details/);
+  nodes(tree)
+    .find((node) => node.type === "Pressable")
+    .props.onPress();
+  assert.equal(retries, 1);
+  assert.match(
+    text(detailsModal(null, { isFetching: true })),
+    /Loading ticket details/,
+  );
+  assert.match(
+    text(detailsModal(null, { isError: true })),
+    /Couldn’t load ticket details/,
+  );
+});
+
+test("403 and 404 conceal cached ticket content", () => {
+  for (const status of [403, 404]) {
+    const ticket = {
+      id: "one",
+      subject: "Private subject",
+      status: "Open",
+      description: "Private details",
+    };
+    const tree = detailsModal(ticket, {
+      data: ticket,
+      isError: true,
+      error: new TicketApiError("Denied", status),
+    });
+    assert.match(text(tree), /This ticket is no longer available/);
+    assert.doesNotMatch(text(tree), /Private subject|Private details/);
+  }
+});
+
+test("ticket query scopes selection, refreshes on open, updates list and clears denied cache", async () => {
+  let options;
+  let state = {};
+  const effects = [];
+  let list = [
+    { id: "one", status: "Open" },
+    { id: "two", status: "Open" },
+  ];
+  const cleared = [],
+    invalidated = [];
+  const hooks = compile("../hooks/api/useSupport.ts", {
+    react: { useEffect: (effect) => effects.push(effect) },
+    "@tanstack/react-query": {
+      useQuery: (value) => {
+        options = value;
+        return state;
+      },
+      useMutation: () => ({}),
+      useQueryClient: () => ({
+        setQueryData: (key, update) => {
+          assert.deepEqual(key, ["supportTickets"]);
+          list = update(list);
+        },
+        getQueryCache: () => ({
+          find: (value) => ({
+            setState: (state) => cleared.push({ value, state }),
+          }),
+        }),
+        invalidateQueries: (value) => invalidated.push(value),
+      }),
+    },
+    "../../api/support": {
+      fetchSupportTicket: async (id) => ({ id, status: "Resolved" }),
+    },
+    "../../utils/support/ticketDetails": ticketDetailsHelpers,
+  });
+  hooks.useSupportTicket(list[0]);
+  assert.deepEqual(options.queryKey, ["supportTickets", "detail", "one"]);
+  assert.equal(options.refetchOnMount, "always");
+  const firstRequest = options.queryFn({
+    signal: new AbortController().signal,
+  });
+  hooks.useSupportTicket(list[1]);
+  assert.deepEqual(options.queryKey, ["supportTickets", "detail", "two"]);
+  assert.equal(options.placeholderData.id, "two");
+  assert.equal((await firstRequest).id, "one");
+  assert.equal(list[0].status, "Resolved");
+  assert.equal(list[1].status, "Open");
+  assert.equal(options.retry(0, new TicketApiError("Denied", 403)), false);
+  assert.equal(options.retry(0, new Error("Offline")), true);
+  state = { error: new TicketApiError("Missing", 404) };
+  hooks.useSupportTicket(list[1]);
+  effects.at(-1)();
+  assert.deepEqual(cleared[0], {
+    value: {
+      queryKey: ["supportTickets", "detail", "two"],
+      exact: true,
+    },
+    state: { data: undefined },
+  });
+  assert.deepEqual(invalidated[0], {
+    queryKey: ["supportTickets"],
+    exact: true,
+  });
+  hooks.useSupportTicket(null);
+  assert.equal(options.enabled, false);
+});
 
 function nodes(element) {
   if (element == null || typeof element === "boolean") return [];
@@ -236,8 +565,8 @@ function ticketModal(onSubmit) {
       "react-native": native,
       "../ui/AddEditModal": { AddEditModal: "AddEditModal" },
       "../ui/fields/BaseField": { BaseField: "BaseField" },
-    "../ui/fields/DropdownField": { DropdownField: "DropdownField" },
-    "../ui/forms/FormSection": { FormSection: "FormSection" },
+      "../ui/fields/DropdownField": { DropdownField: "DropdownField" },
+      "../ui/forms/FormSection": { FormSection: "FormSection" },
       "../../utils/support/ticketForm": load(
         "../../utils/support/ticketForm.ts",
       ),

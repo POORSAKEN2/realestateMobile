@@ -37,6 +37,10 @@ for (const [theme, palette] of Object.entries({
   test(`${theme} badges, inverse actions, alerts and snackbars retain readable contrast`, () => {
     for (const [foreground, background] of [
       ["text", "panel"],
+      ["warning", "warningSurface"],
+      ["success", "successSurface"],
+      ["info", "infoSurface"],
+      ["description", "panel"],
       ["description", "surface"],
       ["onInverse", "text"],
       ["onDanger", "danger"],

@@ -5,6 +5,7 @@ import { Linking, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { FaqAccordion } from "../../components/support/FaqAccordion";
 import { SupportTicketModal } from "../../components/support/SupportTicketModal";
+import { SupportTicketDetailsModal } from "../../components/support/SupportTicketDetailsModal";
 import { SupportListFeedback } from "../../components/support/SupportListFeedback";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
@@ -19,6 +20,7 @@ import {
 import type {
   CreateSupportTicketPayload,
   FAQItem,
+  SupportTicket,
 } from "../../types/domain/support";
 import { useBillingEntitlement } from "../../hooks/api/useBillingEntitlement";
 import { supportLevelLabel } from "../../utils/billing/entitlementCapabilities";
@@ -30,6 +32,9 @@ export default function SupportScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
+  const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(
+    null,
+  );
 
   const faqQuery = useFaqs();
   const ticketQuery = useSupportTickets();
@@ -235,7 +240,13 @@ export default function SupportScreen() {
                   const isResolved =
                     item.status === "Resolved" || item.status === "Closed";
                   return (
-                    <View className="mb-3 rounded-2xl border border-primary/15 bg-panel p-4 shadow-sm shadow-primary/5">
+                    <TouchableOpacity
+                      className="mb-3 rounded-2xl border border-primary/15 bg-panel p-4 shadow-sm shadow-primary/5"
+                      activeOpacity={0.8}
+                      accessibilityRole="button"
+                      accessibilityLabel={`View ticket details: ${item.subject}`}
+                      onPress={() => setSelectedTicket(item)}
+                    >
                       <View className="flex-row items-center justify-between">
                         <Text className="flex-1 pr-2 font-ralewayBold text-base text-textPrimary">
                           {item.subject}
@@ -267,7 +278,17 @@ export default function SupportScreen() {
                           {supportLevelLabel(item.support_level)}
                         </Text>
                       ) : null}
-                    </View>
+                      <View className="mt-3 flex-row items-center justify-between">
+                        <Text className="font-ralewaySemiBold text-xs text-primaryContent">
+                          View ticket details
+                        </Text>
+                        <Feather
+                          name="chevron-right"
+                          size={18}
+                          color={colors.primaryContent}
+                        />
+                      </View>
+                    </TouchableOpacity>
                   );
                 }}
                 ListEmptyComponent={
@@ -324,6 +345,11 @@ export default function SupportScreen() {
         isVisible={isTicketModalOpen}
         onClose={() => setIsTicketModalOpen(false)}
         onSubmit={handleCreateTicket}
+      />
+
+      <SupportTicketDetailsModal
+        ticket={selectedTicket}
+        onClose={() => setSelectedTicket(null)}
       />
 
       <ScreenSnackbar
