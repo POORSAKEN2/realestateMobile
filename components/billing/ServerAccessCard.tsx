@@ -25,8 +25,8 @@ export function ServerAccessCard({
   return (
     <View className="gap-4 rounded-[28px] border border-primary/20 bg-primary/10 p-5">
       <View className="flex-row items-start gap-3">
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary">
-          <Feather name="shield" size={20} color={colors.whitePrimary} />
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
+          <Feather name="shield" size={20} color={colors.primary} />
         </View>
         <View className="min-w-0 flex-1 gap-1">
           <Text className="font-ralewayBold text-xs uppercase tracking-wide text-primary">

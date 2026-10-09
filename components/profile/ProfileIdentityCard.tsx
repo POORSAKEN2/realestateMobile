@@ -69,7 +69,7 @@ export function ProfileIdentityCard({
           ) : null}
         </View>
       </View>
-      <View className="h-10 w-10 items-center justify-center rounded-2xl bg-panel">
+      <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
         <Ionicons name="chevron-forward" color={palette.primary} size={21} />
       </View>
     </TouchableOpacity>

@@ -40,7 +40,7 @@ function ProfileMenuRow({
       } ${item.disabled ? "opacity-50" : ""}`}
       onPress={item.onPress}
     >
-      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+      <View className="h-11 w-11 items-center justify-center rounded-2xl bg-iconSurface">
         <Ionicons name={item.icon} color={palette.primary} size={22} />
       </View>
       <View className="ml-3 min-w-0 flex-1">

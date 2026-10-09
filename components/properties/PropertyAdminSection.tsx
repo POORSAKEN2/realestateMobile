@@ -19,7 +19,7 @@ export function PropertyAdminSection({
   return (
     <View className="gap-4 rounded-2xl border border-primary/15 bg-panel p-4">
       <View className="flex-row items-start gap-3">
-        <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+        <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
           <Feather name={icon} color={colors.primary} size={19} />
         </View>
         <View className="min-w-0 flex-1">

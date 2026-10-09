@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { TransientBooking } from "../../types";
 import {
@@ -268,10 +269,10 @@ function MonthButton({
       activeOpacity={0.78}
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
-      className="h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-panel"
+      className="h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-iconSurface"
       onPress={onPress}
     >
-      <Ionicons name={icon} color="#8A77F4" size={19} />
+      <Ionicons name={icon} color={colors.primary} size={19} />
     </TouchableOpacity>
   );
 }

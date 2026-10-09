@@ -26,7 +26,7 @@ function AccessItem({
 }) {
   return (
     <View className="flex-row items-start py-3.5">
-      <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+      <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
         <Ionicons name={icon} color="#8A77F4" size={18} />
       </View>
       <View className="ml-3 min-w-0 flex-1">

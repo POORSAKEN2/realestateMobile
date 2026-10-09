@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { BookingCalendarView } from "../../utils/bookings/bookingCalendar";
 import { SkeletonBlock, SkeletonGroup } from "../ui/Skeleton";
@@ -97,8 +98,8 @@ export function BookingCalendarLoading({
 export function BookingCalendarEmpty() {
   return (
     <View className="items-center rounded-[24px] border border-dashed border-primary/20 bg-panel p-8">
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-        <Ionicons name="calendar-outline" color="#8A77F4" size={28} />
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-iconSurface">
+        <Ionicons name="calendar-outline" color={colors.primary} size={28} />
       </View>
       <Text className="mt-4 text-center font-ralewayBold text-base text-textPrimary">
         No bookable buildings yet

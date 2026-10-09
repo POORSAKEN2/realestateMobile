@@ -17,7 +17,7 @@ export function FloorPlanIconButton({
   onPress: () => void;
   selected?: boolean;
 }) {
-  const color = danger ? colors.danger : selected ? colors.primary : colors.description;
+  const color = danger ? colors.danger : colors.primary;
 
   return (
     <TouchableOpacity
@@ -26,8 +26,8 @@ export function FloorPlanIconButton({
       accessibilityState={{ disabled, selected }}
       activeOpacity={0.8}
       className={`h-11 w-11 items-center justify-center rounded-xl ${
-        danger ? "bg-dangerSurface" : selected ? "bg-primary/15" : "bg-surface"
-      } ${disabled ? "opacity-50" : ""}`}
+        danger ? "bg-dangerSurface" : "bg-iconSurface"
+      } ${selected ? "border border-primary" : ""} ${disabled ? "opacity-50" : ""}`}
       disabled={disabled}
       onPress={onPress}
     >

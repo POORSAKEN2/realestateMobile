@@ -9,6 +9,11 @@ export interface FAQItem {
 }
 
 export type TicketPriority = "Low" | "Medium" | "High" | "Urgent";
+export type TicketCategory =
+  | "Technical"
+  | "Billing"
+  | "Maintenance"
+  | "General";
 export type TicketStatus = "Open" | "In Progress" | "Resolved" | "Closed";
 
 export interface SupportTicket {
@@ -18,7 +23,7 @@ export interface SupportTicket {
   description: string;
   status: TicketStatus | string;
   priority: TicketPriority | string;
-  category?: string;
+  category?: TicketCategory | string;
   support_level?: "community" | "priority" | "named_escalation" | string;
   created_at?: string;
   updated_at?: string;
@@ -28,5 +33,5 @@ export interface CreateSupportTicketPayload {
   subject: string;
   description: string;
   priority: TicketPriority;
-  category?: string;
+  category: TicketCategory;
 }

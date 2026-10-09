@@ -41,7 +41,7 @@ export function NavigationTile({
       disabled={!isAvailable}
       onPress={href ? () => onNavigate(href) : undefined}
     >
-      <View className="h-16 w-16 items-center justify-center rounded-[22px] border border-primary/30 bg-panel">
+      <View className="h-16 w-16 items-center justify-center rounded-[22px] border border-primary/30 bg-iconSurface">
         <NavigationIcon icon={item.icon} />
       </View>
 

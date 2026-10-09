@@ -3,7 +3,7 @@
     "name": "Terrane",
     "slug": "realestateMobile",
     "scheme": "terrane",
-    "version": "1.0.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "icon": "./assets/branding/png/app-icon-purple.png",
     "newArchEnabled": true,

@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, View, Text, TouchableOpacity, ViewProps } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+import { colors } from "../../../constants/colors";
 import { MODAL_OVERLAY_CLASS_NAME } from "../../../constants/modal";
 
 interface PickerFieldProps {
@@ -34,7 +35,7 @@ export function PickerField({
   onPress,
   required,
   iconName = "calendar-outline", // Default to calendar
-  iconColor = "#8A77F4", // Default to the brand primary color
+  iconColor = colors.primary,
   iconSize = 20,
   rightElement,
   className = "gap-2",

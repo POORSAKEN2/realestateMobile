@@ -303,8 +303,8 @@ export function PropertyDetailsModal({
                   className="mt-4 flex-row items-center gap-3 rounded-2xl bg-primary px-4 py-4"
                   onPress={openFullDetails}
                 >
-                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-white/15">
-                    <Feather name="maximize" color="#ffffff" size={17} />
+                  <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
+                    <Feather name="maximize" color={colors.primary} size={17} />
                   </View>
                   <View className="min-w-0 flex-1">
                     <Text className="font-ralewayExtraBold text-sm text-white">
@@ -349,8 +349,8 @@ export function PropertyDetailsModal({
                   });
                 }}
               >
-                <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                  <Feather name="grid" color="#8A77F4" size={17} />
+                <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
+                  <Feather name="grid" color={colors.primary} size={17} />
                 </View>
                 <View className="min-w-0 flex-1">
                   <Text className="font-ralewayBold text-sm text-textPrimary">
@@ -488,8 +488,8 @@ export function PropertyDetailsModal({
                       key={document.id}
                       onPress={() => openPropertyDocument(document)}
                     >
-                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                        <Feather name="file-text" color="#8A77F4" size={17} />
+                      <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
+                        <Feather name="file-text" color={colors.primary} size={17} />
                       </View>
                       <View className="min-w-0 flex-1">
                         <Text
@@ -669,8 +669,8 @@ function Attribute({
 }) {
   return (
     <View className="flex-1 flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-panel p-3">
-      <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-        <Feather name={icon} color="#8A77F4" size={15} />
+      <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
+        <Feather name={icon} color={colors.primary} size={15} />
       </View>
       <View className="min-w-0 flex-1">
         <Text className="font-ralewayBold text-[9px] uppercase text-description">

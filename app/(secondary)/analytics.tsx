@@ -113,7 +113,7 @@ function PerformanceChart({ history }: { history: PortfolioSnapshot[] }) {
             Total value trend
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
           <Feather name="activity" size={18} color={colors.primary} />
         </View>
       </View>
@@ -205,7 +205,7 @@ function DistributionChart({ slices }: { slices: DistributionSlice[] }) {
             Allocation by asset category
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
           <MaterialCommunityIcons
             name="chart-donut"
             size={19}
@@ -488,7 +488,7 @@ export default function AnalyticsScreen() {
     <Screen className="bg-surface">
       <ModuleHeader
         action={
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 shadow-md shadow-primary/20">
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-iconSurface shadow-md shadow-primary/20">
             <Feather name="bar-chart-2" size={22} color={colors.primary} />
           </View>
         }
@@ -516,7 +516,7 @@ export default function AnalyticsScreen() {
               {metricCards.map((card) => (
                 <View key={card.label} className="w-1/2 p-1.5">
                   <View className="min-h-[132px] rounded-[24px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
-                    <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                    <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
                       <Feather
                         name={card.icon}
                         size={18}
@@ -548,7 +548,7 @@ export default function AnalyticsScreen() {
             ) : (
               <View className="mt-4 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
                 <View className="flex-row items-center gap-3">
-                  <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                  <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
                     <Feather name="lock" size={18} color={colors.primary} />
                   </View>
                   <View className="min-w-0 flex-1">
@@ -567,7 +567,7 @@ export default function AnalyticsScreen() {
             ) : (
               <View className="mt-4 rounded-[28px] border border-primary/20 bg-panel p-5 shadow-sm shadow-primary/10">
                 <View className="flex-row items-center gap-3">
-                  <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                  <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
                     <Feather name="lock" size={18} color={colors.primary} />
                   </View>
                   <View className="min-w-0 flex-1">
@@ -602,7 +602,7 @@ export default function AnalyticsScreen() {
                     Export verified revenue, operating costs, and NOI
                   </Text>
                 </View>
-                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+                <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
                   <Feather name="file-text" size={18} color={colors.primary} />
                 </View>
               </View>

@@ -71,7 +71,7 @@ export function BaseField({
       </Text>
 
       <View className={containerClassName}>
-        {icon && <Ionicons name={icon} color={colors.description} size={19} />}
+        {icon && <Ionicons name={icon} color={colors.primary} size={19} />}
 
         <TextInput
           accessibilityLabel={`${label}${required ? ", required" : ""}`}

@@ -91,7 +91,7 @@ export function RentScreen({
         onSelect={setBucket}
       />
       <View className="mt-4 h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5">
-        <Feather name="search" size={16} color={palette.description} />
+        <Feather name="search" size={16} color={palette.primary} />
         <TextInput
           accessibilityLabel="Search payments"
           className="ml-2.5 flex-1 font-ralewayMedium text-sm text-textPrimary"
@@ -110,7 +110,7 @@ export function RentScreen({
             <Ionicons
               name="close-circle"
               size={18}
-              color={palette.description}
+              color={palette.primary}
             />
           </TouchableOpacity>
         ) : null}

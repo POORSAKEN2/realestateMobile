@@ -40,7 +40,7 @@ export function InquiryCard({
         onPress={onOpen}
       >
         <View className="flex-row items-start gap-3">
-          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-accent/25">
+          <View className="h-11 w-11 items-center justify-center rounded-2xl bg-iconSurface">
             <Ionicons
               name="mail-unread-outline"
               size={21}
