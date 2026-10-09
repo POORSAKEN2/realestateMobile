@@ -175,7 +175,7 @@ export default function SupportScreen() {
           <View key="faqs" className="mt-4 flex-1">
             {/* Search Bar */}
             <View className="mb-3 h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 shadow-sm shadow-primary/5">
-              <Feather name="search" size={16} color={colors.description} />
+              <Feather name="search" size={16} color={colors.primary} />
               <TextInput
                 accessibilityLabel="Search FAQs"
                 className="ml-2.5 flex-1 font-ralewayMedium text-sm text-textPrimary"
@@ -189,7 +189,7 @@ export default function SupportScreen() {
                   <Ionicons
                     name="close-circle"
                     size={16}
-                    color={colors.description}
+                    color={colors.primary}
                   />
                 </TouchableOpacity>
               ) : null}

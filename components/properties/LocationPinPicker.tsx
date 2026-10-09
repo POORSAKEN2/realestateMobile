@@ -190,7 +190,7 @@ export function LocationPinPicker({
             <View className="mt-3 h-14 flex-row items-center gap-2 overflow-hidden rounded-[22px] border border-primary/20 bg-panel px-3.5">
               <MaterialCommunityIcons
                 name="magnify"
-                color="#6F6D6D"
+                color={colors.primary}
                 size={20}
               />
               {isSearchFocused || !searchQuery ? (

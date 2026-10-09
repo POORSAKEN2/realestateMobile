@@ -115,7 +115,7 @@ export function GlobalSearchModal({ onClose }: GlobalSearchModalProps) {
                   <Ionicons
                     name="close-circle"
                     size={18}
-                    color={colors.description}
+                    color={colors.primary}
                   />
                 </TouchableOpacity>
               ) : null}

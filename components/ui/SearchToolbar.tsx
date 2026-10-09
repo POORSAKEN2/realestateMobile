@@ -55,7 +55,7 @@ function FilterButton({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       activeOpacity={0.8}
-      className="relative h-12 min-w-12 items-center justify-center rounded-2xl bg-iconSurface"
+      className="relative h-12 min-w-12 items-center justify-center rounded-2xl"
       onPress={onPress}
     >
       <MaterialCommunityIcons
@@ -115,7 +115,6 @@ export function SearchToolbar({
         value={value}
         wrapperClassName="h-14 rounded-[22px]"
       />
-
       {hasFooter ? (
         <View className="mt-2.5 flex-row items-center justify-between gap-4 px-1">
           {resultLabel ? (

@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { colors } from "../../constants/colors";
 import { SearchField } from "../ui/fields/SearchField";
 
 export type SearchableOption = { id: string; label: string };
@@ -35,7 +36,7 @@ export function SelectionField({
         </Text>
         <MaterialCommunityIcons
           name="chevron-right"
-          color="#6F6D6D"
+          color={colors.primary}
           size={21}
         />
       </TouchableOpacity>
@@ -81,7 +82,11 @@ export function SearchableOptionSelector({
           className="h-11 w-11 items-center justify-center rounded-full bg-primary/10"
           onPress={onBack}
         >
-          <MaterialCommunityIcons name="arrow-left" color="#8A77F4" size={21} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            color={colors.primary}
+            size={21}
+          />
         </TouchableOpacity>
         <Text
           accessibilityRole="header"
@@ -159,7 +164,11 @@ function OptionRow({
         {label}
       </Text>
       {isSelected ? (
-        <MaterialCommunityIcons name="check-circle" color="#8A77F4" size={21} />
+        <MaterialCommunityIcons
+          name="check-circle"
+          color={colors.primary}
+          size={21}
+        />
       ) : null}
     </TouchableOpacity>
   );
