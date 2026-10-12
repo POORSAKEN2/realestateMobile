@@ -54,7 +54,25 @@ export function WorkspacePresentationProvider({ children }: PropsWithChildren) {
     : DEFAULT_LOCATION_OPTIONS.find(
         (location) => location.id === "philippines",
       )!;
-  const style = vars({
+  const style = getThemeVariables(palette);
+  const value = useMemo(
+    () => ({ settings, resolvedTheme, workspaceLocation }),
+    [resolvedTheme, settings, workspaceLocation],
+  );
+  return (
+    <WorkspacePresentationContext.Provider value={value}>
+      <View className="flex-1 bg-surface" style={style}>
+        <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
+        {children}
+      </View>
+    </WorkspacePresentationContext.Provider>
+  );
+}
+
+export function getThemeVariables(
+  palette: Record<keyof typeof lightColors, string>,
+) {
+  return vars({
     "--color-primary": rgb(palette.primary),
     "--color-primary-content": rgb(palette.primaryContent),
     "--color-icon-surface": rgb(palette.iconSurface),
@@ -82,18 +100,6 @@ export function WorkspacePresentationProvider({ children }: PropsWithChildren) {
     "--color-info": rgb(palette.info),
     "--color-info-surface": rgb(palette.infoSurface),
   });
-  const value = useMemo(
-    () => ({ settings, resolvedTheme, workspaceLocation }),
-    [resolvedTheme, settings, workspaceLocation],
-  );
-  return (
-    <WorkspacePresentationContext.Provider value={value}>
-      <View className="flex-1 bg-surface" style={style}>
-        <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
-        {children}
-      </View>
-    </WorkspacePresentationContext.Provider>
-  );
 }
 
 function toDefaultLocation(location: WorkspaceLocationOption) {

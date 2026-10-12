@@ -89,6 +89,7 @@ const appleSession = {
   accessToken: "test-session",
   authMethod: "apple",
   appleUserId: "test-apple-user",
+  profileSetupNoticePending: true,
   user: { id: "user", role: "ADMIN", onboarding_complete: true },
   onboarding: { onboarding_complete: true },
 };
@@ -135,13 +136,14 @@ test("persisted Apple sessions restore across provider remounts without Apple au
   const first = mount();
   first.render();
   const unmount = await first.runtime.flush();
-  first.render().signIn(appleSession);
+  await first.render().signInPersisted(appleSession);
   first.render();
   const stopRefresh = await first.runtime.flush();
   const saved = JSON.parse(storage.get("realestate.auth.session"));
   assert.equal(saved.authMethod, "apple");
   assert.equal(saved.accessToken, appleSession.accessToken);
   assert.equal(saved.appleUserId, appleSession.appleUserId);
+  assert.equal(saved.profileSetupNoticePending, true);
   unmount();
   stopRefresh();
   access.setSessionAccess(null);
@@ -153,16 +155,29 @@ test("persisted Apple sessions restore across provider remounts without Apple au
   assert.equal(restored.isAuthenticated, true);
   assert.equal(restored.hasCompletedOnboarding, true);
   assert.equal(restored.session.accessToken, appleSession.accessToken);
+  assert.equal(restored.session.profileSetupNoticePending, true);
   assert.equal(access.getSessionAccess().token, appleSession.accessToken);
   assert.equal(storage.has("realestate.auth.session"), true);
   stopRestore();
   stopRestoredRefresh();
+  await second
+    .render()
+    .signInPersisted({ ...restored.session, profileSetupNoticePending: false });
+  assert.equal(
+    JSON.parse(storage.get("realestate.auth.session"))
+      .profileSetupNoticePending,
+    false,
+  );
   access.setSessionAccess(null);
 });
 
 test("Apple login redirects only after AuthContext commits the matching session", async () => {
   const runtime = hooks();
-  let auth = { signIn: () => {}, session: null, isAuthenticated: false };
+  let auth = {
+    signInPersisted: async () => {},
+    session: null,
+    isAuthenticated: false,
+  };
   let authenticated;
   const redirects = [];
   const ui = Object.fromEntries(
@@ -187,7 +202,12 @@ test("Apple login redirects only after AuthContext commits the matching session"
       useLocalSearchParams: () => ({}),
     },
     "expo-status-bar": { StatusBar: "status" },
-    "react-native": { ...ui, Platform: { OS: "ios" }, Alert: { alert() {} } },
+    "react-native": {
+      ...ui,
+      Platform: { OS: "ios" },
+      Alert: { alert() {} },
+      useWindowDimensions: () => ({ height: 844, fontScale: 1 }),
+    },
     "react-native-safe-area-context": { SafeAreaView: "safe-area" },
     "../../assets/branding/svg/brand-combination-vertical-white.svg": {
       __esModule: true,
@@ -197,7 +217,7 @@ test("Apple login redirects only after AuthContext commits the matching session"
       SocialLoginSection: "social",
     },
     "../../components/auth/AppleAccountModal": { AppleAccountModal: "modal" },
-    "../../components/auth/AuthErrorFeedback": { AuthErrorFeedback: "feedback" },
+    "../../components/auth/AuthErrorPopup": { AuthErrorPopup: "popup" },
     "../../hooks/auth/useAppleLogin": {
       useAppleLogin: (callback) => {
         authenticated = callback;
@@ -205,6 +225,7 @@ test("Apple login redirects only after AuthContext commits the matching session"
       },
     },
     "../../hooks/useAuth": { useAuth: () => auth },
+    "../../hooks/auth/useLoginKeyboard": { useLoginKeyboard: () => false },
     "../../hooks/useLogin": {
       useLogin: () => ({ email: "", password: "", isLoading: false }),
     },
@@ -212,7 +233,7 @@ test("Apple login redirects only after AuthContext commits the matching session"
   });
   runtime.render(LoginScreen);
   await runtime.flush();
-  authenticated(appleSession);
+  await authenticated(appleSession);
   runtime.render(LoginScreen);
   await runtime.flush();
   assert.deepEqual(redirects, []);

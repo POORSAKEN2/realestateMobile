@@ -13,7 +13,10 @@ Apple login and passwordless workspace signup work through the native iOS Apple 
 ## Behavior
 
 - Linked users receive the same Terrane session, permissions and deletion-recovery behavior as password login.
-- Unlinked users explicitly choose workspace creation or linking. Linking requires the existing Terrane password, even when Apple uses private relay. Signup uses only server-verified Apple email and collects name/company/terms acceptance.
+- Continuing with Apple accepts the linked legal documents and requests automatic signup. An unlinked identity with an unused, server-verified email creates a passwordless ADMIN account, a `My workspace` tenant and the existing trial. Apple supplies the name when available; otherwise `Apple member` is temporary. Company details stay empty.
+- Existing-email conflicts and identities without a verified email open email-code linking. Enter the existing Terrane email, request a code and verify it; no Terrane password is collected. Codes bind to the pending Apple proof and target account, expire within ten minutes, and respect the existing resend/lockout limits. Private relay addresses can be used for signup; linking may use a different Terrane email.
+- New signup sessions persist before the `Complete your profile` popup appears. `Open Profile` navigates to the existing Profile screen; `Later` opens the dashboard. An unacknowledged notice survives app restart; either action saves its dismissal. Details remain optional, and editing the profile company does not rename the workspace.
+- Login scrolling is disabled while the keyboard is closed and enabled while it is visible. The legal footer sits outside the scrolling form, above the bottom safe area or keyboard; branding shrinks to the available space and collapses while typing.
 - New Apple accounts have no Terrane password. Security settings offer email recovery to set one; register the sender with Apple's private relay service so verification mail reaches relay addresses.
 - Deletion submission/information response requests fresh Apple authentication for passwordless users. Proofs bind to the user and operation; existing password users retain their password checks.
 - Cancellation returns to login without error. Provider failures show retry feedback. Pending signup/link credentials remain in memory for at most ten minutes and never enter route URLs or SecureStore. Only the resulting Terrane session and Apple subject persist in SecureStore.
@@ -29,11 +32,13 @@ Backend `.env` must contain dotenv assignments without Markdown code fences. Wit
 ## Checks
 
 ```bash
-node --test tests/appleAuthentication.test.mjs tests/appleCredentialState.test.mjs tests/appleSessionLifecycle.test.mjs tests/accountDeletion.test.mjs tests/passwordChange.test.mjs
+node --test tests/appleAuthentication.test.mjs tests/appleCredentialState.test.mjs tests/appleSessionLifecycle.test.mjs tests/appleSignupFlow.test.mjs tests/authErrorPopup.test.mjs tests/accountDeletion.test.mjs tests/passwordChange.test.mjs
 npx tsc --noEmit
 git diff --check
 ```
 
-Real-device checklist: first signup, repeat login without name, private relay, existing ADMIN/MANAGER linking, cancellation, network failure/retry, app restart, consent revocation, deletion recovery and fresh deletion proof. Check small screens, iPad, keyboard, enlarged text, VoiceOver and both themes. Android/web must retain disabled alternatives. Source tests do not establish Apple Developer setup, backend deployment or store/device acceptance.
+Deploy the compatible API before shipping this mobile flow. This update adds no native module or migration; the original Apple capability and passwordless-account migration remain prerequisites. Email delivery must work for code linking; a code is never returned by the API, including debug builds.
+
+Real-device checklist: first automatic signup and both popup actions, repeat login without name, private relay, existing ADMIN/MANAGER code linking, cancellation, network failure/retry, app restart with an unacknowledged notice, consent revocation, deletion recovery and fresh deletion proof. Check small screens, iPad, keyboard, enlarged text, VoiceOver and both themes. Android/web must retain disabled alternatives. Source tests do not establish Apple Developer setup, backend deployment or store/device acceptance.
 
 Official button artwork: [Apple logo-only generator](https://appleid.cdn-apple.com/appleid/button/logo?size=56&color=white&border=false&border_radius=16&scale=3). The downloaded 168px image displays at 56pt with its original padding and proportions.

@@ -73,6 +73,51 @@ test("server challenge binds native sheet and verification before session creati
   });
 });
 
+test("automatic signup forwards consent and display name only after native verification", async () => {
+  const { service, calls } = setup();
+  await service.login(undefined, { autoRegister: true, confirmation: true });
+  assert.equal(calls[2][1].auto_register, true);
+  assert.equal(calls[2][1].confirmation, true);
+  assert.equal(calls[2][1].display_name, "Apple Owner");
+  assert.equal(calls[2][1].password, undefined);
+});
+
+test("missing legal confirmation blocks the sheet and all provider calls", async () => {
+  const { service, calls } = setup();
+  await assert.rejects(
+    service.login(undefined, { autoRegister: true, confirmation: false }),
+    /Legal documents/,
+  );
+  assert.deepEqual(calls, []);
+});
+
+test("code linking sends pending proof and never a password", async () => {
+  const { service, calls } = setup({
+    result: {
+      cooldown_seconds: 30,
+      expires_in_seconds: 600,
+      message: "Code sent",
+      access_token: "session",
+      user: { id: "user" },
+    },
+  });
+  const account = { pending_token: "pending" };
+  await service.requestLinkCode(account, " existing@example.test ");
+  await service.verifyLinkCode(account, " existing@example.test ", " 123456 ");
+  assert.deepEqual(calls[0].slice(0, 2), [
+    "/auth/apple/link/request-code",
+    { pending_token: "pending", email: "existing@example.test" },
+  ]);
+  assert.deepEqual(calls[1].slice(0, 2), [
+    "/auth/apple/link/verify-code",
+    {
+      pending_token: "pending",
+      email: "existing@example.test",
+      otp_code: "123456",
+    },
+  ]);
+});
+
 test("Apple cancellation does not send verification or create a session", async () => {
   const cancellation = { code: "ERR_REQUEST_CANCELED" };
   const { service, calls } = setup({

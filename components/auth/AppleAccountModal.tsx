@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   KeyboardAvoidingView,
@@ -9,13 +9,17 @@ import {
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { useWorkspacePresentation } from "../../context/WorkspacePresentationContext";
-import type { ApplePendingAccount } from "../../services/apple/appleAuthentication";
-import { LegalLink } from "../legal/LegalLink";
+import {
+  getThemeVariables,
+  useThemeColors,
+  useWorkspacePresentation,
+} from "../../context/WorkspacePresentationContext";
+import type {
+  ApplePendingAccount,
+  AppleLinkCodeResult,
+} from "../../services/apple/appleAuthentication";
 import { Button } from "../ui/buttons/Button";
 import { BaseField } from "../ui/fields/BaseField";
-import { SelectionCheckbox } from "../ui/SelectionCheckbox";
-import { LEGAL_DOCUMENT_URLS } from "../../constants/legal";
 import { AuthErrorFeedback } from "./AuthErrorFeedback";
 import type { AuthErrorFeedback as Feedback } from "../../utils/auth/authErrorFeedback";
 import { useAuthRetryDelay } from "../../hooks/auth/useAuthRetryDelay";
@@ -24,36 +28,52 @@ type Props = {
   account: ApplePendingAccount;
   busy: boolean;
   error: Feedback | null;
+  linkCode:
+    | (AppleLinkCodeResult & { email: string; requestedAt: number })
+    | null;
   onCancel: () => void;
-  onComplete: (
-    input:
-      | { email: string; password: string }
-      | { name: string; company: string; confirmation: boolean },
-  ) => void;
+  onRequestCode: (email: string) => void;
+  onVerifyCode: (email: string, code: string) => void;
 };
 
 export function AppleAccountModal({
   account,
   busy,
   error,
+  linkCode,
   onCancel,
-  onComplete,
+  onRequestCode,
+  onVerifyCode,
 }: Props) {
   const { resolvedTheme } = useWorkspacePresentation();
-  const retryDelay = useAuthRetryDelay(error);
-  const [mode, setMode] = useState<"register" | "link" | null>(null);
+  const palette = useThemeColors();
   const [email, setEmail] = useState(account.email ?? "");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState(account.name ?? "");
-  const [company, setCompany] = useState("");
-  const [accepted, setAccepted] = useState(false);
-  const legalReady = Boolean(
-    LEGAL_DOCUMENT_URLS.terms && LEGAL_DOCUMENT_URLS.privacy,
+  const [code, setCode] = useState("");
+  const retryDelay = useAuthRetryDelay(error);
+  const cooldown = useMemo<Feedback | null>(
+    () =>
+      linkCode
+        ? {
+            title: "",
+            message: "",
+            retryable: false,
+            retryAfterSeconds: Math.max(
+              0,
+              Math.ceil(
+                (linkCode.requestedAt +
+                  linkCode.cooldown_seconds * 1000 -
+                  Date.now()) /
+                  1000,
+              ),
+            ),
+          }
+        : null,
+    [linkCode],
   );
-  const canComplete =
-    mode === "link"
-      ? email.trim() !== "" && password !== ""
-      : name.trim() !== "" && company.trim() !== "" && accepted && legalReady;
+  const resendDelay = useAuthRetryDelay(cooldown);
+  const requested =
+    linkCode?.email.toLowerCase() === email.trim().toLowerCase();
+  const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
   return (
     <Modal
@@ -63,7 +83,10 @@ export function AppleAccountModal({
     >
       <SafeAreaProvider>
         <StatusBar style={resolvedTheme === "dark" ? "light" : "dark"} />
-        <SafeAreaView className="flex-1 bg-surface">
+        <SafeAreaView
+          className="flex-1 bg-surface"
+          style={getThemeVariables(palette)}
+        >
           <KeyboardAvoidingView
             className="flex-1"
             behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -76,139 +99,66 @@ export function AppleAccountModal({
                 accessibilityRole="header"
                 className="font-ralewayBold text-2xl text-textPrimary"
               >
-                {mode === "link"
-                  ? "Link existing account"
-                  : mode === "register"
-                    ? "Create your workspace"
-                    : "Continue with Apple"}
+                Link existing account
               </Text>
-              {mode === null ? (
+              <Text className="font-ralewayMedium text-base leading-6 text-description">
+                Enter your Terrane email. We’ll send a code to verify ownership
+                and connect Apple. No Terrane password is needed.
+              </Text>
+              <BaseField
+                label="Terrane email"
+                value={email}
+                onChangeText={(value) => {
+                  setEmail(value);
+                  setCode("");
+                }}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!busy}
+              />
+              <Button
+                title={requested ? "Resend code" : "Send code"}
+                variant="secondary"
+                disabled={
+                  !validEmail || busy || resendDelay > 0 || retryDelay > 0
+                }
+                onPress={() => onRequestCode(email.trim())}
+              />
+              {resendDelay > 0 ? (
+                <Text className="text-sm text-description">
+                  Resend available in {resendDelay}s.
+                </Text>
+              ) : null}
+              {requested && linkCode ? (
                 <>
-                  <Text className="text-base text-description">
-                    Create a workspace or connect Apple to your existing Terrane
-                    account.
+                  <Text
+                    accessibilityLiveRegion="polite"
+                    className="text-sm leading-5 text-description"
+                  >
+                    {linkCode.message}
                   </Text>
-                  <Button
-                    title="Create workspace"
-                    disabled={busy || !account.can_register}
-                    onPress={() => setMode("register")}
-                  />
-                  {!account.can_register ? (
-                    <Text className="text-sm text-description">
-                      Apple did not provide a verified email. Link an existing
-                      account instead.
-                    </Text>
-                  ) : null}
-                  <Button
-                    title="Link existing account"
-                    variant="secondary"
-                    disabled={busy}
-                    onPress={() => setMode("link")}
-                  />
-                </>
-              ) : mode === "link" ? (
-                <>
                   <BaseField
-                    label="Terrane email"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    editable={!busy}
-                  />
-                  <BaseField
-                    label="Terrane password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    editable={!busy}
-                  />
-                  <Text className="text-sm text-description">
-                    Use your Terrane credentials, even if Apple uses a private
-                    relay address.
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <Text className="text-sm text-description">
-                    Apple email: {account.email}
-                  </Text>
-                  {!legalReady ? (
-                    <Text
-                      accessibilityRole="alert"
-                      className="text-sm text-danger"
-                    >
-                      Legal documents are unavailable in this build. Account
-                      creation is disabled.
-                    </Text>
-                  ) : null}
-                  <BaseField
-                    label="Name"
-                    value={name}
-                    onChangeText={setName}
-                    autoCapitalize="words"
-                    maxLength={255}
-                    editable={!busy}
-                  />
-                  <BaseField
-                    label="Company or workspace name"
-                    value={company}
-                    onChangeText={setCompany}
-                    autoCapitalize="words"
-                    maxLength={255}
-                    editable={!busy}
-                  />
-                  <View className="gap-3">
-                    <SelectionCheckbox
-                      selected={accepted}
-                      disabled={busy}
-                      onPress={() => setAccepted(!accepted)}
-                      label="Accept terms and acknowledge privacy policy"
-                    />
-                    <Text className="text-sm leading-6 text-textPrimary">
-                      Read the{" "}
-                      <LegalLink document="terms">Terms of Service</LegalLink>{" "}
-                      and{" "}
-                      <LegalLink document="privacy">Privacy Policy</LegalLink>.
-                    </Text>
-                  </View>
-                </>
-              )}
-              {error ? <AuthErrorFeedback feedback={error} /> : null}
-              {mode ? (
-                <>
-                  <Button
-                    title={
-                      mode === "link" ? "Link and sign in" : "Create workspace"
+                    label="Verification code"
+                    value={code}
+                    onChangeText={(value) =>
+                      setCode(value.replace(/[^0-9]/g, "").slice(0, 6))
                     }
+                    keyboardType="number-pad"
+                    autoComplete="one-time-code"
+                    textContentType="oneTimeCode"
+                    maxLength={6}
+                    editable={!busy}
+                  />
+                  <Button
+                    title="Link and sign in"
                     isLoading={busy}
-                    disabled={!canComplete || busy || retryDelay > 0}
-                    onPress={() =>
-                      onComplete(
-                        mode === "link"
-                          ? { email: email.trim(), password }
-                          : {
-                              name: name.trim(),
-                              company: company.trim(),
-                              confirmation: accepted,
-                            },
-                      )
-                    }
-                  />
-                  <Button
-                    title="Back"
-                    variant="secondary"
-                    disabled={busy}
-                    onPress={() => {
-                      setPassword("");
-                      setMode(null);
-                    }}
+                    disabled={busy || code.length !== 6 || retryDelay > 0}
+                    onPress={() => onVerifyCode(email.trim(), code)}
                   />
                 </>
               ) : null}
+              {error ? <AuthErrorFeedback feedback={error} /> : null}
               <Button
                 title="Cancel Apple sign-in"
                 variant="secondary"

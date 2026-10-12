@@ -12,6 +12,9 @@ export function sessionFromAuthResponse(response: AuthResponse): AuthSession {
     accessToken: data.access_token,
     authMethod: data.auth_method ?? "password",
     appleUserId: data.apple_user_id ?? undefined,
+    ...(data.account_created === true
+      ? { profileSetupNoticePending: true }
+      : {}),
     user: normalizeUser({
       ...data.user,
       ...Object.fromEntries(

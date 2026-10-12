@@ -6,6 +6,8 @@ export type ApplePendingAccount = {
   email?: string;
   can_register: boolean;
   name?: string;
+  reason?: "existing_account" | "email_required" | "setup_required";
+  expires_in_seconds?: number;
 };
 export type AppleLoginResult =
   | { status: "authenticated"; session: AuthSession }
@@ -13,6 +15,12 @@ export type AppleLoginResult =
 export type AppleAccountInput =
   | { email: string; password: string }
   | { name: string; company: string; confirmation: boolean };
+export type AppleLinkCodeResult = {
+  message: string;
+  expires_in_seconds: number;
+  cooldown_seconds: number;
+};
+type AppleSignupIntent = { autoRegister: boolean; confirmation: boolean };
 type Verification = NonNullable<AuthResponse["data"]> &
   ApplePendingAccount & {
     status: "authenticated" | "account_required" | "reauthenticated";
@@ -56,6 +64,7 @@ export function createAppleAuthentication({
     signal?: AbortSignal,
     operation?: "deletion_request" | "deletion_response",
     requestId?: string,
+    intent?: AppleSignupIntent,
   ) => {
     assertNotAborted(signal);
     if (!(await isAvailable()))
@@ -86,6 +95,13 @@ export function createAppleAuthentication({
         state: credential.state,
         identity_token: credential.identityToken,
         authorization_code: credential.authorizationCode,
+        ...(!operation && intent?.autoRegister
+          ? {
+              auto_register: true,
+              confirmation: intent.confirmation,
+              display_name: credential.name,
+            }
+          : {}),
       },
       signal,
     );
@@ -95,8 +111,15 @@ export function createAppleAuthentication({
   };
   return {
     isAvailable,
-    async login(signal?: AbortSignal): Promise<AppleLoginResult> {
-      const { data, name } = await verify(signal);
+    async login(
+      signal?: AbortSignal,
+      intent?: AppleSignupIntent,
+    ): Promise<AppleLoginResult> {
+      if (intent?.autoRegister && !intent.confirmation)
+        throw new Error(
+          "Legal documents are unavailable in this build. Please try again once they are available.",
+        );
+      const { data, name } = await verify(signal, undefined, undefined, intent);
       if (data.status === "authenticated")
         return { status: "authenticated", session: toSession({ data }) };
       if (data.status !== "account_required" || !data.pending_token)
@@ -108,8 +131,55 @@ export function createAppleAuthentication({
           email: data.email,
           can_register: data.can_register,
           name,
+          ...(data.reason ? { reason: data.reason } : {}),
+          ...(data.expires_in_seconds
+            ? { expires_in_seconds: data.expires_in_seconds }
+            : {}),
         },
       };
+    },
+    async requestLinkCode(
+      account: ApplePendingAccount,
+      email: string,
+      signal?: AbortSignal,
+    ): Promise<AppleLinkCodeResult> {
+      assertNotAborted(signal);
+      const { data } = await post<AppleLinkCodeResult>(
+        "/auth/apple/link/request-code",
+        {
+          pending_token: account.pending_token,
+          email: email.trim(),
+        },
+        signal,
+      );
+      if (
+        !data ||
+        typeof data.cooldown_seconds !== "number" ||
+        typeof data.expires_in_seconds !== "number"
+      )
+        throw new Error(
+          "The verification code could not be requested. Please try again.",
+        );
+      return data;
+    },
+    async verifyLinkCode(
+      account: ApplePendingAccount,
+      email: string,
+      code: string,
+      signal?: AbortSignal,
+    ): Promise<AuthSession> {
+      assertNotAborted(signal);
+      return toSession(
+        await post<NonNullable<AuthResponse["data"]>>(
+          "/auth/apple/link/verify-code",
+          {
+            pending_token: account.pending_token,
+            email: email.trim(),
+            otp_code: code.trim(),
+          },
+          signal,
+        ),
+      );
     },
     async complete(
       account: ApplePendingAccount,

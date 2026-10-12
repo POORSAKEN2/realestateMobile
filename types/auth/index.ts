@@ -4,6 +4,7 @@ export type AuthResponse = {
     access_token?: string;
     auth_method?: "password" | "apple";
     apple_user_id?: string | null;
+    account_created?: boolean;
     user?: unknown;
     onboarding?: unknown;
     permissions?: string[];
@@ -40,6 +41,7 @@ export type AuthSession = {
   accessToken?: string;
   authMethod?: "password" | "apple";
   appleUserId?: string;
+  profileSetupNoticePending?: boolean;
   user?: unknown;
   onboarding?: unknown;
   deletionRecovery?: { cancelled: boolean; scope: "user" | "tenant" } | null;
@@ -53,6 +55,7 @@ export type AuthContextValue = {
   completeOnboarding: () => void;
   setOnboardingCompleted: (completed: boolean) => void;
   signIn: (session?: AuthSession) => void;
+  signInPersisted: (session: AuthSession) => Promise<void>;
   signOut: () => void;
 };
 

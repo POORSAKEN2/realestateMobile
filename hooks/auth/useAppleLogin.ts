@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { AuthSession } from "../../types";
 import {
-  completeAppleAccount,
+  requestAppleLinkCode,
+  verifyAppleLinkCode,
   isAppleCancellation,
   isAppleLoginAvailable,
   loginWithApple,
   type ApplePendingAccount,
+  type AppleLinkCodeResult,
 } from "../../services/apple/appleAuthentication";
 import { useMountedRef } from "../useMountedRef";
 import {
@@ -14,7 +16,9 @@ import {
 } from "../../utils/auth/authErrorFeedback";
 import { useAuthRetryDelay } from "./useAuthRetryDelay";
 
-export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
+export function useAppleLogin(
+  onAuthenticated: (session: AuthSession) => void | Promise<void>,
+) {
   const mounted = useMountedRef();
   const locked = useRef(false);
   const controller = useRef<AbortController | null>(null);
@@ -22,6 +26,9 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
   const [busy, setBusy] = useState(false);
   const [account, setAccount] = useState<ApplePendingAccount | null>(null);
   const [error, setError] = useState<AuthErrorFeedback | null>(null);
+  const [linkCode, setLinkCode] = useState<
+    (AppleLinkCodeResult & { email: string; requestedAt: number }) | null
+  >(null);
   const retryDelay = useAuthRetryDelay(error);
 
   useEffect(() => {
@@ -38,6 +45,7 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
     const timer = setTimeout(
       () => {
         setAccount(null);
+        setLinkCode(null);
         setError({
           ...authErrorFeedback(
             new Error("Apple verification expired. Start again."),
@@ -45,7 +53,7 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
           retryable: true,
         });
       },
-      10 * 60 * 1000,
+      (account.expires_in_seconds ?? 600) * 1000,
     );
     return () => clearTimeout(timer);
   }, [account]);
@@ -62,8 +70,18 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
     try {
       await action(controller.current.signal);
     } catch (failure) {
-      if (mounted.current && !isAppleCancellation(failure))
-        setError(authErrorFeedback(failure, context));
+      if (mounted.current && !isAppleCancellation(failure)) {
+        const feedback = authErrorFeedback(failure, context);
+        const restart =
+          /Apple verification expired|Apple verification.*already used|Apple identity already linked/i.test(
+            feedback.message,
+          );
+        if (restart) {
+          setAccount(null);
+          setLinkCode(null);
+        }
+        setError(restart ? { ...feedback, retryable: true } : feedback);
+      }
     } finally {
       locked.current = false;
       controller.current = null;
@@ -75,34 +93,51 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
     available,
     busy,
     account,
+    linkCode,
     error,
     retryDelay,
     clearError: () => setError(null),
     start: () =>
       perform(async (signal) => {
+        setAccount(null);
+        setLinkCode(null);
         const result = await loginWithApple(signal);
         if (!mounted.current) return;
-        if (result.status === "authenticated") onAuthenticated(result.session);
+        if (result.status === "authenticated")
+          await onAuthenticated(result.session);
         else setAccount(result.account);
       }),
-    complete: (
-      input:
-        | { email: string; password: string }
-        | { name: string; company: string; confirmation: boolean },
-    ) =>
-      perform(
-        async (signal) => {
-          if (!account) return;
-          const session = await completeAppleAccount(account, input, signal);
-          if (!mounted.current) return;
+    requestCode: (email: string) =>
+      perform(async (signal) => {
+        if (!account) return;
+        if (
+          linkCode &&
+          Date.now() < linkCode.requestedAt + linkCode.cooldown_seconds * 1000
+        )
+          return;
+        const result = await requestAppleLinkCode(account, email, signal);
+        if (mounted.current)
+          setLinkCode({
+            ...result,
+            email: email.trim(),
+            requestedAt: Date.now(),
+          });
+      }),
+    verifyCode: (email: string, code: string) =>
+      perform(async (signal) => {
+        if (!account) return;
+        const session = await verifyAppleLinkCode(account, email, code, signal);
+        if (!mounted.current) return;
+        await onAuthenticated(session);
+        if (mounted.current) {
           setAccount(null);
-          onAuthenticated(session);
-        },
-        "password" in input ? "signin" : "register",
-      ),
+          setLinkCode(null);
+        }
+      }),
     cancel: () => {
       if (!locked.current) {
         setAccount(null);
+        setLinkCode(null);
         setError(null);
       }
     },

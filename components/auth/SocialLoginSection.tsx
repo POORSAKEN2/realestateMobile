@@ -29,6 +29,7 @@ type SocialLoginSectionProps = {
   appleLoading: boolean;
   busy: boolean;
   onApplePress: () => void;
+  compact?: boolean;
 };
 
 export function SocialLoginSection({
@@ -36,9 +37,10 @@ export function SocialLoginSection({
   appleLoading,
   busy,
   onApplePress,
+  compact = false,
 }: SocialLoginSectionProps) {
   return (
-    <View className="mt-6">
+    <View className={compact ? "mt-3" : "mt-6"}>
       <View className="flex-row items-center gap-3">
         <View className="h-px flex-1 bg-white/40" />
         <Text className="shrink text-center font-ralewayMedium text-sm text-onPrimary">
@@ -47,7 +49,7 @@ export function SocialLoginSection({
         <View className="h-px flex-1 bg-white/40" />
       </View>
 
-      <View className="mt-5 flex-row justify-center gap-3">
+      <View className={`${compact ? "mt-3" : "mt-5"} flex-row justify-center gap-3`}>
         <Pressable
           accessibilityLabel="Continue with Google"
           accessibilityHint="Not available yet"
@@ -90,10 +92,11 @@ export function SocialLoginSection({
         </Pressable>
       </View>
 
-      <Text className="mt-3 text-center font-ralewayMedium text-xs text-onPrimary">
+      <Text className={`${compact ? "mt-2" : "mt-3"} text-center font-ralewayMedium text-xs leading-4 text-onPrimary`}>
         {appleAvailable
           ? "Google sign-in not available yet"
           : "Not available yet"}
+        {appleAvailable ? "\nApple may create a workspace." : ""}
       </Text>
     </View>
   );

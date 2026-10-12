@@ -10,6 +10,7 @@ import {
   PropsWithChildren,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -34,7 +35,11 @@ async function setSecureItem(key: string, value: string) {
     await SecureStore.setItemAsync(key, value);
     return;
   }
-  if (typeof localStorage !== "undefined") localStorage.setItem(key, value);
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem(key, value);
+    return;
+  }
+  throw new Error("Session storage is unavailable on this device.");
 }
 
 async function deleteSecureItem(key: string) {
@@ -84,6 +89,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [session, setSession] = useState<AuthSession | null>(null);
+  const latestSession = useRef<AuthSession | null>(null);
+  latestSession.current = session;
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -106,6 +113,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setSession(previous => {
           if (previous?.accessToken !== token) return previous;
           const next = { ...previous, user };
+          latestSession.current = next;
           persistSecureItem(AUTH_STORAGE_KEY, JSON.stringify(next));
           return next;
         });
@@ -117,6 +125,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
           setSessionAccess(null);
           queryClient.clear();
           setSession(null);
+          latestSession.current = null;
           setIsAuthenticated(false);
           removeSecureItem(AUTH_STORAGE_KEY);
         }
@@ -141,6 +150,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         if (restoredSession) {
           setSessionAccess(restoredSession.user, restoredSession.accessToken);
           setSession(restoredSession);
+          latestSession.current = restoredSession;
           setIsAuthenticated(true);
         }
         setHasCompletedOnboarding(
@@ -156,6 +166,27 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => { isMounted = false; };
   }, []);
 
+  function commitSession(nextSession?: AuthSession, persist = true) {
+    const normalizedSession = nextSession ?? null;
+    const current = getSessionAccess();
+    if (current.token !== normalizedSession?.accessToken || JSON.stringify(current.access) !== JSON.stringify(normalizeAccess(normalizedSession?.user))) {
+      setSessionAccess(normalizedSession?.user, normalizedSession?.accessToken);
+      queryClient.clear();
+    }
+    setSession(normalizedSession);
+    latestSession.current = normalizedSession;
+    setIsAuthenticated(Boolean(normalizedSession?.accessToken));
+    if (normalizedSession?.accessToken) {
+      if (persist) persistSecureItem(AUTH_STORAGE_KEY, JSON.stringify(normalizedSession));
+      if (hasCompletedOnboardingInSession(normalizedSession)) {
+        setHasCompletedOnboarding(true);
+        persistSecureItem(ONBOARDING_STORAGE_KEY, "true");
+      }
+    } else {
+      removeSecureItem(AUTH_STORAGE_KEY);
+    }
+  }
+
   const value = useMemo<AuthContextValue>(
     () => ({
       session,
@@ -170,29 +201,25 @@ export function AuthProvider({ children }: PropsWithChildren) {
         setHasCompletedOnboarding(completed);
         persistSecureItem(ONBOARDING_STORAGE_KEY, completed ? "true" : "false");
       },
-      signIn: (nextSession) => {
-        const normalizedSession = nextSession ?? null;
-        const current = getSessionAccess();
-        if (current.token !== normalizedSession?.accessToken || JSON.stringify(current.access) !== JSON.stringify(normalizeAccess(normalizedSession?.user))) {
-          setSessionAccess(normalizedSession?.user, normalizedSession?.accessToken);
-          queryClient.clear();
-        }
-        setSession(normalizedSession);
-        setIsAuthenticated(Boolean(normalizedSession?.accessToken));
-        if (normalizedSession?.accessToken) {
-          persistSecureItem(AUTH_STORAGE_KEY, JSON.stringify(normalizedSession));
-          if (hasCompletedOnboardingInSession(normalizedSession)) {
-            setHasCompletedOnboarding(true);
-            persistSecureItem(ONBOARDING_STORAGE_KEY, "true");
+      signIn: commitSession,
+      signInPersisted: async (nextSession) => {
+        const revision = getSessionAccess().revision;
+        await setSecureItem(AUTH_STORAGE_KEY, JSON.stringify(nextSession));
+        if (getSessionAccess().revision !== revision) {
+          if (latestSession.current?.accessToken) {
+            await setSecureItem(AUTH_STORAGE_KEY, JSON.stringify(latestSession.current));
+          } else {
+            await deleteSecureItem(AUTH_STORAGE_KEY);
           }
-        } else {
-          removeSecureItem(AUTH_STORAGE_KEY);
+          throw new Error("Your session changed. Please sign in again.");
         }
+        commitSession(nextSession, false);
       },
       signOut: () => {
         setSessionAccess(null);
         queryClient.clear();
         setSession(null);
+        latestSession.current = null;
         setIsAuthenticated(false);
         removeSecureItem(AUTH_STORAGE_KEY);
       },

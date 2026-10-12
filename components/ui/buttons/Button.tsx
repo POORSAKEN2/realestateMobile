@@ -10,6 +10,7 @@ type ButtonProps = {
   isLoading?: boolean;
   disabled?: boolean;
   leadingIcon?: ReactNode;
+  compact?: boolean;
 };
 
 export function Button({
@@ -19,6 +20,7 @@ export function Button({
   isLoading = false,
   disabled = false,
   leadingIcon,
+  compact = false,
 }: ButtonProps) {
   const buttonClassName =
     variant === "primary"
@@ -33,7 +35,7 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={title}
       accessibilityState={{ disabled: disabled || isLoading, busy: isLoading }}
-      className={`${leadingIcon ? "min-h-12 py-3" : "h-12"} items-center justify-center rounded-lg px-5 ${buttonClassName} ${disabled ? "opacity-50" : ""}`}
+      className={`${leadingIcon || compact ? "min-h-12 py-3" : "h-12"} items-center justify-center rounded-lg ${compact ? "flex-1 px-3" : "px-5"} ${buttonClassName} ${disabled ? "opacity-50" : ""}`}
       disabled={disabled || isLoading}
       onPress={onPress}
     >
@@ -57,7 +59,9 @@ export function Button({
           </Text>
         </View>
       ) : (
-        <Text className={`font-ralewayBold text-base ${textClassName}`}>
+        <Text
+          className={`font-ralewayBold text-base ${compact ? "min-w-0 shrink text-center" : ""} ${textClassName}`}
+        >
           {title}
         </Text>
       )}

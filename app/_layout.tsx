@@ -29,6 +29,7 @@ import { AppleCredentialBootstrap } from "../components/auth/AppleCredentialBoot
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
 import { RevenueCatProvider } from "../context/RevenueCatContext";
 import { WorkspacePresentationProvider } from "../context/WorkspacePresentationContext";
+import { ProfileSetupPrompt } from "../components/auth/ProfileSetupPrompt";
 
 type TextWithDefaultProps = typeof Text & {
   defaultProps?: {
@@ -105,6 +106,7 @@ export default function RootLayout() {
                 </Stack>
                 <EntitlementLimitPrompt />
                 <AccessDeniedPrompt />
+                <ProfileSetupPrompt />
               </DefaultLocationProvider>
             </MapKitGeocodingProvider>
           </RevenueCatProvider>
