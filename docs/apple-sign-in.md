@@ -19,6 +19,12 @@ Apple login and passwordless workspace signup work through the native iOS Apple 
 - Cancellation returns to login without error. Provider failures show retry feedback. Pending signup/link credentials remain in memory for at most ten minutes and never enter route URLs or SecureStore. Only the resulting Terrane session and Apple subject persist in SecureStore.
 - Revoked native credentials sign out Apple sessions. Backend notifications/daily validation revoke their server tokens. Existing password access is preserved.
 
+## Disabled Apple button
+
+For local iOS development, set `EXPO_PUBLIC_APPLE_SIGN_IN_ENABLED=true` in `.env`, then fully reload the app. If the button remains disabled, the installed development client may lack the native Apple module. Rebuild and reinstall with `npx expo run:ios`; Metro reload alone cannot add native modules. Keep Android/web disabled. For EAS builds, configure the same flag in the selected EAS environment and rebuild the app.
+
+Backend `.env` must contain dotenv assignments without Markdown code fences. With `APPLE_SIGN_IN_ENABLED=true` and credentials configured, `POST /api/auth/apple/challenge` should return 200 before the native Apple sheet is requested.
+
 ## Checks
 
 ```bash
