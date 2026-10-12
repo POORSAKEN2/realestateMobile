@@ -1,5 +1,4 @@
-import { FontAwesome } from "@expo/vector-icons";
-import { Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 function GoogleIcon() {
@@ -25,7 +24,19 @@ function GoogleIcon() {
   );
 }
 
-export function SocialLoginSection() {
+type SocialLoginSectionProps = {
+  appleAvailable: boolean;
+  appleLoading: boolean;
+  busy: boolean;
+  onApplePress: () => void;
+};
+
+export function SocialLoginSection({
+  appleAvailable,
+  appleLoading,
+  busy,
+  onApplePress,
+}: SocialLoginSectionProps) {
   return (
     <View className="mt-6">
       <View className="flex-row items-center gap-3">
@@ -52,20 +63,37 @@ export function SocialLoginSection() {
 
         <Pressable
           accessibilityLabel="Continue with Apple"
-          accessibilityHint="Not available yet"
+          accessibilityHint={
+            appleAvailable
+              ? "Sign in or create a workspace with Apple"
+              : "Not available yet"
+          }
           accessibilityRole="button"
-          accessibilityState={{ disabled: true }}
-          className="h-14 w-14 items-center justify-center rounded-2xl bg-white"
-          disabled
+          accessibilityState={{
+            disabled: !appleAvailable || busy,
+            busy: appleLoading,
+          }}
+          className="h-14 w-14 items-center justify-center rounded-2xl bg-white active:opacity-80"
+          disabled={!appleAvailable || busy}
+          onPress={onApplePress}
         >
           <View aria-hidden importantForAccessibility="no-hide-descendants">
-            <FontAwesome name="apple" size={26} color="#000000" />
+            {appleLoading ? (
+              <ActivityIndicator color="#000000" />
+            ) : (
+              <Image
+                source={require("../../assets/branding/png/apple-sign-in-logo.png")}
+                style={{ width: 56, height: 56 }}
+              />
+            )}
           </View>
         </Pressable>
       </View>
 
       <Text className="mt-3 text-center font-ralewayMedium text-xs text-onPrimary">
-        Not available yet
+        {appleAvailable
+          ? "Google sign-in not available yet"
+          : "Not available yet"}
       </Text>
     </View>
   );

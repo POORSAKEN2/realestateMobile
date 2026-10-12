@@ -4,7 +4,7 @@ import { Alert } from "react-native";
 
 import { API_BASE_URL } from "../api/client";
 import { parseApiResponse } from "../api/response";
-import { normalizeUser } from "../api/user";
+import { sessionFromAuthResponse } from "../utils/auth/authSession";
 import { restorationNotice } from "../utils/accountDeletion/accountDeletion";
 import type { AuthResponse } from "../types";
 import { useAuth } from "./useAuth";
@@ -62,29 +62,10 @@ export function useLogin(initialEmail = "") {
         "Login failed. Please check your credentials.",
       );
 
-      const { access_token, user, onboarding, deletion_recovery } =
+      const { deletion_recovery } =
         result.data ?? {};
 
-      signIn({
-        accessToken: access_token,
-        user:
-          user && typeof user === "object"
-            ? normalizeUser({
-                ...user,
-                ...Object.fromEntries(
-                  Object.entries(result.data ?? {}).filter(([key]) =>
-                    [
-                      "permissions",
-                      "assigned_property_ids",
-                      "property_permissions",
-                    ].includes(key),
-                  ),
-                ),
-              })
-            : user,
-        onboarding,
-        deletionRecovery: deletion_recovery,
-      });
+      signIn(sessionFromAuthResponse(result));
       if (deletion_recovery?.cancelled) {
         Alert.alert(
           "Deletion cancelled",

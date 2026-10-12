@@ -18,12 +18,17 @@ import { colors } from "../../constants/colors";
 import { deletionStatusLabel } from "../../utils/accountDeletion/accountDeletion";
 import { formatDateTime } from "../../utils/formatters";
 import { BaseField } from "../ui/fields/BaseField";
+import { AccountIdentityField } from "./AccountIdentityField";
+import { useAuth } from "../../hooks/useAuth";
+import { isAppleCancellation, reauthenticateApple } from "../../services/apple/appleAuthentication";
 
 const key = ["account-deletion-request"] as const;
 const label = (value: string) =>
   value.replaceAll("_", " ").replace(/^./, (letter) => letter.toUpperCase());
 
 export function AccountDeletionCard() {
+  const { session } = useAuth();
+  const passwordless = Boolean(session?.user && typeof session.user === "object" && "has_password" in session.user && session.user.has_password === false);
   const client = useQueryClient();
   const [password, setPassword] = useState("");
   const [reason, setReason] = useState("");
@@ -39,18 +44,18 @@ export function AccountDeletionCard() {
     await client.invalidateQueries({ queryKey: key });
   };
   const submit = useMutation({
-    mutationFn: () =>
+    mutationFn: async () =>
       requestAccountDeletion({
-        current_password: password,
+        ...(passwordless ? { apple_reauth_token: await reauthenticateApple("deletion_request") } : { current_password: password }),
         reason: reason.trim() || undefined,
         confirmation: true,
       }),
     onSuccess: refresh,
   });
   const respond = useMutation({
-    mutationFn: () =>
+    mutationFn: async () =>
       respondToAccountDeletion(request.data!.id, {
-        current_password: password,
+        ...(passwordless ? { apple_reauth_token: await reauthenticateApple("deletion_response", request.data!.id) } : { current_password: password }),
         response: response.trim(),
       }),
     onSuccess: refresh,
@@ -159,21 +164,10 @@ export function AccountDeletionCard() {
                 value={response}
                 onChangeText={setResponse}
               />
-              <BaseField
-                label="Current password"
-                required
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-                textContentType="password"
-                editable={!busy}
-                placeholder="Current password"
-                value={password}
-                onChangeText={setPassword}
-              />
+              <AccountIdentityField passwordless={passwordless} busy={busy} password={password} onChange={setPassword} />
               <TouchableOpacity
                 className="h-12 items-center justify-center rounded-2xl bg-primary"
-                disabled={busy || !response.trim() || !password}
+                disabled={busy || !response.trim() || (!passwordless && !password)}
                 onPress={() => respond.mutate()}
               >
                 <Text className="font-ralewayExtraBold text-white">
@@ -217,21 +211,10 @@ export function AccountDeletionCard() {
                 value={reason}
                 onChangeText={setReason}
               />
-              <BaseField
-                label="Current password"
-                required
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-                textContentType="password"
-                editable={!busy}
-                placeholder="Current password"
-                value={password}
-                onChangeText={setPassword}
-              />
+              <AccountIdentityField passwordless={passwordless} busy={busy} password={password} onChange={setPassword} />
               <TouchableOpacity
                 className="h-12 items-center justify-center rounded-2xl bg-danger"
-                disabled={busy || !password}
+                disabled={busy || (!passwordless && !password)}
                 onPress={confirmSubmit}
               >
                 {submit.isPending ? (
@@ -255,21 +238,10 @@ export function AccountDeletionCard() {
             value={reason}
             onChangeText={setReason}
           />
-          <BaseField
-            label="Current password"
-            required
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            textContentType="password"
-            editable={!busy}
-            placeholder="Current password"
-            value={password}
-            onChangeText={setPassword}
-          />
+          <AccountIdentityField passwordless={passwordless} busy={busy} password={password} onChange={setPassword} />
           <TouchableOpacity
             className="h-12 items-center justify-center rounded-2xl bg-danger"
-            disabled={busy || !password}
+            disabled={busy || (!passwordless && !password)}
             onPress={confirmSubmit}
           >
             {busy ? (
@@ -283,7 +255,7 @@ export function AccountDeletionCard() {
         </View>
       )}
 
-      {error ? (
+      {error && !isAppleCancellation(error) ? (
         <Text accessibilityRole="alert" className="mt-3 text-sm text-danger">
           {error instanceof Error
             ? error.message

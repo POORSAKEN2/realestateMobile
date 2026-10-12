@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { router, Stack } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -22,12 +22,15 @@ import {
 } from "../../api/authRecovery";
 import { EmailVerificationCodeInput } from "../../components/auth/EmailVerificationCodeInput";
 import { colors } from "../../constants/colors";
+import { useAuth } from "../../hooks/useAuth";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function ForgotPasswordScreen() {
+  const { signOut } = useAuth();
+  const params = useLocalSearchParams<{ email?: string | string[] }>();
   const [step, setStep] = useState<"request" | "reset">("request");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => (Array.isArray(params.email) ? params.email[0] : params.email) ?? "");
   const [codeDigits, setCodeDigits] = useState<string[]>(["", "", "", "", "", ""]);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -105,6 +108,7 @@ export default function ForgotPasswordScreen() {
         password: newPassword,
         password_confirmation: confirmPassword,
       });
+      signOut();
 
       Alert.alert(
         "Password reset successful",

@@ -18,6 +18,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import BrandCombinationVertical from "../../assets/branding/svg/brand-combination-vertical-white.svg";
 import { SocialLoginSection } from "../../components/auth/SocialLoginSection";
+import { AppleAccountModal } from "../../components/auth/AppleAccountModal";
+import { useAppleLogin } from "../../hooks/auth/useAppleLogin";
+import { useAuth } from "../../hooks/useAuth";
+import { restorationNotice } from "../../utils/accountDeletion/accountDeletion";
 import { LegalLink } from "../../components/legal/LegalLink";
 import { colors } from "../../constants/colors";
 import { useLogin } from "../../hooks/useLogin";
@@ -40,12 +44,30 @@ export default function LoginScreen() {
   } = useLogin(initialEmail);
 
   const passwordInputRef = useRef<TextInput>(null);
+  const authenticationLock = useRef(false);
+  const { signIn } = useAuth();
+  const apple = useAppleLogin((session) => {
+    signIn(session);
+    if (session.deletionRecovery?.cancelled) Alert.alert("Deletion cancelled", restorationNotice(session.deletionRecovery.scope));
+    router.replace("/");
+  });
+  const authenticationBusy = isLoading || apple.busy || Boolean(apple.account);
+  const startPasswordLogin = async () => {
+    if (authenticationLock.current || authenticationBusy) return;
+    authenticationLock.current = true;
+    try { await handleLogin(); } finally { authenticationLock.current = false; }
+  };
+  const startAppleLogin = async () => {
+    if (authenticationLock.current || authenticationBusy) return;
+    authenticationLock.current = true;
+    try { await apple.start(); } finally { authenticationLock.current = false; }
+  };
 
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<FocusedField>(null);
 
   const canSubmit =
-    email.trim().length > 0 && password.length > 0 && !isLoading;
+    email.trim().length > 0 && password.length > 0 && !authenticationBusy;
 
   useEffect(() => {
     if (Platform.OS !== "android") {
@@ -197,7 +219,7 @@ export default function LoginScreen() {
                     onFocus={() => setFocusedField("password")}
                     onSubmitEditing={() => {
                       if (canSubmit) {
-                        handleLogin();
+                        void startPasswordLogin();
                       }
                     }}
                     placeholder="Enter your password"
@@ -254,7 +276,7 @@ export default function LoginScreen() {
                   canSubmit ? "bg-accent active:opacity-90" : "bg-accent/40"
                 }`}
                 disabled={!canSubmit}
-                onPress={handleLogin}
+                onPress={() => void startPasswordLogin()}
               >
                 {isLoading ? (
                   <ActivityIndicator color={colors.secondary} />
@@ -269,7 +291,8 @@ export default function LoginScreen() {
                 )}
               </Pressable>
 
-              <SocialLoginSection />
+              <SocialLoginSection appleAvailable={apple.available} appleLoading={apple.busy} busy={authenticationBusy} onApplePress={() => void startAppleLogin()} />
+              {apple.error && !apple.account ? <Text accessibilityRole="alert" className="mt-3 text-center text-sm text-white">{apple.error}</Text> : null}
 
               {/* Registration */}
               <View className="mb-12 mt-8 flex-row items-center justify-center gap-1">
@@ -314,6 +337,7 @@ export default function LoginScreen() {
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
+      {apple.account ? <AppleAccountModal account={apple.account} busy={apple.busy} error={apple.error} onCancel={apple.cancel} onComplete={(input) => void apple.complete(input)} /> : null}
     </View>
   );
 }

@@ -11,6 +11,8 @@ import { colors } from "../../constants/colors";
 import { usePasswordChange } from "../../hooks/settings/usePasswordChange";
 import { FormSection } from "../ui/forms/FormSection";
 import { Button } from "../ui/buttons/Button";
+import { useAuth } from "../../hooks/useAuth";
+import { router } from "expo-router";
 
 function PasswordField({
   label,
@@ -73,9 +75,17 @@ function PasswordField({
 }
 
 export function SettingsPasswordCard() {
+  const { session } = useAuth();
   const password = usePasswordChange();
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+  const user = session?.user;
+  if (user && typeof user === "object" && "has_password" in user && user.has_password === false) {
+    const email = "email" in user ? String(user.email ?? "") : "";
+    return <FormSection icon="shield-lock-outline" title="Security" description="Sign in with Apple or set a Terrane password through email recovery." variant="card">
+      <Button title="Set password" variant="secondary" onPress={() => router.push({ pathname: "/(auth)/forgot-password", params: { email } })} />
+    </FormSection>;
+  }
   return (
     <FormSection
       icon="shield-lock-outline"

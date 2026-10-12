@@ -25,6 +25,7 @@ import { NotificationBootstrap } from "../components/notifications/NotificationB
 import { EntitlementLimitPrompt } from "../components/billing/EntitlementLimitPrompt";
 import { AccessDeniedPrompt } from "../components/auth/AccessDeniedPrompt";
 import { AuthProvider } from "../context/AuthContext";
+import { AppleCredentialBootstrap } from "../components/auth/AppleCredentialBootstrap";
 import { DefaultLocationProvider } from "../context/DefaultLocationContext";
 import { RevenueCatProvider } from "../context/RevenueCatContext";
 import { WorkspacePresentationProvider } from "../context/WorkspacePresentationContext";
@@ -87,6 +88,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <AppleCredentialBootstrap />
           <WorkspacePresentationProvider>
           <RevenueCatProvider>
             <MapKitGeocodingProvider>
