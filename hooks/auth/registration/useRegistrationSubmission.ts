@@ -1,6 +1,6 @@
 import { router } from "expo-router";
-import { useCallback, useState } from "react";
-import { Alert } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import { authErrorFeedback } from "../../../utils/auth/authErrorFeedback";
 
 import type { RegistrationFeedback } from "../../../constants/registration";
 import type { RegistrationService } from "../../../services/registration";
@@ -27,10 +27,13 @@ export function useRegistrationSubmission({
   service,
 }: UseRegistrationSubmissionOptions) {
   const [isRegistering, setIsRegistering] = useState(false);
+  const locked = useRef(false);
   const isMountedRef = useMountedRef();
   const { signIn } = useAuth();
 
   const submitRegistration = useCallback(async () => {
+    if (locked.current) return;
+    locked.current = true;
     setIsRegistering(true);
     onFeedback(null);
 
@@ -45,12 +48,17 @@ export function useRegistrationSubmission({
       if (!isMountedRef.current) return;
 
       const message = getRegistrationErrorMessage(error);
-      onFeedback({ message, tone: "error" });
+      onFeedback({
+        message,
+        tone: "error",
+        error: authErrorFeedback(error, "register"),
+      });
 
       if (isVerificationRegistrationError(message)) {
         onVerificationFailure();
       }
     } finally {
+      locked.current = false;
       if (isMountedRef.current) {
         setIsRegistering(false);
       }

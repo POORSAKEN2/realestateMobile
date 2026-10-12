@@ -197,6 +197,7 @@ test("Apple login redirects only after AuthContext commits the matching session"
       SocialLoginSection: "social",
     },
     "../../components/auth/AppleAccountModal": { AppleAccountModal: "modal" },
+    "../../components/auth/AuthErrorFeedback": { AuthErrorFeedback: "feedback" },
     "../../hooks/auth/useAppleLogin": {
       useAppleLogin: (callback) => {
         authenticated = callback;

@@ -19,6 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import BrandCombinationVertical from "../../assets/branding/svg/brand-combination-vertical-white.svg";
 import { SocialLoginSection } from "../../components/auth/SocialLoginSection";
 import { AppleAccountModal } from "../../components/auth/AppleAccountModal";
+import { AuthErrorFeedback } from "../../components/auth/AuthErrorFeedback";
 import { useAppleLogin } from "../../hooks/auth/useAppleLogin";
 import { useAuth } from "../../hooks/useAuth";
 import { restorationNotice } from "../../utils/accountDeletion/accountDeletion";
@@ -40,6 +41,8 @@ export default function LoginScreen() {
     setPassword,
     isLoading,
     error,
+    retryDelay,
+    clearError,
     handleLogin,
   } = useLogin(initialEmail);
 
@@ -63,15 +66,17 @@ export default function LoginScreen() {
     }
   }, [appleSessionToken, isAuthenticated, session?.accessToken]);
   const authenticationBusy =
-    isLoading || apple.busy || Boolean(apple.account) || Boolean(appleSessionToken);
+    isLoading || apple.busy || Boolean(apple.account) || Boolean(appleSessionToken) || retryDelay > 0 || apple.retryDelay > 0;
   const startPasswordLogin = async () => {
     if (authenticationLock.current || authenticationBusy) return;
     authenticationLock.current = true;
+    apple.clearError();
     try { await handleLogin(); } finally { authenticationLock.current = false; }
   };
   const startAppleLogin = async () => {
     if (authenticationLock.current || authenticationBusy) return;
     authenticationLock.current = true;
+    clearError();
     try { await apple.start(); } finally { authenticationLock.current = false; }
   };
 
@@ -183,7 +188,7 @@ export default function LoginScreen() {
 
               {/* Password */}
               <View className="mt-5">
-                <View className="mb-2 flex-row items-center justify-between">
+                <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-3 gap-y-2">
                   <Text className="font-ralewayBold text-sm text-white">
                     Password
                   </Text>
@@ -264,15 +269,8 @@ export default function LoginScreen() {
 
               {/* Error feedback */}
               {error ? (
-                <View
-                  accessibilityLiveRegion="polite"
-                  className="mt-5 flex-row items-start rounded-2xl border border-accent/25 bg-accent/10 px-4 py-3"
-                >
-                  <Feather color="#BEE3DB" name="alert-circle" size={19} />
-
-                  <Text className="ml-3 flex-1 font-ralewayMedium text-sm leading-5 text-white">
-                    {error}
-                  </Text>
+                <View className="mt-5">
+                  <AuthErrorFeedback feedback={error} inverse disabled={authenticationBusy} onRetry={() => void startPasswordLogin()} />
                 </View>
               ) : null}
 
@@ -284,7 +282,7 @@ export default function LoginScreen() {
                   busy: isLoading,
                   disabled: !canSubmit,
                 }}
-                className={`mt-12 h-14 items-center justify-center rounded-2xl ${
+                className={`mt-12 min-h-14 items-center justify-center rounded-2xl py-4 ${
                   canSubmit ? "bg-accent active:opacity-90" : "bg-accent/40"
                 }`}
                 disabled={!canSubmit}
@@ -304,10 +302,10 @@ export default function LoginScreen() {
               </Pressable>
 
               <SocialLoginSection appleAvailable={apple.available} appleLoading={apple.busy} busy={authenticationBusy} onApplePress={() => void startAppleLogin()} />
-              {apple.error && !apple.account ? <Text accessibilityRole="alert" className="mt-3 text-center text-sm text-white">{apple.error}</Text> : null}
+              {apple.error && !apple.account ? <View className="mt-3"><AuthErrorFeedback feedback={apple.error} inverse disabled={authenticationBusy} onRetry={() => void startAppleLogin()} /></View> : null}
 
               {/* Registration */}
-              <View className="mb-12 mt-8 flex-row items-center justify-center gap-1">
+              <View className="mb-12 mt-8 flex-row flex-wrap items-center justify-center gap-x-1 gap-y-2">
                 <Text className="font-ralewayMedium text-sm text-white/75">
                   New to Terrane?
                 </Text>
@@ -316,9 +314,10 @@ export default function LoginScreen() {
                   <Pressable
                     accessibilityLabel="Create a Terrane account"
                     accessibilityRole="link"
+                    className="max-w-full"
                     hitSlop={8}
                   >
-                    <Text className="font-ralewayBold text-sm text-accent">
+                    <Text className="text-center font-ralewayBold text-sm text-accent">
                       Create an account
                     </Text>
                   </Pressable>

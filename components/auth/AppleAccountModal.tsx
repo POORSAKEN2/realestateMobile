@@ -16,11 +16,14 @@ import { Button } from "../ui/buttons/Button";
 import { BaseField } from "../ui/fields/BaseField";
 import { SelectionCheckbox } from "../ui/SelectionCheckbox";
 import { LEGAL_DOCUMENT_URLS } from "../../constants/legal";
+import { AuthErrorFeedback } from "./AuthErrorFeedback";
+import type { AuthErrorFeedback as Feedback } from "../../utils/auth/authErrorFeedback";
+import { useAuthRetryDelay } from "../../hooks/auth/useAuthRetryDelay";
 
 type Props = {
   account: ApplePendingAccount;
   busy: boolean;
-  error: string | null;
+  error: Feedback | null;
   onCancel: () => void;
   onComplete: (
     input:
@@ -37,6 +40,7 @@ export function AppleAccountModal({
   onComplete,
 }: Props) {
   const { resolvedTheme } = useWorkspacePresentation();
+  const retryDelay = useAuthRetryDelay(error);
   const [mode, setMode] = useState<"register" | "link" | null>(null);
   const [email, setEmail] = useState(account.email ?? "");
   const [password, setPassword] = useState("");
@@ -173,11 +177,7 @@ export function AppleAccountModal({
                   </View>
                 </>
               )}
-              {error ? (
-                <Text accessibilityRole="alert" className="text-sm text-danger">
-                  {error}
-                </Text>
-              ) : null}
+              {error ? <AuthErrorFeedback feedback={error} /> : null}
               {mode ? (
                 <>
                   <Button
@@ -185,7 +185,7 @@ export function AppleAccountModal({
                       mode === "link" ? "Link and sign in" : "Create workspace"
                     }
                     isLoading={busy}
-                    disabled={!canComplete}
+                    disabled={!canComplete || busy || retryDelay > 0}
                     onPress={() =>
                       onComplete(
                         mode === "link"

@@ -9,10 +9,22 @@ import type {
 export { API_BASE_URL } from "./config";
 
 import { axiosInstance } from "./axios";
-import { toApiError, ApiError, entitlementLimitDetails, decodeApiErrorPayload } from "./errors";
+import {
+  toApiError,
+  toTransportError,
+  ApiError,
+  entitlementLimitDetails,
+  decodeApiErrorPayload,
+  SERVER_ERROR_MESSAGE,
+} from "./errors";
 import { reportEntitlementLimit } from "../services/billing/entitlementEvents";
 import { getSessionAccess } from "../services/access/sessionAccess";
-import { assertRequestAccess, describeRequest, ResourceScopeIndex, scopeResponse } from "../services/access/requestPolicy";
+import {
+  assertRequestAccess,
+  describeRequest,
+  ResourceScopeIndex,
+  scopeResponse,
+} from "../services/access/requestPolicy";
 let scopeRevision = -1;
 let scopeIndex = new ResourceScopeIndex();
 
@@ -76,17 +88,28 @@ async function request<T>(
   const accessRequest = describeRequest(path, options.method, options.body);
   if (options.access) {
     accessRequest.permission = options.access.permission;
-    accessRequest.propertyId = options.access.propertyId ?? accessRequest.propertyId;
+    accessRequest.propertyId =
+      options.access.propertyId ?? accessRequest.propertyId;
   }
   assertRequestAccess(session.access, accessRequest, index);
   const url = path;
   const isFormData =
     typeof FormData !== "undefined" && options.body instanceof FormData;
   const headers = { ...options.headers } as Record<string, any>;
-  if (accessRequest.permission && session.token && headers.Authorization && headers.Authorization !== `Bearer ${session.token}`) {
-    throw new ApiError("Your account changed. Please try again.", 409, "ACCESS_CHANGED");
+  if (
+    accessRequest.permission &&
+    session.token &&
+    headers.Authorization &&
+    headers.Authorization !== `Bearer ${session.token}`
+  ) {
+    throw new ApiError(
+      "Your account changed. Please try again.",
+      409,
+      "ACCESS_CHANGED",
+    );
   }
-  if (session.token && !headers.Authorization) headers.Authorization = `Bearer ${session.token}`;
+  if (session.token && !headers.Authorization)
+    headers.Authorization = `Bearer ${session.token}`;
   if (isFormData) {
     headers["Content-Type"] = undefined;
   }
@@ -102,20 +125,49 @@ async function request<T>(
     });
 
     if (getSessionAccess().revision !== session.revision) {
-      throw new ApiError("Your account access changed. Please try again.", 409, "ACCESS_CHANGED");
+      throw new ApiError(
+        "Your account access changed. Please try again.",
+        409,
+        "ACCESS_CHANGED",
+      );
     }
-    return scopeResponse(response.data as T, session.access, accessRequest, index);
+    if (!options.responseType || options.responseType === "json") {
+      if (!response.data || typeof response.data !== "object")
+        throw new ApiError(
+          SERVER_ERROR_MESSAGE,
+          response.status,
+          "invalid_response",
+        );
+    }
+    return scopeResponse(
+      response.data as T,
+      session.access,
+      accessRequest,
+      index,
+    );
   } catch (error: any) {
     if (error.response) {
-      const data = decodeApiErrorPayload(error.response.data) as ApiErrorResponse;
-      const failure = toApiError(error.response.status, data);
-      if (failure.status === 403 && getSessionAccess().revision === session.revision) {
-        if (entitlementLimitDetails(failure) || failure.code === "subscription_inactive") reportEntitlementLimit(failure);
+      const data = decodeApiErrorPayload(
+        error.response.data,
+      ) as ApiErrorResponse;
+      const failure = toApiError(error.response.status, data, {
+        requestId: error.response.headers?.["x-request-id"],
+        retryAfter: error.response.headers?.["retry-after"],
+      });
+      if (
+        failure.status === 403 &&
+        getSessionAccess().revision === session.revision
+      ) {
+        if (
+          entitlementLimitDetails(failure) ||
+          failure.code === "subscription_inactive"
+        )
+          reportEntitlementLimit(failure);
         else reportAccessDenied(failure.message);
       }
       throw failure;
     }
-    throw error;
+    throw toTransportError(error);
   }
 }
 

@@ -4,6 +4,7 @@ import type { RegistrationFeedback } from "../../../constants/registration";
 import type { RegistrationService } from "../../../services/registration";
 import { getRegistrationErrorMessage } from "../../../utils/auth/registration";
 import { useMountedRef } from "../../useMountedRef";
+import { authErrorFeedback } from "../../../utils/auth/authErrorFeedback";
 
 type UseRegistrationVerificationOptions = {
   email: string;
@@ -25,6 +26,7 @@ export function useRegistrationVerification({
   const [isRequestingCode, setIsRequestingCode] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(0);
   const requestedEmailRef = useRef<string | null>(null);
+  const requesting = useRef(false);
   const isMountedRef = useMountedRef();
 
   useEffect(() => {
@@ -39,10 +41,11 @@ export function useRegistrationVerification({
 
   const requestVerificationCode = useCallback(
     async (force = false) => {
-      if (isRequestingCode || (!force && secondsRemaining > 0)) {
+      if (requesting.current || isRequestingCode || secondsRemaining > 0) {
         return false;
       }
 
+      requesting.current = true;
       setIsRequestingCode(true);
       onFeedback(null);
 
@@ -61,16 +64,19 @@ export function useRegistrationVerification({
       } catch (error) {
         if (!isMountedRef.current) return false;
 
-        setSecondsRemaining(0);
+        const failure = authErrorFeedback(error, "verification");
+        setSecondsRemaining(failure.retryAfterSeconds ?? 0);
         onFeedback({
           message: getRegistrationErrorMessage(
             error,
             "Unable to send the verification code. Please try again.",
           ),
           tone: "error",
+          error: failure,
         });
         return false;
       } finally {
+        requesting.current = false;
         if (isMountedRef.current) {
           setIsRequestingCode(false);
         }

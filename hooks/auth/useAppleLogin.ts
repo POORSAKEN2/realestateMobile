@@ -8,6 +8,11 @@ import {
   type ApplePendingAccount,
 } from "../../services/apple/appleAuthentication";
 import { useMountedRef } from "../useMountedRef";
+import {
+  authErrorFeedback,
+  type AuthErrorFeedback,
+} from "../../utils/auth/authErrorFeedback";
+import { useAuthRetryDelay } from "./useAuthRetryDelay";
 
 export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
   const mounted = useMountedRef();
@@ -16,7 +21,8 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
   const [available, setAvailable] = useState(false);
   const [busy, setBusy] = useState(false);
   const [account, setAccount] = useState<ApplePendingAccount | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AuthErrorFeedback | null>(null);
+  const retryDelay = useAuthRetryDelay(error);
 
   useEffect(() => {
     void isAppleLoginAvailable()
@@ -32,15 +38,23 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
     const timer = setTimeout(
       () => {
         setAccount(null);
-        setError("Apple verification expired. Start again.");
+        setError({
+          ...authErrorFeedback(
+            new Error("Apple verification expired. Start again."),
+          ),
+          retryable: true,
+        });
       },
       10 * 60 * 1000,
     );
     return () => clearTimeout(timer);
   }, [account]);
 
-  const perform = async (action: (signal: AbortSignal) => Promise<void>) => {
-    if (locked.current) return;
+  const perform = async (
+    action: (signal: AbortSignal) => Promise<void>,
+    context: "signin" | "register" = "signin",
+  ) => {
+    if (locked.current || retryDelay > 0) return;
     locked.current = true;
     controller.current = new AbortController();
     setBusy(true);
@@ -49,11 +63,7 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
       await action(controller.current.signal);
     } catch (failure) {
       if (mounted.current && !isAppleCancellation(failure))
-        setError(
-          failure instanceof Error
-            ? failure.message
-            : "Apple sign-in failed. Please try again.",
-        );
+        setError(authErrorFeedback(failure, context));
     } finally {
       locked.current = false;
       controller.current = null;
@@ -66,6 +76,8 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
     busy,
     account,
     error,
+    retryDelay,
+    clearError: () => setError(null),
     start: () =>
       perform(async (signal) => {
         const result = await loginWithApple(signal);
@@ -78,13 +90,16 @@ export function useAppleLogin(onAuthenticated: (session: AuthSession) => void) {
         | { email: string; password: string }
         | { name: string; company: string; confirmation: boolean },
     ) =>
-      perform(async (signal) => {
-        if (!account) return;
-        const session = await completeAppleAccount(account, input, signal);
-        if (!mounted.current) return;
-        setAccount(null);
-        onAuthenticated(session);
-      }),
+      perform(
+        async (signal) => {
+          if (!account) return;
+          const session = await completeAppleAccount(account, input, signal);
+          if (!mounted.current) return;
+          setAccount(null);
+          onAuthenticated(session);
+        },
+        "password" in input ? "signin" : "register",
+      ),
     cancel: () => {
       if (!locked.current) {
         setAccount(null);

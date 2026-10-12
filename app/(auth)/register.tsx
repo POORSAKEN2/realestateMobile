@@ -15,6 +15,7 @@ export default function RegisterScreen() {
     isRequestingCode,
     passwordWarning,
     requestVerificationCode,
+    retry,
     secondsRemaining,
     step,
     stepIndex,
@@ -28,9 +29,13 @@ export default function RegisterScreen() {
       buttonDisabled={isContinueDisabled}
       buttonLabel={content.buttonLabel}
       feedback={feedback}
-      isLoading={isRegistering}
+      isLoading={isRegistering || isRequestingCode}
+      loadingLabel={
+        isRequestingCode ? "Sending code..." : "Creating account..."
+      }
       onBack={goBack}
       onContinue={continueRegistration}
+      onRetry={retry}
       stepIndex={stepIndex}
       subtitle={content.subtitle}
       title={content.title}
