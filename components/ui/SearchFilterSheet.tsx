@@ -26,6 +26,7 @@ export function SearchFilterSheet({
   return (
     <BottomSheetModal
       backdropAccessibilityLabel={`Close ${title.toLowerCase()}`}
+      bottomInsetMode={footer ? "safe-area" : "edge"}
       keyboardAvoiding
       onClose={onClose}
       visible={visible}

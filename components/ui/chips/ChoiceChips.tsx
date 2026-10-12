@@ -4,6 +4,9 @@ import { View, TouchableOpacity, Text, ViewProps } from "react-native";
 export interface ChipOption<T> {
   label: string;
   value: T;
+  trailingIcon?: React.ReactNode;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 // Using a discriminating union type to perfectly type check single vs multi-select properties
@@ -15,6 +18,7 @@ type ChoiceChipsProps<T> = {
   inactiveTextClassName?: string;
   className?: string; // For the outer container NativeWind style
   style?: ViewProps["style"];
+  showSelectionIndicator?: boolean;
 } & (
   | {
       isMultiSelect?: false;
@@ -39,6 +43,7 @@ export default function ChoiceChips<T extends string | number | boolean>({
   inactiveTextClassName = "text-textPrimary",
   className = "flex-row flex-wrap gap-2",
   style,
+  showSelectionIndicator = false,
 }: ChoiceChipsProps<T>) {
   // Clean checks for checking selection state safely
   const isSelected = (optionValue: T): boolean => {
@@ -63,26 +68,58 @@ export default function ChoiceChips<T extends string | number | boolean>({
     <View className={className} style={style}>
       {options.map((option) => {
         const selected = isSelected(option.value);
+        const hasAdornments =
+          showSelectionIndicator || Boolean(option.trailingIcon);
+        const label = (
+          <Text
+            className={`font-ralewayExtraBold text-xs ${
+              selected ? activeTextClassName : inactiveTextClassName
+            }${hasAdornments ? " min-w-0 shrink" : ""}`}
+          >
+            {option.label}
+          </Text>
+        );
 
         return (
           <TouchableOpacity
             key={String(option.value)}
-            accessibilityLabel={option.label}
+            accessibilityLabel={option.accessibilityLabel ?? option.label}
+            accessibilityHint={option.accessibilityHint}
             accessibilityRole={isMultiSelect ? "checkbox" : "radio"}
             accessibilityState={{ checked: selected }}
             activeOpacity={0.8}
             className={`min-h-11 justify-center rounded-full border px-3.5 py-2.5 ${
               selected ? activeClassName : inactiveClassName
-            }`}
+            }${hasAdornments ? " max-w-full" : ""}`}
             onPress={() => handlePress(option.value)}
           >
-            <Text
-              className={`font-ralewayExtraBold text-xs ${
-                selected ? activeTextClassName : inactiveTextClassName
-              }`}
-            >
-              {option.label}
-            </Text>
+            {hasAdornments ? (
+              <View className="max-w-full flex-row items-center gap-2">
+                {showSelectionIndicator && selected ? (
+                  <Text
+                    accessible={false}
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                    className={`shrink-0 text-sm ${activeTextClassName}`}
+                  >
+                    ✓
+                  </Text>
+                ) : null}
+                {label}
+                {option.trailingIcon ? (
+                  <View
+                    accessible={false}
+                    accessibilityElementsHidden
+                    importantForAccessibility="no-hide-descendants"
+                    className="shrink-0"
+                  >
+                    {option.trailingIcon}
+                  </View>
+                ) : null}
+              </View>
+            ) : (
+              label
+            )}
           </TouchableOpacity>
         );
       })}

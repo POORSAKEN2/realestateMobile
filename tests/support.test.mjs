@@ -105,9 +105,75 @@ const native = Object.fromEntries(
     "TouchableOpacity",
     "View",
     "Pressable",
+    "ScrollView",
   ].map((name) => [name, name]),
 );
 const palette = load("../../constants/colors.ts");
+const icons = {
+  Feather: "Feather",
+  Ionicons: "Ionicons",
+  MaterialCommunityIcons: "MaterialCommunityIcons",
+};
+const sharedMocks = {
+  "react/jsx-runtime": jsx,
+  "react-native": native,
+  "@expo/vector-icons": icons,
+};
+const skeleton = compile("../components/ui/Skeleton.tsx", {
+  ...sharedMocks,
+  react: load("react"),
+});
+const moduleState = compile("../components/ui/ModuleState.tsx", {
+  ...sharedMocks,
+  "../../constants/colors": palette,
+  "./Skeleton": skeleton,
+});
+const { SearchField } = compile("../components/ui/fields/SearchField.tsx", {
+  ...sharedMocks,
+  "../../../constants/colors": palette,
+});
+const { SearchToolbar } = compile("../components/ui/SearchToolbar.tsx", {
+  ...sharedMocks,
+  "../../constants/colors": palette,
+  "./fields/SearchField": { SearchField },
+});
+const choiceChips = compile("../components/ui/chips/ChoiceChips.tsx", {
+  ...sharedMocks,
+  react: load("react"),
+});
+const { default: AddButton } = compile(
+  "../components/ui/buttons/AddButton.tsx",
+  {
+    ...sharedMocks,
+    react: load("react"),
+    "../../../hooks/auth/useAccess": {
+      useAccess: () => ({ can: () => false }),
+    },
+  },
+);
+const { FormActionRow } = compile(
+  "../components/ui/forms/FormActionRow.tsx",
+  sharedMocks,
+);
+const { ModalActionFooter } = compile(
+  "../components/ui/ModalActionFooter.tsx",
+  {
+    "react/jsx-runtime": jsx,
+    "react-native-safe-area-context": { SafeAreaView: "SafeAreaView" },
+  },
+);
+const { SearchFilterActions, SearchFilterSheet } = compile(
+  "../components/ui/SearchFilterSheet.tsx",
+  {
+    ...sharedMocks,
+    "react-native-safe-area-context": { SafeAreaView: "SafeAreaView" },
+    "./BottomSheetModal": { BottomSheetModal: "BottomSheetModal" },
+    "./forms/FormActionRow": { FormActionRow },
+    "./groups/RadioOptionList": { RadioOptionList: "RadioOptionList" },
+    "./ModalActionFooter": { ModalActionFooter },
+    "./ModalHeader": { ModalHeader: "ModalHeader" },
+  },
+);
 const { Button } = compile("../components/ui/buttons/Button.tsx", {
   "react/jsx-runtime": jsx,
   "react-native": native,
@@ -120,6 +186,7 @@ const { SupportListFeedback } = compile(
     "react-native": native,
     "../../constants/colors": palette,
     "../ui/buttons/Button": { Button },
+    "../ui/ModuleState": moduleState,
   },
 );
 
@@ -131,6 +198,7 @@ function screen({
   filters,
   createTicket = async () => {},
   refetch = async () => {},
+  openURL = async () => {},
 }) {
   const query = (overrides) => ({
     data: undefined,
@@ -165,8 +233,8 @@ function screen({
         ];
       },
     },
-    "react-native": native,
-    "@expo/vector-icons": { Feather: "Feather", Ionicons: "Ionicons" },
+    "react-native": { ...native, Linking: { openURL } },
+    "@expo/vector-icons": icons,
     "../../constants/colors": palette,
     "../../hooks/api/useSupport": {
       useFaqs: () => query(faqs),
@@ -180,6 +248,14 @@ function screen({
       "../../utils/billing/entitlementCapabilities.ts",
     ),
     "../../components/support/SupportListFeedback": { SupportListFeedback },
+    "../../components/ui/ModuleState": moduleState,
+    "../../components/ui/SearchToolbar": { SearchToolbar },
+    "../../components/ui/buttons/AddButton": {
+      __esModule: true,
+      default: AddButton,
+    },
+    "../../components/ui/buttons/Button": { Button },
+    "../../components/ui/chips/ChoiceChips": choiceChips,
     "../../utils/support/ticketDetails": ticketDetailsHelpers,
     "../../utils/support/ticketList": ticketList,
   };
@@ -204,6 +280,121 @@ function screen({
     return SupportScreen();
   };
 }
+
+test("Help Center uses shared search and add controls while contact actions retain destinations", async () => {
+  const opened = [];
+  const render = screen({
+    faqs: {
+      data: [
+        { id: "billing", question: "Billing", answer: "Rent help" },
+        { id: "access", question: "Access", answer: "Login help" },
+      ],
+    },
+    openURL: async (url) => {
+      opened.push(url);
+    },
+  });
+  const getSearch = () =>
+    nodes(render()).find((node) => node.type === "TextInput");
+  assert.equal(getSearch().props.accessibilityLabel, "Search FAQs");
+  assert.equal(getSearch().props.placeholder, "Search help topics...");
+  assert.equal(getSearch().props.textAlignVertical, "center");
+  assert.equal(
+    nodes(render()).some(
+      (node) => node.props?.accessibilityLabel === "Open filters",
+    ),
+    false,
+  );
+  getSearch().props.onChangeText("billing");
+  assert.deepEqual(
+    nodes(render())
+      .find((node) => node.type === "PullToRefreshFlatList")
+      .props.data.map((faq) => faq.id),
+    ["billing"],
+  );
+  nodes(render())
+    .find((node) => node.props?.accessibilityLabel === "Clear FAQ search")
+    .props.onPress();
+  assert.equal(getSearch().props.value, "");
+  assert.equal(
+    nodes(render()).find((node) => node.type === "PullToRefreshFlatList").props
+      .data.length,
+    2,
+  );
+
+  const add = nodes(
+    nodes(render()).find((node) => node.type === "ModuleHeader").props.action,
+  ).find((node) => node.type === "TouchableOpacity");
+  assert.equal(add.props.accessibilityLabel, "Create support ticket");
+  add.props.onPress();
+  assert.equal(
+    nodes(render()).find((node) => node.type === "SupportTicketModal").props
+      .isVisible,
+    true,
+  );
+  for (const [title, icon] of [
+    ["Email Support", "mail"],
+    ["Hotline", "phone"],
+  ]) {
+    const button = nodes(render()).find(
+      (node) =>
+        node.type === "Pressable" && node.props.accessibilityLabel === title,
+    );
+    assert.match(button.props.className, /bg-panel/);
+    assert.equal(
+      nodes(button).find((node) => node.type === "Feather").props.name,
+      icon,
+    );
+    await button.props.onPress();
+  }
+  assert.deepEqual(opened, ["mailto:support@terrane.app", "tel:+639171234567"]);
+});
+
+test("shared Button leading icons preserve loading and disabled behavior", () => {
+  for (const leadingIcon of [undefined, jsx.jsx("Feather", { name: "mail" })]) {
+    for (const isLoading of [false, true]) {
+      const button = Button({
+        title: "Retry",
+        variant: "secondary",
+        onPress: () => {},
+        leadingIcon,
+        isLoading,
+      });
+      assert.equal(button.props.disabled, isLoading);
+      assert.equal(button.props.accessibilityState.busy, isLoading);
+      assert.equal(button.props.accessibilityLabel, "Retry");
+      assert.match(button.props.className, leadingIcon ? /min-h-12/ : /h-12/);
+      if (leadingIcon && !isLoading) {
+        assert.match(
+          nodes(button).find((node) => node.type === "Text").props.className,
+          /min-w-0 shrink/,
+        );
+      }
+      assert.equal(
+        nodes(button).some((node) => node.type === "Feather"),
+        Boolean(leadingIcon) && !isLoading,
+      );
+      assert.equal(
+        nodes(button).some((node) => node.type === "ActivityIndicator"),
+        isLoading,
+      );
+    }
+  }
+  assert.equal(
+    Button({ title: "Retry", onPress: () => {}, disabled: true }).props
+      .disabled,
+    true,
+  );
+  const empty = moduleState.ModuleEmptyState({
+    title: "Empty",
+    description: "No items",
+    icon: "help-circle-outline",
+  });
+  assert.equal(
+    nodes(empty).some((node) => node.type === "Pressable"),
+    false,
+  );
+});
 
 test("ticket card opens selected details and dismissal retains list state", () => {
   const ticket = {
@@ -280,6 +471,16 @@ test("ticket cards hide descriptions and show only urgent priority before status
 });
 
 const ticketList = load("../../utils/support/ticketList.ts");
+const sortChoice = (
+  field = "creation",
+  direction = ticketList.DEFAULT_TICKET_FILTERS.sort.directions[field],
+) => ({
+  field,
+  directions: {
+    ...ticketList.DEFAULT_TICKET_FILTERS.sort.directions,
+    [field]: direction,
+  },
+});
 const listRecords = [
   {
     id: "new",
@@ -320,7 +521,7 @@ const listRecords = [
 ];
 
 test("ticket filters combine exactly and sort without mutating cached rows", () => {
-  const original = [...listRecords];
+  const original = structuredClone(listRecords);
   const ids = (filters) =>
     ticketList
       .filterAndSortTickets(listRecords, {
@@ -328,7 +529,7 @@ test("ticket filters combine exactly and sort without mutating cached rows", () 
         ...filters,
       })
       .map((ticket) => ticket.id);
-  assert.deepEqual(ids({ sort: "newest" }), [
+  assert.deepEqual(ids({ sort: sortChoice() }), [
     "new",
     "urgent",
     "high",
@@ -336,7 +537,7 @@ test("ticket filters combine exactly and sort without mutating cached rows", () 
     "missing",
     "unknown",
   ]);
-  assert.deepEqual(ids({ sort: "oldest" }), [
+  assert.deepEqual(ids({ sort: sortChoice("creation", "asc") }), [
     "medium",
     "high",
     "urgent",
@@ -344,7 +545,7 @@ test("ticket filters combine exactly and sort without mutating cached rows", () 
     "missing",
     "unknown",
   ]);
-  assert.deepEqual(ids({ sort: "priority" }), [
+  assert.deepEqual(ids({ sort: sortChoice("priority", "desc") }), [
     "urgent",
     "high",
     "medium",
@@ -352,7 +553,7 @@ test("ticket filters combine exactly and sort without mutating cached rows", () 
     "missing",
     "unknown",
   ]);
-  assert.deepEqual(ids({ sort: "status" }), [
+  assert.deepEqual(ids({ sort: sortChoice("status", "asc") }), [
     "urgent",
     "high",
     "medium",
@@ -360,14 +561,45 @@ test("ticket filters combine exactly and sort without mutating cached rows", () 
     "missing",
     "unknown",
   ]);
-  assert.deepEqual(ids({ status: "Open", priority: "Urgent" }), ["urgent"]);
-  assert.deepEqual(ids({ status: "Closed", priority: "Urgent" }), []);
-  assert.deepEqual(ids({ status: "Deferred", priority: "Escalated" }), [
+  for (const sort of [
+    sortChoice("priority", "asc"),
+    sortChoice("status", "desc"),
+  ]) {
+    assert.deepEqual(ids({ sort }), [
+      "new",
+      "medium",
+      "high",
+      "urgent",
+      "missing",
+      "unknown",
+    ]);
+    assert.deepEqual(
+      ids({
+        sort,
+        statuses: ["Open", "In Progress"],
+        priorities: ["Urgent", "High"],
+      }),
+      ["high", "urgent"],
+    );
+  }
+  assert.deepEqual(ids({ statuses: ["Open"], priorities: ["Urgent"] }), [
+    "urgent",
+  ]);
+  assert.deepEqual(ids({ statuses: ["Closed"], priorities: ["Urgent"] }), []);
+  assert.deepEqual(ids({ statuses: ["Deferred"], priorities: ["Escalated"] }), [
     "unknown",
   ]);
-  assert.deepEqual(ids({ status: "", priority: "" }), ["missing"]);
+  assert.deepEqual(ids({ statuses: [""], priorities: [""] }), ["missing"]);
+  assert.deepEqual(
+    ids({ statuses: ["Open", "In Progress"], priorities: ["Urgent", "High"] }),
+    ["urgent", "high"],
+  );
+  assert.deepEqual(
+    ids({ statuses: ["Open", "Closed"], priorities: ["Urgent", "High"] }),
+    ["urgent"],
+  );
   assert.deepEqual(listRecords, original);
-  assert.deepEqual(ids({ sort: "newest" }), ids({ sort: "newest" }));
+  assert.deepEqual(ids({ sort: sortChoice() }), ids({ sort: sortChoice() }));
   const options = ticketList.ticketFilterOptions(listRecords);
   assert.deepEqual(
     options.statuses.map((option) => option.value),
@@ -377,6 +609,111 @@ test("ticket filters combine exactly and sort without mutating cached rows", () 
     options.priorities.map((option) => option.value),
     ["ALL", "Urgent", "High", "Medium", "Low", "Escalated", ""],
   );
+});
+
+test("sort ties retain submitted-date and ID ordering, invalid and unfamiliar values stay last", () => {
+  const records = [
+    { id: "tie-b", created_at: "2026-10-07T10:00:00Z" },
+    { id: "tie-a", created_at: "2026-10-07T10:00:00Z" },
+    { id: "latest-submission", created_at: "2026-10-08T10:00:00Z" },
+    { id: "invalid-submission", created_at: "invalid" },
+    { id: "no-dates" },
+  ].map((ticket) => ({
+    ...ticket,
+    subject: ticket.id,
+    status: "Open",
+    priority: "High",
+  }));
+  records.push(
+    {
+      id: "unfamiliar",
+      status: "Deferred",
+      priority: "Escalated",
+      created_at: "2026-10-09T10:00:00Z",
+    },
+    { id: "missing", created_at: "2026-10-10T10:00:00Z" },
+  );
+  const original = structuredClone(records);
+  for (const field of ["creation", "priority", "status"]) {
+    for (const direction of ["asc", "desc"]) {
+      const result = ticketList.filterAndSortTickets(records, {
+        ...ticketList.DEFAULT_TICKET_FILTERS,
+        sort: sortChoice(field, direction),
+      });
+      const expected =
+        field === "creation"
+          ? direction === "asc"
+            ? [
+                "tie-a",
+                "tie-b",
+                "latest-submission",
+                "unfamiliar",
+                "missing",
+                "invalid-submission",
+                "no-dates",
+              ]
+            : [
+                "missing",
+                "unfamiliar",
+                "latest-submission",
+                "tie-a",
+                "tie-b",
+                "invalid-submission",
+                "no-dates",
+              ]
+          : [
+              "latest-submission",
+              "tie-a",
+              "tie-b",
+              "invalid-submission",
+              "no-dates",
+              "missing",
+              "unfamiliar",
+            ];
+      assert.deepEqual(
+        result.map((ticket) => ticket.id),
+        expected,
+      );
+      for (const ticket of result)
+        assert.equal(
+          ticket,
+          records.find((row) => row.id === ticket.id),
+        );
+      assert.deepEqual(records, original);
+    }
+  }
+});
+
+test("selecting sort fields preserves direction memory, toggles only the active field and leaves defaults unchanged", () => {
+  const initial = structuredClone(ticketList.DEFAULT_TICKET_FILTERS.sort);
+  let sort = ticketList.selectTicketSort(initial, "creation");
+  assert.deepEqual(sort.directions, {
+    creation: "asc",
+    priority: "desc",
+    status: "asc",
+  });
+  sort = ticketList.selectTicketSort(sort, "priority");
+  assert.equal(sort.directions.priority, "desc");
+  sort = ticketList.selectTicketSort(sort, "priority");
+  assert.equal(sort.directions.priority, "asc");
+  sort = ticketList.selectTicketSort(sort, "status");
+  sort = ticketList.selectTicketSort(sort, "status");
+  assert.equal(sort.directions.status, "desc");
+  sort = ticketList.selectTicketSort(sort, "creation");
+  assert.deepEqual(sort.directions, {
+    creation: "asc",
+    priority: "asc",
+    status: "desc",
+  });
+  assert.deepEqual(initial, ticketList.DEFAULT_TICKET_FILTERS.sort);
+  for (const [field, asc, desc] of [
+    ["creation", "Creation: oldest first", "Creation: newest first"],
+    ["priority", "Priority: lowest first", "Priority: highest first"],
+    ["status", "Status: open first", "Status: closed first"],
+  ]) {
+    assert.equal(ticketList.ticketSortSummary(sortChoice(field, "asc")), asc);
+    assert.equal(ticketList.ticketSortSummary(sortChoice(field, "desc")), desc);
+  }
 });
 
 test("ticket sort/filter controls apply, cancel, clear and survive detail dismissal and tab switches", () => {
@@ -399,7 +736,11 @@ test("ticket sort/filter controls apply, cancel, clear and survive detail dismis
   assert.equal(getSheet(), undefined);
   assert.equal(data().length, listRecords.length);
   open();
-  const filters = { status: "Open", priority: "Urgent", sort: "priority" };
+  const filters = {
+    statuses: ["Open"],
+    priorities: ["Urgent"],
+    sort: sortChoice("priority"),
+  };
   getSheet().props.onApply(filters);
   assert.equal(getSheet(), undefined);
   assert.deepEqual(
@@ -437,7 +778,7 @@ test("ticket sort/filter controls apply, cancel, clear and survive detail dismis
     ["urgent"],
   );
   open();
-  getSheet().props.onApply({ ...filters, status: "Closed" });
+  getSheet().props.onApply({ ...filters, statuses: ["Closed"] });
   assert.deepEqual(data(), []);
   const empty = nodes(render()).find(
     (node) => node.type === "PullToRefreshFlatList",
@@ -449,12 +790,202 @@ test("ticket sort/filter controls apply, cancel, clear and survive detail dismis
   assert.equal(data().length, listRecords.length);
 });
 
+test("ticket summaries follow option order including unfamiliar and missing values", () => {
+  const options = ticketList.ticketFilterOptions(listRecords);
+  assert.equal(
+    ticketList.ticketListSummary(ticketList.DEFAULT_TICKET_FILTERS, options),
+    "Creation: newest first · All statuses · All priorities",
+  );
+  const filters = {
+    statuses: ["", "Deferred", "Closed", "Open"],
+    priorities: ["Escalated", "High", "Urgent", ""],
+    sort: sortChoice("status"),
+  };
+  assert.equal(
+    ticketList.ticketListSummary(filters, options),
+    "Status: open first · Open, Closed, Deferred, Not provided · Urgent, High, Escalated, Not provided",
+  );
+  assert.equal(
+    ticketList.ticketListSummary(filters, options),
+    ticketList.ticketListSummary(
+      {
+        ...filters,
+        statuses: [...filters.statuses].reverse(),
+        priorities: [...filters.priorities].reverse(),
+      },
+      options,
+    ),
+  );
+});
+
+test("shared pill selection indicators are opt-in and retain single-select defaults", () => {
+  const { default: ChoiceChips } = choiceChips;
+  let selected;
+  const props = {
+    options: [
+      { label: "Open", value: "Open" },
+      { label: "Closed", value: "Closed" },
+    ],
+    value: "Open",
+    onSelect: (value) => {
+      selected = value;
+    },
+  };
+  const plain = ChoiceChips(props);
+  assert.ok(!text(plain).includes("✓"));
+  const pills = nodes(plain).filter(
+    (node) => node.props?.accessibilityRole === "radio",
+  );
+  assert.equal(pills[0].props.children.type, "Text");
+  pills[1].props.onPress();
+  assert.equal(selected, "Closed");
+  const decorated = ChoiceChips({ ...props, showSelectionIndicator: true });
+  const indicators = nodes(decorated).filter(
+    (node) => node.type === "Text" && node.props.children === "✓",
+  );
+  assert.equal(indicators.length, 1);
+  assert.equal(indicators[0].props.accessible, false);
+  const withIcon = ChoiceChips({
+    ...props,
+    options: [
+      {
+        label: "Creation",
+        value: "Open",
+        trailingIcon: jsx.jsx("Feather", { name: "arrow-down" }),
+        accessibilityLabel: "Creation: newest first, descending",
+        accessibilityHint: "Tap again to reverse.",
+      },
+    ],
+  });
+  const iconPill = nodes(withIcon).find(
+    (node) => node.props?.accessibilityRole === "radio",
+  );
+  assert.equal(
+    iconPill.props.accessibilityLabel,
+    "Creation: newest first, descending",
+  );
+  assert.equal(iconPill.props.accessibilityHint, "Tap again to reverse.");
+  assert.ok(!text(iconPill).includes("✓"));
+  assert.equal(
+    nodes(iconPill).find((node) => node.type === "Feather").props.name,
+    "arrow-down",
+  );
+  assert.ok(
+    nodes(iconPill).some(
+      (node) =>
+        node.type === "View" &&
+        node.props.importantForAccessibility === "no-hide-descendants",
+    ),
+  );
+});
+
+test("large filter button shows ordered supporting text without inline pills or sort icons", () => {
+  const render = screen({
+    tab: "tickets",
+    tickets: { data: listRecords },
+    filters: { statuses: [], priorities: [], sort: sortChoice() },
+  });
+  const trigger = () =>
+    nodes(render()).find((node) =>
+      node.props?.accessibilityLabel?.startsWith("Sort and filter tickets."),
+    );
+  const sheet = () =>
+    nodes(render()).find((node) => node.type === "SupportTicketFilterSheet");
+  assert.match(text(trigger()), /Sort & filter/);
+  assert.match(
+    text(trigger()),
+    /Creation: newest first · All statuses · All priorities/,
+  );
+  assert.deepEqual(
+    nodes(trigger())
+      .filter((node) => node.type === "Feather")
+      .map((node) => node.props.name),
+    ["sliders", "chevron-down"],
+  );
+  assert.ok(
+    !nodes(render()).some(
+      (node) =>
+        node.props?.accessibilityRole === "checkbox" ||
+        node.type === "ScrollView",
+    ),
+  );
+  trigger().props.onPress();
+  sheet().props.onApply({
+    statuses: ["In Progress", "Open"],
+    priorities: ["High", "Urgent"],
+    sort: sortChoice("creation", "asc"),
+  });
+  assert.match(
+    text(trigger()),
+    /Creation: oldest first · Open, In Progress · Urgent, High/,
+  );
+  assert.deepEqual(
+    nodes(render())
+      .find((node) => node.type === "PullToRefreshFlatList")
+      .props.data.map((ticket) => ticket.id),
+    ["high", "urgent"],
+  );
+  const summary = nodes(trigger()).find(
+    (node) =>
+      node.type === "Text" && text(node).includes("Creation: oldest first"),
+  );
+  assert.equal(summary.props.numberOfLines, undefined);
+  assert.match(trigger().props.className, /min-h-11/);
+});
+
+test("directional sorting applies to rows and summary and survives reopening and cancellation", () => {
+  const records = [
+    { ...listRecords[0], updated_at: "2026-10-08T10:00:00Z" },
+    { ...listRecords[1], updated_at: "2026-10-09T10:00:00Z" },
+  ];
+  const original = structuredClone(records);
+  const render = screen({ tab: "tickets", tickets: { data: records } });
+  const trigger = () =>
+    nodes(render()).find((node) =>
+      node.props?.accessibilityLabel?.startsWith("Sort and filter tickets."),
+    );
+  const sheet = () =>
+    nodes(render()).find((node) => node.type === "SupportTicketFilterSheet");
+  trigger().props.onPress();
+  const filters = {
+    statuses: [],
+    priorities: [],
+    sort: sortChoice("creation", "asc"),
+  };
+  sheet().props.onApply(filters);
+  assert.equal(sheet().props.visible, false);
+  assert.match(
+    text(trigger()),
+    /Creation: oldest first · All statuses · All priorities/,
+  );
+  assert.match(
+    trigger().props.accessibilityLabel,
+    /Creation: oldest first · All statuses · All priorities/,
+  );
+  assert.deepEqual(
+    nodes(render())
+      .find((node) => node.type === "PullToRefreshFlatList")
+      .props.data.map((ticket) => ticket.id),
+    ["urgent", "new"],
+  );
+  trigger().props.onPress();
+  assert.deepEqual(sheet().props.filters, filters);
+  sheet().props.onClose();
+  trigger().props.onPress();
+  assert.deepEqual(sheet().props.filters, filters);
+  assert.deepEqual(records, original);
+});
+
 test("successful ticket submission clears list filters so the new ticket is not hidden", async () => {
   let submitted;
   const render = screen({
     tab: "tickets",
     tickets: { data: listRecords },
-    filters: { status: "Closed", priority: "Low", sort: "oldest" },
+    filters: {
+      statuses: ["Closed"],
+      priorities: ["Low"],
+      sort: sortChoice("creation", "asc"),
+    },
     createTicket: async (payload) => {
       submitted = payload;
     },
@@ -524,9 +1055,54 @@ test("shared radio choices announce selection and use readable theme tokens", ()
   );
 });
 
-test("ticket filter sheet keeps edits local until apply and reset restores all defaults", () => {
-  let buttonPalette = palette.lightColors;
-  let draft = { status: "Closed", priority: "Low", sort: "oldest" };
+test("filter sheets with actions avoid the iOS edge offset and retain one bottom safe-area owner", () => {
+  for (const hasFooter of [false, true]) {
+    const footer = hasFooter
+      ? SearchFilterActions({ onApply: () => {}, onReset: () => {} })
+      : undefined;
+    const tree = SearchFilterSheet({
+      children: jsx.jsx("Text", { children: "Filters" }),
+      footer,
+      title: "Filters",
+      description: "Choose filters",
+      visible: true,
+      onClose: () => {},
+    });
+    assert.equal(tree.props.bottomInsetMode, hasFooter ? "safe-area" : "edge");
+    const body = tree.props.children;
+    assert.deepEqual(body.props.edges, hasFooter ? [] : ["bottom"]);
+    const safeAreas = nodes(tree).filter(
+      (node) => node.type === "SafeAreaView",
+    );
+    assert.equal(
+      safeAreas.filter((node) => node.props.edges.includes("bottom")).length,
+      1,
+    );
+    if (hasFooter) {
+      const actions = safeAreas.find((node) =>
+        node.props.edges.includes("bottom"),
+      );
+      assert.match(actions.props.className, /pb-4/);
+      assert.equal(
+        nodes(tree).find((node) => node.type === "ScrollView").props.style
+          .flexShrink,
+        1,
+      );
+      assert.ok(
+        nodes(actions).some(
+          (node) => node.props?.accessibilityLabel === "Apply filters",
+        ),
+      );
+    }
+  }
+});
+
+test("ticket filter sheet uses shared actions, keeps drafts local and resets defaults", () => {
+  let draft = {
+    statuses: ["Closed"],
+    priorities: ["Low"],
+    sort: sortChoice("creation", "asc"),
+  };
   const initial = draft;
   let applied;
   const { SupportTicketFilterSheet } = compile(
@@ -544,15 +1120,14 @@ test("ticket filter sheet keeps edits local until apply and reset restores all d
         ],
       },
       "react-native": { ...native, Platform: { OS: "ios" } },
+      "@expo/vector-icons": icons,
+      "../../constants/colors": palette,
       "../ui/SearchFilterSheet": {
         SearchFilterSheet: "SearchFilterSheet",
         SearchFilterSection: "SearchFilterSection",
+        SearchFilterActions,
       },
-      "../ui/groups/RadioOptionList": { RadioOptionList: "RadioOptionList" },
-      "../ui/ModalActionFooter": { ModalActionFooter: "ModalActionFooter" },
-      "../../context/WorkspacePresentationContext": {
-        useThemeColors: () => buttonPalette,
-      },
+      "../ui/chips/ChoiceChips": choiceChips,
       "../../utils/support/ticketList": ticketList,
     },
   );
@@ -567,44 +1142,244 @@ test("ticket filter sheet keeps edits local until apply and reset restores all d
       },
       onClose: () => {},
     });
-  for (const [index, value] of [
-    [0, "Open"],
-    [1, "Urgent"],
-    [2, "priority"],
-  ]) {
-    nodes(render())
-      .filter((node) => node.type === "RadioOptionList")
-      [index].props.onSelect(value);
-  }
+  const press = (label) =>
+    nodes([render(), render().props.footer])
+      .find(
+        (node) =>
+          node.props?.accessibilityLabel === label ||
+          (node.props?.accessibilityRole === "radio" &&
+            node.props.accessibilityLabel.startsWith(`${label}:`)),
+      )
+      .props.onPress();
+  press("Open");
+  press("Urgent");
+  press("Priority");
   assert.deepEqual(initial, {
-    status: "Closed",
-    priority: "Low",
-    sort: "oldest",
+    statuses: ["Closed"],
+    priorities: ["Low"],
+    sort: sortChoice("creation", "asc"),
   });
   assert.equal(applied, undefined);
-  for (const theme of [palette.lightColors, palette.darkColors]) {
-    buttonPalette = theme;
-    const applyButton = nodes(render().props.footer).find(
-      (node) => node.props?.accessibilityLabel === "Apply ticket filters",
-    );
-    assert.equal(applyButton.props.style.backgroundColor, theme.primaryStrong);
-    assert.match(
-      nodes(applyButton).find((node) => node.type === "Text").props.className,
-      /text-whitePrimary/,
-    );
-  }
+  assert.deepEqual(
+    nodes(render())
+      .filter((node) => node.type === "SearchFilterSection")
+      .map((node) => node.props.label),
+    ["Status", "Priority", "Sort by"],
+  );
+  assert.equal(render().props.footer.type, SearchFilterActions);
+  const applyButton = nodes(render().props.footer).find(
+    (node) => node.props?.accessibilityLabel === "Apply filters",
+  );
+  assert.match(applyButton.props.className, /bg-primary/);
   nodes(render().props.footer)
-    .find((node) => node.props?.accessibilityLabel === "Apply ticket filters")
+    .find((node) => node.props?.accessibilityLabel === "Apply filters")
     .props.onPress();
   assert.deepEqual(applied, {
-    status: "Open",
-    priority: "Urgent",
-    sort: "priority",
+    statuses: ["Closed", "Open"],
+    priorities: ["Low", "Urgent"],
+    sort: {
+      field: "priority",
+      directions: { creation: "asc", priority: "desc", status: "asc" },
+    },
   });
   nodes(render().props.footer)
-    .find((node) => node.props?.accessibilityLabel === "Reset ticket filters")
+    .find((node) => node.props?.accessibilityLabel === "Reset")
     .props.onPress();
   assert.deepEqual(draft, ticketList.DEFAULT_TICKET_FILTERS);
+  for (const [group, all, first, second] of [
+    ["statuses", "All statuses", "Open", "In Progress"],
+    ["priorities", "All priorities", "Urgent", "High"],
+  ]) {
+    const pill = (label) =>
+      nodes(render()).find((node) => node.props?.accessibilityLabel === label);
+    assert.equal(pill(all).props.accessibilityState.checked, true);
+    assert.equal(pill(all).props.accessibilityRole, "checkbox");
+    assert.match(text(pill(all)), /✓/);
+    assert.match(pill(all).props.className, /min-h-11/);
+    press(first);
+    assert.deepEqual(draft[group], [first]);
+    assert.equal(pill(all).props.accessibilityState.checked, false);
+    press(second);
+    assert.deepEqual(draft[group], [first, second]);
+    press(first);
+    assert.deepEqual(draft[group], [second]);
+    press(second);
+    assert.deepEqual(draft[group], []);
+    assert.equal(pill(all).props.accessibilityState.checked, true);
+    press(first);
+    press(all);
+    assert.deepEqual(draft[group], []);
+    assert.equal(pill(first).props.accessibilityState.checked, false);
+  }
+  assert.deepEqual(
+    nodes(render())
+      .filter((node) => node.props?.accessibilityRole === "radio")
+      .map(
+        (node) =>
+          nodes(node).find(
+            (child) => child.type === "Text" && child.props.children !== "✓",
+          ).props.children,
+      ),
+    ["Creation", "Priority", "Status"],
+  );
+  for (const { label, value } of ticketList.TICKET_SORT_OPTIONS) {
+    if (draft.sort.field === value)
+      press(value === "creation" ? "Priority" : "Creation");
+    press(label);
+    assert.equal(draft.sort.field, value);
+    const initialDirection = draft.sort.directions[value];
+    press(label);
+    assert.equal(
+      draft.sort.directions[value],
+      initialDirection === "asc" ? "desc" : "asc",
+    );
+    const checkedSorts = nodes(render()).filter(
+      (node) =>
+        node.props?.accessibilityRole === "radio" &&
+        node.props.accessibilityState.checked,
+    );
+    assert.equal(checkedSorts.length, 1);
+    assert.ok(checkedSorts[0].props.accessibilityLabel.startsWith(`${label}:`));
+    assert.match(
+      checkedSorts[0].props.accessibilityHint,
+      /Tap again to reverse/,
+    );
+    assert.match(text(checkedSorts[0]), /✓/);
+    for (const option of ticketList.TICKET_SORT_OPTIONS) {
+      const pill = nodes(render()).find(
+        (node) =>
+          node.props?.accessibilityRole === "radio" &&
+          node.props.accessibilityLabel.startsWith(`${option.label}:`),
+      );
+      const arrow = nodes(pill).find((node) => node.type === "Feather");
+      assert.equal(
+        arrow.props.name,
+        draft.sort.directions[option.value] === "asc"
+          ? "arrow-up"
+          : "arrow-down",
+      );
+      assert.equal(
+        arrow.props.color,
+        draft.sort.field === option.value
+          ? palette.colors.primaryContent
+          : palette.colors.text,
+      );
+    }
+  }
+  const remembered = structuredClone(draft.sort.directions);
+  press("Creation");
+  press("Priority");
+  press("Status");
+  assert.deepEqual(draft.sort.directions, remembered);
+  assert.match(
+    text(render()),
+    /Tap the selected option again to reverse its order/,
+  );
+  const beforeDraft = structuredClone(draft);
+  press("Escalated");
+  assert.deepEqual(beforeDraft.priorities, []);
+  press("Apply filters");
+  assert.deepEqual(applied.priorities, ["Escalated"]);
+  assert.deepEqual(applied.sort, { field: "status", directions: remembered });
+  press("Reset");
+  press("Apply filters");
+  assert.deepEqual(applied, ticketList.DEFAULT_TICKET_FILTERS);
+});
+
+test("remembered sort directions survive reopening and web Escape restores focus", () => {
+  const previousDocument = globalThis.document;
+  const previousHTMLElement = globalThis.HTMLElement;
+  const listeners = new Map();
+  let focusRestored = 0;
+  class FocusTarget {
+    isConnected = true;
+    focus() {
+      focusRestored++;
+    }
+  }
+  globalThis.HTMLElement = FocusTarget;
+  globalThis.document = {
+    activeElement: new FocusTarget(),
+    addEventListener: (name, handler) => listeners.set(name, handler),
+    removeEventListener: (name, handler) => {
+      if (listeners.get(name) === handler) listeners.delete(name);
+    },
+  };
+  try {
+    let effects = [];
+    let draft;
+    let closes = 0;
+    const { SupportTicketFilterSheet } = compile(
+      "../components/support/SupportTicketFilterSheet.tsx",
+      {
+        "react/jsx-runtime": jsx,
+        react: {
+          useEffect: (effect) => effects.push(effect),
+          useRef: (current) => ({ current }),
+          useState: (initial) => [
+            draft ?? initial,
+            (next) => {
+              draft = typeof next === "function" ? next(draft) : next;
+            },
+          ],
+        },
+        "react-native": { Platform: { OS: "web" } },
+        "@expo/vector-icons": icons,
+        "../../constants/colors": palette,
+        "../ui/SearchFilterSheet": {
+          SearchFilterActions,
+          SearchFilterSheet: "SearchFilterSheet",
+          SearchFilterSection: "SearchFilterSection",
+        },
+        "../ui/chips/ChoiceChips": choiceChips,
+        "../../utils/support/ticketList": ticketList,
+      },
+    );
+    const filters = {
+      statuses: ["Open"],
+      priorities: ["Urgent"],
+      sort: {
+        field: "priority",
+        directions: { creation: "asc", priority: "asc", status: "desc" },
+      },
+    };
+    const props = {
+      filters,
+      ...ticketList.ticketFilterOptions(listRecords),
+      visible: true,
+      onApply: () => {},
+      onClose: () => closes++,
+    };
+    SupportTicketFilterSheet(props);
+    effects[0]();
+    const cleanup = effects[1]();
+    assert.deepEqual(draft, filters);
+    let prevented = 0;
+    listeners.get("keydown")({
+      key: "Escape",
+      preventDefault: () => prevented++,
+      stopPropagation: () => {},
+    });
+    assert.equal(closes, 1);
+    assert.equal(prevented, 1);
+    cleanup();
+    assert.equal(listeners.size, 0);
+    assert.equal(focusRestored, 1);
+    draft = {
+      ...filters,
+      statuses: ["Closed"],
+      sort: ticketList.selectTicketSort(filters.sort, "priority"),
+    };
+    effects = [];
+    SupportTicketFilterSheet(props);
+    effects[0]();
+    assert.deepEqual(draft, filters);
+  } finally {
+    if (previousDocument === undefined) delete globalThis.document;
+    else globalThis.document = previousDocument;
+    if (previousHTMLElement === undefined) delete globalThis.HTMLElement;
+    else globalThis.HTMLElement = previousHTMLElement;
+  }
 });
 
 test("ticket detail endpoint encodes ID and unwraps response", async () => {
@@ -1121,7 +1896,17 @@ for (const tab of ["faqs", "tickets"]) {
         text(tree),
         /No support tickets yet|No FAQs available|\(0\)/,
       );
-      assert.match(text(tree), state.isPending ? /Loading/ : /Could not load/);
+      if (state.isPending) {
+        assert.ok(
+          nodes(tree).some(
+            (node) =>
+              node.props?.accessibilityRole === "progressbar" &&
+              node.props.accessibilityLabel.startsWith("Loading"),
+          ),
+        );
+      } else {
+        assert.match(text(tree), /Could not load/);
+      }
       assert.equal(
         nodes(tree).some((node) => node.type === "PullToRefreshFlatList"),
         false,

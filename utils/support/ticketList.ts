@@ -1,24 +1,59 @@
 import type { SupportTicket } from "../../types/domain/support";
 
-export type TicketSort = "newest" | "oldest" | "priority" | "status";
+export type TicketSortField = "creation" | "priority" | "status";
+export type TicketSortDirection = "asc" | "desc";
+export type TicketSort = {
+  field: TicketSortField;
+  directions: Record<TicketSortField, TicketSortDirection>;
+};
 export type TicketListFilters = {
-  status: string;
-  priority: string;
+  statuses: string[];
+  priorities: string[];
   sort: TicketSort;
 };
 
 export const DEFAULT_TICKET_FILTERS: TicketListFilters = {
-  status: "ALL",
-  priority: "ALL",
-  sort: "newest",
+  statuses: [],
+  priorities: [],
+  sort: {
+    field: "creation",
+    directions: { creation: "desc", priority: "desc", status: "asc" },
+  },
 };
 
-export const TICKET_SORT_OPTIONS: { label: string; value: TicketSort }[] = [
-  { label: "Newest first", value: "newest" },
-  { label: "Oldest first", value: "oldest" },
-  { label: "Priority: highest first", value: "priority" },
-  { label: "Status: open first", value: "status" },
-];
+export const TICKET_SORT_OPTIONS: { label: string; value: TicketSortField }[] =
+  [
+    { label: "Creation", value: "creation" },
+    { label: "Priority", value: "priority" },
+    { label: "Status", value: "status" },
+  ];
+
+const SORT_SUMMARIES: Record<
+  TicketSortField,
+  Record<TicketSortDirection, string>
+> = {
+  creation: { asc: "Creation: oldest first", desc: "Creation: newest first" },
+  priority: { asc: "Priority: lowest first", desc: "Priority: highest first" },
+  status: { asc: "Status: open first", desc: "Status: closed first" },
+};
+
+export function ticketSortSummary(sort: TicketSort, field = sort.field) {
+  return SORT_SUMMARIES[field][sort.directions[field]];
+}
+
+export function selectTicketSort(
+  sort: TicketSort,
+  field: TicketSortField,
+): TicketSort {
+  if (sort.field !== field) return { ...sort, field };
+  return {
+    ...sort,
+    directions: {
+      ...sort.directions,
+      [field]: sort.directions[field] === "asc" ? "desc" : "asc",
+    },
+  };
+}
 
 const STATUS_ORDER = ["Open", "In Progress", "Resolved", "Closed"];
 const PRIORITY_ORDER = ["Urgent", "High", "Medium", "Low"];
@@ -42,13 +77,31 @@ export function ticketFilterOptions(tickets: SupportTicket[]) {
   };
 }
 
-export function ticketListSummary(filters: TicketListFilters) {
+export function ticketListSummary(
+  filters: TicketListFilters,
+  options = ticketFilterOptions([]),
+) {
+  const labels = (
+    values: string[],
+    choices: { label: string; value: string }[],
+    allLabel: string,
+  ) => {
+    if (values.length === 0) return allLabel;
+    const selected = new Set(values);
+    const ordered = choices.filter((option) => selected.has(option.value));
+    const knownValues = new Set(ordered.map((option) => option.value));
+    return [
+      ...ordered.map((option) => option.label),
+      ...values
+        .filter((value) => !knownValues.has(value))
+        .sort()
+        .map((value) => value || "Not provided"),
+    ].join(", ");
+  };
   return [
-    TICKET_SORT_OPTIONS.find((option) => option.value === filters.sort)?.label,
-    filters.status !== "ALL" ? filters.status || "Status not provided" : null,
-    filters.priority !== "ALL"
-      ? `${filters.priority || "Not provided"} priority`
-      : null,
+    ticketSortSummary(filters.sort),
+    labels(filters.statuses, options.statuses, "All statuses"),
+    labels(filters.priorities, options.priorities, "All priorities"),
   ]
     .filter(Boolean)
     .join(" · ");
@@ -58,17 +111,17 @@ export function filterAndSortTickets(
   tickets: SupportTicket[],
   filters: TicketListFilters,
 ) {
+  const statuses = new Set(filters.statuses);
+  const priorities = new Set(filters.priorities);
   const rank = (value: string | undefined, order: string[]) => {
-    const index = order.indexOf(value?.trim() || "");
-    return index < 0 ? order.length : index;
+    return order.indexOf(value?.trim() || "");
   };
   const rows = tickets
     .filter(
       (ticket) =>
-        (filters.status === "ALL" ||
-          (ticket.status?.trim() || "") === filters.status) &&
-        (filters.priority === "ALL" ||
-          (ticket.priority?.trim() || "") === filters.priority),
+        (statuses.size === 0 || statuses.has(ticket.status?.trim() || "")) &&
+        (priorities.size === 0 ||
+          priorities.has(ticket.priority?.trim() || "")),
     )
     .map((ticket) => ({
       ticket,
@@ -77,16 +130,25 @@ export function filterAndSortTickets(
       priorityRank: rank(ticket.priority, PRIORITY_ORDER),
     }));
 
+  const { field, directions } = filters.sort;
+  const direction = directions[field];
   rows.sort((a, b) => {
-    if (filters.sort === "priority" && a.priorityRank !== b.priorityRank)
-      return a.priorityRank - b.priorityRank;
-    if (filters.sort === "status" && a.statusRank !== b.statusRank)
-      return a.statusRank - b.statusRank;
+    if (field !== "creation") {
+      const aRank = field === "priority" ? a.priorityRank : a.statusRank;
+      const bRank = field === "priority" ? b.priorityRank : b.statusRank;
+      const aKnown = aRank >= 0;
+      const bKnown = bRank >= 0;
+      if (aKnown !== bKnown) return aKnown ? -1 : 1;
+      if (aKnown && aRank !== bRank) {
+        const ascendingRank = field === "status" ? 1 : -1;
+        return (aRank - bRank) * ascendingRank * (direction === "asc" ? 1 : -1);
+      }
+    }
     const aValid = Number.isFinite(a.timestamp);
     const bValid = Number.isFinite(b.timestamp);
     if (aValid !== bValid) return aValid ? -1 : 1;
     if (aValid && a.timestamp !== b.timestamp)
-      return filters.sort === "oldest"
+      return field === "creation" && direction === "asc"
         ? a.timestamp - b.timestamp
         : b.timestamp - a.timestamp;
     return String(a.ticket.id).localeCompare(String(b.ticket.id));

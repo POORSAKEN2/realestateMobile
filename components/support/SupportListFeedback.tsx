@@ -1,7 +1,7 @@
-import { ActivityIndicator, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
-import { colors } from "../../constants/colors";
 import { Button } from "../ui/buttons/Button";
+import { ModuleLoadingState } from "../ui/ModuleState";
 
 export function SupportListFeedback({
   label,
@@ -20,14 +20,10 @@ export function SupportListFeedback({
 }) {
   if (!hasData && isPending) {
     return (
-      <View
-        className="flex-1 items-center justify-center gap-3"
-        accessibilityRole="progressbar"
-        accessibilityLabel={`Loading ${label}`}
-      >
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text className="text-sm text-description">Loading {label}...</Text>
-      </View>
+      <ModuleLoadingState
+        title={`Loading ${label}`}
+        description={`Fetching ${label}.`}
+      />
     );
   }
 

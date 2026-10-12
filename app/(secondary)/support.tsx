@@ -1,6 +1,6 @@
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
-import { Linking, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Linking, Text, TouchableOpacity, View } from "react-native";
 
 import { PullToRefreshFlatList } from "../../components/ui/PullToRefreshFlatList";
 import { FaqAccordion } from "../../components/support/FaqAccordion";
@@ -10,6 +10,10 @@ import { SupportListFeedback } from "../../components/support/SupportListFeedbac
 import { SupportTicketFilterSheet } from "../../components/support/SupportTicketFilterSheet";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
 import { ModuleHeader } from "../../components/ui/ModuleHeader";
+import { ModuleEmptyState } from "../../components/ui/ModuleState";
+import { SearchToolbar } from "../../components/ui/SearchToolbar";
+import AddButton from "../../components/ui/buttons/AddButton";
+import { Button } from "../../components/ui/buttons/Button";
 import { Screen } from "../../components/ui/Screen";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { colors } from "../../constants/colors";
@@ -58,9 +62,9 @@ export default function SupportScreen() {
     [tickets, ticketFilters],
   );
   const filterOptions = useMemo(() => ticketFilterOptions(tickets), [tickets]);
-  const ticketSummary = ticketListSummary(ticketFilters);
+  const ticketSummary = ticketListSummary(ticketFilters, filterOptions);
   const hasTicketFilters =
-    ticketFilters.status !== "ALL" || ticketFilters.priority !== "ALL";
+    ticketFilters.statuses.length > 0 || ticketFilters.priorities.length > 0;
   const createTicketMutation = useCreateSupportTicket();
   const entitlementQuery = useBillingEntitlement();
   const currentSupportLevel =
@@ -88,15 +92,11 @@ export default function SupportScreen() {
       <View className="flex-1">
         <ModuleHeader
           action={
-            <TouchableOpacity
-              accessibilityLabel="Create support ticket"
-              accessibilityRole="button"
-              activeOpacity={0.8}
-              className="h-11 w-11 items-center justify-center rounded-2xl bg-primary"
+            <AddButton
+              iconOnly
+              title="Create support ticket"
               onPress={() => setIsTicketModalOpen(true)}
-            >
-              <Ionicons name="add" size={18} color="#FFFFFF" />
-            </TouchableOpacity>
+            />
           }
           eyebrow="Account"
           leading={
@@ -173,27 +173,14 @@ export default function SupportScreen() {
 
         {activeTab === "faqs" ? (
           <View key="faqs" className="mt-4 flex-1">
-            {/* Search Bar */}
-            <View className="mb-3 h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 shadow-sm shadow-primary/5">
-              <Feather name="search" size={16} color={colors.primary} />
-              <TextInput
-                accessibilityLabel="Search FAQs"
-                className="ml-2.5 flex-1 font-ralewayMedium text-sm text-textPrimary"
-                onChangeText={setSearchQuery}
-                placeholder="Search help topics..."
-                placeholderTextColor={colors.description}
-                value={searchQuery}
-              />
-              {searchQuery ? (
-                <TouchableOpacity onPress={() => setSearchQuery("")}>
-                  <Ionicons
-                    name="close-circle"
-                    size={16}
-                    color={colors.primary}
-                  />
-                </TouchableOpacity>
-              ) : null}
-            </View>
+            <SearchToolbar
+              accessibilityLabel="Search FAQs"
+              className="mb-3"
+              clearAccessibilityLabel="Clear FAQ search"
+              onChangeText={setSearchQuery}
+              placeholder="Search help topics..."
+              value={searchQuery}
+            />
 
             {/* FAQs List */}
             <SupportListFeedback
@@ -216,22 +203,20 @@ export default function SupportScreen() {
                 renderItem={({ item }) => <FaqAccordion faq={item} />}
                 ListEmptyComponent={
                   faqQuery.isError ? null : (
-                    <View className="mt-4 items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8">
-                      <Feather
-                        name="help-circle"
-                        size={36}
-                        color={colors.description}
+                    <View className="mt-4">
+                      <ModuleEmptyState
+                        icon="help-circle-outline"
+                        title={
+                          faqs.length > 0
+                            ? "No matching FAQs"
+                            : "No FAQs available"
+                        }
+                        description={
+                          faqs.length > 0
+                            ? "Try another search or use the + button to create a support ticket."
+                            : "Use the + button to create a support ticket."
+                        }
                       />
-                      <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
-                        {faqs.length > 0
-                          ? "No matching FAQs"
-                          : "No FAQs available"}
-                      </Text>
-                      <Text className="mt-1 text-center text-xs text-description">
-                        {faqs.length > 0
-                          ? "Try another search or use the + button to create a support ticket."
-                          : "Use the + button to create a support ticket."}
-                      </Text>
                     </View>
                   )
                 }
@@ -244,6 +229,7 @@ export default function SupportScreen() {
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel={`Sort and filter tickets. ${ticketSummary}`}
+              accessibilityHint="Choose ticket statuses, priorities, and display order"
               activeOpacity={0.8}
               className="mb-3 min-h-11 flex-row items-center gap-3 rounded-xl border border-primary/20 bg-panel px-3 py-2"
               onPress={() => setIsFilterSheetOpen(true)}
@@ -350,36 +336,31 @@ export default function SupportScreen() {
                 }}
                 ListEmptyComponent={
                   ticketQuery.isError ? null : (
-                    <View className="mt-4 items-center justify-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8">
-                      <Ionicons
-                        name="chatbubbles-outline"
-                        size={36}
-                        color={colors.description}
+                    <View className="mt-4">
+                      <ModuleEmptyState
+                        icon="chatbubbles-outline"
+                        title={
+                          tickets.length > 0
+                            ? "No matching tickets"
+                            : "No support tickets yet"
+                        }
+                        description={
+                          tickets.length > 0
+                            ? "Change the status or priority filters to see more tickets."
+                            : "Need help? Use the + button to create a support ticket."
+                        }
+                        action={
+                          tickets.length > 0 ? (
+                            <Button
+                              title="Clear ticket filters"
+                              variant="secondary"
+                              onPress={() =>
+                                setTicketFilters(DEFAULT_TICKET_FILTERS)
+                              }
+                            />
+                          ) : undefined
+                        }
                       />
-                      <Text className="mt-3 font-ralewayBold text-base text-textPrimary">
-                        {tickets.length > 0
-                          ? "No matching tickets"
-                          : "No support tickets yet"}
-                      </Text>
-                      <Text className="mt-1 text-center text-xs text-description">
-                        {tickets.length > 0
-                          ? "Change the status or priority filters to see more tickets."
-                          : "Need help? Use the + button to create a support ticket."}
-                      </Text>
-                      {tickets.length > 0 ? (
-                        <TouchableOpacity
-                          accessibilityRole="button"
-                          accessibilityLabel="Clear ticket filters"
-                          className="mt-3 min-h-11 items-center justify-center px-3"
-                          onPress={() =>
-                            setTicketFilters(DEFAULT_TICKET_FILTERS)
-                          }
-                        >
-                          <Text className="font-ralewayBold text-sm text-primaryContent">
-                            Clear filters
-                          </Text>
-                        </TouchableOpacity>
-                      ) : null}
                     </View>
                   )
                 }
@@ -391,27 +372,27 @@ export default function SupportScreen() {
 
         {/* Contact shortcuts banner */}
         <View className="mb-2 mt-auto flex-row gap-2 border-t border-primary/10 pt-3">
-          <TouchableOpacity
-            activeOpacity={0.8}
-            className="h-11 flex-1 flex-row items-center justify-center rounded-xl bg-primary/10"
-            onPress={() => Linking.openURL("mailto:support@terrane.app")}
-          >
-            <Feather name="mail" size={15} color={colors.primary} />
-            <Text className="ml-2 font-ralewayBold text-xs text-primary">
-              Email Support
-            </Text>
-          </TouchableOpacity>
+          <View className="flex-1">
+            <Button
+              title="Email Support"
+              variant="secondary"
+              leadingIcon={
+                <Feather name="mail" size={15} color={colors.primary} />
+              }
+              onPress={() => Linking.openURL("mailto:support@terrane.app")}
+            />
+          </View>
 
-          <TouchableOpacity
-            activeOpacity={0.8}
-            className="h-11 flex-1 flex-row items-center justify-center rounded-xl bg-primary/10"
-            onPress={() => Linking.openURL("tel:+639171234567")}
-          >
-            <Feather name="phone" size={15} color={colors.primary} />
-            <Text className="ml-2 font-ralewayBold text-xs text-primary">
-              Hotline
-            </Text>
-          </TouchableOpacity>
+          <View className="flex-1">
+            <Button
+              title="Hotline"
+              variant="secondary"
+              leadingIcon={
+                <Feather name="phone" size={15} color={colors.primary} />
+              }
+              onPress={() => Linking.openURL("tel:+639171234567")}
+            />
+          </View>
         </View>
       </View>
 

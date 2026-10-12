@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import type { ReactNode } from "react";
 import { Text, View } from "react-native";
 
 import { colors } from "../../constants/colors";
@@ -25,10 +26,12 @@ export function ModuleLoadingState({
 }
 
 export function ModuleEmptyState({
+  action,
   description,
   icon,
   title,
 }: {
+  action?: ReactNode;
   description: string;
   icon: keyof typeof Ionicons.glyphMap;
   title: string;
@@ -42,6 +45,7 @@ export function ModuleEmptyState({
       <Text className="mt-1 text-center text-sm leading-5 text-description">
         {description}
       </Text>
+      {action ? <View className="mt-4 w-full">{action}</View> : null}
     </View>
   );
 }
