@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import BrandCombinationVertical from "../../assets/branding/svg/brand-combination-vertical-white.svg";
+import { SocialLoginSection } from "../../components/auth/SocialLoginSection";
 import { LegalLink } from "../../components/legal/LegalLink";
 import { colors } from "../../constants/colors";
 import { useLogin } from "../../hooks/useLogin";
@@ -267,6 +268,8 @@ export default function LoginScreen() {
                   </Text>
                 )}
               </Pressable>
+
+              <SocialLoginSection />
 
               {/* Registration */}
               <View className="mb-12 mt-8 flex-row items-center justify-center gap-1">
