@@ -18,6 +18,7 @@ Apple login and passwordless workspace signup work through the native iOS Apple 
 - Deletion submission/information response requests fresh Apple authentication for passwordless users. Proofs bind to the user and operation; existing password users retain their password checks.
 - Cancellation returns to login without error. Provider failures show retry feedback. Pending signup/link credentials remain in memory for at most ten minutes and never enter route URLs or SecureStore. Only the resulting Terrane session and Apple subject persist in SecureStore.
 - Revoked native credentials sign out Apple sessions. Backend notifications/daily validation revoke their server tokens. Existing password access is preserved.
+- Valid Terrane sessions restore from SecureStore on app reopen without opening Apple's sheet. Apple controls password/biometric prompts after sign-out or fresh reauthentication; the app never stores the Apple password. Simulator credential-state checks are skipped, and unavailable checks preserve the session. Test native revocation on a real device.
 
 ## Disabled Apple button
 
@@ -28,7 +29,7 @@ Backend `.env` must contain dotenv assignments without Markdown code fences. Wit
 ## Checks
 
 ```bash
-node --test tests/appleAuthentication.test.mjs tests/accountDeletion.test.mjs tests/passwordChange.test.mjs
+node --test tests/appleAuthentication.test.mjs tests/appleCredentialState.test.mjs tests/appleSessionLifecycle.test.mjs tests/accountDeletion.test.mjs tests/passwordChange.test.mjs
 npx tsc --noEmit
 git diff --check
 ```

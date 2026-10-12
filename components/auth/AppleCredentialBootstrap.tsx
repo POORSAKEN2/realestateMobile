@@ -1,48 +1,46 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { AppState, Platform } from "react-native";
-import { apiClient } from "../../api/client";
+import { apiClient, authHeaders } from "../../api/client";
 import { useAuth } from "../../hooks/useAuth";
 import { getSessionAccess } from "../../services/access/sessionAccess";
 import { nativeApple } from "../../services/apple/nativeApple";
+import { createAppleCredentialMonitor } from "../../services/apple/appleCredentialState";
 
 export function AppleCredentialBootstrap() {
   const { session, signOut } = useAuth();
+  const signOutRef = useRef(signOut);
+  signOutRef.current = signOut;
   useEffect(() => {
     if (
       Platform.OS !== "ios" ||
       session?.authMethod !== "apple" ||
+      !session.accessToken ||
       !session.appleUserId
     )
       return;
-    let disposed = false;
-    const revoke = () => {
-      if (disposed || getSessionAccess().token !== session.accessToken) return;
-      void apiClient.post("/logout").catch(() => {});
-      signOut();
-    };
-    const check = () => {
-      void nativeApple
-        .isAuthorized(session.appleUserId!)
-        .then((authorized) => {
-          if (!authorized) revoke();
-        })
-        .catch(() => {});
-    };
-    check();
-    const removeRevoke = nativeApple.onRevoke(revoke);
+    const token = session.accessToken;
+    const monitor = createAppleCredentialMonitor({
+      token,
+      currentToken: () => getSessionAccess().token,
+      read: () => nativeApple.getCredentialState(session.appleUserId!),
+      onInvalidate: (reason) => {
+        console.info("[auth] Session invalidated", { reason });
+        void apiClient
+          .post("/logout", undefined, { headers: authHeaders(token) })
+          .catch(() => {});
+        signOutRef.current();
+      },
+    });
+    void monitor.check();
+    const removeRevoke = nativeApple.onRevoke(monitor.revoke);
     const subscription = AppState.addEventListener("change", (state) => {
-      if (state === "active") check();
+      if (state === "active") void monitor.check();
     });
     return () => {
-      disposed = true;
+      monitor.dispose();
       removeRevoke();
       subscription.remove();
     };
-  }, [
-    session?.accessToken,
-    session?.authMethod,
-    session?.appleUserId,
-    signOut,
-  ]);
+  }, [session?.accessToken, session?.authMethod, session?.appleUserId]);
   return null;
 }

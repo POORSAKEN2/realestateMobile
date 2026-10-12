@@ -1,3 +1,5 @@
+import type { AppleCredentialState } from "./appleCredentialState";
+
 export type AppleChallenge = {
   challenge_id: string;
   nonce: string;
@@ -17,8 +19,8 @@ export const nativeApple = {
   async signIn(_challenge: AppleChallenge): Promise<NativeAppleCredential> {
     throw new Error("Apple sign-in requires the iOS app.");
   },
-  async isAuthorized(_user: string): Promise<boolean> {
-    return true;
+  async getCredentialState(_user: string): Promise<AppleCredentialState> {
+    return "unknown";
   },
   onRevoke(_listener: () => void): () => void {
     return () => {};

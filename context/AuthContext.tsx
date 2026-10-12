@@ -111,6 +111,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
         });
       } catch (error) {
         if (!disposed && getSessionAccess().revision === revision && error instanceof ApiError && [401, 403].includes(error.status)) {
+          console.info("[auth] Session invalidated", {
+            reason: error.status === 401 ? "server_unauthenticated" : "server_forbidden",
+          });
           setSessionAccess(null);
           queryClient.clear();
           setSession(null);

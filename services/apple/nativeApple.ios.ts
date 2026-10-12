@@ -1,4 +1,6 @@
 import * as AppleAuthentication from "expo-apple-authentication";
+import { isDevice } from "expo-device";
+import { readAppleCredentialState } from "./appleCredentialState";
 import type { AppleChallenge, NativeAppleCredential } from "./nativeApple";
 
 export const nativeApple = {
@@ -30,12 +32,22 @@ export const nativeApple = {
         : undefined,
     };
   },
-  async isAuthorized(user: string): Promise<boolean> {
-    const state = await AppleAuthentication.getCredentialStateAsync(user);
-    return (
-      state ===
-      AppleAuthentication.AppleAuthenticationCredentialState.AUTHORIZED
-    );
+  getCredentialState(user: string) {
+    return readAppleCredentialState(isDevice, async () => {
+      const state = await AppleAuthentication.getCredentialStateAsync(user);
+      switch (state) {
+        case AppleAuthentication.AppleAuthenticationCredentialState.AUTHORIZED:
+          return "authorized";
+        case AppleAuthentication.AppleAuthenticationCredentialState.REVOKED:
+          return "revoked";
+        case AppleAuthentication.AppleAuthenticationCredentialState.NOT_FOUND:
+          return "not_found";
+        case AppleAuthentication.AppleAuthenticationCredentialState.TRANSFERRED:
+          return "transferred";
+        default:
+          return "unknown";
+      }
+    });
   },
   onRevoke(listener: () => void): () => void {
     const subscription = AppleAuthentication.addRevokeListener(listener);

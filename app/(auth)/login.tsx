@@ -45,13 +45,25 @@ export default function LoginScreen() {
 
   const passwordInputRef = useRef<TextInput>(null);
   const authenticationLock = useRef(false);
-  const { signIn } = useAuth();
+  const { signIn, session, isAuthenticated } = useAuth();
+  const [appleSessionToken, setAppleSessionToken] = useState<string | null>(null);
   const apple = useAppleLogin((session) => {
     signIn(session);
+    setAppleSessionToken(session.accessToken!);
     if (session.deletionRecovery?.cancelled) Alert.alert("Deletion cancelled", restorationNotice(session.deletionRecovery.scope));
-    router.replace("/");
   });
-  const authenticationBusy = isLoading || apple.busy || Boolean(apple.account);
+  useEffect(() => {
+    if (
+      appleSessionToken &&
+      isAuthenticated &&
+      session?.accessToken === appleSessionToken
+    ) {
+      setAppleSessionToken(null);
+      router.replace("/");
+    }
+  }, [appleSessionToken, isAuthenticated, session?.accessToken]);
+  const authenticationBusy =
+    isLoading || apple.busy || Boolean(apple.account) || Boolean(appleSessionToken);
   const startPasswordLogin = async () => {
     if (authenticationLock.current || authenticationBusy) return;
     authenticationLock.current = true;
