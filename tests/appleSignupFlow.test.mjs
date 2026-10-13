@@ -342,3 +342,66 @@ test("Apple linking locks overlapping requests, expires proofs, and clears crede
   assert.equal(render().error, null);
   assert.equal(render().busy, false);
 });
+
+test("identity rejection clears pending linking proof and retry commits one session", async (t) => {
+  const runtime = hooks();
+  const mounted = { current: true };
+  const { ApiError } = load("../../api/errors.ts");
+  let starts = 0,
+    release;
+  const sessions = [];
+  t.mock.method(globalThis, "setTimeout", () => 1);
+  t.mock.method(globalThis, "clearTimeout", () => {});
+  const { useAppleLogin } = loadWithMocks(
+    file("../hooks/auth/useAppleLogin.ts"),
+    {
+      react: runtime.react,
+      "../useMountedRef": { useMountedRef: () => mounted },
+      "./useAuthRetryDelay": { useAuthRetryDelay: () => 0 },
+      "../../services/apple/appleAuthentication": {
+        isAppleLoginAvailable: async () => true,
+        isAppleCancellation: () => false,
+        loginWithApple: async () => {
+          starts++;
+          if (starts === 1)
+            return {
+              status: "account_required",
+              account: { pending_token: "old-proof" },
+            };
+          await new Promise((resolve) => {
+            release = resolve;
+          });
+          return {
+            status: "authenticated",
+            session: { accessToken: "fresh-session" },
+          };
+        },
+        requestAppleLinkCode: async () => ({
+          message: "sent",
+          cooldown_seconds: 30,
+          expires_in_seconds: 600,
+        }),
+        verifyAppleLinkCode: async () => {
+          throw new ApiError("rejected", 422, "apple_identity_unverified");
+        },
+      },
+    },
+  );
+  const render = () =>
+    runtime.render(() => useAppleLogin((session) => sessions.push(session)));
+  await render().start();
+  await render().requestCode("existing@example.test");
+  assert.equal(render().account.pending_token, "old-proof");
+  await render().verifyCode("existing@example.test", "123456");
+  assert.equal(render().account, null);
+  assert.equal(render().linkCode, null);
+  assert.equal(render().error.retryable, true);
+  const retry = render().start();
+  await render().start();
+  assert.equal(starts, 2);
+  release();
+  await retry;
+  assert.deepEqual(sessions, [{ accessToken: "fresh-session" }]);
+  assert.equal(render().error, null);
+  assert.equal(render().busy, false);
+});

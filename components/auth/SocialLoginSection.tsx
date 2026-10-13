@@ -1,5 +1,7 @@
-import { ActivityIndicator, Image, Pressable, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
+import { colors } from "../../constants/colors";
 
 function GoogleIcon() {
   return (
@@ -49,13 +51,15 @@ export function SocialLoginSection({
         <View className="h-px flex-1 bg-white/40" />
       </View>
 
-      <View className={`${compact ? "mt-3" : "mt-5"} flex-row justify-center gap-3`}>
+      <View
+        className={`${compact ? "mt-3" : "mt-5"} flex-row justify-center gap-3`}
+      >
         <Pressable
           accessibilityLabel="Continue with Google"
           accessibilityHint="Not available yet"
           accessibilityRole="button"
           accessibilityState={{ disabled: true }}
-          className="h-14 w-14 items-center justify-center rounded-2xl bg-white"
+          className="h-14 w-14 items-center justify-center rounded-2xl bg-iconSurface"
           disabled
         >
           <View aria-hidden importantForAccessibility="no-hide-descendants">
@@ -75,24 +79,23 @@ export function SocialLoginSection({
             disabled: !appleAvailable || busy,
             busy: appleLoading,
           }}
-          className="h-14 w-14 items-center justify-center rounded-2xl bg-white active:opacity-80"
+          className="h-14 w-14 items-center justify-center rounded-2xl bg-iconSurface active:opacity-80"
           disabled={!appleAvailable || busy}
           onPress={onApplePress}
         >
           <View aria-hidden importantForAccessibility="no-hide-descendants">
             {appleLoading ? (
-              <ActivityIndicator color="#000000" />
+              <ActivityIndicator color={colors.text} />
             ) : (
-              <Image
-                source={require("../../assets/branding/png/apple-sign-in-logo.png")}
-                style={{ width: 56, height: 56 }}
-              />
+              <Ionicons name="logo-apple" size={24} color={colors.text} />
             )}
           </View>
         </Pressable>
       </View>
 
-      <Text className={`${compact ? "mt-2" : "mt-3"} text-center font-ralewayMedium text-xs leading-4 text-onPrimary`}>
+      <Text
+        className={`${compact ? "mt-2" : "mt-3"} text-center font-ralewayMedium text-xs leading-4 text-onPrimary`}
+      >
         {appleAvailable
           ? "Google sign-in not available yet"
           : "Not available yet"}

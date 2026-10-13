@@ -24,6 +24,14 @@ export function authErrorFeedback(
         ? "Unable to create account"
         : "Unable to send verification code";
   if (error instanceof ApiError) {
+    if (error.code === "apple_identity_unverified") {
+      return {
+        title,
+        message: "Apple sign-in couldn’t be verified. Please try again.",
+        retryable: true,
+        requestId: error.requestId,
+      };
+    }
     const network = error.status === 0;
     const server = error.status >= 500 || error.code === "invalid_response";
     const credential =

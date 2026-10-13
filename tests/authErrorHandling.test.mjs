@@ -413,3 +413,20 @@ test("Retry-After delay reaches zero, blocks early retry and cleans up its timer
   cleanup();
   assert.ok(cleared >= 1);
 });
+
+test("Apple identity rejection offers a fresh attempt without exposing diagnostics", () => {
+  const { authErrorFeedback } = load("../../utils/auth/authErrorFeedback.ts");
+  const error = toApiError(422, {
+    success: false,
+    error: "apple_identity_unverified",
+    message: "Apple identity could not be verified. Start again.",
+    request_id: "d5881f71-28a5-499c-a731-c8fcd837d7a0",
+  });
+  const feedback = authErrorFeedback(error);
+  assert.equal(feedback.retryable, true);
+  assert.equal(
+    feedback.message,
+    "Apple sign-in couldn’t be verified. Please try again.",
+  );
+  assert.equal(feedback.requestId, "d5881f71-28a5-499c-a731-c8fcd837d7a0");
+});

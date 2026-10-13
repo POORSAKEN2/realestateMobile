@@ -15,6 +15,7 @@ import {
   type AuthErrorFeedback,
 } from "../../utils/auth/authErrorFeedback";
 import { useAuthRetryDelay } from "./useAuthRetryDelay";
+import { ApiError } from "../../api/errors";
 
 export function useAppleLogin(
   onAuthenticated: (session: AuthSession) => void | Promise<void>,
@@ -73,6 +74,8 @@ export function useAppleLogin(
       if (mounted.current && !isAppleCancellation(failure)) {
         const feedback = authErrorFeedback(failure, context);
         const restart =
+          (failure instanceof ApiError &&
+            failure.code === "apple_identity_unverified") ||
           /Apple verification expired|Apple verification.*already used|Apple identity already linked/i.test(
             feedback.message,
           );

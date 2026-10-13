@@ -220,3 +220,43 @@ test("malformed backend sessions and wrong verification statuses cannot authenti
     await assert.rejects(service.login());
   }
 });
+
+test("retry after rejected verification requests new credentials and never replays a code", async () => {
+  const calls = [];
+  let attempts = 0;
+  const service = createAppleAuthentication({
+    enabled: () => true,
+    native: {
+      isAvailable: async () => true,
+      signIn: async (challenge) => ({
+        state: challenge.state,
+        identityToken: `identity-${attempts}`,
+        authorizationCode: `code-${attempts}`,
+      }),
+    },
+    post: async (path, body) => {
+      calls.push([path, body]);
+      if (path.endsWith("/challenge")) {
+        attempts++;
+        return {
+          data: {
+            challenge_id: `challenge-${attempts}`,
+            state: `state-${attempts}`,
+            nonce: `nonce-${attempts}`,
+          },
+        };
+      }
+      if (attempts === 1) throw new Error("Apple identity rejection");
+      return { data: { status: "authenticated", access_token: "session" } };
+    },
+    toSession: ({ data }) => ({ accessToken: data.access_token }),
+  });
+  await assert.rejects(service.login(), /Apple identity rejection/);
+  const result = await service.login();
+  assert.equal(result.session.accessToken, "session");
+  const verifications = calls.filter(([path]) => path.endsWith("/verify"));
+  assert.equal(verifications.length, 2);
+  assert.equal(verifications[0][1].authorization_code, "code-1");
+  assert.equal(verifications[1][1].authorization_code, "code-2");
+  assert.equal(verifications[1][1].challenge_id, "challenge-2");
+});
