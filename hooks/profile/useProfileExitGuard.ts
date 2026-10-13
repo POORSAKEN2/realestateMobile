@@ -13,10 +13,12 @@ export function useProfileExitGuard({
   hasChanges,
   isSaving,
   onDiscard,
+  discardDescription = "Your unsaved profile edits and photo selection will be removed.",
 }: {
   hasChanges: boolean;
   isSaving: boolean;
   onDiscard: () => void;
+  discardDescription?: string;
 }) {
   const navigation = useNavigation();
   const [confirmation, setConfirmation] = useState<ProfileConfirmation | null>(
@@ -45,8 +47,7 @@ export function useProfileExitGuard({
     }
     setConfirmation({
       title: "Discard changes?",
-      description:
-        "Your unsaved profile edits and photo selection will be removed.",
+      description: discardDescription,
       confirmLabel: "Discard",
       onConfirm: onDiscarded,
     });
@@ -88,6 +89,12 @@ export function useProfileExitGuard({
   }
 
   return {
+    leave,
+    requestLeave: (onLeave: () => void) =>
+      requestDiscard(() => {
+        onDiscard();
+        leave(onLeave);
+      }),
     confirmation,
     requestDiscard,
     requestSignOut,

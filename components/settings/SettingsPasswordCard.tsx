@@ -1,78 +1,11 @@
 import { useState } from "react";
-import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  type TextInputProps,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../../constants/colors";
+import { Text, View } from "react-native";
+import { PasswordField } from "../ui/fields/PasswordField";
 import { usePasswordChange } from "../../hooks/settings/usePasswordChange";
 import { FormSection } from "../ui/forms/FormSection";
 import { Button } from "../ui/buttons/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { router } from "expo-router";
-
-function PasswordField({
-  label,
-  value,
-  onChangeText,
-  error,
-  disabled,
-  textContentType,
-}: {
-  label: string;
-  value: string;
-  onChangeText: (value: string) => void;
-  error?: string;
-  disabled: boolean;
-  textContentType: TextInputProps["textContentType"];
-}) {
-  const [visible, setVisible] = useState(false);
-  return (
-    <View className="gap-2">
-      <Text className="font-ralewaySemiBold text-sm text-textPrimary">
-        {label}
-      </Text>
-      <View
-        className={`min-h-14 flex-row items-center rounded-xl border bg-surface px-3 ${error ? "border-danger" : "border-primary/20"}`}
-      >
-        <TextInput
-          accessibilityLabel={label}
-          className="min-h-14 min-w-0 flex-1 text-base text-textPrimary"
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType={textContentType}
-          secureTextEntry={!visible}
-          editable={!disabled}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={label}
-          placeholderTextColor={colors.description}
-        />
-        <TouchableOpacity
-          accessibilityRole="button"
-          accessibilityLabel={`${visible ? "Hide" : "Show"} ${label.toLowerCase()}`}
-          disabled={disabled}
-          className="h-11 w-11 items-center justify-center"
-          onPress={() => setVisible((current) => !current)}
-        >
-          <Ionicons
-            name={visible ? "eye-outline" : "eye-off-outline"}
-            color={colors.description}
-            size={20}
-          />
-        </TouchableOpacity>
-      </View>
-      {error ? (
-        <Text accessibilityRole="alert" className="text-xs text-danger">
-          {error}
-        </Text>
-      ) : null}
-    </View>
-  );
-}
 
 export function SettingsPasswordCard() {
   const { session } = useAuth();
@@ -80,11 +13,26 @@ export function SettingsPasswordCard() {
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
   const user = session?.user;
-  if (user && typeof user === "object" && "has_password" in user && user.has_password === false) {
-    const email = "email" in user ? String(user.email ?? "") : "";
-    return <FormSection icon="shield-lock-outline" title="Security" description="Sign in with Apple or set a Terrane password through email recovery." variant="card">
-      <Button title="Set password" variant="secondary" onPress={() => router.push({ pathname: "/(auth)/forgot-password", params: { email } })} />
-    </FormSection>;
+  if (
+    user &&
+    typeof user === "object" &&
+    "has_password" in user &&
+    user.has_password === false
+  ) {
+    return (
+      <FormSection
+        icon="shield-lock-outline"
+        title="Security"
+        description="Add a Terrane password to sign in with email. Apple sign-in will still work."
+        variant="card"
+      >
+        <Button
+          title="Set password"
+          variant="secondary"
+          onPress={() => router.push("/(secondary)/settings/password")}
+        />
+      </FormSection>
+    );
   }
   return (
     <FormSection

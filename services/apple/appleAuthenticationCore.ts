@@ -62,14 +62,19 @@ export function createAppleAuthentication({
   const isAvailable = async () => enabled() && (await native.isAvailable());
   const verify = async (
     signal?: AbortSignal,
-    operation?: "deletion_request" | "deletion_response",
+    operation?: "deletion_request" | "deletion_response" | "set_password",
     requestId?: string,
     intent?: AppleSignupIntent,
   ) => {
     assertNotAborted(signal);
     if (!(await isAvailable()))
       throw new Error("Apple sign-in is not available on this device.");
-    const prefix = operation ? "/auth/apple/reauth" : "/auth/apple";
+    const prefix =
+      operation === "set_password"
+        ? "/user/set-password"
+        : operation
+          ? "/auth/apple/reauth"
+          : "/auth/apple";
     const { data: challenge } = await post<AppleChallenge>(
       `${prefix}/challenge`,
       operation ? { operation, request_id: requestId } : undefined,
@@ -196,10 +201,11 @@ export function createAppleAuthentication({
       );
     },
     async reauthenticate(
-      operation: "deletion_request" | "deletion_response",
+      operation: "deletion_request" | "deletion_response" | "set_password",
       requestId?: string,
+      signal?: AbortSignal,
     ): Promise<string> {
-      const { data } = await verify(undefined, operation, requestId);
+      const { data } = await verify(signal, operation, requestId);
       if (data.status !== "reauthenticated" || !data.reauth_token)
         throw new Error("Apple verification failed. Please try again.");
       return data.reauth_token;

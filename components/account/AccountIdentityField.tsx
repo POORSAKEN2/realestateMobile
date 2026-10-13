@@ -16,7 +16,7 @@ export function AccountIdentityField({
     return (
       <Text className="text-sm leading-6 text-description">
         Apple will verify your identity when you submit. Use the iOS app, or set
-        a Terrane password through email recovery.
+        a Terrane password in Settings.
       </Text>
     );
   return (

@@ -565,3 +565,17 @@ test("Profile's shared field adapter preserves native input behavior, errors, an
     null,
   );
 });
+
+test("form Cancel confirms dirty state and leaves only after guard removal", () => {
+  const runtime = guardSetup();
+  runtime.render().requestLeave(() => runtime.dispatched.push("settings"));
+  runtime.render().cancel();
+  assert.equal(runtime.discarded, 0);
+  runtime.render().requestLeave(() => runtime.dispatched.push("settings"));
+  runtime.render().confirm();
+  assert.equal(runtime.discarded, 1);
+  assert.equal(runtime.dispatched.length, 0);
+  runtime.render();
+  runtime.flushEffects();
+  assert.deepEqual(runtime.dispatched, ["settings"]);
+});

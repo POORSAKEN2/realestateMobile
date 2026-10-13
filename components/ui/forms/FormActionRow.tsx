@@ -33,7 +33,11 @@ export function FormActionRow({
   const isSubmitDisabled = actionsDisabled || submitDisabled;
 
   return (
-    <View className={`flex-row ${showCancelAction ? "gap-3" : ""}`}>
+    <View
+      collapsable={false}
+      style={{ minHeight: 56 }}
+      className={`flex-row ${showCancelAction ? "gap-3" : ""}`}
+    >
       {showCancelAction ? (
         <TouchableOpacity
           accessibilityLabel={cancelText}

@@ -17,7 +17,7 @@ Apple login and passwordless workspace signup work through the native iOS Apple 
 - Existing-email conflicts and identities without a verified email open email-code linking. Enter the existing Terrane email, request a code and verify it; no Terrane password is collected. Codes bind to the pending Apple proof and target account, expire within ten minutes, and respect the existing resend/lockout limits. Private relay addresses can be used for signup; linking may use a different Terrane email.
 - New signup sessions persist before the `Complete your profile` popup appears. `Open Profile` navigates to the existing Profile screen; `Later` opens the dashboard. An unacknowledged notice survives app restart; either action saves its dismissal. Details remain optional, and editing the profile company does not rename the workspace.
 - Login scrolling is disabled while the keyboard is closed and enabled while it is visible. The legal footer sits outside the scrolling form, above the bottom safe area or keyboard; branding shrinks to the available space and collapses while typing.
-- New Apple accounts have no Terrane password. Security settings offer email recovery to set one; register the sender with Apple's private relay service so verification mail reaches relay addresses.
+- New Apple accounts have no Terrane password. Settings → Set password opens an authenticated two-field form. Saving requires fresh native Apple verification and preserves the existing session and Apple sign-in. Password setup requires an Apple-enabled iOS build; public email recovery remains separate.
 - Deletion submission/information response requests fresh Apple authentication for passwordless users. Proofs bind to the user and operation; existing password users retain their password checks.
 - Cancellation returns to login without error. Provider failures show retry feedback. Pending signup/link credentials remain in memory for at most ten minutes and never enter route URLs or SecureStore. Only the resulting Terrane session and Apple subject persist in SecureStore.
 - Revoked native credentials sign out Apple sessions. Backend notifications/daily validation revoke their server tokens. Existing password access is preserved.
@@ -42,3 +42,11 @@ Deploy the compatible API before shipping this mobile flow. This update adds no 
 Real-device checklist: first automatic signup and both popup actions, repeat login without name, private relay, existing ADMIN/MANAGER code linking, cancellation, network failure/retry, app restart with an unacknowledged notice, consent revocation, deletion recovery and fresh deletion proof. Check small screens, iPad, keyboard, enlarged text, VoiceOver and both themes. Android/web must retain disabled alternatives. Source tests do not establish Apple Developer setup, backend deployment or store/device acceptance.
 
 Official button artwork: [Apple logo-only generator](https://appleid.cdn-apple.com/appleid/button/logo?size=56&color=white&border=false&border_radius=16&scale=3). The downloaded 168px image displays at 56pt with its original padding and proportions.
+
+## First-password setup
+
+Deploy `/api/user/set-password/challenge`, `/verify`, and the final `/api/user/set-password` endpoint before releasing the nested Settings screen. No native rebuild or migration is required beyond the existing Apple-enabled development/release app.
+
+The screen validates matching passwords with at least eight characters, obtains fresh Apple proof, and submits once. Cancellation and errors preserve the draft; subsequent submissions start a new challenge. Passwords and receipts stay in memory and are cleared on completion or departure. Success persists the updated `has_password` in the current session, returns to Settings, and shows `Password set`. Existing Change password and public Forgot password flows remain separate.
+
+Acceptance: set the first password yourself in Apple-enabled iOS, verify Settings changes to Change password, reopen the app, and confirm both password and Apple login. Source tests and simulator layout inspection do not establish real-device password/autofill or deployment acceptance.

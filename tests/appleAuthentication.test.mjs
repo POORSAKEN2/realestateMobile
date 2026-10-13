@@ -260,3 +260,28 @@ test("retry after rejected verification requests new credentials and never repla
   assert.equal(verifications[1][1].authorization_code, "code-2");
   assert.equal(verifications[1][1].challenge_id, "challenge-2");
 });
+
+test("first-password reauthentication uses authenticated setup endpoints and supports abort", async () => {
+  const { service, calls } = setup({
+    result: { status: "reauthenticated", reauth_token: "receipt" },
+  });
+  const signal = new AbortController().signal;
+  assert.equal(
+    await service.reauthenticate("set_password", undefined, signal),
+    "receipt",
+  );
+  assert.equal(calls[0][0], "/user/set-password/challenge");
+  assert.deepEqual(calls[0][1], {
+    operation: "set_password",
+    request_id: undefined,
+  });
+  assert.equal(calls[2][0], "/user/set-password/verify");
+  assert.equal(calls[2][2], signal);
+  const controller = new AbortController();
+  controller.abort();
+  await assert.rejects(
+    service.reauthenticate("set_password", undefined, controller.signal),
+    isAppleCancellation,
+  );
+  assert.equal(calls.length, 3);
+});
