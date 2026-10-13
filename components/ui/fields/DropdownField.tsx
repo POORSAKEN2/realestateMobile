@@ -103,7 +103,7 @@ export function DropdownField<T extends string>({
         </Text>
         <MaterialCommunityIcons
           name={isFilledVariant ? "chevron-right" : "chevron-down"}
-          color={colors.description}
+          color={colors.primary}
           size={isCompactVariant ? 19 : 22}
         />
       </TouchableOpacity>

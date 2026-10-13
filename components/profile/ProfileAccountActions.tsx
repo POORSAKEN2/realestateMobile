@@ -16,7 +16,7 @@ export function ProfileAccountActions({
 }: ProfileAccountActionsProps) {
   return (
     <View>
-      <ProfileMenuSection
+      {/* <ProfileMenuSection
         title="Account"
         items={[
           {
@@ -27,16 +27,18 @@ export function ProfileAccountActions({
             onPress: onOpenAdditionalSettings,
           },
         ]}
-      />
+      /> */}
       <TouchableOpacity
         accessibilityRole="button"
         accessibilityLabel="Sign out"
+        accessibilityState={{ disabled }}
         disabled={disabled}
+        activeOpacity={0.8}
         onPress={onSignOut}
-        className="mt-4 min-h-14 flex-row items-center justify-center gap-2 rounded-xl border border-danger/25"
+        className={`mt-6 min-h-14 flex-row items-center gap-3 rounded-2xl bg-dangerSurface px-4 py-3 ${disabled ? "opacity-50" : ""}`}
       >
         <Ionicons name="log-out-outline" color={colors.danger} size={20} />
-        <Text className="font-ralewaySemiBold text-sm text-danger">
+        <Text className="min-w-0 flex-1 font-ralewayBold text-sm text-danger">
           Sign out
         </Text>
       </TouchableOpacity>

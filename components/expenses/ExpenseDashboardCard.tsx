@@ -220,7 +220,7 @@ export function ExpenseDashboardCard({
       className="h-[164px] w-[128px] rounded-[20px] border border-primary/20 bg-panel p-3.5"
       style={cardShadow}
     >
-      <View className="h-10 w-10 items-center justify-center rounded-[13px] bg-primary/10">
+      <View className="h-10 w-10 items-center justify-center rounded-[13px] bg-iconSurface">
         <MaterialCommunityIcons name={icon} color={colors.primary} size={21} />
       </View>
       <Text

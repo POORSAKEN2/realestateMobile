@@ -103,7 +103,7 @@ function EmptyState({
         className="items-center rounded-[28px] border border-primary/15 bg-panel px-6 py-8"
         style={{ width: "100%", maxWidth: 440, alignSelf: "center" }}
       >
-        <View className="mb-6 h-24 w-24 items-center justify-center rounded-[32px] border border-primary/20 bg-primary/10">
+        <View className="mb-6 h-24 w-24 items-center justify-center rounded-[32px] border border-primary/20 bg-iconSurface">
           <Ionicons
             name={failed ? "cloud-offline-outline" : "notifications-outline"}
             size={40}

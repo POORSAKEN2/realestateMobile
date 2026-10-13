@@ -14,17 +14,20 @@ import {
 
 import { REGISTRATION_STEPS } from "../../../constants/registration";
 import { Screen } from "../../ui/Screen";
+import type { RegistrationFeedback } from "../../../constants/registration";
+import { AuthErrorFeedback } from "../AuthErrorFeedback";
+import { authErrorFeedback } from "../../../utils/auth/authErrorFeedback";
+import { useAuthRetryDelay } from "../../../hooks/auth/useAuthRetryDelay";
 
 type RegistrationStepLayoutProps = PropsWithChildren<{
   buttonDisabled?: boolean;
   buttonLabel: string;
-  feedback?: {
-    message: string;
-    tone: "error" | "info";
-  } | null;
+  feedback?: RegistrationFeedback | null;
   isLoading?: boolean;
+  loadingLabel?: string;
   onBack: () => void;
   onContinue: () => void;
+  onRetry?: () => void;
   stepIndex: number;
   subtitle: string;
   title: string;
@@ -36,14 +39,17 @@ export function RegistrationStepLayout({
   children,
   feedback,
   isLoading = false,
+  loadingLabel = "Creating account...",
   onBack,
   onContinue,
+  onRetry,
   stepIndex,
   subtitle,
   title,
 }: RegistrationStepLayoutProps) {
   const stepCount = REGISTRATION_STEPS.length;
-  const isButtonDisabled = buttonDisabled || isLoading;
+  const retryDelay = useAuthRetryDelay(feedback?.error ?? null);
+  const isButtonDisabled = buttonDisabled || isLoading || retryDelay > 0;
 
   return (
     <Screen className="bg-surface">
@@ -98,26 +104,21 @@ export function RegistrationStepLayout({
 
           <View className="mt-9">{children}</View>
 
-          {feedback ? (
-            <View
-              className={`mt-6 flex-row rounded-[12px] border px-4 py-3 ${
-                feedback.tone === "error"
-                  ? "border-danger/20 bg-dangerSurface"
-                  : "border-primary bg-primary/10"
-              }`}
-            >
-              <Feather
-                name={
-                  feedback.tone === "error" ? "alert-circle" : "check-circle"
+          {feedback?.tone === "error" ? (
+            <View className="mt-6">
+              <AuthErrorFeedback
+                feedback={
+                  feedback.error ??
+                  authErrorFeedback(new Error(feedback.message), "register")
                 }
-                size={18}
-                color={feedback.tone === "error" ? colors.danger : colors.primary}
+                onRetry={onRetry}
+                disabled={isLoading}
               />
-              <Text
-                className={`ml-3 flex-1 text-sm leading-5 ${
-                  feedback.tone === "error" ? "text-danger" : "text-secondary"
-                }`}
-              >
+            </View>
+          ) : feedback ? (
+            <View className="mt-6 flex-row rounded-[12px] border border-primary bg-primary/10 px-4 py-3">
+              <Feather name="check-circle" size={18} color={colors.primary} />
+              <Text className="ml-3 flex-1 text-sm leading-5 text-secondary">
                 {feedback.message}
               </Text>
             </View>
@@ -137,7 +138,7 @@ export function RegistrationStepLayout({
             <View className="flex-row items-center">
               <ActivityIndicator color="#ffffff" />
               <Text className="ml-3 font-ralewayBold text-[16px] text-white">
-                Creating account...
+                {loadingLabel}
               </Text>
             </View>
           ) : (

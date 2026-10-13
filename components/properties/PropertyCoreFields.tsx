@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { ReactNode } from 'react';
 import { Switch, Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { PropertyClassification, PropertyType } from "../../types";
 import {
@@ -301,10 +302,10 @@ export function PropertyCoreFields({
         <View className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
           <View className="flex-row items-center justify-between gap-4">
             <View className="min-w-0 flex-1 flex-row items-center gap-3">
-              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
                 <MaterialCommunityIcons
                   name="calendar-clock"
-                  color="#8A77F4"
+                  color={colors.primary}
                   size={21}
                 />
               </View>
@@ -339,10 +340,10 @@ export function PropertyCoreFields({
         <View className={`rounded-2xl border border-primary/20 bg-primary/5 p-4 ${publishingBlocked ? "opacity-60" : ""}`}>
           <View className="flex-row items-center justify-between gap-4">
             <View className="min-w-0 flex-1 flex-row items-center gap-3">
-              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+              <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
                 <MaterialCommunityIcons
                   name="earth"
-                  color="#8A77F4"
+                  color={colors.primary}
                   size={21}
                 />
               </View>

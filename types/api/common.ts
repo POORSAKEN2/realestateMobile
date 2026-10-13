@@ -12,6 +12,7 @@ export type PaginatedApiData<T> = {
 };
 
 export type ApiErrorResponse = {
+  request_id?: string;
   message?: string;
   code?: string;
   error?: string;

@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import type {
   EditableProfileField,
@@ -53,6 +53,9 @@ type ProfileDetailsFormProps = {
   onChange: (field: EditableProfileField, value: string) => void;
   values: Pick<ProfileForm, EditableProfileField>;
   disabled?: boolean;
+  isEditing: boolean;
+  savedValues: Pick<ProfileForm, EditableProfileField>;
+  onEdit: () => void;
 };
 
 export function ProfileDetailsForm({
@@ -60,26 +63,58 @@ export function ProfileDetailsForm({
   onChange,
   values,
   disabled = false,
+  isEditing,
+  savedValues,
+  onEdit,
 }: ProfileDetailsFormProps) {
   return (
     <View className="mt-5">
       <FormSection
         icon="account-edit-outline"
         title="Professional details"
-        description="Used across your account and documents. Only your name is required."
+        description={isEditing ? "Only your full name is required." : undefined}
         variant="card"
+        headerAction={
+          !isEditing ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Edit professional details"
+              accessibilityState={{ disabled }}
+              disabled={disabled}
+              onPress={onEdit}
+              className="min-h-12 min-w-12 items-center justify-center rounded-lg px-2 active:bg-primary/10"
+            >
+              <Text className="font-ralewaySemiBold text-sm text-primaryContent">
+                Edit
+              </Text>
+            </Pressable>
+          ) : null
+        }
       >
         <View className="gap-4">
-          {PROFILE_FIELDS.map(({ field, ...fieldProps }) => (
-            <ProfileField
-              key={field}
-              {...fieldProps}
-              value={values[field]}
-              error={errors[field]}
-              editable={!disabled}
-              onChangeText={(value) => onChange(field, value)}
-            />
-          ))}
+          {PROFILE_FIELDS.map(({ field, ...fieldProps }) =>
+            isEditing ? (
+              <ProfileField
+                key={field}
+                {...fieldProps}
+                value={values[field]}
+                error={errors[field]}
+                editable={!disabled}
+                onChangeText={(value) => onChange(field, value)}
+              />
+            ) : (
+              <View key={field} className="gap-1">
+                <Text className="font-ralewaySemiBold text-sm text-description">
+                  {fieldProps.label}
+                </Text>
+                <Text
+                  className={`font-ralewayMedium text-base leading-6 ${savedValues[field].trim() ? "text-textPrimary" : "text-description"}`}
+                >
+                  {savedValues[field].trim() || "Not added"}
+                </Text>
+              </View>
+            ),
+          )}
         </View>
       </FormSection>
     </View>

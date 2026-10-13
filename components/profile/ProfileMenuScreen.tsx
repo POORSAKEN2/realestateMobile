@@ -112,7 +112,7 @@ export function ProfileMenuScreen() {
       {
         accessibilityHint: "Opens support center",
         icon: "help-circle-outline",
-        label: "Help center",
+        label: "Help Center",
         onPress: () => router.push(appRoutes.secondary.support),
         supportingText: "Browse FAQs or contact support",
         trailingIcon: "open-outline",

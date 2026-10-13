@@ -4,10 +4,16 @@ import { Alert } from "react-native";
 
 import { API_BASE_URL } from "../api/client";
 import { parseApiResponse } from "../api/response";
-import { normalizeUser } from "../api/user";
+import { toTransportError } from "../api/errors";
+import {
+  authErrorFeedback,
+  type AuthErrorFeedback,
+} from "../utils/auth/authErrorFeedback";
+import { sessionFromAuthResponse } from "../utils/auth/authSession";
 import { restorationNotice } from "../utils/accountDeletion/accountDeletion";
 import type { AuthResponse } from "../types";
 import { useAuth } from "./useAuth";
+import { useAuthRetryDelay } from "./auth/useAuthRetryDelay";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -15,34 +21,29 @@ function isValidEmail(value: string) {
   return EMAIL_PATTERN.test(value.trim());
 }
 
-function getErrorMessage(error: unknown) {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return "Login failed. Please try again.";
-}
-
 export function useLogin(initialEmail = "") {
   const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AuthErrorFeedback | null>(null);
+  const retryDelay = useAuthRetryDelay(error);
   const { signIn } = useAuth();
 
   const handleLogin = async () => {
+    if (isLoading || retryDelay > 0) return;
     setIsLoading(true);
     setError(null);
-    console.log("Attempting login at URL:", `${API_BASE_URL}/login`);
 
     if (!isValidEmail(email)) {
-      setError("Please enter a valid email address.");
+      setError(
+        authErrorFeedback(new Error("Please enter a valid email address.")),
+      );
       setIsLoading(false);
       return;
     }
 
     if (!password) {
-      setError("Password is required.");
+      setError(authErrorFeedback(new Error("Password is required.")));
       setIsLoading(false);
       return;
     }
@@ -55,6 +56,8 @@ export function useLogin(initialEmail = "") {
           Accept: "application/json",
         },
         body: JSON.stringify({ email: email.trim(), password }),
+      }).catch((failure) => {
+        throw toTransportError(failure);
       });
 
       const result = await parseApiResponse<AuthResponse>(
@@ -62,29 +65,9 @@ export function useLogin(initialEmail = "") {
         "Login failed. Please check your credentials.",
       );
 
-      const { access_token, user, onboarding, deletion_recovery } =
-        result.data ?? {};
+      const { deletion_recovery } = result.data ?? {};
 
-      signIn({
-        accessToken: access_token,
-        user:
-          user && typeof user === "object"
-            ? normalizeUser({
-                ...user,
-                ...Object.fromEntries(
-                  Object.entries(result.data ?? {}).filter(([key]) =>
-                    [
-                      "permissions",
-                      "assigned_property_ids",
-                      "property_permissions",
-                    ].includes(key),
-                  ),
-                ),
-              })
-            : user,
-        onboarding,
-        deletionRecovery: deletion_recovery,
-      });
+      signIn(sessionFromAuthResponse(result));
       if (deletion_recovery?.cancelled) {
         Alert.alert(
           "Deletion cancelled",
@@ -93,10 +76,7 @@ export function useLogin(initialEmail = "") {
       }
       router.replace("/(tabs)/dashboard");
     } catch (err) {
-      const message = getErrorMessage(err);
-
-      setError(message);
-      Alert.alert("Login failed", message);
+      setError(authErrorFeedback(err));
     } finally {
       setIsLoading(false);
     }
@@ -109,6 +89,8 @@ export function useLogin(initialEmail = "") {
     setPassword,
     isLoading,
     error,
+    retryDelay,
+    clearError: () => setError(null),
     handleLogin,
   };
 }

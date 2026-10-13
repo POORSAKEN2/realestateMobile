@@ -38,3 +38,17 @@ export async function createSupportTicket(
 
   return unwrapData<SupportTicket>(response);
 }
+
+export async function fetchSupportTicket(
+  id: string,
+  accessToken?: string,
+  signal?: AbortSignal,
+): Promise<SupportTicket> {
+  const response = await apiClient.get<
+    ApiEnvelope<SupportTicket> | SupportTicket
+  >(`/support-tickets/${encodeURIComponent(id)}`, {
+    headers: authHeaders(accessToken),
+    signal,
+  });
+  return unwrapData<SupportTicket>(response);
+}

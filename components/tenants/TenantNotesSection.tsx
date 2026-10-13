@@ -178,7 +178,7 @@ function NoteAction({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       activeOpacity={0.75}
-      className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10"
+      className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface"
       onPress={onPress}
     >
       <Ionicons color="#8A77F4" name={icon} size={16} />

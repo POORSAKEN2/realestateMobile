@@ -1,12 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 import type { ProfileCompletion } from "../../types";
 import { colors } from "../../constants/colors";
 import { getInitials } from "../../utils/profile/profileForm";
+import type { ProfileAccountPresentation } from "../../utils/profile/profileAccountPresentation";
 
 type ProfileSummaryCardProps = {
   completion: ProfileCompletion;
-  email?: string;
+  account: ProfileAccountPresentation;
   imageUri: string;
   jobTitle: string;
   name: string;
@@ -16,7 +18,7 @@ type ProfileSummaryCardProps = {
 
 export function ProfileSummaryCard({
   completion,
-  email,
+  account,
   imageUri,
   jobTitle,
   name,
@@ -24,14 +26,16 @@ export function ProfileSummaryCard({
   disabled = false,
 }: ProfileSummaryCardProps) {
   return (
-    <View className="mt-4 gap-4 rounded-3xl border border-primary/20 bg-panel p-4">
-      <View className="flex-row items-center gap-4">
+    <View className="mt-4 gap-3 rounded-[24px] border border-textPrimary/10 bg-panel p-4 shadow-sm shadow-textPrimary/5">
+      <View className="flex-row items-start gap-4">
         <TouchableOpacity
           accessibilityRole="button"
           accessibilityLabel="Change profile photo"
           accessibilityHint="Opens your photo library"
+          accessibilityState={{ disabled }}
           disabled={disabled}
           onPress={onChangePhoto}
+          className="shrink-0"
         >
           <View className="h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-primary/10">
             {imageUri ? (
@@ -41,43 +45,58 @@ export function ProfileSummaryCard({
                 resizeMode="cover"
               />
             ) : (
-              <Text className="font-ralewayExtraBold text-xl text-primary">
+              <Text className="font-ralewayExtraBold text-xl text-primaryContent">
                 {getInitials(name)}
               </Text>
             )}
           </View>
-          <View className="absolute -bottom-1 -right-1 h-7 w-7 items-center justify-center rounded-full border-2 border-panel bg-primary">
+          <View
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            pointerEvents="none"
+            className="absolute -bottom-1 -right-1 h-7 w-7 items-center justify-center rounded-full border-2 border-panel"
+            style={{ backgroundColor: colors.primaryStrong }}
+          >
             <Ionicons name="camera" color={colors.whitePrimary} size={13} />
           </View>
         </TouchableOpacity>
         <View className="min-w-0 flex-1 gap-1">
-          <Text
-            className="font-ralewayBold text-base text-textPrimary"
-            numberOfLines={2}
-          >
+          <Text className="font-ralewayBold text-xl leading-7 text-textPrimary">
             {name.trim() || "Your name"}
           </Text>
-          <Text selectable className="text-xs text-description">
-            {email || jobTitle.trim() || "Real estate professional"}
-          </Text>
-          <TouchableOpacity
-            accessibilityRole="button"
-            disabled={disabled}
-            onPress={onChangePhoto}
-            className="min-h-11 justify-center"
-          >
-            <Text className="font-ralewaySemiBold text-sm text-primary">
-              {imageUri ? "Change photo" : "Add profile photo"}
+          {account.provider === "apple" ? (
+            <>
+              <Text className="font-ralewayMedium text-sm leading-5 text-description">
+                Apple account
+              </Text>
+              {account.summaryEmail ? (
+                <Text
+                  selectable
+                  className="font-ralewayMedium text-sm leading-5 text-description"
+                >
+                  {account.summaryEmail}
+                </Text>
+              ) : null}
+            </>
+          ) : (
+            <Text
+              selectable
+              className="font-ralewayMedium text-sm leading-5 text-description"
+            >
+              {account.summaryEmail ||
+                jobTitle.trim() ||
+                "Real estate professional"}
             </Text>
-          </TouchableOpacity>
+          )}
         </View>
       </View>
-      <View className="gap-2 border-t border-primary/10 pt-3">
+
+      <View className="gap-2 border-t border-textPrimary/10 pt-3">
         <View className="flex-row items-center justify-between gap-3">
-          <Text className="min-w-0 flex-1 font-ralewaySemiBold text-xs text-description">
+          <Text className="min-w-0 flex-1 font-ralewaySemiBold text-sm leading-5 text-description">
             Profile completeness
           </Text>
-          <Text className="font-ralewayBold text-xs text-primary">
+          <Text className="shrink-0 font-ralewayBold text-sm leading-5 text-primaryContent">
             {completion.percent}%
           </Text>
         </View>

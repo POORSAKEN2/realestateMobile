@@ -115,7 +115,7 @@ export async function changePassword(
 }
 
 export async function requestAccountDeletion(
-  payload: { reason?: string; confirmation: boolean; current_password: string },
+  payload: { reason?: string; confirmation: boolean; current_password?: string; apple_reauth_token?: string },
   accessToken?: string,
 ) {
   const response = await apiClient.post<ApiEnvelope<AccountDeletionRequest>>(
@@ -142,7 +142,7 @@ export async function fetchAccountDeletionRequest(): Promise<AccountDeletionRequ
 
 export async function respondToAccountDeletion(
   id: string,
-  payload: { current_password: string; response: string },
+  payload: { current_password?: string; apple_reauth_token?: string; response: string },
 ) {
   return normalizeAccountDeletion(
     unwrapData(

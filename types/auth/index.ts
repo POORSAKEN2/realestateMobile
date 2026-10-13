@@ -2,6 +2,9 @@ import type { AccessSnapshot } from "./access";
 export type AuthResponse = {
   data?: {
     access_token?: string;
+    auth_method?: "password" | "apple";
+    apple_user_id?: string | null;
+    account_created?: boolean;
     user?: unknown;
     onboarding?: unknown;
     permissions?: string[];
@@ -22,6 +25,7 @@ export type AuthUser = {
   id?: string | number;
   name?: string;
   email?: string;
+  has_password?: boolean;
   role?: string;
   job_title?: string;
   jobTitle?: string;
@@ -35,6 +39,9 @@ export type AuthUser = {
 
 export type AuthSession = {
   accessToken?: string;
+  authMethod?: "password" | "apple";
+  appleUserId?: string;
+  profileSetupNoticePending?: boolean;
   user?: unknown;
   onboarding?: unknown;
   deletionRecovery?: { cancelled: boolean; scope: "user" | "tenant" } | null;
@@ -48,6 +55,7 @@ export type AuthContextValue = {
   completeOnboarding: () => void;
   setOnboardingCompleted: (completed: boolean) => void;
   signIn: (session?: AuthSession) => void;
+  signInPersisted: (session: AuthSession) => Promise<void>;
   signOut: () => void;
 };
 
@@ -89,5 +97,6 @@ export type ChangePasswordPayload = {
 export type AccountDeletionRequestPayload = {
   reason?: string;
   confirmation: boolean;
-  current_password: string;
+  current_password?: string;
+  apple_reauth_token?: string;
 };

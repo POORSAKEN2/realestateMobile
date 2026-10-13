@@ -1,4 +1,5 @@
-import { ActivityIndicator, Pressable, Text } from "react-native";
+import type { ReactNode } from "react";
+import { ActivityIndicator, Pressable, Text, View } from "react-native";
 
 import { colors } from "../../../constants/colors";
 
@@ -8,6 +9,8 @@ type ButtonProps = {
   variant?: "primary" | "secondary";
   isLoading?: boolean;
   disabled?: boolean;
+  leadingIcon?: ReactNode;
+  compact?: boolean;
 };
 
 export function Button({
@@ -16,6 +19,8 @@ export function Button({
   variant = "primary",
   isLoading = false,
   disabled = false,
+  leadingIcon,
+  compact = false,
 }: ButtonProps) {
   const buttonClassName =
     variant === "primary"
@@ -28,8 +33,9 @@ export function Button({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={title}
       accessibilityState={{ disabled: disabled || isLoading, busy: isLoading }}
-      className={`h-12 items-center justify-center rounded-lg px-5 ${buttonClassName} ${disabled ? 'opacity-50' : ''}`}
+      className={`${leadingIcon || compact ? "min-h-12 py-3" : "h-12"} items-center justify-center rounded-lg ${compact ? "self-stretch px-3" : "px-5"} ${buttonClassName} ${disabled ? "opacity-50" : ""}`}
       disabled={disabled || isLoading}
       onPress={onPress}
     >
@@ -37,8 +43,25 @@ export function Button({
         <ActivityIndicator
           color={variant === "primary" ? colors.whitePrimary : colors.primary}
         />
+      ) : leadingIcon ? (
+        <View className="w-full min-w-0 flex-row items-center justify-center gap-2">
+          <View
+            accessibilityElementsHidden
+            className="shrink-0"
+            importantForAccessibility="no-hide-descendants"
+          >
+            {leadingIcon}
+          </View>
+          <Text
+            className={`min-w-0 shrink text-center font-ralewayBold text-base ${textClassName}`}
+          >
+            {title}
+          </Text>
+        </View>
       ) : (
-        <Text className={`font-ralewayBold text-base ${textClassName}`}>
+        <Text
+          className={`font-ralewayBold text-base ${compact ? "min-w-0 shrink text-center" : ""} ${textClassName}`}
+        >
           {title}
         </Text>
       )}

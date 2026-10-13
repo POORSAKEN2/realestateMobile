@@ -28,3 +28,18 @@ export function getQuickNavigationItems(
     permits(access, item.permission),
   );
 }
+
+export function getCenterNavigationAction(
+  user: unknown,
+):
+  | { type: "mapped-properties"; item: QuickNavigationItem | null }
+  | { type: "quick-navigation" } {
+  const access = normalizeAccess(user);
+  if (access.role !== "MANAGER") return { type: "quick-navigation" };
+
+  const item = dashboardNavigationSections[1].items[1];
+  return {
+    type: "mapped-properties",
+    item: permits(access, item.permission) ? item : null,
+  };
+}

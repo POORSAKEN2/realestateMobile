@@ -1,12 +1,10 @@
 import { router, type Href } from "expo-router";
 
 import { appRoutes } from "../../constants/navigation";
-import {
-  BackButton,
-  type BackButtonVariant,
-} from "../ui/buttons/BackButton";
+import { BackButton, type BackButtonVariant } from "../ui/buttons/BackButton";
 
 type SecondaryBackButtonProps = {
+  disabled?: boolean;
   accessibilityLabel?: string;
   fallbackRoute?: Href;
   navigation?: BackNavigation;
@@ -26,6 +24,7 @@ const expoRouterNavigation: BackNavigation = {
 };
 
 export function SecondaryBackButton({
+  disabled = false,
   accessibilityLabel = "Go back",
   fallbackRoute = appRoutes.primary.dashboard,
   navigation = expoRouterNavigation,
@@ -42,6 +41,7 @@ export function SecondaryBackButton({
 
   return (
     <BackButton
+      disabled={disabled}
       accessibilityLabel={accessibilityLabel}
       onPress={handlePress}
       variant={variant}

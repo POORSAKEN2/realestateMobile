@@ -115,7 +115,6 @@ export function SearchToolbar({
         value={value}
         wrapperClassName="h-14 rounded-[22px]"
       />
-
       {hasFooter ? (
         <View className="mt-2.5 flex-row items-center justify-between gap-4 px-1">
           {resultLabel ? (

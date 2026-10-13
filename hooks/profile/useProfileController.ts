@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { updateUserProfile } from "../../api/user";
 import { selectProfileImage } from "../../services/profileImagePicker";
@@ -20,6 +20,7 @@ import {
   validateProfileForm,
 } from "../../utils/profile/profileForm";
 import { useAuth } from "../useAuth";
+import { getProfileAccountPresentation } from "../../utils/profile/profileAccountPresentation";
 
 export type ProfileControllerDependencies = {
   updateProfile: ProfileUpdateGateway;
@@ -49,11 +50,14 @@ export function useProfileController(
   const [validationErrors, setValidationErrors] =
     useState<ProfileValidationErrors>({});
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const saving = useRef(false);
 
   const completion = useMemo(() => getProfileCompletion(form), [form]);
   const hasChanges = selectedImage !== null || !formsMatch(form, savedForm);
 
   function updateField(field: EditableProfileField, value: string) {
+    if (saving.current) return;
     setForm((current) => ({ ...current, [field]: value }));
 
     if (validationErrors[field]) {
@@ -62,24 +66,36 @@ export function useProfileController(
   }
 
   function discardChanges() {
-    if (isSaving) return;
+    if (saving.current) return;
     setForm(savedForm);
     setSelectedImage(null);
     setValidationErrors({});
+    setIsEditing(false);
+  }
+
+  function beginEditing() {
+    if (!saving.current) setIsEditing(true);
   }
 
   async function chooseProfileImage() {
+    if (saving.current) return "cancelled";
     const result = await dependencies.selectImage();
 
-    if (result.status === "selected") {
+    if (result.status === "selected" && !saving.current) {
       setSelectedImage(result.image);
       setForm((current) => ({ ...current, imageUri: result.image.uri }));
+      setIsEditing(true);
     }
 
     return result.status;
   }
 
   async function saveProfile(): Promise<ProfileSaveResult> {
+    if (saving.current)
+      return {
+        status: "failed",
+        message: "Your profile is already being saved.",
+      };
     const errors = validateProfileForm(form);
     setValidationErrors(errors);
 
@@ -91,6 +107,7 @@ export function useProfileController(
       return { status: "session-expired" };
     }
 
+    saving.current = true;
     setIsSaving(true);
 
     try {
@@ -111,6 +128,7 @@ export function useProfileController(
       setSavedForm(nextForm);
       setSelectedImage(null);
       setValidationErrors({});
+      setIsEditing(false);
 
       return { status: "saved" };
     } catch (error) {
@@ -122,18 +140,28 @@ export function useProfileController(
             : "Profile update failed. Please try again.",
       };
     } finally {
+      saving.current = false;
       setIsSaving(false);
     }
   }
 
   return {
     chooseProfileImage,
+    beginEditing,
     discardChanges,
     completion,
     email: user?.email?.trim(),
+    accountPresentation: getProfileAccountPresentation(
+      session?.authMethod,
+      user?.email,
+      user?.name,
+    ),
     form,
     hasChanges,
     isSaving,
+    isAuthenticated: Boolean(session?.accessToken),
+    isEditing,
+    savedForm,
     saveDisabled: isSaving || !hasChanges,
     saveProfile,
     signOut,

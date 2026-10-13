@@ -32,15 +32,17 @@ export function SearchField({
     <View
       className={`h-12 min-w-0 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 ${wrapperClassName}`}
     >
-      <MaterialCommunityIcons name="magnify" color={colors.description} size={20} />
+      <MaterialCommunityIcons name="magnify" color={colors.primary} size={20} />
       <TextInput
         autoCapitalize="none"
         autoCorrect={false}
-        className="ml-2 min-w-0 flex-1 text-base text-textPrimary"
+        className="ml-2 h-full min-w-0 flex-1 py-0 text-[16px] text-textPrimary"
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={colors.description}
         returnKeyType="search"
+        style={{ includeFontPadding: false }}
+        textAlignVertical="center"
         value={value}
         {...inputProps}
       />
@@ -54,7 +56,7 @@ export function SearchField({
         >
           <MaterialCommunityIcons
             name="close-circle"
-            color={colors.description}
+            color={colors.muted}
             size={19}
           />
         </TouchableOpacity>

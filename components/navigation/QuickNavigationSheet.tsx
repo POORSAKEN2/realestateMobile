@@ -59,14 +59,22 @@ export function QuickNavigationSheet({
         style={{ flexShrink: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
+          alignItems: "center",
+          justifyContent: "flex-start",
           paddingHorizontal: 12,
           paddingTop: 8,
           paddingBottom: 12,
         }}
       >
-        <View className="flex-row flex-wrap">
+        <View
+          className="w-full max-w-[480px] flex-row flex-wrap items-start justify-center"
+          style={{ alignContent: "flex-start" }}
+        >
           {items.map((item) => (
-            <View key={String(item.href)} className="w-1/3 px-2 pb-4">
+            <View
+              key={String(item.href)}
+              className="w-1/3 items-center self-start px-2 pb-4"
+            >
               <NavigationTile item={item} onNavigate={() => onNavigate(item)} />
             </View>
           ))}

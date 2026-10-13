@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import type { ReactNode } from "react";
 import { Text, View } from "react-native";
+import { colors } from "../../../constants/colors";
 
 type FormSectionProps = {
   children: ReactNode;
@@ -8,6 +9,8 @@ type FormSectionProps = {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
   title: string;
   variant?: "divider" | "card";
+  headerAction?: ReactNode;
+  showIcon?: boolean;
 };
 
 export function FormSection({
@@ -16,6 +19,8 @@ export function FormSection({
   icon,
   title,
   variant = "divider",
+  headerAction,
+  showIcon = true,
 }: FormSectionProps) {
   const isCard = variant === "card";
 
@@ -30,19 +35,21 @@ export function FormSection({
       <View
         className={`flex-row gap-3 ${isCard ? "items-center" : "items-start"}`}
       >
-        <View
-          className={
-            isCard
-              ? "h-12 w-12 items-center justify-center rounded-2xl bg-primary/10"
-              : "h-9 w-9 items-center justify-center rounded-xl bg-primary/10"
-          }
-        >
-          <MaterialCommunityIcons
-            name={icon}
-            color="#8A77F4"
-            size={isCard ? 22 : 19}
-          />
-        </View>
+        {showIcon ? (
+          <View
+            className={
+              isCard
+                ? "h-12 w-12 items-center justify-center rounded-2xl bg-iconSurface"
+                : "h-9 w-9 items-center justify-center rounded-xl bg-iconSurface"
+            }
+          >
+            <MaterialCommunityIcons
+              name={icon}
+              color={colors.primary}
+              size={isCard ? 22 : 19}
+            />
+          </View>
+        ) : null}
         <View className="min-w-0 flex-1">
           <Text
             className={
@@ -59,6 +66,7 @@ export function FormSection({
             </Text>
           ) : null}
         </View>
+        {headerAction}
       </View>
       {children}
     </View>

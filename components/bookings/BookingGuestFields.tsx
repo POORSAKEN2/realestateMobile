@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { Lessee } from "../../types";
 import type {
@@ -61,12 +62,12 @@ export function BookingGuestFields({
         onPress={onToggleAddingGuest}
       >
         <View className="min-w-0 flex-1 flex-row items-center gap-3">
-          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+          <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
             <MaterialCommunityIcons
               name={
                 isAddingGuest ? "account-check-outline" : "account-plus-outline"
               }
-              color="#8A77F4"
+              color={colors.primary}
               size={19}
             />
           </View>

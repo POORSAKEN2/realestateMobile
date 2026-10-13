@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../../constants/colors";
 
 export type RadioOption<T extends string> = {
   label: string;
@@ -35,8 +36,8 @@ export function RadioOptionList<T extends string>({
             onPress={() => onSelect(option.value)}
           >
             <Text
-              className={`font-ralewayBold text-base ${
-                selected ? "text-primary" : "text-textPrimary"
+              className={`min-w-0 flex-1 py-3 font-ralewayBold text-base ${
+                selected ? "text-primaryContent" : "text-textPrimary"
               }`}
             >
               {option.label}
@@ -44,7 +45,7 @@ export function RadioOptionList<T extends string>({
             {selected ? (
               <MaterialCommunityIcons
                 name="check-circle"
-                color="#8A77F4"
+                color={colors.primaryContent}
                 size={21}
               />
             ) : null}

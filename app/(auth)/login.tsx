@@ -13,13 +13,21 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import BrandCombinationVertical from "../../assets/branding/svg/brand-combination-vertical-white.svg";
+import { SocialLoginSection } from "../../components/auth/SocialLoginSection";
+import { AppleAccountModal } from "../../components/auth/AppleAccountModal";
+import { AuthErrorPopup } from "../../components/auth/AuthErrorPopup";
+import { useAppleLogin } from "../../hooks/auth/useAppleLogin";
+import { useAuth } from "../../hooks/useAuth";
+import { restorationNotice } from "../../utils/accountDeletion/accountDeletion";
 import { LegalLink } from "../../components/legal/LegalLink";
 import { colors } from "../../constants/colors";
 import { useLogin } from "../../hooks/useLogin";
+import { useLoginKeyboard } from "../../hooks/auth/useLoginKeyboard";
 
 type FocusedField = "email" | "password" | null;
 
@@ -35,16 +43,78 @@ export default function LoginScreen() {
     setPassword,
     isLoading,
     error,
+    retryDelay,
+    clearError,
     handleLogin,
   } = useLogin(initialEmail);
 
   const passwordInputRef = useRef<TextInput>(null);
+  const authenticationLock = useRef(false);
+  const { signInPersisted, session, isAuthenticated } = useAuth();
+  const keyboardVisible = useLoginKeyboard();
+  const { height, fontScale } = useWindowDimensions();
+  const compact = height < 700 || keyboardVisible;
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const [formHeight, setFormHeight] = useState(0);
+  const brandHeight = keyboardVisible
+    ? 0
+    : Math.min(240, Math.max(0, viewportHeight - formHeight - 12));
+  const fieldHeight = Math.max(compact ? 48 : 56, Math.ceil(48 * fontScale));
+  const [appleSessionToken, setAppleSessionToken] = useState<string | null>(
+    null,
+  );
+  const apple = useAppleLogin(async (session) => {
+    await signInPersisted(session);
+    setAppleSessionToken(session.accessToken!);
+    if (session.deletionRecovery?.cancelled)
+      Alert.alert(
+        "Deletion cancelled",
+        restorationNotice(session.deletionRecovery.scope),
+      );
+  });
+  useEffect(() => {
+    if (
+      appleSessionToken &&
+      isAuthenticated &&
+      session?.accessToken === appleSessionToken
+    ) {
+      setAppleSessionToken(null);
+      router.replace("/");
+    }
+  }, [appleSessionToken, isAuthenticated, session?.accessToken]);
+  const authenticationBusy =
+    isLoading ||
+    apple.busy ||
+    Boolean(apple.account) ||
+    Boolean(appleSessionToken) ||
+    retryDelay > 0 ||
+    apple.retryDelay > 0;
+  const startPasswordLogin = async () => {
+    if (authenticationLock.current || authenticationBusy) return;
+    authenticationLock.current = true;
+    apple.clearError();
+    try {
+      await handleLogin();
+    } finally {
+      authenticationLock.current = false;
+    }
+  };
+  const startAppleLogin = async () => {
+    if (authenticationLock.current || authenticationBusy) return;
+    authenticationLock.current = true;
+    clearError();
+    try {
+      await apple.start();
+    } finally {
+      authenticationLock.current = false;
+    }
+  };
 
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<FocusedField>(null);
 
   const canSubmit =
-    email.trim().length > 0 && password.length > 0 && !isLoading;
+    email.trim().length > 0 && password.length > 0 && !authenticationBusy;
 
   useEffect(() => {
     if (Platform.OS !== "android") {
@@ -84,23 +154,35 @@ export default function LoginScreen() {
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
           className="flex-1"
-          keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
         >
           <ScrollView
-            automaticallyAdjustKeyboardInsets={Platform.OS === "ios"}
             bounces={false}
+            scrollEnabled={keyboardVisible}
+            className="flex-1"
+            onLayout={(event) =>
+              setViewportHeight(event.nativeEvent.layout.height)
+            }
             contentContainerClassName="flex-grow px-6"
             keyboardDismissMode="on-drag"
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
             {/* Branding */}
-            <View className="min-h-[250px] flex-1 items-center justify-center">
-              <BrandCombinationVertical width="100%" height={240} />
+            <View
+              className="items-center justify-center"
+              style={{ height: brandHeight }}
+            >
+              {brandHeight > 0 ? (
+                <BrandCombinationVertical width="100%" height={brandHeight} />
+              ) : null}
             </View>
 
             {/* Authentication form */}
-            <View className="">
+            <View
+              onLayout={(event) =>
+                setFormHeight(event.nativeEvent.layout.height)
+              }
+            >
               {/* Email */}
               <View>
                 <Text className="mb-2 font-ralewayBold text-sm text-white">
@@ -108,7 +190,8 @@ export default function LoginScreen() {
                 </Text>
 
                 <View
-                  className={`h-14 flex-row items-center rounded-2xl border pl-4 ${
+                  style={{ height: fieldHeight }}
+                  className={`flex-row items-center rounded-2xl border pl-4 ${
                     focusedField === "email"
                       ? "border-accent bg-white/15"
                       : "border-white/20 bg-white/10"
@@ -147,8 +230,8 @@ export default function LoginScreen() {
               </View>
 
               {/* Password */}
-              <View className="mt-5">
-                <View className="mb-2 flex-row items-center justify-between">
+              <View className={compact ? "mt-3" : "mt-5"}>
+                <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-3 gap-y-2">
                   <Text className="font-ralewayBold text-sm text-white">
                     Password
                   </Text>
@@ -168,7 +251,8 @@ export default function LoginScreen() {
                 </View>
 
                 <View
-                  className={`h-14 flex-row items-center rounded-2xl border pl-4 ${
+                  style={{ height: fieldHeight }}
+                  className={`flex-row items-center rounded-2xl border pl-4 ${
                     focusedField === "password"
                       ? "border-accent bg-white/15"
                       : "border-white/20 bg-white/10"
@@ -196,7 +280,7 @@ export default function LoginScreen() {
                     onFocus={() => setFocusedField("password")}
                     onSubmitEditing={() => {
                       if (canSubmit) {
-                        handleLogin();
+                        void startPasswordLogin();
                       }
                     }}
                     placeholder="Enter your password"
@@ -227,20 +311,6 @@ export default function LoginScreen() {
                 </View>
               </View>
 
-              {/* Error feedback */}
-              {error ? (
-                <View
-                  accessibilityLiveRegion="polite"
-                  className="mt-5 flex-row items-start rounded-2xl border border-accent/25 bg-accent/10 px-4 py-3"
-                >
-                  <Feather color="#BEE3DB" name="alert-circle" size={19} />
-
-                  <Text className="ml-3 flex-1 font-ralewayMedium text-sm leading-5 text-white">
-                    {error}
-                  </Text>
-                </View>
-              ) : null}
-
               {/* Sign-in button */}
               <Pressable
                 accessibilityLabel="Sign in to your account"
@@ -249,11 +319,11 @@ export default function LoginScreen() {
                   busy: isLoading,
                   disabled: !canSubmit,
                 }}
-                className={`mt-12 h-14 items-center justify-center rounded-2xl ${
+                className={`${compact ? "mt-4 min-h-12 py-3" : "mt-6 min-h-14 py-4"} items-center justify-center rounded-2xl ${
                   canSubmit ? "bg-accent active:opacity-90" : "bg-accent/40"
                 }`}
                 disabled={!canSubmit}
-                onPress={handleLogin}
+                onPress={() => void startPasswordLogin()}
               >
                 {isLoading ? (
                   <ActivityIndicator color={colors.secondary} />
@@ -268,8 +338,18 @@ export default function LoginScreen() {
                 )}
               </Pressable>
 
+              <SocialLoginSection
+                compact={compact}
+                appleAvailable={apple.available}
+                appleLoading={apple.busy}
+                busy={authenticationBusy}
+                onApplePress={() => void startAppleLogin()}
+              />
+
               {/* Registration */}
-              <View className="mb-12 mt-8 flex-row items-center justify-center gap-1">
+              <View
+                className={`${compact ? "mb-3 mt-3" : "mb-4 mt-5"} flex-row flex-wrap items-center justify-center gap-x-1 gap-y-2`}
+              >
                 <Text className="font-ralewayMedium text-sm text-white/75">
                   New to Terrane?
                 </Text>
@@ -278,39 +358,62 @@ export default function LoginScreen() {
                   <Pressable
                     accessibilityLabel="Create a Terrane account"
                     accessibilityRole="link"
+                    className="max-w-full"
                     hitSlop={8}
                   >
-                    <Text className="font-ralewayBold text-sm text-accent">
+                    <Text className="text-center font-ralewayBold text-sm text-accent">
                       Create an account
                     </Text>
                   </Pressable>
                 </Link>
               </View>
             </View>
-
-            {/* Legal copy */}
-            <View className="mt-auto items-center px-4 pt-12">
-              <Text className="text-center font-ralewayMedium text-xs leading-5 text-white/60">
-                By signing in, you agree to our{" "}
-                <LegalLink
-                  className="font-ralewayBold text-white underline"
-                  document="terms"
-                >
-                  Terms of Service
-                </LegalLink>{" "}
-                and acknowledge our{" "}
-                <LegalLink
-                  className="font-ralewayBold text-white underline"
-                  document="privacy"
-                >
-                  Privacy Policy
-                </LegalLink>
-                .
-              </Text>
-            </View>
           </ScrollView>
+          <View className="shrink-0 items-center px-6 py-2">
+            <Text className="text-center font-ralewayMedium text-xs leading-5 text-white">
+              By continuing, you agree to our{" "}
+              <LegalLink
+                className="font-ralewayBold text-white underline"
+                document="terms"
+              >
+                Terms of Service
+              </LegalLink>{" "}
+              and acknowledge our{" "}
+              <LegalLink
+                className="font-ralewayBold text-white underline"
+                document="privacy"
+              >
+                Privacy Policy
+              </LegalLink>
+              .
+            </Text>
+          </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
+      {error ? (
+        <AuthErrorPopup
+          feedback={error}
+          disabled={authenticationBusy}
+          onRetry={() => void startPasswordLogin()}
+        />
+      ) : apple.error && !apple.account ? (
+        <AuthErrorPopup
+          feedback={apple.error}
+          disabled={authenticationBusy}
+          onRetry={() => void startAppleLogin()}
+        />
+      ) : null}
+      {apple.account ? (
+        <AppleAccountModal
+          account={apple.account}
+          busy={apple.busy}
+          error={apple.error}
+          linkCode={apple.linkCode}
+          onCancel={apple.cancel}
+          onRequestCode={(email) => void apple.requestCode(email)}
+          onVerifyCode={(email, code) => void apple.verifyCode(email, code)}
+        />
+      ) : null}
     </View>
   );
 }

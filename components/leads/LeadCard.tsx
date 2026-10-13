@@ -44,9 +44,7 @@ export function LeadCard({ lead, onUpdateStatus }: LeadCardProps) {
       <View className="flex-row items-start justify-between">
         <View className="flex-row items-center gap-2.5">
           <View
-            className={`h-9 w-9 items-center justify-center rounded-2xl ${
-              isViewing ? "bg-primary/10" : "bg-accent/20"
-            }`}
+            className="h-9 w-9 items-center justify-center rounded-2xl bg-iconSurface"
           >
             <Ionicons
               name={isViewing ? "calendar-outline" : "mail-outline"}

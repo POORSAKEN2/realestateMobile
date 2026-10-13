@@ -11,6 +11,9 @@ interface FieldProps extends Omit<TextInputProps, "onChangeText"> {
   required?: boolean;
   variant?: "default" | "filled";
   wrapperClassName?: string;
+  error?: string;
+  focused?: boolean;
+  trailing?: React.ReactNode;
 }
 
 export function BaseField({
@@ -25,29 +28,44 @@ export function BaseField({
   autoCapitalize,
   variant = "default",
   wrapperClassName = "",
+  error,
+  focused = false,
+  trailing,
   ...rest
 }: FieldProps) {
   // 1. Determine layout variant styles (Profile Icon style vs Standard style)
   const isFilledVariant = variant === "filled";
   const isIconVariant = !!icon && !isFilledVariant;
+  const filledRow = isFilledVariant && Boolean(icon || trailing);
 
   // 2. Resolve conflicting style classes between modules
   const labelClassName = isFilledVariant
     ? "font-ralewaySemiBold text-sm text-description"
     : "text-xs font-ralewayBold text-description";
+  const surfaceClassName = error
+    ? "border-danger bg-dangerSurface"
+    : focused
+      ? "border-primary bg-panel"
+      : `border-textPrimary/10 ${isFilledVariant ? "bg-surface" : "bg-panel"}`;
 
   const containerClassName = isFilledVariant
-    ? `rounded-2xl border border-textPrimary/10 bg-surface px-4 ${
-        multiline ? "min-h-24 py-3" : "h-14"
+    ? `rounded-2xl border ${surfaceClassName} px-4 ${
+        multiline
+          ? "min-h-24 py-3"
+          : filledRow
+            ? "min-h-14 flex-row items-center"
+            : "h-14"
       }`
     : isIconVariant
-      ? "h-14 flex-row items-center rounded-xl border border-textPrimary/10 bg-panel px-4 shadow-sm shadow-textPrimary/5"
-      : `rounded-xl border border-textPrimary/10 bg-panel px-4 ${
+      ? `h-14 flex-row items-center rounded-xl border ${surfaceClassName} px-4 shadow-sm shadow-textPrimary/5`
+      : `rounded-xl border ${surfaceClassName} px-4 ${
           multiline ? "min-h-28 py-4" : "h-14"
         }`;
 
   const inputClassName = isFilledVariant
-    ? "flex-1 font-ralewayMedium mb-2 text-base text-textPrimary"
+    ? filledRow
+      ? "ml-3 min-h-14 min-w-0 flex-1 py-3 font-ralewayMedium text-base text-textPrimary"
+      : "flex-1 font-ralewayMedium mb-2 text-base text-textPrimary"
     : isIconVariant
       ? "ml-3 flex-1 text-base font-ralewayBold text-textPrimary"
       : "flex-1 text-base text-textPrimary";
@@ -71,7 +89,13 @@ export function BaseField({
       </Text>
 
       <View className={containerClassName}>
-        {icon && <Ionicons name={icon} color={colors.description} size={19} />}
+        {icon && (
+          <Ionicons
+            name={icon}
+            color={error ? colors.danger : colors.primary}
+            size={19}
+          />
+        )}
 
         <TextInput
           accessibilityLabel={`${label}${required ? ", required" : ""}`}
@@ -86,7 +110,17 @@ export function BaseField({
           textAlignVertical={multiline ? "top" : "center"}
           {...rest} // Easily handles native props like secureTextEntry, autoCorrect, etc.
         />
+        {trailing}
       </View>
+      {error ? (
+        <Text
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          className="font-ralewayMedium text-xs leading-5 text-danger"
+        >
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 }

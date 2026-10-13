@@ -83,7 +83,7 @@ export function DashboardHero({
             accessibilityLabel="Open global search"
             accessibilityRole="button"
             activeOpacity={0.82}
-            className="h-11 w-11 items-center justify-center rounded-2xl border border-primary/20 bg-panel/90 shadow-lg shadow-primary/20"
+            className="h-11 w-11 items-center justify-center rounded-2xl border border-primary/20 bg-iconSurface shadow-lg shadow-primary/20"
             hitSlop={10}
             onPress={onSearchPress}
           >
@@ -94,13 +94,13 @@ export function DashboardHero({
             accessibilityLabel="Open notifications"
             accessibilityRole="button"
             activeOpacity={0.82}
-            className="relative h-11 w-11 items-center justify-center rounded-2xl border border-white/30 bg-primary shadow-lg shadow-textPrimary/20"
+            className="relative h-11 w-11 items-center justify-center rounded-2xl border border-white/30 bg-iconSurface shadow-lg shadow-textPrimary/20"
             hitSlop={10}
             onPress={onNotificationsPress}
           >
             <Ionicons
               name="notifications-outline"
-              color={colors.whitePrimary}
+              color={colors.primary}
               size={21}
             />
             <View className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full border border-white bg-danger" />

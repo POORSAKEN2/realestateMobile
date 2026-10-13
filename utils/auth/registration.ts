@@ -1,4 +1,5 @@
 import type { RegisterFormData, RegistrationDraft } from "../../types";
+import { authErrorFeedback } from "./authErrorFeedback";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VERIFICATION_CODE_PATTERN = /^\d{6}$/;
@@ -7,7 +8,10 @@ export function getRegistrationErrorMessage(
   error: unknown,
   fallback = "Registration failed. Please try again.",
 ) {
-  return error instanceof Error ? error.message : fallback;
+  return authErrorFeedback(
+    error instanceof Error ? error : new Error(fallback),
+    "register",
+  ).message;
 }
 
 export function validateRegistrationCredentials(

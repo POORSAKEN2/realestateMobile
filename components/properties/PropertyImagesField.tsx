@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { SelectedImage } from "../../utils/properties/propertyForm";
 
@@ -20,10 +21,10 @@ export function PropertyImagesField({
     <View className="gap-4 rounded-[24px] border border-primary/20 bg-panel p-4 shadow-sm shadow-primary/10">
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1 flex-row items-center gap-3">
-          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+          <View className="h-12 w-12 items-center justify-center rounded-2xl bg-iconSurface">
             <MaterialCommunityIcons
               name="image-outline"
-              color="#8A77F4"
+              color={colors.primary}
               size={22}
             />
           </View>

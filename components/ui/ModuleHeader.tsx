@@ -9,6 +9,7 @@ type ModuleHeaderProps = {
   supportingText?: string;
   title: string;
   centerTitle?: boolean;
+  titleNumberOfLines?: number;
 };
 
 export function ModuleHeader({
@@ -18,6 +19,7 @@ export function ModuleHeader({
   supportingText,
   title,
   centerTitle,
+  titleNumberOfLines = 1,
 }: ModuleHeaderProps) {
   const palette = useThemeColors();
   return (
@@ -40,7 +42,7 @@ export function ModuleHeader({
             `font-ralewayExtraBold text-[30px] leading-9 tracking-tight` +
             (centerTitle ? " text-center" : "")
           }
-          numberOfLines={1}
+          numberOfLines={titleNumberOfLines}
           style={{ color: palette.text }}
         >
           {title}

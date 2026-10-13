@@ -46,7 +46,7 @@ export function PaymentCard({
       {/* Top Header */}
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center gap-2">
-          <View className="h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
+        <View className="h-8 w-8 items-center justify-center rounded-xl bg-iconSurface">
             <Feather name="dollar-sign" size={16} color={palette.primary} />
           </View>
           <View>

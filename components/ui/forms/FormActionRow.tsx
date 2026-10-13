@@ -1,4 +1,5 @@
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../../constants/colors";
 
 export function FormActionRow({
   appearance = "default",
@@ -12,6 +13,7 @@ export function FormActionRow({
   showSubmitAction = true,
   submitDisabled = false,
   submitText,
+  tone = "default",
 }: {
   appearance?: "default" | "card";
   cancelDisabled?: boolean;
@@ -24,26 +26,33 @@ export function FormActionRow({
   showSubmitAction?: boolean;
   submitDisabled?: boolean;
   submitText: string;
+  tone?: "default" | "strong";
 }) {
   const actionsDisabled = disabled || isPending;
   const isCancelDisabled = actionsDisabled || cancelDisabled;
   const isSubmitDisabled = actionsDisabled || submitDisabled;
 
   return (
-    <View className={`flex-row ${showCancelAction ? "gap-3" : ""}`}>
+    <View
+      collapsable={false}
+      style={{ minHeight: 56 }}
+      className={`flex-row ${showCancelAction ? "gap-3" : ""}`}
+    >
       {showCancelAction ? (
         <TouchableOpacity
           accessibilityLabel={cancelText}
           accessibilityRole="button"
           accessibilityState={{ disabled: isCancelDisabled }}
           activeOpacity={0.85}
-          className={`min-h-14 flex-1 items-center justify-center rounded-2xl border border-primary bg-panel px-3 py-3 ${
+          className={`min-h-14 flex-1 items-center justify-center rounded-2xl border ${tone === "strong" ? "border-primaryContent" : "border-primary"} bg-panel px-3 py-3 ${
             isCancelDisabled ? "opacity-60" : ""
           }`}
           disabled={isCancelDisabled}
           onPress={onCancel}
         >
-          <Text className="text-center font-ralewayBold text-base text-primary">
+          <Text
+            className={`text-center font-ralewayBold text-base ${tone === "strong" ? "text-primaryContent" : "text-primary"}`}
+          >
             {cancelText}
           </Text>
         </TouchableOpacity>
@@ -54,21 +63,19 @@ export function FormActionRow({
           accessibilityRole="button"
           accessibilityState={{ disabled: isSubmitDisabled, busy: isPending }}
           activeOpacity={0.85}
-          className={`min-h-14 flex-1 items-center justify-center rounded-2xl bg-primary px-3 py-3 ${
+          className={`min-h-14 flex-1 items-center justify-center rounded-2xl ${tone === "strong" ? "bg-primaryContent" : "bg-primary"} px-3 py-3 ${
             isSubmitDisabled ? "opacity-60" : ""
           }`}
           disabled={isSubmitDisabled}
           onPress={onSubmit}
         >
           {isPending ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator
+              color={tone === "strong" ? colors.onInverse : "#FFFFFF"}
+            />
           ) : (
             <Text
-              className={
-                appearance === "card"
-                  ? "text-center font-ralewayBold text-base text-white"
-                  : "text-center font-ralewayBold text-lg text-white"
-              }
+              className={`text-center font-ralewayBold ${appearance === "card" ? "text-base" : "text-lg"} ${tone === "strong" ? "text-onInverse" : "text-white"}`}
             >
               {submitText}
             </Text>

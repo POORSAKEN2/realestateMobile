@@ -163,8 +163,8 @@ function MainMetric({
         <>
           <View className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-accent/10" />
           <View className="absolute -bottom-10 -left-8 h-28 w-28 rounded-full bg-primary/25" />
-          <View className="h-14 w-14 items-center justify-center rounded-2xl border border-accent/25 bg-accent/15">
-            <Ionicons name={icon} color={colors.accent} size={27} />
+          <View className="h-14 w-14 items-center justify-center rounded-2xl border border-accent/25 bg-iconSurface">
+            <Ionicons name={icon} color={colors.primary} size={27} />
           </View>
         </>
       ) : (

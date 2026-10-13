@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { colors } from "../../constants/colors";
 import { Text, View } from "react-native";
 
 import { onboardingScreens } from "../../constants/onboarding";
@@ -8,22 +9,16 @@ import { OnboardingPageLayout } from "./OnboardingPageLayout";
 const folderRows = [
   {
     label: "Properties",
-    iconColor: "#8A77F4",
-    iconBg: "bg-successSurface",
     lineClassName: "bg-success",
     meta: "18 files",
   },
   {
     label: "Bookings",
-    iconColor: "#2563EB",
-    iconBg: "bg-infoSurface",
     lineClassName: "bg-info",
     meta: "6 pending",
   },
   {
     label: "Documents",
-    iconColor: "#8A77F4",
-    iconBg: "bg-primary/10",
     lineClassName: "bg-primary/45",
     meta: "Updated",
   },
@@ -78,8 +73,8 @@ export function OnboardingFive() {
                 </Text>
               </View>
 
-              <View className="h-10 w-10 items-center justify-center rounded-2xl border border-success/25 bg-successSurface shadow-sm">
-                <Feather name="archive" size={18} color="#8A77F4" />
+              <View className="h-10 w-10 items-center justify-center rounded-2xl border border-success/25 bg-iconSurface shadow-sm">
+                <Feather name="archive" size={18} color={colors.primary} />
               </View>
             </View>
 
@@ -91,9 +86,9 @@ export function OnboardingFive() {
                 >
                   <View className="flex-row items-center gap-3">
                     <View
-                      className={`h-12 w-12 items-center justify-center rounded-2xl border border-textPrimary/10 ${row.iconBg}`}
+                    className="h-12 w-12 items-center justify-center rounded-2xl border border-textPrimary/10 bg-iconSurface"
                     >
-                      <Feather name="folder" size={24} color={row.iconColor} />
+                      <Feather name="folder" size={24} color={colors.primary} />
                     </View>
 
                     <View className="flex-1">

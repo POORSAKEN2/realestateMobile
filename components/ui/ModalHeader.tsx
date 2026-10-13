@@ -60,7 +60,7 @@ export function ModalHeader({
           accessibilityRole="button"
           accessibilityState={{ disabled }}
           activeOpacity={0.76}
-          className={`h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 ${
+          className={`h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-iconSurface ${
             disabled ? "opacity-50" : ""
           }`}
           disabled={disabled}

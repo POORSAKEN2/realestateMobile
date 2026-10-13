@@ -167,6 +167,12 @@ export function useRegistrationFlow(
     isRequestingCode,
     passwordWarning,
     requestVerificationCode,
+    retry:
+      step === "verification"
+        ? () => {
+            void requestVerificationCode();
+          }
+        : continueRegistration,
     secondsRemaining,
     step,
     stepIndex,

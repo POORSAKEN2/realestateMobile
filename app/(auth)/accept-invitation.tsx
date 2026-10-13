@@ -111,7 +111,7 @@ export default function AcceptInvitationScreen() {
             contentContainerClassName="flex-grow justify-center px-6 py-10"
           >
             <View className="rounded-3xl bg-panel p-6">
-              <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+              <View className="h-14 w-14 items-center justify-center rounded-2xl bg-iconSurface">
                 <Feather name="user-check" size={26} color={colors.primary} />
               </View>
               <Text className="mt-5 font-ralewayExtraBold text-3xl text-textPrimary">

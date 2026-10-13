@@ -1,4 +1,5 @@
 import type { RegistrationDraft } from "../types";
+import type { AuthErrorFeedback } from "../utils/auth/authErrorFeedback";
 
 export const VERIFICATION_CODE_LENGTH = 6;
 
@@ -14,6 +15,7 @@ export type RegistrationStep = (typeof REGISTRATION_STEPS)[number];
 export type RegistrationFeedback = {
   message: string;
   tone: "error" | "info";
+  error?: AuthErrorFeedback;
 };
 
 export const INITIAL_REGISTRATION_DRAFT: RegistrationDraft = {

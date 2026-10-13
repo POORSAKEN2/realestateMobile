@@ -91,12 +91,12 @@ export function LocationPinPicker({
           accessibilityLabel="Open property pin map"
           accessibilityRole="button"
           activeOpacity={0.85}
-          className="h-11 w-11 items-center justify-center rounded-2xl bg-primary"
+          className="h-11 w-11 items-center justify-center rounded-2xl bg-iconSurface"
           onPress={() => setIsMapVisible(true)}
         >
           <MaterialCommunityIcons
             name="map-marker-radius-outline"
-            color="#FFFFFF"
+            color={colors.primary}
             size={22}
           />
         </TouchableOpacity>
@@ -190,7 +190,7 @@ export function LocationPinPicker({
             <View className="mt-3 h-14 flex-row items-center gap-2 overflow-hidden rounded-[22px] border border-primary/20 bg-panel px-3.5">
               <MaterialCommunityIcons
                 name="magnify"
-                color="#6F6D6D"
+                color={colors.primary}
                 size={20}
               />
               {isSearchFocused || !searchQuery ? (

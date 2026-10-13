@@ -17,7 +17,7 @@ function DetailField({
 }) {
   return (
     <View className="flex-row gap-3 border-b border-primary/10 py-4 last:border-b-0">
-      <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+      <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
         <Feather name={icon} size={17} color={colors.primary} />
       </View>
       <View className="min-w-0 flex-1">
@@ -49,7 +49,7 @@ export function InquiryDetail({
     <View className="gap-4 pb-8">
       <View className="rounded-[28px] border border-primary/15 bg-panel p-5 shadow-sm shadow-primary/5">
         <View className="flex-row items-center gap-3">
-          <View className="h-14 w-14 items-center justify-center rounded-2xl bg-accent/25">
+          <View className="h-14 w-14 items-center justify-center rounded-2xl bg-iconSurface">
             <Ionicons name="person-outline" size={26} color={colors.primary} />
           </View>
           <View className="min-w-0 flex-1">

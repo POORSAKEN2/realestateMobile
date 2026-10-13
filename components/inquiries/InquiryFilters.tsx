@@ -30,7 +30,7 @@ export function InquiryFilters({
   return (
     <View className="gap-3">
       <View className="h-12 flex-row items-center rounded-2xl border border-primary/20 bg-panel px-3.5 shadow-sm shadow-primary/5">
-        <Feather name="search" size={16} color={colors.description} />
+        <Feather name="search" size={16} color={colors.primary} />
         <TextInput
           accessibilityLabel="Search inquiries"
           autoCapitalize="none"
@@ -51,7 +51,7 @@ export function InquiryFilters({
             <Ionicons
               name="close-circle"
               size={18}
-              color={colors.description}
+              color={colors.primary}
             />
           </TouchableOpacity>
         ) : null}

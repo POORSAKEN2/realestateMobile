@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { Bedspace, BedspaceStatus } from "../../types";
 import { formatCurrency } from "../../utils/formatters";
@@ -31,10 +32,10 @@ export function BedspaceCard({ bedspace }: { bedspace: Bedspace }) {
   return (
     <View className="rounded-2xl border border-textPrimary/10 bg-panel p-4">
       <View className="flex-row items-start gap-3">
-        <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+        <View className="h-11 w-11 items-center justify-center rounded-xl bg-iconSurface">
           <MaterialCommunityIcons
             name="bed-single-outline"
-            color="#8A77F4"
+            color={colors.primary}
             size={21}
           />
         </View>

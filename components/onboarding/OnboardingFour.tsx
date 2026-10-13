@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { Image, Text, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import { onboardingScreens } from "../../constants/onboarding";
 import { OnboardingControls } from "./OnboardingControls";
@@ -53,8 +54,8 @@ export function OnboardingFour() {
                 </Text>
               </View>
 
-              <View className="h-11 w-11 items-center justify-center rounded-2xl border border-danger/20 bg-panel/90 shadow-sm">
-                <Feather name="trending-up" size={20} color="#1E1F45" />
+              <View className="h-11 w-11 items-center justify-center rounded-2xl border border-danger/20 bg-iconSurface shadow-sm">
+                <Feather name="trending-up" size={20} color={colors.primary} />
               </View>
             </View>
 

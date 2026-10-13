@@ -57,7 +57,7 @@ export function TenantDocumentsSection({
               key={document.id}
               onPress={() => onOpen(document)}
             >
-              <View className="h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+              <View className="h-11 w-11 items-center justify-center rounded-xl bg-iconSurface">
                 <Ionicons color="#8A77F4" name="document-outline" size={21} />
               </View>
               <View className="min-w-0 flex-1">

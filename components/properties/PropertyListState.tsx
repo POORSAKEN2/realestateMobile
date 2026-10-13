@@ -1,5 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import { SkeletonBlock } from "../ui/Skeleton";
 
@@ -40,8 +41,8 @@ export function PropertyListMessage({
 }) {
   return (
     <View className="items-center rounded-3xl border border-dashed border-primary/20 bg-panel p-8">
-      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-        <MaterialCommunityIcons name={icon} color="#8A77F4" size={28} />
+      <View className="h-14 w-14 items-center justify-center rounded-2xl bg-iconSurface">
+        <MaterialCommunityIcons name={icon} color={colors.primary} size={28} />
       </View>
       <Text className="mt-4 text-center font-ralewayExtraBold text-lg text-textPrimary">
         {title}

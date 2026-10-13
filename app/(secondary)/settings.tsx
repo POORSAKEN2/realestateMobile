@@ -1,3 +1,7 @@
+import { useEffect } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useSnackbar } from "../../hooks/useSnackbar";
+import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 
 import { Screen } from "../../components/ui/Screen";
@@ -11,6 +15,13 @@ import { SettingsPrivacySection } from "../../components/settings/SettingsPrivac
 import { OnboardingPreviewCard } from "../../components/settings/OnboardingPreviewCard";
 
 export default function SettingsScreen() {
+  const { passwordSet } = useLocalSearchParams<{ passwordSet?: string }>();
+  const snackbar = useSnackbar();
+  useEffect(() => {
+    if (passwordSet !== "1") return;
+    snackbar.show("Password set.");
+    router.setParams({ passwordSet: undefined });
+  }, [passwordSet, snackbar.show]);
   return (
     <Screen bottomInset="safe-area" className="bg-surface">
       <KeyboardAvoidingView
@@ -49,6 +60,7 @@ export default function SettingsScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      <ScreenSnackbar message={snackbar.message} onDismiss={snackbar.dismiss} />
     </Screen>
   );
 }

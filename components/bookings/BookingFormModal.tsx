@@ -166,10 +166,10 @@ export function BookingFormModal({
 
         {selectedBuilding ? (
           <View className="flex-row items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4">
-            <View className="h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <View className="h-10 w-10 items-center justify-center rounded-xl bg-iconSurface">
               <MaterialCommunityIcons
                 name="door-open"
-                color="#8A77F4"
+                color={colors.primary}
                 size={20}
               />
             </View>

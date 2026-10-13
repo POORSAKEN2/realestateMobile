@@ -63,7 +63,7 @@ export function PropertyLifecyclePanel({
             {getPropertyLifecycleDescription(currentStatus)}
           </Text>
         </View>
-        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
+        <View className="h-10 w-10 items-center justify-center rounded-2xl bg-iconSurface">
           <Feather name="repeat" color={colors.primary} size={18} />
         </View>
       </View>

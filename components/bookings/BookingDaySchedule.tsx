@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
+import { colors } from "../../constants/colors";
 
 import type { TransientBooking } from "../../types";
 import {
@@ -61,8 +62,8 @@ export function BookingDaySchedule({
               className="min-h-14 flex-row items-center gap-2.5 rounded-2xl border border-primary/10 bg-primary/5 px-3 py-2"
               onPress={() => onOpenBooking(booking)}
             >
-              <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-                <Ionicons name="bed-outline" color="#8A77F4" size={18} />
+              <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
+                <Ionicons name="bed-outline" color={colors.primary} size={18} />
               </View>
               <View className="min-w-0 flex-1">
                 <Text
@@ -83,8 +84,8 @@ export function BookingDaySchedule({
         </View>
       ) : (
         <View className="min-h-12 flex-row items-center gap-2.5 rounded-2xl bg-primary/5 px-3 py-2">
-          <View className="h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
-            <Ionicons name="sparkles-outline" color="#8A77F4" size={17} />
+          <View className="h-9 w-9 items-center justify-center rounded-xl bg-iconSurface">
+            <Ionicons name="sparkles-outline" color={colors.primary} size={17} />
           </View>
           <View className="min-w-0 flex-1">
             <Text className="font-ralewayExtraBold text-sm text-textPrimary">
