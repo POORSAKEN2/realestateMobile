@@ -11,6 +11,7 @@ export function QuickNavigationButton({
   disabled,
   reducedMotion,
   onPress,
+  destinationLabel,
   top,
   left,
 }: {
@@ -18,6 +19,7 @@ export function QuickNavigationButton({
   disabled: boolean;
   reducedMotion: boolean;
   onPress: () => void;
+  destinationLabel?: string;
   top: number;
   left: number;
 }) {
@@ -43,12 +45,23 @@ export function QuickNavigationButton({
     <TouchableOpacity
       accessibilityRole="button"
       accessibilityLabel={
-        open ? "Close quick navigation" : "Open quick navigation"
+        destinationLabel
+          ? `Open ${destinationLabel}`
+          : open
+            ? "Close quick navigation"
+            : "Open quick navigation"
       }
       accessibilityHint={
-        disabled ? "No permitted shortcuts available" : undefined
+        disabled
+          ? destinationLabel
+            ? `${destinationLabel} is unavailable`
+            : "No permitted shortcuts available"
+          : undefined
       }
-      accessibilityState={{ disabled, expanded: open }}
+      accessibilityState={{
+        disabled,
+        ...(destinationLabel ? {} : { expanded: open }),
+      }}
       activeOpacity={0.8}
       disabled={disabled}
       onPress={onPress}

@@ -20,7 +20,10 @@ import {
 } from "../../utils/auth/accessPolicy";
 import { colors } from "../../constants/colors";
 import { tabBarLayout } from "../../constants/tabBar";
-import { getQuickNavigationItems } from "../../constants/quickNavigation";
+import {
+  getCenterNavigationAction,
+  getQuickNavigationItems,
+} from "../../constants/quickNavigation";
 import { useThemeColors } from "../../context/WorkspacePresentationContext";
 import { QuickNavigationButton } from "./QuickNavigationButton";
 import { QuickNavigationSheet } from "./QuickNavigationSheet";
@@ -49,14 +52,16 @@ function AppTabBarView({
   open,
   disabled,
   reducedMotion,
-  onToggle,
+  onCenterPress,
+  destinationLabel,
   onSelect,
   docked = false,
 }: BottomTabBarProps & {
   open: boolean;
   disabled: boolean;
   reducedMotion: boolean;
-  onToggle: () => void;
+  onCenterPress: () => void;
+  destinationLabel?: string;
   onSelect?: (action: () => void, permission?: AppPermission) => void;
   docked?: boolean;
 }) {
@@ -151,7 +156,8 @@ function AppTabBarView({
         open={open}
         disabled={disabled}
         reducedMotion={reducedMotion}
-        onPress={onToggle}
+        onPress={onCenterPress}
+        destinationLabel={destinationLabel}
         left={center - ADD_BUTTON_SIZE / 2}
         top={TAB_BAR_TOP - ADD_BUTTON_SIZE / 2 + tabBarLayout.addButtonOffset}
       />
@@ -210,6 +216,11 @@ export function AppTabBar(props: BottomTabBarProps) {
     () => getQuickNavigationItems(session?.user),
     [session?.user],
   );
+  const centerAction = useMemo(
+    () => getCenterNavigationAction(session?.user),
+    [session?.user],
+  );
+  const opensMap = centerAction.type === "mapped-properties";
   const [open, setOpen] = useState(false);
   const [presented, setPresented] = useState(false);
   const openRef = useRef(false);
@@ -221,8 +232,13 @@ export function AppTabBar(props: BottomTabBarProps) {
     openRef.current = false;
     setOpen(false);
   }, []);
-  const toggle = () => {
+  const onCenterPress = () => {
     if (pending.current) return;
+    const action = getCenterNavigationAction(userRef.current);
+    if (action.type === "mapped-properties") {
+      if (action.item) router.navigate(action.item.href);
+      return;
+    }
     if (openRef.current) close();
     else if (items.length) {
       openRef.current = true;
@@ -247,11 +263,11 @@ export function AppTabBar(props: BottomTabBarProps) {
   }, []);
 
   useEffect(() => {
-    if (!session?.user || !items.length) {
+    if (!session?.user || !items.length || opensMap) {
       pending.current = null;
       close();
     }
-  }, [session?.user, items.length, close]);
+  }, [session?.user, items.length, opensMap, close]);
   useEffect(() => {
     pending.current = null;
     close();
@@ -265,10 +281,11 @@ export function AppTabBar(props: BottomTabBarProps) {
 
   const barProps = {
     ...props,
-    open,
-    disabled: !items.length,
+    open: opensMap ? false : open,
+    disabled: opensMap ? !centerAction.item : !items.length,
     reducedMotion,
-    onToggle: toggle,
+    onCenterPress,
+    destinationLabel: opensMap ? "Mapped Properties" : undefined,
   };
   return (
     <>
@@ -280,7 +297,7 @@ export function AppTabBar(props: BottomTabBarProps) {
         <AppTabBarView {...barProps} />
       </View>
       <QuickNavigationSheet
-        visible={open}
+        visible={!opensMap && open}
         reducedMotion={reducedMotion}
         items={items}
         onClose={close}
