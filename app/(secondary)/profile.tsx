@@ -1,12 +1,6 @@
 import { router } from "expo-router";
-import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  View,
-} from "react-native";
+import { useState } from "react";
+import { Alert, Keyboard, ScrollView, View } from "react-native";
 
 import { ProfileAccountActions } from "../../components/profile/ProfileAccountActions";
 import { ProfileDetailsForm } from "../../components/profile/ProfileDetailsForm";
@@ -15,6 +9,9 @@ import { ProfileSummaryCard } from "../../components/profile/ProfileSummaryCard"
 import { Screen } from "../../components/ui/Screen";
 import { ScreenSnackbar } from "../../components/ui/Snackbar";
 import { useProfileController } from "../../hooks/profile/useProfileController";
+import { useProfileExitGuard } from "../../hooks/profile/useProfileExitGuard";
+import { useProfileKeyboardInset } from "../../hooks/profile/useProfileKeyboardInset";
+import { ConfirmationModal } from "../../components/ui/ConfirmationModal";
 import { useSnackbar } from "../../hooks/useSnackbar";
 import { appRoutes } from "../../constants/navigation";
 import { SecondaryBackButton } from "../../components/navigation/SecondaryBackButton";
@@ -29,7 +26,17 @@ export function ProfileScreen({
 }: ProfileScreenProps) {
   const profile = useProfileController();
   const profileSnackbar = useSnackbar();
+  const [footerHeight, setFooterHeight] = useState(0);
+  const exit = useProfileExitGuard({
+    hasChanges: profile.hasChanges && profile.isAuthenticated,
+    isSaving: profile.isSaving && profile.isAuthenticated,
+    onDiscard: () => {
+      Keyboard.dismiss();
+      profile.discardChanges();
+    },
+  });
   const isPrimary = navigationLevel === "primary";
+  const keyboard = useProfileKeyboardInset();
 
   async function handleChangePhoto() {
     const status = await profile.chooseProfileImage();
@@ -51,34 +58,22 @@ export function ProfileScreen({
     }
 
     if (result.status === "session-expired") {
-      Alert.alert(
-        "Session expired",
-        "Please sign in again before updating your profile.",
+      profileSnackbar.show(
+        "Session expired. Please sign in again before updating your profile.",
       );
       return;
     }
 
     if (result.status === "failed") {
-      Alert.alert("Couldn’t save changes", result.message);
+      profileSnackbar.show(result.message);
     }
   }
 
   function handleSignOut() {
-    Alert.alert(
-      "Sign out?",
-      "You’ll need to sign in again to manage your properties.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Sign Out",
-          style: "destructive",
-          onPress: () => {
-            profile.signOut();
-            router.replace("/(auth)/login");
-          },
-        },
-      ],
-    );
+    exit.requestSignOut(() => {
+      profile.signOut();
+      router.replace("/(auth)/login");
+    });
   }
 
   return (
@@ -86,9 +81,12 @@ export function ProfileScreen({
       bottomInset={isPrimary ? "tab-bar" : "safe-area"}
       className="bg-surface"
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      <View
+        ref={keyboard.containerRef}
+        collapsable={false}
         className="flex-1"
+        style={{ paddingBottom: keyboard.bottomInset }}
+        onLayout={keyboard.onLayout}
       >
         <View className="h-3" />
         <ModuleHeader
@@ -110,7 +108,7 @@ export function ProfileScreen({
         >
           <ProfileSummaryCard
             completion={profile.completion}
-            email={profile.email}
+            account={profile.accountPresentation}
             imageUri={profile.form.imageUri}
             jobTitle={profile.form.jobTitle}
             name={profile.form.fullName}
@@ -121,17 +119,11 @@ export function ProfileScreen({
             errors={profile.validationErrors}
             onChange={profile.updateField}
             values={profile.form}
+            savedValues={profile.savedForm}
+            isEditing={profile.isEditing}
+            onEdit={profile.beginEditing}
             disabled={profile.isSaving}
           />
-          {!profile.hasChanges ? (
-            <ProfileSaveButton
-              disabled={profile.saveDisabled}
-              hasChanges={profile.hasChanges}
-              isSaving={profile.isSaving}
-              onPress={handleSave}
-              onDiscard={profile.discardChanges}
-            />
-          ) : null}
           <ProfileAccountActions
             onOpenAdditionalSettings={() =>
               router.push(appRoutes.secondary.settings)
@@ -140,8 +132,13 @@ export function ProfileScreen({
             disabled={profile.isSaving}
           />
         </ScrollView>
-        {profile.hasChanges ? (
-          <View className="border-t border-primary/15 bg-surface pt-3">
+        {profile.isEditing ? (
+          <View
+            className="border-t border-textPrimary/10 bg-panel py-4"
+            onLayout={(event) => {
+              setFooterHeight(event.nativeEvent.layout.height);
+            }}
+          >
             <ProfileSaveButton
               disabled={profile.saveDisabled}
               hasChanges={profile.hasChanges}
@@ -150,32 +147,28 @@ export function ProfileScreen({
                 Keyboard.dismiss();
                 void handleSave();
               }}
-              onDiscard={() =>
-                Alert.alert(
-                  "Discard changes?",
-                  "Your unsaved profile edits and photo selection will be removed.",
-                  [
-                    { text: "Keep editing", style: "cancel" },
-                    {
-                      text: "Discard",
-                      style: "destructive",
-                      onPress: () => {
-                        Keyboard.dismiss();
-                        profile.discardChanges();
-                      },
-                    },
-                  ],
-                )
-              }
+              onDiscard={() => exit.requestDiscard()}
             />
           </View>
         ) : null}
-      </KeyboardAvoidingView>
+      </View>
 
       <ScreenSnackbar
         message={profileSnackbar.message}
         onDismiss={profileSnackbar.dismiss}
         placement="screen-bottom"
+        bottomClearance={
+          profile.isEditing ? footerHeight + keyboard.bottomInset + 24 : 0
+        }
+      />
+      <ConfirmationModal
+        visible={Boolean(exit.confirmation)}
+        title={exit.confirmation?.title ?? ""}
+        description={exit.confirmation?.description ?? ""}
+        confirmLabel={exit.confirmation?.confirmLabel}
+        isPending={profile.isSaving}
+        onCancel={exit.cancel}
+        onConfirm={exit.confirm}
       />
     </Screen>
   );

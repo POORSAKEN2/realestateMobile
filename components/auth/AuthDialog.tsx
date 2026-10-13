@@ -19,10 +19,12 @@ export function AuthDialog({
   visible,
   onClose,
   onDismiss,
+  panelClassName = "rounded-2xl",
 }: PropsWithChildren<{
   visible: boolean;
   onClose: () => void;
   onDismiss?: () => void;
+  panelClassName?: string;
 }>) {
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
@@ -47,7 +49,7 @@ export function AuthDialog({
       >
         <ScrollView
           accessibilityViewIsModal
-          className="w-full max-w-[480px] rounded-2xl bg-panel"
+          className={`w-full max-w-[480px] bg-panel ${panelClassName}`}
           style={{
             flexGrow: 0,
             maxHeight: Math.max(height - insets.top - insets.bottom - 48, 0),

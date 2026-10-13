@@ -35,7 +35,7 @@ export function Button({
       accessibilityRole="button"
       accessibilityLabel={title}
       accessibilityState={{ disabled: disabled || isLoading, busy: isLoading }}
-      className={`${leadingIcon || compact ? "min-h-12 py-3" : "h-12"} items-center justify-center rounded-lg ${compact ? "flex-1 px-3" : "px-5"} ${buttonClassName} ${disabled ? "opacity-50" : ""}`}
+      className={`${leadingIcon || compact ? "min-h-12 py-3" : "h-12"} items-center justify-center rounded-lg ${compact ? "self-stretch px-3" : "px-5"} ${buttonClassName} ${disabled ? "opacity-50" : ""}`}
       disabled={disabled || isLoading}
       onPress={onPress}
     >

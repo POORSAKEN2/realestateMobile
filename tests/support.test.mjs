@@ -153,7 +153,7 @@ const { default: AddButton } = compile(
 );
 const { FormActionRow } = compile(
   "../components/ui/forms/FormActionRow.tsx",
-  sharedMocks,
+  { ...sharedMocks, "../../../constants/colors": palette },
 );
 const { ModalActionFooter } = compile(
   "../components/ui/ModalActionFooter.tsx",
