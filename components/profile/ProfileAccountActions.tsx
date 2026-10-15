@@ -1,5 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
-import { colors } from "../../constants/colors";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ProfileMenuSection } from "./ProfileMenuSection";
 
@@ -35,10 +33,9 @@ export function ProfileAccountActions({
         disabled={disabled}
         activeOpacity={0.8}
         onPress={onSignOut}
-        className={`mt-6 min-h-14 flex-row items-center gap-3 rounded-2xl bg-dangerSurface px-4 py-3 ${disabled ? "opacity-50" : ""}`}
+        className={`mt-6 min-h-12 items-center justify-center rounded-2xl bg-danger px-4 py-3 ${disabled ? "opacity-50" : ""}`}
       >
-        <Ionicons name="log-out-outline" color={colors.danger} size={20} />
-        <Text className="min-w-0 flex-1 font-ralewayBold text-sm text-danger">
+        <Text className="text-center font-ralewayExtraBold text-onDanger">
           Sign out
         </Text>
       </TouchableOpacity>
