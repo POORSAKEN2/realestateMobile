@@ -6,6 +6,7 @@ const {
   getWorkspaceSettingsChanges,
   resolveDashboardLocation,
   resolveWorkspaceTheme,
+  resolveWorkspaceThemeSetting,
   validateWorkspaceSettings,
 } = load("../../utils/workspaceSettings.ts");
 const {
@@ -42,6 +43,50 @@ test("theme resolves fixed choices and system appearance", () => {
   assert.equal(resolveWorkspaceTheme("dark", "light"), "dark");
   assert.equal(resolveWorkspaceTheme("system", "dark"), "dark");
   assert.equal(resolveWorkspaceTheme("system", null), "light");
+});
+
+test("expired workspace access forces Light for dark and system preferences", () => {
+  for (const theme of ["dark", "system", "light"]) {
+    const applied = resolveWorkspaceThemeSetting(theme, {
+      access_mode: "read_only",
+      status: "expired",
+    });
+    assert.equal(applied, "light");
+    assert.equal(resolveWorkspaceTheme(applied, "dark"), "light");
+  }
+});
+
+test("theme preserves active, grace, unknown and ungated subscription access", () => {
+  for (const entitlement of [
+    undefined,
+    null,
+    {},
+    { access_mode: "active" },
+    { access_mode: "active", status: "expired" },
+    { status: "expired", in_grace_period: true },
+    { access_mode: "read_only", gating_enabled: false },
+    { status: "canceled" },
+  ]) {
+    assert.equal(resolveWorkspaceThemeSetting("dark", entitlement), "dark");
+    assert.equal(resolveWorkspaceThemeSetting("system", entitlement), "system");
+  }
+  assert.equal(
+    resolveWorkspaceThemeSetting("dark", { status: "expired" }),
+    "light",
+  );
+});
+
+test("renewal restores the saved theme without overwriting the preference", () => {
+  const settings = { ...values, theme: "dark" };
+  assert.equal(
+    resolveWorkspaceThemeSetting(settings.theme, { access_mode: "read_only" }),
+    "light",
+  );
+  assert.equal(
+    resolveWorkspaceThemeSetting(settings.theme, { access_mode: "active" }),
+    "dark",
+  );
+  assert.equal(settings.theme, "dark");
 });
 
 test("workspace presentation controls money, number, and date formats", () => {

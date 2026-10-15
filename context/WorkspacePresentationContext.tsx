@@ -6,17 +6,21 @@ import { useColorScheme, View } from "react-native";
 import { darkColors, lightColors, setActiveColors } from "../constants/colors";
 import { DEFAULT_LOCATION_OPTIONS } from "../constants/defaultLocation";
 import { useEffectiveWorkspaceSettings } from "../hooks/api/useWorkspaceSettings";
+import { useBillingEntitlement } from "../hooks/api/useBillingEntitlement";
 import type { WorkspaceSettings } from "../types/domain/workspaceSettings";
 import type { WorkspaceLocationOption } from "../types/domain/workspaceSettings";
 import { setPresentationSettings } from "../utils/formatters";
-import { resolveWorkspaceTheme } from "../utils/workspaceSettings";
+import {
+  resolveWorkspaceTheme,
+  resolveWorkspaceThemeSetting,
+} from "../utils/workspaceSettings";
 
 export const DEFAULT_WORKSPACE_SETTINGS: WorkspaceSettings = {
   appName: "Terrane",
   currency: "PHP",
   locale: "en-PH",
   dateFormat: "MM/DD/YYYY",
-  theme: "system",
+  theme: "light",
   defaultDashboardLocation: "philippines",
 };
 
@@ -38,13 +42,21 @@ function rgb(hex: string) {
 export function WorkspacePresentationProvider({ children }: PropsWithChildren) {
   const systemTheme = useColorScheme();
   const query = useEffectiveWorkspaceSettings();
+  const entitlementQuery = useBillingEntitlement();
   const effective = query.data;
-  const settings: WorkspaceSettings = effective
+  const savedSettings: WorkspaceSettings = effective
     ? {
         ...effective,
         defaultDashboardLocation: effective.defaultDashboardLocation.value,
       }
     : DEFAULT_WORKSPACE_SETTINGS;
+  const settings: WorkspaceSettings = {
+    ...savedSettings,
+    theme: resolveWorkspaceThemeSetting(
+      savedSettings.theme,
+      entitlementQuery.data,
+    ),
+  };
   const resolvedTheme = resolveWorkspaceTheme(settings.theme, systemTheme);
   const palette = resolvedTheme === "dark" ? darkColors : lightColors;
   setActiveColors(resolvedTheme);

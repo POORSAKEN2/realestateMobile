@@ -4,6 +4,7 @@ import type {
   WorkspaceSettingsOptions,
   WorkspaceTheme,
 } from "../types/domain/workspaceSettings";
+import type { BillingEntitlement } from "../types/domain/billing";
 
 export const WORKSPACE_SETTING_LABELS: Record<keyof WorkspaceSettings, string> = {
   appName: "Workspace name",
@@ -55,6 +56,22 @@ export function resolveWorkspaceTheme(
   system: "light" | "dark" | null | undefined,
 ) {
   return theme === "system" ? (system === "dark" ? "dark" : "light") : theme;
+}
+
+export function resolveWorkspaceThemeSetting(
+  theme: WorkspaceTheme,
+  entitlement?: Pick<
+    BillingEntitlement,
+    "access_mode" | "status" | "in_grace_period" | "gating_enabled"
+  > | null,
+): WorkspaceTheme {
+  if (!entitlement || entitlement.gating_enabled === false) return theme;
+  if (entitlement.access_mode) {
+    return entitlement.access_mode === "read_only" ? "light" : theme;
+  }
+  return entitlement.status === "expired" && !entitlement.in_grace_period
+    ? "light"
+    : theme;
 }
 
 export function resolveDashboardLocation<T>(
