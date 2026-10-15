@@ -8,6 +8,7 @@ import type {
   DashboardSummaryMetricTone,
   RoleDashboardSummaryCardProps,
 } from "./types";
+import { useDashboardSummaryLayout } from "./useDashboardSummaryLayout";
 
 const managerShadow = {
   elevation: 7,
@@ -32,7 +33,7 @@ const managerMetricStyles: Record<
     dot: "bg-primary",
     icon: "bg-primary/10",
     iconColor: colors.primary,
-    label: "text-primary",
+    label: "text-primaryContent",
   },
   success: {
     container: "border-success/15 bg-successSurface/30",
@@ -53,31 +54,41 @@ const managerMetricStyles: Record<
 function ManagerMetric({
   isLoading,
   metric,
+  stacked,
+  fontScale,
 }: {
   isLoading: boolean;
   metric: DashboardSummaryMetric;
+  stacked: boolean;
+  fontScale: number;
 }) {
   const tone = managerMetricStyles[metric.tone ?? "neutral"];
 
   return (
     <View
-      className={`h-full min-w-0 flex-1 rounded-2xl border p-3 ${tone.container}`}
+      className={`min-w-0 rounded-2xl border p-3 ${tone.container}`}
+      style={{ minHeight: 80, ...(stacked ? {} : { flex: 1 }) }}
     >
-      <View className="flex-row items-center justify-between ">
+      <View
+        className="flex-row items-start justify-between gap-2"
+        style={{ minHeight: 28 * fontScale }}
+      >
         <View className="min-w-0 flex-1 flex-row items-center gap-1.5">
           <Text
-            adjustsFontSizeToFit
-            className={`min-w-0 flex-1 font-ralewayExtraBold text-[8px] uppercase tracking-wide ${tone.label}`}
-            minimumFontScale={0.75}
-            numberOfLines={1}
+            allowFontScaling={false}
+            className={`min-w-0 flex-1 font-ralewayExtraBold text-[11px] uppercase leading-[14px] ${tone.label}`}
+            style={{ fontSize: 11 * fontScale, lineHeight: 14 * fontScale }}
           >
             {metric.label}
           </Text>
         </View>
         <View
-          className={`h-5 w-5 items-center justify-center rounded-md ${tone.icon}`}
+          className={`h-5 w-5 shrink-0 items-center justify-center rounded-md ${tone.icon}`}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
         >
           <MaterialCommunityIcons
+            accessible={false}
             name={metric.icon}
             color={tone.iconColor}
             size={14}
@@ -86,9 +97,18 @@ function ManagerMetric({
       </View>
 
       {isLoading ? (
-        <SkeletonBlock className="mt-1 h-4 w-1/3 bg-primary/10" />
+        <View
+          className="mt-1 justify-center"
+          style={{ height: 22 * fontScale }}
+        >
+          <SkeletonBlock className="h-4 w-1/3 bg-primary/10" />
+        </View>
       ) : (
-        <Text className="font-ralewayExtraBold text-[22px] leading-[23px] text-textPrimary">
+        <Text
+          allowFontScaling={false}
+          style={{ fontSize: 18 * fontScale, lineHeight: 22 * fontScale }}
+          className="mt-1 font-ralewayExtraBold text-[18px] leading-[22px] text-textPrimary"
+        >
           {metric.value}
         </Text>
       )}
@@ -105,58 +125,107 @@ export function ManagerDashboardSummaryCard({
   subtitle,
   value,
 }: RoleDashboardSummaryCardProps) {
+  const { isWide, padding, stackMetrics, fontScale, onLayout } =
+    useDashboardSummaryLayout(metrics.length);
   return (
     <View
-      className="flex aspect-video overflow-hidden rounded-2xl border border-primary/15 bg-panel p-2"
-      style={[managerShadow]}
+      onLayout={onLayout}
+      className="overflow-hidden rounded-2xl border border-primary/15 bg-panel"
+      style={[managerShadow, { padding }]}
     >
-      <View className="p-4" style={{ height: "55%" }}>
-        <View className="flex-row items-center justify-between gap-4">
-          <View className="rounded-full border border-primary/10 bg-primary/10 px-2.5 py-1">
-            <Text className="font-ralewayExtraBold text-[9px] uppercase tracking-wider text-primary">
-              {badge}
-            </Text>
+      <View
+        style={{
+          flexDirection: isWide ? "row" : "column",
+          gap: isWide ? 24 : 16,
+        }}
+      >
+        <View
+          className="min-w-0 gap-3"
+          style={isWide ? { flex: 0.4, justifyContent: "center" } : undefined}
+        >
+          <View className="flex-row flex-wrap items-center justify-between gap-2">
+            <View className="max-w-full rounded-full border border-primary/10 bg-primary/10 px-2.5 py-1">
+              <Text
+                allowFontScaling={false}
+                style={{ fontSize: 10 * fontScale, lineHeight: 14 * fontScale }}
+                className="font-ralewayExtraBold text-[10px] uppercase tracking-wider text-primaryContent"
+              >
+                {badge}
+              </Text>
+            </View>
+            <View
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              className="h-7 w-7 items-center justify-center rounded-lg border border-primary/30 bg-panel"
+            >
+              <MaterialCommunityIcons
+                accessible={false}
+                name={icon}
+                color={colors.primary}
+                size={17}
+              />
+            </View>
           </View>
-          <View className="h-7 w-7 items-center justify-center rounded-lg border border-primary/30 bg-panel">
-            <MaterialCommunityIcons
-              name={icon}
-              color={colors.primary}
-              size={17}
-            />
+
+          <View className="gap-1">
+            {label ? (
+              <Text
+                allowFontScaling={false}
+                style={{ fontSize: 10 * fontScale, lineHeight: 14 * fontScale }}
+                className="font-ralewayExtraBold text-[10px] uppercase tracking-wide text-description"
+              >
+                {label}
+              </Text>
+            ) : null}
+
+            {isLoading ? (
+              <View
+                className="justify-center"
+                style={{ height: (isWide ? 40 : 36) * fontScale }}
+              >
+                <SkeletonBlock className="h-7 w-1/3 rounded-xl bg-primary/10" />
+              </View>
+            ) : (
+              <Text
+                allowFontScaling={false}
+                className="font-ralewayExtraBold text-[28px] text-textPrimary"
+                style={{
+                  fontSize: (isWide ? 32 : 28) * fontScale,
+                  lineHeight: (isWide ? 40 : 36) * fontScale,
+                }}
+              >
+                {value}
+              </Text>
+            )}
+            {subtitle ? (
+              <Text
+                allowFontScaling={false}
+                style={{ fontSize: 11 * fontScale, lineHeight: 16 * fontScale }}
+                className="font-ralewayMedium text-[11px] leading-[16px] text-description"
+              >
+                {subtitle}
+              </Text>
+            ) : null}
           </View>
         </View>
-
-        <View className="flex-1 justify-evenly">
-          {label ? (
-            <Text className="font-ralewayExtraBold text-[10px] uppercase tracking-wide text-description">
-              {label}
-            </Text>
+        <View className="min-w-0" style={isWide ? { flex: 0.6 } : undefined}>
+          {!isWide ? (
+            <View className="mb-4 border-t border-primary/50" />
           ) : null}
-
-          {isLoading ? (
-            <SkeletonBlock className="mt-1 h-7 w-1/3 rounded-xl bg-primary/10" />
-          ) : (
-            <Text className="font-ralewayExtraBold text-[28px] leading-[30px] text-textPrimary">
-              {value}
-            </Text>
-          )}
-          {subtitle ? (
-            <Text className="font-ralewayMedium text-[11px] leading-[12px] text-description">
-              {subtitle}
-            </Text>
-          ) : null}
-        </View>
-      </View>
-      <View className="flex items-center gap-4 px-4">
-        <View className="w-full border-t border-primary/50" />
-        <View className="flex-row justify-center gap-4">
-          {metrics.map((metric) => (
-            <ManagerMetric
-              isLoading={isLoading}
-              key={metric.label}
-              metric={metric}
-            />
-          ))}
+          <View
+            className="gap-3"
+            style={{ flexDirection: stackMetrics ? "column" : "row" }}
+          >
+            {metrics.map((metric) => (
+              <ManagerMetric
+                isLoading={isLoading}
+                key={metric.label}
+                metric={metric}
+                stacked={stackMetrics}
+                fontScale={fontScale}
+              />
+            ))}
+          </View>
         </View>
       </View>
     </View>
