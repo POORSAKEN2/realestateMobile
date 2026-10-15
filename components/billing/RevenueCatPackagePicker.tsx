@@ -56,7 +56,11 @@ export function RevenueCatPackagePicker({
   }
 
   return (
-    <View className="gap-2">
+    <View
+      className="gap-2"
+      accessibilityRole="radiogroup"
+      accessibilityLabel="Billing option"
+    >
       <Text className="font-ralewayBold text-sm text-textPrimary">
         Billing option
       </Text>
@@ -92,25 +96,25 @@ export function RevenueCatPackagePicker({
             accessibilityRole="radio"
             accessibilityState={{ checked: isSelected, disabled }}
             activeOpacity={0.8}
-            className={`flex-row items-center justify-between rounded-2xl border p-4 ${
+            className={`min-h-12 flex-row items-center justify-between gap-3 rounded-2xl border p-4 ${
               isSelected
                 ? "border-primary bg-primary/10"
-                : "border-primary/15 bg-surface"
+                : "border-textPrimary/10 bg-surface"
             }`}
             disabled={disabled}
             key={option.key}
             onPress={() => onSelect(option.key)}
           >
-            <View>
+            <View className="min-w-0 flex-1">
               <Text className="font-ralewayBold text-sm text-textPrimary">
                 {REVENUECAT_BILLING_PERIOD_LABELS[option.key]}
               </Text>
-              <Text className="mt-0.5 font-ralewayMedium text-xs text-description">
+              <Text className="mt-0.5 font-ralewayMedium text-sm leading-5 text-description">
                 {formattedPrice}
               </Text>
             </View>
             <Feather
-              color={colors.primary}
+              color={colors.primaryContent}
               name={isSelected ? "check-circle" : "circle"}
               size={20}
             />

@@ -7,6 +7,7 @@ export function BillingActionButton({
   icon,
   onPress,
   primary = false,
+  strong = false,
   disabled = false,
   isLoading = false,
 }: {
@@ -14,18 +15,33 @@ export function BillingActionButton({
   icon?: keyof typeof Feather.glyphMap;
   onPress: () => void;
   primary?: boolean;
+  strong?: boolean;
   disabled?: boolean;
   isLoading?: boolean;
 }) {
   const blocked = disabled || isLoading;
-  const color = primary ? colors.whitePrimary : colors.primary;
+  const color = strong
+    ? colors.onInverse
+    : primary
+      ? colors.whitePrimary
+      : colors.primary;
+  const surfaceClassName = strong
+    ? "border-primaryContent bg-primaryContent"
+    : primary
+      ? "border-primary bg-primary"
+      : "border-primary/20 bg-panel";
+  const textClassName = strong
+    ? "text-onInverse"
+    : primary
+      ? "text-white"
+      : "text-primary";
   return (
     <TouchableOpacity
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ busy: isLoading, disabled: blocked }}
       activeOpacity={0.8}
-      className={`min-h-12 flex-row items-center justify-center gap-2 rounded-2xl border px-4 py-3 ${primary ? "border-primary bg-primary" : "border-primary/20 bg-panel"} ${blocked ? "opacity-60" : ""}`}
+      className={`${strong ? "min-h-14" : "min-h-12"} flex-row items-center justify-center gap-2 rounded-2xl border px-4 py-3 ${surfaceClassName} ${blocked ? "opacity-60" : ""}`}
       disabled={blocked}
       onPress={onPress}
     >
@@ -35,7 +51,7 @@ export function BillingActionButton({
         <Feather name={icon} color={color} size={17} />
       ) : null}
       <Text
-        className={`text-center font-ralewayExtraBold text-sm ${primary ? "text-white" : "text-primary"}`}
+        className={`min-w-0 shrink text-center ${strong ? "font-ralewayBold text-base" : "font-ralewayExtraBold text-sm"} ${textClassName}`}
       >
         {label}
       </Text>
